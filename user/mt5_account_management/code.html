@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MT5 Account Management | Admin Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#adc6ff",
+              "on-secondary": "#003915",
+              "inverse-surface": "#dae2fd",
+              "tertiary": "#ffb3ad",
+              "surface-container-high": "#222a3d",
+              "on-primary": "#002e6a",
+              "on-background": "#dae2fd",
+              "on-tertiary-container": "#5c0008",
+              "surface-dim": "#0b1326",
+              "on-tertiary": "#68000a",
+              "secondary-fixed": "#6bff8f",
+              "tertiary-fixed-dim": "#ffb3ad",
+              "surface-tint": "#adc6ff",
+              "surface-container-lowest": "#060e20",
+              "inverse-on-surface": "#283044",
+              "secondary-container": "#00b954",
+              "on-error": "#690005",
+              "error-container": "#93000a",
+              "on-surface-variant": "#c2c6d6",
+              "inverse-primary": "#005ac2",
+              "secondary-fixed-dim": "#4ae176",
+              "surface-container-highest": "#2d3449",
+              "secondary": "#4ae176",
+              "on-primary-container": "#00285d",
+              "surface": "#0b1326",
+              "on-secondary-fixed-variant": "#005321",
+              "surface-bright": "#31394d",
+              "tertiary-container": "#ff5451",
+              "outline-variant": "#424754",
+              "on-tertiary-fixed": "#410004",
+              "primary-fixed-dim": "#adc6ff",
+              "outline": "#8c909f",
+              "primary-fixed": "#d8e2ff",
+              "primary-container": "#4d8eff",
+              "error": "#ffb4ab",
+              "surface-container-low": "#131b2e",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed-variant": "#004395",
+              "on-secondary-container": "#004119",
+              "background": "#0b1326",
+              "tertiary-fixed": "#ffdad7",
+              "on-primary-fixed": "#001a42",
+              "surface-variant": "#2d3449",
+              "on-tertiary-fixed-variant": "#930013",
+              "on-secondary-fixed": "#002109",
+              "on-surface": "#dae2fd",
+              "surface-container": "#171f33"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #0b1326; color: #dae2fd; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(45, 52, 73, 0.6); backdrop-filter: blur(20px); }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .asymmetric-card { border-top-left-radius: 0.75rem; border-bottom-right-radius: 0.75rem; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#131b2e] flex flex-col py-6 px-4 z-50">
+<div class="mb-10 px-2 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">show_chart</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tighter text-[#dae2fd]">Live-Trader</h1>
+<p class="text-[10px] font-['Inter'] tracking-[0.05em] uppercase font-semibold text-primary">Admin Terminal</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#31394d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#adc6ff] bg-[#31394d] rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">Users</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#31394d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">KYC</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#31394d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">Finance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#31394d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">show_chart</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">Trades</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#31394d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#c2c6d6] hover:text-[#dae2fd] hover:bg-[#31394d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-['Inter'] tracking-[0.05em] uppercase text-xs font-semibold">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-2 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional portrait of an administrative male user with serious expression for fin-tech security panel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBnMkY_Rry_N_UZt0EBr8kV7C5lPcRu31GnJ0mYqTg3bRI2-Zxu4AV9Wymmk4bVHFHHkDzt2SfpMyHQoYyBgnvlwjxEPKQd0zOYHzixOo-jeH1i41Xq5NhSfEQyWqjZek9uil2ZkFRjHMQVuQscoaIHXFZKrI3ENx0ppN7fiuA3J-znhCZQ1EK1RpqlmtjZwDlDJf0Qc1MoDk5nkudwQo9l4A6GDJCGbDC5PoCXxxVdSRcvFL5oLqppkGv-nOj_JchpilFZHa09EOH"/>
+</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Admin User</p>
+<p class="text-[10px] text-on-surface-variant">System Architect</p>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#0b1326]/60 backdrop-blur-md border-b border-[#424754]/15 flex justify-between items-center px-8">
+<div class="flex items-center bg-surface-container-highest px-4 py-2 rounded-lg w-96 focus-within:ring-1 focus-within:ring-[#adc6ff]/40 transition-all">
+<span class="material-symbols-outlined text-[#c2c6d6] text-sm mr-3">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface placeholder:text-on-surface-variant" placeholder="Search account ID, server or group..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-[#c2c6d6] hover:text-[#dae2fd] transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-tertiary rounded-full"></span>
+</button>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#adc6ff] font-bold">account_circle</span>
+<span class="font-['Inter'] text-sm text-[#c2c6d6]">System Status: <span class="text-secondary">Optimal</span></span>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="pt-24 pb-12 px-8 space-y-8">
+<!-- Context Header -->
+<div class="flex justify-between items-end">
+<div>
+<nav class="flex items-center gap-2 text-xs text-on-surface-variant mb-2">
+<span>Users</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span>User Detail</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-primary">MT5 Management</span>
+</nav>
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface">User Accounts <span class="text-on-surface-variant/40 font-light">/</span> #499201</h2>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high hover:bg-surface-bright text-on-surface text-sm font-semibold rounded transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                        New MT5 Account
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-container text-on-primary text-sm font-semibold rounded transition-all">
+<span class="material-symbols-outlined text-sm">sync</span>
+                        Global Sync
+                    </button>
+</div>
+</div>
+<!-- Bento Stats -->
+<div class="grid grid-cols-4 gap-6">
+<div class="bg-surface-container-low p-6 asymmetric-card flex flex-col justify-between">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Total Equity</span>
+<div>
+<span class="text-2xl font-bold tabular-nums">$284,102.45</span>
+<div class="flex items-center gap-1 text-secondary text-xs font-semibold mt-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +4.2%
+                        </div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 asymmetric-card flex flex-col justify-between">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Active Accounts</span>
+<div>
+<span class="text-2xl font-bold tabular-nums">04</span>
+<div class="text-on-surface-variant text-xs mt-1">out of 5 allowed</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 asymmetric-card flex flex-col justify-between">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Risk Exposure</span>
+<div>
+<span class="text-2xl font-bold tabular-nums">High</span>
+<div class="flex items-center gap-1 text-tertiary text-xs font-semibold mt-1">
+<span class="material-symbols-outlined text-sm">warning</span>
+                            Margin Level 112%
+                        </div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 asymmetric-card border border-primary/10">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary">Connection</span>
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(74,225,118,0.6)]"></span>
+</div>
+<span class="text-2xl font-bold tabular-nums text-primary">Healthy</span>
+<div class="text-[10px] text-on-surface-variant mt-1">Latency: 14ms (NY4)</div>
+</div>
+</div>
+<!-- Main MT5 Table Section -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden shadow-2xl">
+<div class="px-6 py-4 border-b border-outline-variant/10 flex items-center justify-between bg-surface-container-high/40">
+<h3 class="font-bold text-sm tracking-widest uppercase">MT5 Account Inventory</h3>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] font-bold rounded">FILTER: ALL</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] font-bold rounded">SORT: EQUITY</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider border-b border-outline-variant/5">
+<th class="px-6 py-4">Account ID</th>
+<th class="px-6 py-4">Server</th>
+<th class="px-6 py-4">Group / Type</th>
+<th class="px-6 py-4">Leverage</th>
+<th class="px-6 py-4">Equity (USD)</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Last Sync</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-6 font-mono font-bold text-sm">88100249</td>
+<td class="px-6 py-6">
+<div class="text-sm font-medium">MT5-PRIME-01</div>
+<div class="text-[10px] text-on-surface-variant uppercase">New York Node</div>
+</td>
+<td class="px-6 py-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20">REAL_RAW_SPREAD</span>
+</td>
+<td class="px-6 py-6 tabular-nums text-sm">1:500</td>
+<td class="px-6 py-6 font-bold tabular-nums text-sm">$142,005.12</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="text-xs font-semibold text-secondary">LIVE</span>
+</div>
+</td>
+<td class="px-6 py-6 text-xs text-on-surface-variant">2 mins ago</td>
+<td class="px-6 py-6 text-right">
+<div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-primary/20 rounded-lg text-primary transition-all" title="Sync Now">
+<span class="material-symbols-outlined text-lg">sync</span>
+</button>
+<button class="p-2 hover:bg-tertiary/20 rounded-lg text-tertiary transition-all" title="Reset Password">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-on-surface-variant/20 rounded-lg text-on-surface-variant transition-all" title="Settings">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-6 font-mono font-bold text-sm">88100562</td>
+<td class="px-6 py-6">
+<div class="text-sm font-medium">MT5-STND-04</div>
+<div class="text-[10px] text-on-surface-variant uppercase">London Node</div>
+</td>
+<td class="px-6 py-6">
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded border border-outline-variant/20">REAL_STANDARD</span>
+</td>
+<td class="px-6 py-6 tabular-nums text-sm">1:100</td>
+<td class="px-6 py-6 font-bold tabular-nums text-sm">$42,099.00</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span class="text-xs font-semibold text-tertiary">DISCONNECTED</span>
+</div>
+</td>
+<td class="px-6 py-6 text-xs text-on-surface-variant">14 hours ago</td>
+<td class="px-6 py-6 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 hover:bg-primary/20 rounded-lg text-primary transition-all" title="Sync Now">
+<span class="material-symbols-outlined text-lg">sync</span>
+</button>
+<button class="p-2 hover:bg-tertiary/20 rounded-lg text-tertiary transition-all" title="Reset Password">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-on-surface-variant/20 rounded-lg text-on-surface-variant transition-all" title="Settings">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-6 font-mono font-bold text-sm">88100918</td>
+<td class="px-6 py-6">
+<div class="text-sm font-medium">MT5-PRIME-01</div>
+<div class="text-[10px] text-on-surface-variant uppercase">New York Node</div>
+</td>
+<td class="px-6 py-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20">REAL_RAW_SPREAD</span>
+</td>
+<td class="px-6 py-6 tabular-nums text-sm">1:500</td>
+<td class="px-6 py-6 font-bold tabular-nums text-sm">$100,000.33</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="text-xs font-semibold text-secondary">LIVE</span>
+</div>
+</td>
+<td class="px-6 py-6 text-xs text-on-surface-variant">Just now</td>
+<td class="px-6 py-6 text-right">
+<div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-primary/20 rounded-lg text-primary transition-all" title="Sync Now">
+<span class="material-symbols-outlined text-lg">sync</span>
+</button>
+<button class="p-2 hover:bg-tertiary/20 rounded-lg text-tertiary transition-all" title="Reset Password">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-on-surface-variant/20 rounded-lg text-on-surface-variant transition-all" title="Settings">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Bottom Section: Logs & Quick Stats -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Detailed Logs Section -->
+<div class="col-span-8 bg-surface-container-low rounded-xl flex flex-col h-[400px]">
+<div class="px-6 py-4 border-b border-outline-variant/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">terminal</span>
+<h3 class="font-bold text-sm tracking-widest uppercase">System Interaction Logs</h3>
+</div>
+<div class="flex gap-4">
+<button class="text-[10px] font-bold text-primary hover:underline">EXPORT CSV</button>
+<button class="text-[10px] font-bold text-tertiary hover:underline">CLEAR LOGS</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 font-mono text-[11px] space-y-2 bg-surface-container-lowest/50">
+<div class="flex gap-4 text-on-surface-variant">
+<span class="w-32 shrink-0">[2023-10-24 14:22:01]</span>
+<span class="text-secondary">[INFO]</span>
+<span>Sync requested for Account 88100249. Handshake successful.</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<span class="w-32 shrink-0">[2023-10-24 14:22:05]</span>
+<span class="text-secondary">[INFO]</span>
+<span>Market prices updated: 42 symbols synchronized across cluster.</span>
+</div>
+<div class="flex gap-4 text-tertiary">
+<span class="w-32 shrink-0">[2023-10-24 14:25:33]</span>
+<span class="text-tertiary">[ERROR]</span>
+<span>Connection timeout on MT5-STND-04. Re-attempting handshake (1/5)...</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<span class="w-32 shrink-0">[2023-10-24 14:28:12]</span>
+<span class="text-secondary">[INFO]</span>
+<span>Admin 'sys_arch_01' modified leverage for Account 88100918: (1:100 -&gt; 1:500)</span>
+</div>
+<div class="flex gap-4 text-tertiary">
+<span class="w-32 shrink-0">[2023-10-24 14:30:45]</span>
+<span class="text-tertiary">[ERROR]</span>
+<span>Trade Execution Error (499201): Order 772101 failed - Invalid S/L level.</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<span class="w-32 shrink-0">[2023-10-24 14:35:00]</span>
+<span class="text-primary">[TRACE]</span>
+<span>Keep-alive ping received from Server MT5-PRIME-01. Latency stable at 12ms.</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<span class="w-32 shrink-0">[2023-10-24 14:38:22]</span>
+<span class="text-secondary">[INFO]</span>
+<span>Account 88100249: Margin level critical warning suppressed by admin.</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<span class="w-32 shrink-0">[2023-10-24 14:42:10]</span>
+<span class="text-secondary">[INFO]</span>
+<span>Log cycle complete. Heartbeat OK.</span>
+</div>
+</div>
+<div class="px-6 py-2 bg-surface-container-high/40 border-t border-outline-variant/10 text-[10px] font-mono text-on-surface-variant/60 italic">
+                        Real-time streaming enabled... listening on port 4432 (MT5 Bridge)
+                    </div>
+</div>
+<!-- Quick Actions / Advanced Controls -->
+<div class="col-span-4 space-y-6">
+<div class="glass-panel p-6 rounded-xl border border-outline-variant/10 flex flex-col gap-4">
+<h4 class="text-sm font-bold uppercase tracking-wider text-primary">Advanced Global Controls</h4>
+<div class="space-y-3">
+<button class="w-full flex items-center justify-between p-3 bg-surface-container-highest/50 hover:bg-surface-bright rounded border border-outline-variant/10 transition-all">
+<span class="text-xs font-semibold">Mass Leverage Reset</span>
+<span class="material-symbols-outlined text-sm">tune</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 bg-surface-container-highest/50 hover:bg-surface-bright rounded border border-outline-variant/10 transition-all">
+<span class="text-xs font-semibold">Force Server Reconnect</span>
+<span class="material-symbols-outlined text-sm">hub</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 bg-tertiary/10 hover:bg-tertiary/20 text-tertiary rounded border border-tertiary/20 transition-all">
+<span class="text-xs font-bold">EMERGENCY: Halt Trading</span>
+<span class="material-symbols-outlined text-sm">dangerous</span>
+</button>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-secondary/50">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Synchronization Health</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-[10px] font-bold mb-1">
+<span>DATA INTEGRITY</span>
+<span class="text-secondary">99.8%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[99.8%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] font-bold mb-1">
+<span>NETWORK STABILITY</span>
+<span class="text-primary">82%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%] shadow-[0_0_8px_rgba(173,198,255,0.4)]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for Global Action (MT5 Sync Specific) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group z-50">
+<span class="material-symbols-outlined text-3xl font-bold">refresh</span>
+<span class="absolute right-16 bg-surface-container-highest text-on-surface text-[10px] font-bold py-1 px-3 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">REFRESH CLUSTER</span>
+</button>
+</body></html>

@@ -1,0 +1,227 @@
+export const userOpsTabs = [
+  { id: 'list', label: 'User List', path: '/users/list' },
+  { id: 'kyc', label: 'KYC Requests', path: '/users/kyc' },
+  { id: 'activity', label: 'User Activity', path: '/users/activity' },
+  { id: 'mt5', label: 'MT5 Accounts', path: '/users/mt5' },
+];
+
+export const userDetailTabs = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'profile', label: 'Profile' },
+  { id: 'kyc', label: 'KYC' },
+  { id: 'wallet', label: 'Wallet' },
+  { id: 'mt5', label: 'MT5 Accounts' },
+  { id: 'trading', label: 'Trading History' },
+  { id: 'activity', label: 'Activity Logs' },
+  { id: 'risk', label: 'Risk View' },
+];
+
+export const users = [
+  {
+    id: 'usr-19284',
+    uid: '19284',
+    name: 'Marco Rossi',
+    email: 'm.rossi@example.com',
+    country: 'IT',
+    tier: 'VIP Gold',
+    segment: 'High Frequency FX',
+    kycStatus: 'VERIFIED',
+    riskStatus: 'WATCHLIST',
+    walletBalance: '$42,500.00',
+    equity: '$48,920.00',
+    pnl30d: '+$4,280',
+    openPositions: 12,
+    mt5Accounts: 2,
+    registered: '2026-03-28 08:42',
+    lastSeen: '2m ago',
+    source: 'Affiliate / Milan Desk',
+    phone: '+39 347 992 1200',
+    dob: '1991-04-14',
+    address: 'Via Torino 44, Milan',
+    notes: 'Priority trader with same-day withdrawal review.',
+    kyc: {
+      level: 'Level 2',
+      submittedAt: '2026-03-28 10:10',
+      reviewer: 'Compliance Desk A',
+      documents: ['Passport', 'Utility Bill', 'Source of Funds'],
+      aml: 'No direct sanction hit, low media exposure.',
+    },
+    wallet: [
+      { asset: 'USD', balance: '$21,200.00', available: '$18,000.00', hold: '$3,200.00' },
+      { asset: 'USDT', balance: '16,500.00', available: '14,500.00', hold: '2,000.00' },
+      { asset: 'EUR', balance: '4,800.00', available: '4,800.00', hold: '0.00' },
+    ],
+    mt5: [
+      { login: '8800124', server: 'LiveTrader-Live 01', group: 'VIP\\FX', leverage: '1:200', status: 'CONNECTED', equity: '$28,400', marginLevel: '382%', lastSync: '14s ago' },
+      { login: '8809982', server: 'LiveTrader-Copy 01', group: 'Copy\\Pro', leverage: '1:100', status: 'SYNC_DELAY', equity: '$14,520', marginLevel: '214%', lastSync: '4m ago' },
+    ],
+    tradingHistory: [
+      { ticket: '8459201', symbol: 'EURUSD', side: 'BUY', lots: '1.20', open: '1.09240', close: '1.09420', pnl: '+$216', time: '2026-03-30 09:42' },
+      { ticket: '8459012', symbol: 'XAUUSD', side: 'SELL', lots: '0.80', open: '2162.40', close: '2159.10', pnl: '+$264', time: '2026-03-30 08:14' },
+    ],
+    activity: [
+      { time: '09:42', actor: 'System', action: 'Trade settled on MT5 8800124', channel: 'Trading Engine' },
+      { time: '09:10', actor: 'Marco Rossi', action: 'Withdrawal requested for $3,200', channel: 'Client Portal' },
+      { time: '08:44', actor: 'Ops Desk', action: 'Wallet hold released after review', channel: 'Treasury Console' },
+    ],
+    risk: {
+      score: '71 / 100',
+      exposure: '$118,400',
+      concentration: 'BTC 42%',
+      drawdown: '6.1%',
+      alerts: ['High crypto concentration', 'One delayed MT5 sync', 'Recent withdrawal after profit realization'],
+    },
+  },
+  {
+    id: 'usr-20112',
+    uid: '20112',
+    name: 'Elena Vance',
+    email: 'e.vance@citadel.com',
+    country: 'US',
+    tier: 'Prime',
+    segment: 'Institutional Copy',
+    kycStatus: 'PENDING',
+    riskStatus: 'LOW',
+    walletBalance: '$12,000.00',
+    equity: '$15,840.00',
+    pnl30d: '+$1,140',
+    openPositions: 5,
+    mt5Accounts: 1,
+    registered: '2026-03-30 05:16',
+    lastSeen: '11m ago',
+    source: 'Direct Sales',
+    phone: '+1 212 555 1420',
+    dob: '1988-11-02',
+    address: '31 Hudson Yards, New York',
+    notes: 'Waiting on POA refresh before withdrawal enablement.',
+    kyc: {
+      level: 'Level 1',
+      submittedAt: '2026-03-30 05:44',
+      reviewer: 'Compliance Queue',
+      documents: ['Driver License', 'Bank Statement'],
+      aml: 'Enhanced due diligence requested for employer validation.',
+    },
+    wallet: [
+      { asset: 'USD', balance: '$12,000.00', available: '$12,000.00', hold: '$0.00' },
+    ],
+    mt5: [
+      { login: '8811020', server: 'LiveTrader-Live 01', group: 'Institutional\\Copy', leverage: '1:50', status: 'CONNECTED', equity: '$15,840', marginLevel: '426%', lastSync: '22s ago' },
+    ],
+    tradingHistory: [
+      { ticket: '8459052', symbol: 'BTCUSD', side: 'SELL', lots: '0.45', open: '64200', close: '63100', pnl: '+$495', time: '2026-03-30 07:20' },
+      { ticket: '8458788', symbol: 'ETHUSD', side: 'BUY', lots: '2.50', open: '3440', close: '3498', pnl: '+$145', time: '2026-03-29 19:12' },
+    ],
+    activity: [
+      { time: '10:15', actor: 'System', action: 'KYC moved to manual review', channel: 'Compliance Engine' },
+      { time: '09:52', actor: 'Elena Vance', action: 'Uploaded proof of address', channel: 'Client Portal' },
+    ],
+    risk: {
+      score: '34 / 100',
+      exposure: '$35,000',
+      concentration: 'BTC 28%',
+      drawdown: '1.4%',
+      alerts: ['Pending KYC verification'],
+    },
+  },
+  {
+    id: 'usr-18552',
+    uid: '18552',
+    name: 'Kofi Arhin',
+    email: 'k.arhin@gh.com',
+    country: 'GH',
+    tier: 'Retail Plus',
+    segment: 'Manual FX',
+    kycStatus: 'REJECTED',
+    riskStatus: 'ELEVATED',
+    walletBalance: '$5,000.00',
+    equity: '$4,120.00',
+    pnl30d: '-$880',
+    openPositions: 3,
+    mt5Accounts: 2,
+    registered: '2026-03-27 13:08',
+    lastSeen: '54m ago',
+    source: 'Referral',
+    phone: '+233 24 555 8923',
+    dob: '1994-07-09',
+    address: 'Airport Residential, Accra',
+    notes: 'Blocked for repeated mismatched KYC submissions.',
+    kyc: {
+      level: 'Level 0',
+      submittedAt: '2026-03-27 13:40',
+      reviewer: 'Compliance Desk C',
+      documents: ['National ID', 'Utility Bill'],
+      aml: 'Document mismatch between submitted ID and selfie review.',
+    },
+    wallet: [
+      { asset: 'USDT', balance: '5,000.00', available: '0.00', hold: '5,000.00' },
+    ],
+    mt5: [
+      { login: '8810881', server: 'LiveTrader-Live 02', group: 'Retail\\FX', leverage: '1:300', status: 'LIMITED', equity: '$2,820', marginLevel: '118%', lastSync: '2m ago' },
+      { login: '8810882', server: 'LiveTrader-Demo 01', group: 'Demo\\FX', leverage: '1:500', status: 'DISCONNECTED', equity: '$1,300', marginLevel: 'n/a', lastSync: '22m ago' },
+    ],
+    tradingHistory: [
+      { ticket: '8458772', symbol: 'XAUUSD', side: 'BUY', lots: '1.20', open: '2150.40', close: '2145.20', pnl: '-$52', time: '2026-03-30 03:11' },
+    ],
+    activity: [
+      { time: '09:34', actor: 'Risk Desk', action: 'Withdrawal request rejected', channel: 'Treasury Console' },
+      { time: '08:10', actor: 'System', action: 'Account permissions reduced', channel: 'Risk Engine' },
+    ],
+    risk: {
+      score: '88 / 100',
+      exposure: '$26,200',
+      concentration: 'Gold 66%',
+      drawdown: '19.8%',
+      alerts: ['Rejected KYC', 'Margin stress on account 8810881', 'Recent withdrawal flagged'],
+    },
+  },
+];
+
+export const kycQueue = [
+  { id: 'KYC-1042', userId: 'usr-20112', user: 'Elena Vance', tier: 'Prime', country: 'US', status: 'Pending Review', eta: '18m', docs: '2/3 complete', risk: 'Medium' },
+  { id: 'KYC-1041', userId: 'usr-18552', user: 'Kofi Arhin', tier: 'Retail Plus', country: 'GH', status: 'Rejected', eta: 'Requires outreach', docs: 'Mismatch', risk: 'High' },
+  { id: 'KYC-1038', userId: 'usr-19284', user: 'Marco Rossi', tier: 'VIP Gold', country: 'IT', status: 'Verified', eta: 'Completed', docs: '3/3 complete', risk: 'Low' },
+];
+
+export const activityFeed = [
+  { id: 'ACT-9120', userId: 'usr-19284', user: 'Marco Rossi', event: 'Withdrawal request created', source: 'Client Portal', severity: 'Info', time: '09:10', owner: 'Treasury' },
+  { id: 'ACT-9114', userId: 'usr-20112', user: 'Elena Vance', event: 'Proof of address uploaded', source: 'KYC Widget', severity: 'Info', time: '08:52', owner: 'Compliance' },
+  { id: 'ACT-9102', userId: 'usr-18552', user: 'Kofi Arhin', event: 'MT5 permissions reduced after margin alert', source: 'Risk Engine', severity: 'Critical', time: '08:10', owner: 'Risk Desk' },
+  { id: 'ACT-9099', userId: 'usr-19284', user: 'Marco Rossi', event: 'Manual wallet hold released', source: 'Treasury Console', severity: 'Review', time: '07:54', owner: 'Finance Ops' },
+];
+
+export const mt5Accounts = [
+  { login: '8800124', userId: 'usr-19284', user: 'Marco Rossi', server: 'LiveTrader-Live 01', status: 'CONNECTED', connection: '15ms', group: 'VIP\\FX', leverage: '1:200', balance: '$28,400', lastSync: '14s ago' },
+  { login: '8809982', userId: 'usr-19284', user: 'Marco Rossi', server: 'LiveTrader-Copy 01', status: 'SYNC_DELAY', connection: '143ms', group: 'Copy\\Pro', leverage: '1:100', balance: '$14,520', lastSync: '4m ago' },
+  { login: '8811020', userId: 'usr-20112', user: 'Elena Vance', server: 'LiveTrader-Live 01', status: 'CONNECTED', connection: '18ms', group: 'Institutional\\Copy', leverage: '1:50', balance: '$15,840', lastSync: '22s ago' },
+  { login: '8810881', userId: 'usr-18552', user: 'Kofi Arhin', server: 'LiveTrader-Live 02', status: 'LIMITED', connection: '64ms', group: 'Retail\\FX', leverage: '1:300', balance: '$2,820', lastSync: '2m ago' },
+  { login: '8810882', userId: 'usr-18552', user: 'Kofi Arhin', server: 'LiveTrader-Demo 01', status: 'DISCONNECTED', connection: 'Offline', group: 'Demo\\FX', leverage: '1:500', balance: '$1,300', lastSync: '22m ago' },
+];
+
+export const mt5Logs = {
+  '8800124': [
+    { time: '09:44:12', event: 'Heartbeat acknowledged', source: 'Gateway A', level: 'Info' },
+    { time: '09:38:03', event: 'Equity synced to CRM', source: 'Bridge Service', level: 'Info' },
+    { time: '09:17:44', event: 'Password change propagated', source: 'Admin Console', level: 'Review' },
+  ],
+  '8809982': [
+    { time: '09:41:01', event: 'Quote sync delayed > 120s', source: 'Bridge Service', level: 'Warning' },
+    { time: '09:34:50', event: 'Reconnection attempt succeeded', source: 'Gateway B', level: 'Info' },
+    { time: '09:11:32', event: 'Server load spike detected', source: 'Infra Monitor', level: 'Warning' },
+  ],
+  '8811020': [
+    { time: '09:43:55', event: 'Trade history batch imported', source: 'Bridge Service', level: 'Info' },
+    { time: '09:40:14', event: 'Session token refreshed', source: 'Gateway A', level: 'Info' },
+  ],
+  '8810881': [
+    { time: '09:35:40', event: 'Margin level below threshold', source: 'Risk Engine', level: 'Critical' },
+    { time: '09:14:17', event: 'Permissions downgraded to close-only', source: 'Admin Console', level: 'Review' },
+  ],
+  '8810882': [
+    { time: '09:02:11', event: 'Account unreachable', source: 'Gateway C', level: 'Critical' },
+    { time: '08:41:09', event: 'Retry exhausted after 5 attempts', source: 'Bridge Service', level: 'Critical' },
+  ],
+};
+
+export function getUserById(userId) {
+  return users.find((user) => user.id === userId);
+}

@@ -1,0 +1,237 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-display: "Manrope", sans-serif;
+  --font-heading: "Manrope", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* Surface & layout colors */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-2);
+  --color-muted-surface: var(--muted-surface);
+  --color-surface-bright: var(--surface-bright);
+  --color-border: var(--border);
+  --color-glass: var(--glass);
+
+  /* Brand — identity */
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-strong);
+  --color-brand-muted: color-mix(in srgb, var(--brand) 12%, transparent);
+  --color-primary: var(--brand);
+  --color-primary-hover: var(--brand-strong);
+  --color-primary-container: var(--brand-strong);
+
+  /* Text */
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-secondary: var(--text-muted);
+  --color-text-on-accent: var(--text-on-accent);
+
+  /* Semantic state colors — independent of brand */
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --color-secondary: var(--accent);
+  --color-border-subtle: var(--glass);
+}
+
+@layer base {
+  :root {
+    /* ── DIGITAL OBSIDIAN (Light) ── */
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-2: #f1f5f9;
+    --muted-surface: #e2e8f0;
+    --surface-bright: #cbd5e1;
+
+    --text: #0b1326;
+    --text-muted: #424754;
+
+    /* The Accents */
+    --brand: #2a4a8a;
+    --brand-strong: #1e3a8a;
+
+    --positive: #2db85a;
+    --negative: #dc2626;
+    --warning: #d97706;
+    --accent: #2a4a8a;
+
+    --border: rgba(66, 71, 84, 0.15);
+    --glass: rgba(255, 255, 255, 0.1); /* Simplified */
+
+    --text-on-accent: #ffffff;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(66, 71, 84, 0.1);
+
+    /* RGB Helpers */
+    --primary-rgb: 42, 74, 138;
+    --negative-rgb: 220, 38, 38;
+  }
+
+  .dark {
+    /* ── DIGITAL OBSIDIAN (Dark) ── */
+    --bg: #0b1326; /* Primary void */
+    --surface: #060e20; /* Card surface */
+    --surface-2: #131b2e; /* Section surface / Nav */
+    --muted-surface: #1a2540; /* Active panels */
+    --surface-bright: #31394d; /* Hover rank */
+
+    --text: #dae2fd; /* on_surface */
+    --text-muted: #c2c6d6; /* on_surface_variant */
+
+    /* The Accents */
+    --brand: #adc6ff; /* Primary Focus Blue */
+    --brand-strong: #2a4a8a; /* Primary Container */
+
+    --positive: #4ae176; /* Bioluminescent Green */
+    --positive-dim: #2db85a; /* Buy button green */
+
+    --negative: #ffb3ad; /* Sophisticated Red */
+    --warning: #f59e0b;
+    --accent: #adc6ff;
+
+    --border: rgba(66, 71, 84, 0.15); /* Ghost Border */
+    --glass: rgba(34, 47, 74, 0.15); /* Simplified */
+
+    --text-on-accent: #0b1326;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(173, 198, 255, 0.1);
+
+    /* RGB Helpers */
+    --primary-rgb: 173, 198, 255;
+    --negative-rgb: 255, 179, 173;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-feature-settings: "ss01" 1, "cv03" 1, "cv04" 1;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+
+  /* Reserve mono for dense numeric and operational data only */
+  .font-mono,
+  input[type="number"],
+  .price-data {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum" 1;
+  }
+
+  ::placeholder {
+    letter-spacing: 0;
+  }
+}
+
+@layer utilities {
+  /* Minimal solid shadows only */
+  .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .focus-ring-primary {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  .btn-buy {
+    background-color: var(--positive);
+    color: var(--bg);
+  }
+
+  .btn-sell {
+    background-color: var(--negative);
+    color: #fff;
+  }
+
+  /* ── Global Scrollbar — sleek & minimal ── */
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--brand) 30%, transparent);
+  }
+
+  /* ── Sidebar auto-hide scrollbar ── */
+  .sidebar-scroll {
+    scrollbar-width: none;
+  }
+  .sidebar-scroll:hover {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 9999px;
+  }
+}
+
+/* Minimal Load Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.3s ease-out forwards;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
