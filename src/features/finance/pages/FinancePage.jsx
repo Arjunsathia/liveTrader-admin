@@ -1,73 +1,116 @@
 import React from 'react';
-import { Card, StatCard } from '../../../components/ui/Card';
-import { Table, TableRow, TableCell } from '../../../components/ui/Table';
-import { Badge } from '../../../components/ui/Badge';
+import { useLocation } from 'react-router-dom';
+import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { ArrowUpCircle, ArrowDownCircle, History, Filter, Download, Plus, CheckCircle2, XCircle } from 'lucide-react';
+import { Card } from '../../../components/ui/Card';
+import { PageShell } from '../../../layout/PageShell';
+import { SectionHeader } from '../../../layout/SectionHeader';
+import { MetricStrip } from '../../../components/cards/MetricStrip';
+import { TableToolbar } from '../../../components/tables/TableToolbar';
+import { FilterBar } from '../../../components/filters/FilterBar';
+import { FilterChips } from '../../../components/filters/FilterChips';
+import { DataTable } from '../../../components/tables/DataTable';
+import { Pagination } from '../../../components/tables/Pagination';
+import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
+import { useDrawerState } from '../../../hooks/useDrawerState';
+import { useTableState } from '../../../hooks/useTableState';
+import { exportRows } from '../../../utils/exporters';
+import { financeService } from '../../../services/financeService';
+
+function renderCell(row, column) {
+  if (column.type === 'status') return <StatusBadge status={row[column.key]} dot={false} />;
+  if (column.type === 'amount') return <span className="price-data font-medium text-text">{row[column.key]}</span>;
+  if (column.type === 'mono') return <span className="font-mono text-[12px] text-text-muted">{row[column.key]}</span>;
+  return row[column.key];
+}
 
 export function FinancePage() {
-  const transactions = [
-    { type: 'DEPOSIT', amount: '$15,000.00', method: 'Binance Pay', id: 'TXN-90210', user: 'Marco Rossi', status: 'COMPLETED', date: '2024-03-30 09:42' },
-    { type: 'WITHDRAW', amount: '$2,500.00', method: 'Wire Transfer', id: 'TXN-90211', user: 'Elena Vance', status: 'PENDING', date: '2024-03-30 10:15' },
-    { type: 'WITHDRAW', amount: '$12,000.00', method: 'USDT (ERC20)', id: 'TXN-90212', user: 'Kofi Arhin', status: 'FLAGGED', date: '2024-03-30 10:30' },
-    { type: 'DEPOSIT', amount: '$5,000.00', method: 'Credit Card', id: 'TXN-90213', user: 'Sara Johnson', status: 'COMPLETED', date: '2024-03-30 11:05' },
-  ];
+  const location = useLocation();
+  const slug = location.pathname.split('/')[2] || 'deposits';
+  const workspace = financeService.getWorkspace(slug);
+  const drawer = useDrawerState(null);
+  const table = useTableState(workspace.rows, {
+    searchFields: ['id', 'user', 'subject', 'method', 'rail', 'queue', 'reason'],
+    initialPageSize: 10,
+  });
+
+  const columns = workspace.columns.map((column) => ({
+    ...column,
+    render: (row) => renderCell(row, column),
+  }));
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Finance Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-up">
-        <StatCard label="Total Net Equity" value="$241.4M" subtext="+1.2% exposure" trend="up" icon={Plus} />
-        <StatCard label="Pending Withdrawals" value="$38,200" subtext="12 items waiting" trend="warning" icon={ArrowDownCircle} />
-        <StatCard label="24h Deposits" value="$125,000" subtext="42 transactions" trend="up" icon={ArrowUpCircle} />
-        <StatCard label="Daily Net Flow" value="+$86,800" subtext="Positive liquidity" trend="up" icon={History} />
-      </div>
+    <PageShell>
 
-      {/* Control Bar */}
-      <div className="bg-surface-elevated border border-border/40 p-4 rounded-[8px] flex items-center justify-between gap-4 animate-fade-up delay-100">
-        <div className="flex gap-4 items-center">
-            <Button variant="secondary" icon={ArrowUpCircle}>Deposit Logs</Button>
-            <Button variant="secondary" icon={ArrowDownCircle}>Withdrawal Queue</Button>
-            <Button variant="secondary" icon={History}>Transaction History</Button>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" icon={Filter}>Advanced Filters</Button>
-          <Button variant="primary" icon={Plus}>Manual Adjustment</Button>
-        </div>
-      </div>
 
-      {/* Transaction Table */}
-      <Card title="Treasury Monitor" subtitle="Live Deposit & Withdrawal Tracking" padding={false} className="animate-fade-up delay-200">
-        <Table 
-          headers={['Transaction ID', 'User', 'Operation', 'Amount', 'Method', 'Current Status', 'Timestamp']}
-          data={transactions}
-          rowRenderer={(txn, i) => (
-            <TableRow key={i}>
-              <TableCell className="font-mono text-text-muted font-bold">{txn.id}</TableCell>
-              <TableCell className="font-bold text-text">{txn.user}</TableCell>
-              <TableCell>
-                <Badge variant={txn.type === 'DEPOSIT' ? 'success' : 'danger'}>{txn.type}</Badge>
-              </TableCell>
-              <TableCell className="font-bold text-text font-heading">{txn.amount}</TableCell>
-              <TableCell className="text-text-muted">{txn.method}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Badge variant={txn.status === 'COMPLETED' ? 'success' : txn.status === 'PENDING' ? 'warning' : 'danger'} dot>
-                    {txn.status}
-                  </Badge>
-                  {txn.status === 'PENDING' && (
-                    <div className="flex gap-1 ml-2">
-                      <Button size="sm" variant="ghost" className="p-1 min-w-0 h-6 w-6"><CheckCircle2 size={14} className="text-positive"/></Button>
-                      <Button size="sm" variant="ghost" className="p-1 min-w-0 h-6 w-6"><XCircle size={14} className="text-negative"/></Button>
-                    </div>
-                  )}
+      <MetricStrip metrics={workspace.metrics} />
+
+      <TableToolbar
+        searchValue={table.search}
+        onSearchChange={table.setSearch}
+        searchPlaceholder={`Search ${workspace.title.toLowerCase()} records`}
+        actions={(
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `finance-${slug}.csv`)}>Export</Button>
+            <Button variant="secondary" icon={Eye}>Open Audit Trail</Button>
+          </>
+        )}
+      >
+        <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />
+      </TableToolbar>
+
+      <FilterChips filters={table.filters} onClear={(key) => table.setFilter(key, 'all')} />
+
+      <Card title={workspace.tableTitle} subtitle={workspace.tableSubtitle} padding={false}>
+        <DataTable
+          columns={[
+            ...columns,
+            {
+              key: 'action',
+              label: 'Action',
+              render: (row) => (
+                <div className="text-right">
+                  <Button size="sm" variant="secondary" onClick={() => drawer.open(row)}>Open</Button>
                 </div>
-              </TableCell>
-              <TableCell className="text-right text-text-muted opacity-60 font-mono">{txn.date}</TableCell>
-            </TableRow>
-          )}
+              ),
+            },
+          ]}
+          data={table.items}
+          rowKey="id"
+        />
+        <Pagination
+          page={table.page}
+          totalPages={table.totalPages}
+          onPageChange={table.setPage}
+          pageSize={table.pageSize}
+          onPageSizeChange={table.setPageSize}
         />
       </Card>
-    </div>
+
+      <AdminDrawer
+        open={drawer.isOpen}
+        title={drawer.value?.id ?? 'Finance Record'}
+        subtitle={drawer.value?.user ?? drawer.value?.subject ?? ''}
+        onClose={drawer.close}
+        footer={(
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={drawer.close}>Close</Button>
+            <Button variant="primary">Mark Reviewed</Button>
+          </div>
+        )}
+      >
+        {drawer.value && (
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(drawer.value).map(([key, value]) => (
+              <div key={key} className="rounded-[10px] border border-border/30 bg-bg/70 p-3">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{key}</div>
+                <div className="mt-1 text-[13px] text-text">{String(value)}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </AdminDrawer>
+    </PageShell>
   );
 }

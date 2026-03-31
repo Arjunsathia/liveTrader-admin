@@ -1,215 +1,138 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Wallet, 
-  LineChart, 
-  Copy, 
-  Share2, 
-  FileText, 
-  LifeBuoy, 
-  ShieldCheck,
-  ChevronDown,
-  LogOut
-} from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { adminNavigation } from '../app/config/navigation';
+import { hasPermission } from '../app/config/permissions';
+import { useAdminSession } from '../app/providers/AdminSessionProvider';
 
-const MENU_ITEMS = [
-  { 
-    id: 'dashboard', 
-    label: 'Dashboard', 
-    icon: <LayoutDashboard size={18} strokeWidth={2.5} />, 
-    path: '/',
-    subItems: [
-      { id: 'db-overview', label: 'Overview', path: '/' },
-      { id: 'db-analytics', label: 'Analytics Snapshot', path: '/dashboard/analytics' },
-      { id: 'db-alerts', label: 'Alerts Panel', path: '/dashboard/alerts' },
-      { id: 'db-activity', label: 'Recent Activity', path: '/dashboard/activity' },
-    ]
-  },
-  { 
-    id: 'users', 
-    label: 'User Management', 
-    icon: <Users size={18} strokeWidth={2.5} />, 
-    path: '/users',
-    subItems: [
-      { id: 'u-list', label: 'User List', path: '/users/list' },
-      { id: 'u-kyc', label: 'KYC Requests', path: '/users/kyc' },
-      { id: 'u-activity', label: 'User Activity', path: '/users/activity' },
-      { id: 'u-wallet', label: 'Wallet Summary', path: '/users/wallet' },
-      { id: 'u-risk', label: 'Risk View', path: '/users/risk' },
-    ]
-  },
-  { 
-    id: 'finance', 
-    label: 'Finance / Treasury', 
-    icon: <Wallet size={18} strokeWidth={2.5} />, 
-    path: '/finance',
-    subItems: [
-      { id: 'f-deposits', label: 'Deposits', path: '/finance/deposits' },
-      { id: 'f-withdrawals', label: 'Withdrawals', path: '/finance/withdrawals' },
-      { id: 'f-transactions', label: 'Transactions', path: '/finance/transactions' },
-      { id: 'f-approvals', label: 'Manual Approvals', path: '/finance/approvals' },
-    ]
-  },
-  { 
-    id: 'trading', 
-    label: 'Trading Operations', 
-    icon: <LineChart size={18} strokeWidth={2.5} />, 
-    path: '/trading',
-    subItems: [
-      { id: 't-accounts', label: 'Trading Accounts', path: '/trading/accounts' },
-      { id: 't-orders', label: 'Open Orders', path: '/trading/orders' },
-      { id: 't-positions', label: 'Open Positions', path: '/trading/positions' },
-      { id: 't-history', label: 'Trade History', path: '/trading/history' },
-    ]
-  },
-  { 
-    id: 'copy', 
-    label: 'Copy Trading', 
-    icon: <Copy size={18} strokeWidth={2.5} />, 
-    path: '/copy-trading',
-    subItems: [
-      { id: 'c-strategies', label: 'Strategies', path: '/copy-trading/strategies' },
-      { id: 'c-providers', label: 'Providers', path: '/copy-trading/providers' },
-      { id: 'c-followers', label: 'Followers', path: '/copy-trading/followers' },
-      { id: 'c-performance', label: 'Performance', path: '/copy-trading/performance' },
-    ]
-  },
-  { 
-    id: 'ib', 
-    label: 'IB System', 
-    icon: <Share2 size={18} strokeWidth={2.5} />, 
-    path: '/ib-system',
-    subItems: [
-      { id: 'ib-referrals', label: 'Referrals', path: '/ib-system/referrals' },
-      { id: 'ib-commissions', label: 'Commissions', path: '/ib-system/commissions' },
-      { id: 'ib-payouts', label: 'Payouts', path: '/ib-system/payouts' },
-    ]
-  },
-  { 
-    id: 'reports', 
-    label: 'Reports Center', 
-    icon: <FileText size={18} strokeWidth={2.5} />, 
-    path: '/reports',
-    subItems: [
-      { id: 'r-finance', label: 'Finance Reports', path: '/reports/finance' },
-      { id: 'r-trading', label: 'Trading Reports', path: '/reports/trading' },
-      { id: 'r-users', label: 'User Reports', path: '/reports/users' },
-      { id: 'r-export', label: 'Export Center', path: '/reports/export' },
-    ]
-  },
-  { 
-    id: 'support', 
-    label: 'Support Desk', 
-    icon: <LifeBuoy size={18} strokeWidth={2.5} />, 
-    path: '/support',
-    subItems: [
-      { id: 's-tickets', label: 'Ticket List', path: '/support/tickets' },
-      { id: 's-open', label: 'Active Queue', path: '/support/open' },
-      { id: 's-closed', label: 'Resolved Tickets', path: '/support/closed' },
-    ]
-  },
-  { 
-    id: 'admin', 
-    label: 'Admin Management', 
-    icon: <ShieldCheck size={18} strokeWidth={2.5} />, 
-    path: '/admin-mgmt',
-    subItems: [
-      { id: 'a-users', label: 'Admin Users', path: '/admin-mgmt/users' },
-      { id: 'a-roles', label: 'Roles / Permissions', path: '/admin-mgmt/roles' },
-      { id: 'a-logs', label: 'Activity Logs', path: '/admin-mgmt/logs' },
-    ]
-  },
-];
-
-const SidebarItem = ({ 
-  item, 
-  collapsed, 
-  activeId, 
-  expandedId, 
+function SidebarItem({
+  item,
+  collapsed,
+  activeId,
+  expandedId,
   navigate,
   onHoverStart,
   onHoverEnd,
-  hoverNode
-}) => {
+  hoverNode,
+  onToggleExpand,
+}) {
+  const Icon = item.icon;
   const ref = useRef(null);
   const hasSubItems = item.subItems && item.subItems.length > 0;
   const isExpanded = expandedId === item.id;
-  const isActive = activeId === item.id || (hasSubItems && item.subItems.some(sub => activeId === sub.id));
-  const isHoveredInPortal = collapsed && hoverNode?.item.id === item.id;
+  const isActive =
+    activeId === item.id ||
+    (hasSubItems && item.subItems.some((s) => activeId === s.id));
+  const isHoveredPortal = collapsed && hoverNode?.item.id === item.id;
 
-  const handleMainClick = () => {
+  const handleMouseEnter = () => {
+    if (collapsed && ref.current) onHoverStart(item, ref.current.getBoundingClientRect());
+  };
+
+  const handleClick = () => {
+    if (hasSubItems && !collapsed) onToggleExpand(item.id);
     navigate(hasSubItems ? item.subItems[0].path : item.path);
   };
 
-  const handleMouseEnter = () => {
-    if (collapsed && ref.current) {
-        const rect = ref.current.getBoundingClientRect();
-        onHoverStart(item, rect);
-    }
-  };
-
   return (
-    <div className="flex flex-col w-full group/item px-3.5" onMouseEnter={handleMouseEnter} onMouseLeave={onHoverEnd}>
+    <div
+      className="flex flex-col w-full"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={onHoverEnd}
+    >
       <button
         ref={ref}
-        onClick={handleMainClick}
-        className={`relative flex items-center cursor-pointer outline-none whitespace-nowrap overflow-hidden transition-all duration-300 w-full px-4 py-3.5 rounded-[8px] border
-          ${collapsed ? 'justify-center gap-0' : 'justify-start gap-4'}
-          ${isActive 
-            ? 'bg-primary/20 dark:bg-primary/10 text-text border-primary/20 dark:border-white/5' 
-            : `text-text-muted/60 border-transparent hover:bg-primary/10 dark:hover:bg-white/5 hover:text-primary dark:hover:text-text ${isHoveredInPortal ? 'bg-primary/10 dark:bg-white/5 text-primary dark:text-text' : ''}`}`}
+        onClick={handleClick}
+        className={`
+          group/btn relative flex items-center outline-none cursor-pointer select-none
+          transition-all duration-200 rounded-[10px] w-full
+          ${collapsed ? 'justify-center px-0 py-3 mx-auto w-11 h-11' : 'px-3.5 py-2.5 gap-3'}
+          ${isActive
+            ? 'bg-primary/[0.12] text-primary'
+            : `text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80
+               ${isHoveredPortal ? 'bg-white/[0.04] text-text/80' : ''}`
+          }
+        `}
       >
+        {/* Active left accent bar */}
         {isActive && !collapsed && (
-          <div className="absolute left-[3px] top-[15%] bottom-[15%] w-[4px] bg-primary rounded-full animate-in fade-in slide-in-from-left-full duration-400" />
+          <span className="absolute left-0 top-[18%] bottom-[18%] w-[3px] bg-primary rounded-r-full" />
         )}
 
-        <div className={`shrink-0 flex items-center justify-center transition-all duration-400 w-5 h-5 ${isActive ? 'text-primary scale-105' : 'group-hover:text-primary transition-transform group-hover:scale-110'}`}>
-          {item.icon}
-        </div>
 
+
+        {/* Icon */}
+        <span
+          className={`shrink-0 flex items-center justify-center w-[18px] h-[18px] transition-all duration-200
+            ${isActive
+              ? 'text-primary'
+              : 'group-hover/btn:text-text/80 group-hover/btn:scale-110'
+            }`}
+        >
+          <Icon size={17} strokeWidth={isActive ? 2 : 1.8} />
+        </span>
+
+        {/* Label + chevron */}
         {!collapsed && (
-          <div className="flex-1 flex items-center justify-between overflow-hidden">
-            <span className={`text-[13px] font-heading font-medium tracking-[-0.02em] transition-all duration-300 ${isActive ? 'text-text' : 'text-text-muted/65 group-hover:text-primary dark:group-hover:text-text/90'}`}>
+          <span className="flex-1 flex items-center justify-between min-w-0">
+            <span
+              className={`text-[13px] font-heading font-medium tracking-[-0.025em] truncate transition-colors duration-200
+                ${isActive ? 'text-text' : 'text-text-muted/60 group-hover/btn:text-text/80'}`}
+            >
               {item.label}
             </span>
             {hasSubItems && (
-              <ChevronDown 
-                size={14} 
-                strokeWidth={3} 
-                className={`ml-auto transition-transform duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isExpanded ? 'rotate-180 text-primary' : 'rotate-0 text-text-muted/30'}`} 
+              <ChevronDown
+                size={13}
+                strokeWidth={2.5}
+                className={`ml-2 shrink-0 transition-transform duration-350 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                  ${isExpanded ? 'rotate-180 text-primary' : 'text-text-muted/25'}`}
               />
             )}
-          </div>
+          </span>
+        )}
+
+        {/* Collapsed active dot */}
+        {isActive && collapsed && (
+          <span className="absolute right-1.5 top-1.5 w-1 h-1 rounded-full bg-primary" />
         )}
       </button>
 
+      {/* Sub-items */}
       {hasSubItems && !collapsed && (
         <div
-          className="grid transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden"
+          className="grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{
             gridTemplateRows: isExpanded ? '1fr' : '0fr',
             opacity: isExpanded ? 1 : 0,
-            marginTop: isExpanded ? '4px' : '0'
           }}
         >
-          <div className="overflow-hidden">
-            <div className="flex flex-col gap-1 ml-6 pl-4 border-l border-border/20 relative mb-2">
-              {item.subItems.map(sub => {
-                const isSubItemSelected = activeId === sub.id;
+          <div className="overflow-hidden min-h-0">
+            <div className="relative ml-[29px] pt-1 pb-2 flex flex-col gap-0.5">
+              {/* Connector line */}
+              <span className="absolute left-0 top-2 bottom-2 w-px bg-border/[0.15]" />
+
+              {item.subItems.map((sub) => {
+                const isSub = activeId === sub.id;
                 return (
                   <button
                     key={sub.id}
                     onClick={() => navigate(sub.path)}
-                    className={`relative w-full text-left py-2 px-3 rounded-lg text-[12px] font-heading font-medium tracking-[-0.01em] transition-all duration-300 border cursor-pointer outline-none flex items-center group/sub hover:translate-x-1
-                      ${isSubItemSelected
-                        ? 'bg-primary/20 dark:bg-primary/20 text-primary border-primary/10'
-                        : 'text-text-muted/60 border-transparent hover:bg-primary/5 dark:hover:bg-white/5 hover:text-primary dark:hover:text-text'}`}
+                    className={`group/sub relative flex items-center gap-2.5 pl-4 pr-3 py-[7px] rounded-[8px]
+                      text-[12px] font-heading font-medium tracking-[-0.01em]
+                      outline-none cursor-pointer transition-all duration-200
+                      hover:translate-x-0.5
+                      ${isSub
+                        ? 'bg-primary/[0.1] text-primary'
+                        : 'text-text-muted/50 hover:bg-white/[0.04] hover:text-text/75'
+                      }`}
                   >
-                    <div className={`absolute -left-[18.5px] top-1/2 -translate-y-1/2 transition-all duration-400 
-                      ${isSubItemSelected ? 'w-1 h-3 bg-primary rounded-full' : 'w-1 h-1 bg-border/40 rounded-full group-hover/sub:bg-primary/30'}`}
+                    {/* Connector tick */}
+                    <span
+                      className={`absolute left-0 top-1/2 -translate-y-1/2
+                        w-[11px] h-px transition-all duration-200
+                        ${isSub ? 'bg-primary' : 'bg-border/25 group-hover/sub:bg-border/40'}`}
                     />
                     {sub.label}
                   </button>
@@ -221,137 +144,311 @@ const SidebarItem = ({
       )}
     </div>
   );
-};
+}
 
-export function Sidebar({ collapsed }) {
+/* ─────────────────────────────────────────────────────────────
+   SECTION LABEL (groups nav items visually)
+───────────────────────────────────────────────────────────── */
+function NavSection({ label, collapsed }) {
+  if (collapsed) {
+    return <div className="w-6 h-px bg-border/[0.12] mx-auto my-2" />;
+  }
+  return (
+    <div className="px-4 pt-5 pb-1.5">
+      <span className="text-[9.5px] font-bold tracking-[0.18em] uppercase text-text-muted/25 font-heading select-none">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SIDEBAR
+───────────────────────────────────────────────────────────── */
+export function Sidebar({ collapsed, isMobile }) {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { permissions } = useAdminSession();
   const [hoverNode, setHoverNode] = useState(null);
   const hoverTimer = useRef(null);
+  const [manualExpandedId, setManualExpandedId] = useState(null);
+  const [manualExpandedPath, setManualExpandedPath] = useState(null);
 
-  const handleHoverStart = useCallback((item, rect) => {
-    clearTimeout(hoverTimer.current);
-    setHoverNode({ item, rect });
-  }, []);
+  const allowedItems = useMemo(
+    () =>
+      adminNavigation
+        .filter((item) => hasPermission(permissions, item.permission))
+        .map((item) => ({
+          ...item,
+          subItems: item.subItems?.filter((s) => hasPermission(permissions, s.permission)),
+        })),
+    [permissions],
+  );
 
-  const handleHoverEnd = useCallback(() => {
-    hoverTimer.current = setTimeout(() => {
-        setHoverNode(null);
-    }, 150);
-  }, []);
+  const getUsersActiveId = () => {
+    if (location.state?.usersView === 'kyc') return 'users-kyc';
+    if (location.state?.usersView === 'mt5') return 'users-mt5';
+    return 'users-list';
+  };
 
   const getActiveId = () => {
-    const path = location.pathname;
-    if (path === '/') return 'db-overview'; 
-    
-    for (const item of MENU_ITEMS) {
-      if (item.path === path && (!item.subItems || item.subItems.length === 0)) return item.id;
+    const { pathname } = location;
+    if (pathname === '/') return 'dashboard';
+    for (const item of allowedItems) {
+      if (item.path === pathname && (!item.subItems || item.subItems.length === 0)) return item.id;
       if (item.subItems) {
-        const sub = item.subItems.find(s => s.path === path);
+        const sub = item.subItems.find((c) => c.path === pathname);
         if (sub) return sub.id;
       }
+      if (pathname.startsWith('/users/') && item.id === 'users') return getUsersActiveId();
+      if (pathname.startsWith('/support/tickets/') && item.id === 'support') return 'support-tickets';
     }
     return null;
   };
 
   const activeId = getActiveId();
-  const expandedId = MENU_ITEMS.find(
-    (item) => item.path === location.pathname || item.subItems?.some((sub) => sub.path === location.pathname)
-  )?.id;
+
+  const routeExpandedId = useMemo(
+    () => allowedItems.find(
+      (item) =>
+        item.path === location.pathname ||
+        item.subItems?.some((subItem) => subItem.path === location.pathname) ||
+        (location.pathname.startsWith('/users/') && item.id === 'users') ||
+        (location.pathname.startsWith('/support/tickets/') && item.id === 'support'),
+    )?.id ?? null,
+    [allowedItems, location.pathname],
+  );
+
+  const expandedId = manualExpandedPath === location.pathname
+    ? manualExpandedId
+    : routeExpandedId;
+
+  const toggleExpand = (id) => {
+    setManualExpandedPath(location.pathname);
+    setManualExpandedId(expandedId === id ? null : id);
+  };
+
+  const handleHoverStart = (item, rect) => {
+    if (isMobile) return;
+    clearTimeout(hoverTimer.current);
+    setHoverNode({ item, rect });
+  };
+
+  const handleHoverEnd = () => {
+    if (isMobile) return;
+    hoverTimer.current = window.setTimeout(() => setHoverNode(null), 250);
+  };
+
+  const sidebarWidth = isMobile ? '280px' : collapsed ? '72px' : '252px';
+  const sidebarLeft = isMobile && collapsed ? '-280px' : '0';
+
+  /* Split nav into sections to match the current navigation structure. */
+  const mainItems = allowedItems.slice(0, 4);
+  const mgmtItems = allowedItems.slice(4, 8);
+  const systemItems = allowedItems.slice(8);
 
   return (
-    <aside 
-      className="fixed left-0 top-0 h-screen z-[100] flex flex-col border-r border-border/10 overflow-hidden"
+    <aside
+      className="fixed top-0 h-screen z-[100] flex flex-col overflow-hidden"
       style={{
-        width: collapsed ? '72px' : '248px',
-        transition: 'width 0.4s cubic-bezier(0.16,1,0.3,1)',
+        width: sidebarWidth,
+        left: sidebarLeft,
+        transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
         backgroundColor: 'var(--surface-2)',
+        borderRight: '1px solid var(--border)',
+        boxShadow: 'none',
       }}
     >
-      <style>{`.sidebar-scroll::-webkit-scrollbar { display: none; } .sidebar-scroll { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
-      
-      <div className={`flex items-center shrink-0 transition-all duration-400 w-full ${collapsed ? 'justify-center h-[90px]' : 'px-6 h-[90px]'}`}>
-        <div className="relative w-10 h-10 rounded-[8px] flex items-center justify-center shrink-0 bg-primary cursor-pointer" onClick={() => navigate('/')}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--bg)" className="relative z-10">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      {/* Scrollbar suppression */}
+      <style>{`
+        .sb-scroll::-webkit-scrollbar { display: none; }
+        .sb-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
+      {/* ── LOGO ─────────────────────────────────────────── */}
+      <div
+        className={`flex items-center shrink-0 h-[68px] transition-all duration-400
+          ${collapsed ? 'justify-center px-0' : 'px-5 gap-3.5'}`}
+        style={{ borderBottom: '1px solid var(--border)' }}
+      >
+        {/* Mark */}
+        <button
+          onClick={() => navigate('/')}
+          className="relative shrink-0 w-9 h-9 rounded-[10px] flex items-center justify-center bg-primary cursor-pointer group/logo transition-all duration-300 active:scale-95"
+        >
+          {/* Grid mark */}
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="1" y="1" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.55)" />
+            <rect x="11" y="1" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.35)" />
+            <rect x="1" y="11" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.35)" />
+            <rect x="11" y="11" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.15)" />
           </svg>
-          <div className="absolute inset-0 rounded-[8px] border border-white/20 z-0"></div>
-        </div>
+        </button>
+
+        {/* Wordmark */}
         {!collapsed && (
-          <div className="ml-3.5 flex flex-col justify-center animate-fade-in whitespace-nowrap overflow-hidden">
-            <span className="font-heading font-semibold text-[18px] tracking-[-0.05em] leading-none text-text">
-              LiveTrade<span className="text-primary">.</span> <span className="text-primary text-[9px] font-semibold uppercase tracking-[0.24em] mt-1.5 opacity-80">PRO</span>
+          <div className="flex flex-col gap-0.5 overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
+            <div className="flex items-baseline gap-1.5 leading-none">
+              <span className="font-heading font-bold text-[17px] tracking-[-0.05em] text-text">
+                LiveTrade<span className="text-primary">.</span>
+              </span>
+              <span className="text-[8.5px] font-bold tracking-[0.22em] uppercase text-primary/70 px-1 py-0.5 rounded-[4px] bg-primary/[0.1] border border-primary/[0.2] leading-none">
+                PRO
+              </span>
+            </div>
+            <span className="text-[9.5px] font-medium text-text-muted/30 tracking-[0.04em]">
+              Admin Console
             </span>
           </div>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden pt-4 pb-12 sidebar-scroll flex flex-col gap-1.5">
-        {MENU_ITEMS.map((item) => (
-          <SidebarItem 
-            key={item.id} 
-            item={item} 
-            collapsed={collapsed} 
-            activeId={activeId}
-            expandedId={expandedId}
-            navigate={navigate}
-            onHoverStart={handleHoverStart}
-            onHoverEnd={handleHoverEnd}
-            hoverNode={hoverNode}
-          />
-        ))}
+      {/* ── NAV ──────────────────────────────────────────── */}
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden sb-scroll relative">
+        <div className={`flex flex-col pt-3 pb-8 ${collapsed ? 'items-center gap-1 px-2' : 'gap-0.5 px-3'}`}>
+
+          {/* Main section */}
+          {mainItems.length > 0 && (
+            <>
+              <NavSection label="Main" collapsed={collapsed} />
+              {mainItems.map((item) => (
+                <SidebarItem
+                  key={item.id}
+                  item={item}
+                  collapsed={collapsed}
+                  activeId={activeId}
+                  expandedId={expandedId}
+                  navigate={navigate}
+                  onHoverStart={handleHoverStart}
+                  onHoverEnd={handleHoverEnd}
+                  hoverNode={hoverNode}
+                  onToggleExpand={toggleExpand}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Management section */}
+          {mgmtItems.length > 0 && (
+            <>
+              <NavSection label="Management" collapsed={collapsed} />
+              {mgmtItems.map((item) => (
+                <SidebarItem
+                  key={item.id}
+                  item={item}
+                  collapsed={collapsed}
+                  activeId={activeId}
+                  expandedId={expandedId}
+                  navigate={navigate}
+                  onHoverStart={handleHoverStart}
+                  onHoverEnd={handleHoverEnd}
+                  hoverNode={hoverNode}
+                  onToggleExpand={toggleExpand}
+                />
+              ))}
+            </>
+          )}
+
+          {/* System section */}
+          {systemItems.length > 0 && (
+            <>
+              <NavSection label="System" collapsed={collapsed} />
+              {systemItems.map((item) => (
+                <SidebarItem
+                  key={item.id}
+                  item={item}
+                  collapsed={collapsed}
+                  activeId={activeId}
+                  expandedId={expandedId}
+                  navigate={navigate}
+                  onHoverStart={handleHoverStart}
+                  onHoverEnd={handleHoverEnd}
+                  hoverNode={hoverNode}
+                  onToggleExpand={toggleExpand}
+                />
+              ))}
+            </>
+          )}
+        </div>
       </nav>
 
-      <div className="pt-4 px-4 pb-6 border-t border-border/10 shrink-0">
-        <button 
-          className={`flex items-center gap-4 px-4 py-3.5 rounded-[8px] transition-all duration-400 group relative w-full
-            ${collapsed ? 'justify-center' : ''}
-            text-text-muted/60 hover:bg-negative/10 hover:text-negative`}
-        >
-          <LogOut size={18} strokeWidth={2} className="shrink-0" />
-          {!collapsed && <span className="text-[13px] font-heading font-medium tracking-[-0.02em]">System Sign Out</span>}
-        </button>
-      </div>
 
-      {collapsed && hoverNode && createPortal(
-          <div 
-            className={`fixed z-[99999] animate-in fade-in zoom-in-95 duration-200 flex flex-col
-              bg-surface-elevated border border-border/50 rounded-[8px] py-2 min-w-[200px]
-            `}
-            style={{ 
-              top: hoverNode.rect.top, 
-              left: 74 
-            }}
+
+
+      {collapsed && hoverNode &&
+        createPortal(
+          <div
+            className="fixed z-[99999]"
+            style={{ top: hoverNode.rect.top, left: 76 }}
             onMouseEnter={() => clearTimeout(hoverTimer.current)}
             onMouseLeave={handleHoverEnd}
           >
-            <div className="px-4 pb-2 mb-2 border-b border-border/30 text-[10px] font-semibold tracking-[0.14em] text-text-muted uppercase">
-                {hoverNode.item.label}
-            </div>
-            {hoverNode.item.subItems ? (
-                <div className="flex flex-col px-1.5 gap-0.5 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                    {hoverNode.item.subItems.map(sub => (
-                        <button
-                            key={sub.id}
-                            onClick={() => { navigate(sub.path); setHoverNode(null); }}
-                            className={`relative w-full text-left py-2 px-3 rounded-lg text-[11px] font-medium tracking-[0.04em] transition-all duration-300 border-none cursor-pointer outline-none flex items-center hover:bg-primary/10 hover:text-primary ${activeId === sub.id ? 'bg-primary/20 text-primary' : 'text-text-muted/70'}`}
-                        >
-                            {sub.label}
-                        </button>
-                    ))}
-                </div>
-            ) : (
-                <button
+            {/* Arrow connector */}
+            <div
+              className="absolute left-0 top-4 w-2 h-2 rotate-45 -translate-x-1 border-l border-b border-border/30"
+              style={{ backgroundColor: 'var(--surface-2)' }}
+            />
+
+              <div
+              className="flex flex-col rounded-[12px] overflow-hidden min-w-[210px] border border-border/60"
+              style={{
+                backgroundColor: 'var(--surface-2)',
+                animation: 'sideTooltip 0.18s cubic-bezier(0.16,1,0.3,1)',
+              }}
+            >
+              {/* Header */}
+              <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                {hoverNode.item.icon && (
+                  <span className="w-7 h-7 rounded-[8px] bg-primary/[0.12] border border-primary/[0.18] flex items-center justify-center text-primary shrink-0">
+                    <hoverNode.item.icon size={14} strokeWidth={2} />
+                  </span>
+                )}
+                <span className="text-[13px] font-heading font-semibold tracking-[-0.02em] text-text">
+                  {hoverNode.item.label}
+                </span>
+              </div>
+
+              {/* Sub-items or direct link */}
+              <div className="p-2">
+                {hoverNode.item.subItems?.length > 0 ? (
+                  hoverNode.item.subItems.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => { navigate(sub.path); setHoverNode(null); }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-[12px] font-heading font-medium tracking-[-0.01em]
+                        transition-all duration-150 cursor-pointer outline-none text-left
+                        hover:bg-primary/[0.08] hover:text-primary
+                        ${activeId === sub.id ? 'bg-primary/[0.12] text-primary' : 'text-text-muted/60'}`}
+                    >
+                      {activeId === sub.id && (
+                        <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
+                      )}
+                      {sub.label}
+                    </button>
+                  ))
+                ) : (
+                  <button
                     onClick={() => { navigate(hoverNode.item.path); setHoverNode(null); }}
-                    className="px-4 py-1 text-[11px] font-bold text-text-muted/70 hover:text-primary w-full text-left"
-                >
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-[12px] font-heading font-medium text-text-muted/60 hover:bg-primary/[0.08] hover:text-primary transition-all duration-150 cursor-pointer outline-none text-left"
+                  >
+                    <ChevronRight size={12} strokeWidth={2.5} className="text-primary/40" />
                     Open {hoverNode.item.label}
-                </button>
-            )}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>,
-          document.body
-      )}
+          document.body,
+        )
+      }
+
+      {/* Portal animation keyframes */}
+      <style>{`
+        @keyframes sideTooltip {
+          from { opacity: 0; transform: translateX(-6px) scale(0.97); }
+          to   { opacity: 1; transform: translateX(0)   scale(1); }
+        }
+      `}</style>
     </aside>
   );
 }

@@ -1,65 +1,89 @@
 import React from 'react';
-import { Card, StatCard } from '../../../components/ui/Card';
-import { Table, TableRow, TableCell } from '../../../components/ui/Table';
-import { Badge } from '../../../components/ui/Badge';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { 
-  LifeBuoy, 
-  MessageSquare, 
-  Clock, 
-  AlertCircle, 
-  Plus, 
-  ChevronRight 
-} from 'lucide-react';
+import { Card } from '../../../components/ui/Card';
+import { PageShell } from '../../../layout/PageShell';
+import { SectionHeader } from '../../../layout/SectionHeader';
+import { MetricStrip } from '../../../components/cards/MetricStrip';
+import { TableToolbar } from '../../../components/tables/TableToolbar';
+import { FilterBar } from '../../../components/filters/FilterBar';
+import { FilterChips } from '../../../components/filters/FilterChips';
+import { DataTable } from '../../../components/tables/DataTable';
+import { Pagination } from '../../../components/tables/Pagination';
+import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { useTableState } from '../../../hooks/useTableState';
+import { exportRows } from '../../../utils/exporters';
+import { supportService } from '../../../services/supportService';
+
+function renderCell(row, column) {
+  if (column.type === 'status') return <StatusBadge status={row[column.key]} dot={false} />;
+  if (column.type === 'mono') return <span className="font-mono text-[12px] text-text-muted">{row[column.key]}</span>;
+  return row[column.key];
+}
 
 export function SupportPage() {
-  const tickets = [
-    { id: 'TKT-1025', subject: 'Withdrawal Delay', user: 'Marco Rossi', priority: 'HIGH', status: 'OPEN', date: '12m ago' },
-    { id: 'TKT-1024', subject: '2FA Reset Request', user: 'Elena Vance', priority: 'MEDIUM', status: 'IN_PROGRESS', date: '2h ago' },
-    { id: 'TKT-1023', subject: 'API Key Error', user: 'Kofi Arhin', priority: 'LOW', status: 'RESOLVED', date: '5h ago' },
-    { id: 'TKT-1022', subject: 'Account Verification', user: 'Sara Johnson', priority: 'MEDIUM', status: 'OPEN', date: 'yesterday' },
-  ];
+  const location = useLocation();
+  const navigate = useNavigate();
+  const slug = location.pathname.split('/')[2] || 'tickets';
+  const workspace = supportService.getWorkspace(slug);
+  const table = useTableState(workspace.rows, {
+    searchFields: ['ticket', 'user', 'subject', 'owner'],
+    initialPageSize: 10,
+  });
+
+  const columns = workspace.columns.map((column) => ({
+    ...column,
+    render: (row) => renderCell(row, column),
+  }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-up">
-        <StatCard label="Live Tickets" value="42" subtext="Awaiting response" trend="warning" icon={MessageSquare} />
-        <StatCard label="Avg Response Time" value="1.5h" subtext="Last 24 hours" trend="up" icon={Clock} />
-        <StatCard label="Urgent Escalations" value="03" subtext="Management review" trend="danger" icon={AlertCircle} />
-        <StatCard label="User Satisfaction" value="4.8/5" subtext="Service rating" trend="up" icon={LifeBuoy} />
-      </div>
+    <PageShell>
 
-      <Card title="Helpdesk Monitor" subtitle="Live Support Ticket Stream" padding={false} className="animate-fade-up delay-100">
-        <Table 
-          headers={['Ticket ID', 'Identity', 'Subject Area', 'Priority', 'Current Status', 'Last Active', 'Thread']}
-          data={tickets}
-          rowRenderer={(t, i) => (
-            <TableRow key={i}>
-              <TableCell className="font-mono text-text-muted font-bold">{t.id}</TableCell>
-              <TableCell className="font-bold text-text">{t.user}</TableCell>
-              <TableCell className="text-text-muted max-w-[200px] truncate">{t.subject}</TableCell>
-              <TableCell>
-                <Badge variant={t.priority === 'HIGH' ? 'danger' : t.priority === 'MEDIUM' ? 'warning' : 'info'}>
-                    {t.priority}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge variant={t.status === 'OPEN' ? 'danger' : t.status === 'RESOLVED' ? 'success' : 'warning'} dot>
-                    {t.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-text-muted opacity-60 font-mono italic">{t.date}</TableCell>
-              <TableCell className="text-right">
-                <Button size="sm" variant="secondary" icon={ChevronRight}>Open Ticket</Button>
-              </TableCell>
-            </TableRow>
-          )}
+
+      <MetricStrip metrics={workspace.metrics} />
+
+      <TableToolbar
+        searchValue={table.search}
+        onSearchChange={table.setSearch}
+        searchPlaceholder={`Search ${workspace.title.toLowerCase()} records`}
+        actions={(
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `support-${slug}.csv`)}>Export</Button>
+            <Button variant="primary" icon={Eye}>Create Ticket</Button>
+          </>
+        )}
+      >
+        <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />
+      </TableToolbar>
+
+      <FilterChips filters={table.filters} onClear={(key) => table.setFilter(key, 'all')} />
+
+      <Card title={workspace.tableTitle} subtitle={workspace.tableSubtitle} padding={false}>
+        <DataTable
+          columns={[
+            ...columns,
+            {
+              key: 'action',
+              label: 'Action',
+              render: (row) => (
+                <div className="text-right">
+                  <Button size="sm" variant="secondary" onClick={() => navigate(`/support/tickets/${row.ticket}`)}>Open</Button>
+                </div>
+              ),
+            },
+          ]}
+          data={table.items}
+          rowKey="id"
         />
-        <div className="p-4 border-t border-border/40 flex justify-between items-center bg-white/2">
-            <Button variant="ghost" size="sm" icon={Plus}>Create Manual Ticket</Button>
-            <Button variant="secondary" size="sm">View Support Archives</Button>
-        </div>
+        <Pagination
+          page={table.page}
+          totalPages={table.totalPages}
+          onPageChange={table.setPage}
+          pageSize={table.pageSize}
+          onPageSizeChange={table.setPageSize}
+        />
       </Card>
-    </div>
+    </PageShell>
   );
 }

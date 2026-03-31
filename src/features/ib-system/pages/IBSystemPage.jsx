@@ -1,51 +1,105 @@
 import React from 'react';
-import { Card, StatCard } from '../../../components/ui/Card';
-import { Table, TableRow, TableCell } from '../../../components/ui/Table';
-import { Badge } from '../../../components/ui/Badge';
+import { useLocation } from 'react-router-dom';
+import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { Share2, DollarSign, Award, Target, ChevronRight } from 'lucide-react';
+import { Card } from '../../../components/ui/Card';
+import { PageShell } from '../../../layout/PageShell';
+import { SectionHeader } from '../../../layout/SectionHeader';
+import { MetricStrip } from '../../../components/cards/MetricStrip';
+import { TableToolbar } from '../../../components/tables/TableToolbar';
+import { FilterBar } from '../../../components/filters/FilterBar';
+import { FilterChips } from '../../../components/filters/FilterChips';
+import { DataTable } from '../../../components/tables/DataTable';
+import { Pagination } from '../../../components/tables/Pagination';
+import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
+import { useDrawerState } from '../../../hooks/useDrawerState';
+import { useTableState } from '../../../hooks/useTableState';
+import { exportRows } from '../../../utils/exporters';
+import { ibSystemService } from '../../../services/ibSystemService';
+
+function renderCell(row, column) {
+  if (column.type === 'status') return <StatusBadge status={row[column.key]} dot={false} />;
+  if (column.type === 'amount') return <span className="price-data font-medium text-text">{row[column.key]}</span>;
+  if (column.type === 'mono') return <span className="font-mono text-[12px] text-text-muted">{row[column.key]}</span>;
+  return row[column.key];
+}
 
 export function IBSystemPage() {
-  const referrals = [
-    { name: 'John Doe Broker', level: 'Diamond', referral_count: '1,240', commission: '$12,500.00', status: 'ACTIVE' },
-    { name: 'Sarah Partner', level: 'Gold', referral_count: '450', commission: '$4,200.00', status: 'ACTIVE' },
-    { name: 'Mike Smith IB', level: 'Silver', referral_count: '120', commission: '$1,150.00', status: 'ACTIVE' },
-    { name: 'Trading Genius', level: 'Platinum', referral_count: '840', commission: '$8,400.00', status: 'REVIEW' },
-  ];
+  const location = useLocation();
+  const slug = location.pathname.split('/')[2] || 'referrals';
+  const workspace = ibSystemService.getWorkspace(slug);
+  const drawer = useDrawerState(null);
+  const table = useTableState(workspace.rows, {
+    searchFields: ['id', 'partner', 'statement', 'batch'],
+    initialPageSize: 10,
+  });
+
+  const columns = workspace.columns.map((column) => ({
+    ...column,
+    render: (row) => renderCell(row, column),
+  }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-up">
-        <StatCard label="Total IB Partners" value="214" subtext="Official referrals" trend="up" icon={Share2} />
-        <StatCard label="Referral Volume" value="$45.2M" subtext="Trader net turnover" trend="up" icon={Target} />
-        <StatCard label="Total Commissions" value="$142,500" subtext="Paid this month" trend="up" icon={DollarSign} />
-        <StatCard label="Top IB Performance" value="+12%" subtext="Growth vs last month" trend="up" icon={Award} />
-      </div>
+    <PageShell>
+      <SectionHeader
+        eyebrow={workspace.eyebrow}
+        title={workspace.title}
+        description={workspace.description}
+        actions={(
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `ib-system-${slug}.csv`)}>Export</Button>
+            <Button variant="secondary" icon={Eye}>Open Partner Tree</Button>
+          </>
+        )}
+      />
 
-      <Card title="Partnership Management" subtitle="IB Network & Commission Tracking" padding={false} className="animate-fade-up delay-100">
-        <Table 
-          headers={['Partner Name', 'Tier Level', 'Referral Count', 'Total Commission', 'Status', 'Network View']}
-          data={referrals}
-          rowRenderer={(ib, i) => (
-            <TableRow key={i}>
-              <TableCell className="font-bold text-text">{ib.name}</TableCell>
-              <TableCell>
-                <Badge variant={ib.level === 'Diamond' ? 'info' : ib.level === 'Platinum' ? 'success' : 'muted'}>
-                    {ib.level}
-                </Badge>
-              </TableCell>
-              <TableCell className="font-mono text-text-muted">{ib.referral_count}</TableCell>
-              <TableCell className="font-heading font-black text-text price-data">{ib.commission}</TableCell>
-              <TableCell>
-                <Badge variant={ib.status === 'ACTIVE' ? 'success' : 'warning'} dot>{ib.status}</Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button size="sm" variant="ghost" icon={ChevronRight}>Referral Tree</Button>
-              </TableCell>
-            </TableRow>
-          )}
+      <MetricStrip metrics={workspace.metrics} />
+
+      <TableToolbar searchValue={table.search} onSearchChange={table.setSearch} searchPlaceholder={`Search ${workspace.title.toLowerCase()} records`}>
+        <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />
+      </TableToolbar>
+
+      <FilterChips filters={table.filters} onClear={(key) => table.setFilter(key, 'all')} />
+
+      <Card title={workspace.tableTitle} subtitle={workspace.tableSubtitle} padding={false}>
+        <DataTable
+          columns={[
+            ...columns,
+            {
+              key: 'action',
+              label: 'Action',
+              render: (row) => (
+                <div className="text-right">
+                  <Button size="sm" variant="secondary" onClick={() => drawer.open(row)}>Open</Button>
+                </div>
+              ),
+            },
+          ]}
+          data={table.items}
+          rowKey="id"
+        />
+        <Pagination
+          page={table.page}
+          totalPages={table.totalPages}
+          onPageChange={table.setPage}
+          pageSize={table.pageSize}
+          onPageSizeChange={table.setPageSize}
         />
       </Card>
-    </div>
+
+      <AdminDrawer open={drawer.isOpen} title={drawer.value?.id ?? 'IB Record'} subtitle={drawer.value?.partner ?? ''} onClose={drawer.close}>
+        {drawer.value && (
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(drawer.value).map(([key, value]) => (
+              <div key={key} className="rounded-[10px] border border-border/30 bg-bg/70 p-3">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{key}</div>
+                <div className="mt-1 text-[13px] text-text">{String(value)}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </AdminDrawer>
+    </PageShell>
   );
 }

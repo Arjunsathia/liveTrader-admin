@@ -1,80 +1,104 @@
 import React from 'react';
-import { Card, StatCard } from '../../../components/ui/Card';
-import { Table, TableRow, TableCell } from '../../../components/ui/Table';
-import { Badge } from '../../../components/ui/Badge';
+import { useLocation } from 'react-router-dom';
+import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { ShieldCheck, UserCheck, Key, Lock, Plus, Users, ShieldAlert } from 'lucide-react';
+import { Card } from '../../../components/ui/Card';
+import { PageShell } from '../../../layout/PageShell';
+import { SectionHeader } from '../../../layout/SectionHeader';
+import { MetricStrip } from '../../../components/cards/MetricStrip';
+import { TableToolbar } from '../../../components/tables/TableToolbar';
+import { FilterBar } from '../../../components/filters/FilterBar';
+import { FilterChips } from '../../../components/filters/FilterChips';
+import { DataTable } from '../../../components/tables/DataTable';
+import { Pagination } from '../../../components/tables/Pagination';
+import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
+import { useDrawerState } from '../../../hooks/useDrawerState';
+import { useTableState } from '../../../hooks/useTableState';
+import { exportRows } from '../../../utils/exporters';
+import { adminService } from '../../../services/adminService';
+
+function renderCell(row, column) {
+  if (column.type === 'status') return <StatusBadge status={row[column.key]} dot={false} />;
+  if (column.type === 'mono') return <span className="font-mono text-[12px] text-text-muted">{row[column.key]}</span>;
+  return row[column.key];
+}
 
 export function AdminMgmtPage() {
-  const admins = [
-    { name: 'Alex Rivera', role: 'SUPER ADMIN', permissions: 'ALL', status: 'ACTIVE', last_active: 'Now' },
-    { name: 'System Auditor', role: 'AUDITOR', permissions: 'READ_ONLY', status: 'ACTIVE', last_active: '2h ago' },
-    { name: 'Support lead', role: 'OPERATOR', permissions: 'SUPPORT_ONLY', status: 'OFFLINE', last_active: '1d ago' },
-    { name: 'Finance Admin', role: 'MANAGER', permissions: 'FINANCE_ONLY', status: 'ACTIVE', last_active: '15m ago' },
-  ];
+  const location = useLocation();
+  const slug = location.pathname.split('/')[2] || 'users';
+  const workspace = adminService.getWorkspace(slug);
+  const drawer = useDrawerState(null);
+  const table = useTableState(workspace.rows, {
+    searchFields: ['id', 'name', 'role', 'permission', 'admin', 'action'],
+    initialPageSize: 10,
+  });
+
+  const columns = workspace.columns.map((column) => ({
+    ...column,
+    render: (row) => renderCell(row, column),
+  }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-up">
-        <StatCard label="Admin Users" value="08" subtext="Internal platform staff" icon={Users} />
-        <StatCard label="Active Sessions" value="02" subtext="Current admin access" icon={ShieldCheck} />
-        <StatCard label="Security Logs" value="NOMINAL" subtext="0 flags detected" icon={Lock} />
-      </div>
+    <PageShell>
+      <SectionHeader
+        eyebrow={workspace.eyebrow}
+        title={workspace.title}
+        description={workspace.description}
+        actions={(
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `admin-${slug}.csv`)}>Export</Button>
+            <Button variant="primary" icon={Eye}>{slug === 'users' ? 'Provision Admin' : 'Open Security Review'}</Button>
+          </>
+        )}
+      />
 
-      <Card title="Personnel Registry" subtitle="Admin User Roles & Permissions" padding={false} className="animate-fade-up delay-100">
-        <Table 
-          headers={['Administrator Identity', 'Functional Role', 'Permission Level', 'Current Status', 'Identity Trace', 'Management']}
-          data={admins}
-          rowRenderer={(admin, i) => (
-            <TableRow key={i}>
-              <TableCell className="font-bold text-text">{admin.name}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                    <ShieldAlert size={14} className="text-primary/60" />
-                    <span className="text-[11px] font-black uppercase tracking-widest text-text-muted">{admin.role}</span>
+      <MetricStrip metrics={workspace.metrics} />
+
+      <TableToolbar searchValue={table.search} onSearchChange={table.setSearch} searchPlaceholder={`Search ${workspace.title.toLowerCase()} records`}>
+        <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />
+      </TableToolbar>
+
+      <FilterChips filters={table.filters} onClear={(key) => table.setFilter(key, 'all')} />
+
+      <Card title={workspace.tableTitle} subtitle={workspace.tableSubtitle} padding={false}>
+        <DataTable
+          columns={[
+            ...columns,
+            {
+              key: 'action',
+              label: 'Action',
+              render: (row) => (
+                <div className="text-right">
+                  <Button size="sm" variant="secondary" onClick={() => drawer.open(row)}>Open</Button>
                 </div>
-              </TableCell>
-              <TableCell className="font-mono text-text-muted text-[10px]">{admin.permissions}</TableCell>
-              <TableCell>
-                <Badge variant={admin.status === 'ACTIVE' ? 'success' : 'muted'} dot>{admin.status}</Badge>
-              </TableCell>
-              <TableCell className="text-text-muted opacity-60 font-mono italic">{admin.last_active}</TableCell>
-              <TableCell className="text-right">
-                <Button size="sm" variant="ghost" icon={Key}>Credentials</Button>
-              </TableCell>
-            </TableRow>
-          )}
+              ),
+            },
+          ]}
+          data={table.items}
+          rowKey="id"
         />
-        <div className="p-4 border-t border-border/40 flex justify-end bg-white/2">
-            <Button variant="primary" icon={Plus}>Provision New Admin Account</Button>
-        </div>
+        <Pagination
+          page={table.page}
+          totalPages={table.totalPages}
+          onPageChange={table.setPage}
+          pageSize={table.pageSize}
+          onPageSizeChange={table.setPageSize}
+        />
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up delay-200">
-          <Card title="Role-Based Access" subtitle="Define Permission Packages">
-              <div className="space-y-3">
-                  {['Financial Approver', 'Compliance Auditor', 'Trading Spectator'].map((role, i) => (
-                      <div key={i} className="p-4 rounded-[8px] bg-white/2 border border-white/5 flex justify-between items-center">
-                          <span className="font-bold">{role}</span>
-                          <Button size="sm" variant="secondary">Configure</Button>
-                      </div>
-                  ))}
+      <AdminDrawer open={drawer.isOpen} title={drawer.value?.id ?? 'Admin Record'} subtitle={drawer.value?.name ?? drawer.value?.role ?? ''} onClose={drawer.close}>
+        {drawer.value && (
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(drawer.value).map(([key, value]) => (
+              <div key={key} className="rounded-[10px] border border-border/30 bg-bg/70 p-3">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{key}</div>
+                <div className="mt-1 text-[13px] text-text">{String(value)}</div>
               </div>
-          </Card>
-          <Card title="Security Hardening" subtitle="Global Access Policies">
-               <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 rounded-[8px] bg-white/2 border border-white/5">
-                      <span className="text-[13px] font-bold">Require Admin MFA</span>
-                      <Badge variant="success">Active</Badge>
-                  </div>
-                  <div className="flex justify-between items-center p-3 rounded-[8px] bg-white/2 border border-white/5">
-                      <span className="text-[13px] font-bold">Auto-session Timeout</span>
-                      <span className="text-text-muted font-mono">15m</span>
-                  </div>
-                  <Button variant="ghost" className="w-full">View Full Security Audit Log</Button>
-               </div>
-          </Card>
-      </div>
-    </div>
+            ))}
+          </div>
+        )}
+      </AdminDrawer>
+    </PageShell>
   );
 }

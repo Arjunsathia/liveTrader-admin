@@ -1,19 +1,8 @@
-export const userOpsTabs = [
-  { id: 'list', label: 'User List', path: '/users/list' },
-  { id: 'kyc', label: 'KYC Requests', path: '/users/kyc' },
-  { id: 'activity', label: 'User Activity', path: '/users/activity' },
-  { id: 'mt5', label: 'MT5 Accounts', path: '/users/mt5' },
-];
-
-export const userDetailTabs = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'profile', label: 'Profile' },
-  { id: 'kyc', label: 'KYC' },
-  { id: 'wallet', label: 'Wallet' },
-  { id: 'mt5', label: 'MT5 Accounts' },
-  { id: 'trading', label: 'Trading History' },
-  { id: 'activity', label: 'Activity Logs' },
-  { id: 'risk', label: 'Risk View' },
+export const userMetrics = [
+  { label: 'Total Users', value: '12,842', subtext: '452 new this month', trend: 'up' },
+  { label: 'KYC Queue', value: '154', subtext: '28 above SLA', trend: 'warning' },
+  { label: 'Funded Accounts', value: '8,420', subtext: '65.6% funded ratio', trend: 'up' },
+  { label: 'Flagged Users', value: '62', subtext: 'Risk review in progress', trend: 'danger' },
 ];
 
 export const users = [
@@ -22,9 +11,11 @@ export const users = [
     uid: '19284',
     name: 'Marco Rossi',
     email: 'm.rossi@example.com',
+    phone: '+39 347 992 1200',
     country: 'IT',
     tier: 'VIP Gold',
     segment: 'High Frequency FX',
+    fundingState: 'FUNDED',
     kycStatus: 'VERIFIED',
     riskStatus: 'WATCHLIST',
     walletBalance: '$42,500.00',
@@ -35,14 +26,13 @@ export const users = [
     registered: '2026-03-28 08:42',
     lastSeen: '2m ago',
     source: 'Affiliate / Milan Desk',
-    phone: '+39 347 992 1200',
-    dob: '1991-04-14',
     address: 'Via Torino 44, Milan',
-    notes: 'Priority trader with same-day withdrawal review.',
+    notesSummary: 'Priority trader with same-day withdrawal review.',
     kyc: {
       level: 'Level 2',
       submittedAt: '2026-03-28 10:10',
       reviewer: 'Compliance Desk A',
+      status: 'VERIFIED',
       documents: ['Passport', 'Utility Bill', 'Source of Funds'],
       aml: 'No direct sanction hit, low media exposure.',
     },
@@ -69,17 +59,24 @@ export const users = [
       exposure: '$118,400',
       concentration: 'BTC 42%',
       drawdown: '6.1%',
+      status: 'WATCHLIST',
       alerts: ['High crypto concentration', 'One delayed MT5 sync', 'Recent withdrawal after profit realization'],
     },
+    notes: [
+      { id: 'NOTE-1', author: 'Compliance Desk', time: '2026-03-30 10:12', text: 'Enhanced review completed. No additional source-of-funds docs required.' },
+      { id: 'NOTE-2', author: 'Treasury Ops', time: '2026-03-30 08:40', text: 'Large withdrawal routed to same-day queue due to VIP classification.' },
+    ],
   },
   {
     id: 'usr-20112',
     uid: '20112',
     name: 'Elena Vance',
     email: 'e.vance@citadel.com',
+    phone: '+1 212 555 1420',
     country: 'US',
     tier: 'Prime',
     segment: 'Institutional Copy',
+    fundingState: 'PENDING',
     kycStatus: 'PENDING',
     riskStatus: 'LOW',
     walletBalance: '$12,000.00',
@@ -90,14 +87,13 @@ export const users = [
     registered: '2026-03-30 05:16',
     lastSeen: '11m ago',
     source: 'Direct Sales',
-    phone: '+1 212 555 1420',
-    dob: '1988-11-02',
     address: '31 Hudson Yards, New York',
-    notes: 'Waiting on POA refresh before withdrawal enablement.',
+    notesSummary: 'Waiting on POA refresh before withdrawal enablement.',
     kyc: {
       level: 'Level 1',
       submittedAt: '2026-03-30 05:44',
       reviewer: 'Compliance Queue',
+      status: 'PENDING',
       documents: ['Driver License', 'Bank Statement'],
       aml: 'Enhanced due diligence requested for employer validation.',
     },
@@ -120,17 +116,23 @@ export const users = [
       exposure: '$35,000',
       concentration: 'BTC 28%',
       drawdown: '1.4%',
+      status: 'LOW',
       alerts: ['Pending KYC verification'],
     },
+    notes: [
+      { id: 'NOTE-3', author: 'Compliance Queue', time: '2026-03-30 09:58', text: 'Proof of address requires a refreshed utility bill dated within 90 days.' },
+    ],
   },
   {
     id: 'usr-18552',
     uid: '18552',
     name: 'Kofi Arhin',
     email: 'k.arhin@gh.com',
+    phone: '+233 24 555 8923',
     country: 'GH',
     tier: 'Retail Plus',
     segment: 'Manual FX',
+    fundingState: 'RESTRICTED',
     kycStatus: 'REJECTED',
     riskStatus: 'ELEVATED',
     walletBalance: '$5,000.00',
@@ -141,14 +143,13 @@ export const users = [
     registered: '2026-03-27 13:08',
     lastSeen: '54m ago',
     source: 'Referral',
-    phone: '+233 24 555 8923',
-    dob: '1994-07-09',
     address: 'Airport Residential, Accra',
-    notes: 'Blocked for repeated mismatched KYC submissions.',
+    notesSummary: 'Blocked for repeated mismatched KYC submissions.',
     kyc: {
       level: 'Level 0',
       submittedAt: '2026-03-27 13:40',
       reviewer: 'Compliance Desk C',
+      status: 'REJECTED',
       documents: ['National ID', 'Utility Bill'],
       aml: 'Document mismatch between submitted ID and selfie review.',
     },
@@ -171,57 +172,32 @@ export const users = [
       exposure: '$26,200',
       concentration: 'Gold 66%',
       drawdown: '19.8%',
+      status: 'ELEVATED',
       alerts: ['Rejected KYC', 'Margin stress on account 8810881', 'Recent withdrawal flagged'],
     },
+    notes: [
+      { id: 'NOTE-4', author: 'Risk Desk', time: '2026-03-30 09:36', text: 'Close-only mode applied until document mismatch case is resolved.' },
+    ],
   },
 ];
 
 export const kycQueue = [
-  { id: 'KYC-1042', userId: 'usr-20112', user: 'Elena Vance', tier: 'Prime', country: 'US', status: 'Pending Review', eta: '18m', docs: '2/3 complete', risk: 'Medium' },
-  { id: 'KYC-1041', userId: 'usr-18552', user: 'Kofi Arhin', tier: 'Retail Plus', country: 'GH', status: 'Rejected', eta: 'Requires outreach', docs: 'Mismatch', risk: 'High' },
-  { id: 'KYC-1038', userId: 'usr-19284', user: 'Marco Rossi', tier: 'VIP Gold', country: 'IT', status: 'Verified', eta: 'Completed', docs: '3/3 complete', risk: 'Low' },
+  { id: 'KYC-1042', userId: 'usr-20112', user: 'Elena Vance', tier: 'Prime', country: 'US', status: 'PENDING', eta: '18m', docs: '2/3 complete', risk: 'MEDIUM' },
+  { id: 'KYC-1041', userId: 'usr-18552', user: 'Kofi Arhin', tier: 'Retail Plus', country: 'GH', status: 'REJECTED', eta: 'Requires outreach', docs: 'Mismatch', risk: 'HIGH' },
+  { id: 'KYC-1038', userId: 'usr-19284', user: 'Marco Rossi', tier: 'VIP Gold', country: 'IT', status: 'VERIFIED', eta: 'Completed', docs: '3/3 complete', risk: 'LOW' },
 ];
 
-export const activityFeed = [
-  { id: 'ACT-9120', userId: 'usr-19284', user: 'Marco Rossi', event: 'Withdrawal request created', source: 'Client Portal', severity: 'Info', time: '09:10', owner: 'Treasury' },
-  { id: 'ACT-9114', userId: 'usr-20112', user: 'Elena Vance', event: 'Proof of address uploaded', source: 'KYC Widget', severity: 'Info', time: '08:52', owner: 'Compliance' },
-  { id: 'ACT-9102', userId: 'usr-18552', user: 'Kofi Arhin', event: 'MT5 permissions reduced after margin alert', source: 'Risk Engine', severity: 'Critical', time: '08:10', owner: 'Risk Desk' },
-  { id: 'ACT-9099', userId: 'usr-19284', user: 'Marco Rossi', event: 'Manual wallet hold released', source: 'Treasury Console', severity: 'Review', time: '07:54', owner: 'Finance Ops' },
+export const userActivityFeed = [
+  { id: 'ACT-9120', userId: 'usr-19284', user: 'Marco Rossi', event: 'Withdrawal request created', source: 'Client Portal', severity: 'INFO', time: '09:10', owner: 'Treasury' },
+  { id: 'ACT-9114', userId: 'usr-20112', user: 'Elena Vance', event: 'Proof of address uploaded', source: 'KYC Widget', severity: 'INFO', time: '08:52', owner: 'Compliance' },
+  { id: 'ACT-9102', userId: 'usr-18552', user: 'Kofi Arhin', event: 'MT5 permissions reduced after margin alert', source: 'Risk Engine', severity: 'CRITICAL', time: '08:10', owner: 'Risk Desk' },
+  { id: 'ACT-9099', userId: 'usr-19284', user: 'Marco Rossi', event: 'Manual wallet hold released', source: 'Treasury Console', severity: 'REVIEW', time: '07:54', owner: 'Finance Ops' },
 ];
 
 export const mt5Accounts = [
-  { login: '8800124', userId: 'usr-19284', user: 'Marco Rossi', server: 'LiveTrader-Live 01', status: 'CONNECTED', connection: '15ms', group: 'VIP\\FX', leverage: '1:200', balance: '$28,400', lastSync: '14s ago' },
-  { login: '8809982', userId: 'usr-19284', user: 'Marco Rossi', server: 'LiveTrader-Copy 01', status: 'SYNC_DELAY', connection: '143ms', group: 'Copy\\Pro', leverage: '1:100', balance: '$14,520', lastSync: '4m ago' },
-  { login: '8811020', userId: 'usr-20112', user: 'Elena Vance', server: 'LiveTrader-Live 01', status: 'CONNECTED', connection: '18ms', group: 'Institutional\\Copy', leverage: '1:50', balance: '$15,840', lastSync: '22s ago' },
-  { login: '8810881', userId: 'usr-18552', user: 'Kofi Arhin', server: 'LiveTrader-Live 02', status: 'LIMITED', connection: '64ms', group: 'Retail\\FX', leverage: '1:300', balance: '$2,820', lastSync: '2m ago' },
-  { login: '8810882', userId: 'usr-18552', user: 'Kofi Arhin', server: 'LiveTrader-Demo 01', status: 'DISCONNECTED', connection: 'Offline', group: 'Demo\\FX', leverage: '1:500', balance: '$1,300', lastSync: '22m ago' },
+  { id: 'MT5-1', login: '8800124', userId: 'usr-19284', user: 'Marco Rossi', server: 'LiveTrader-Live 01', status: 'CONNECTED', connection: '15ms', group: 'VIP\\FX', leverage: '1:200', balance: '$28,400', lastSync: '14s ago' },
+  { id: 'MT5-2', login: '8809982', userId: 'usr-19284', user: 'Marco Rossi', server: 'LiveTrader-Copy 01', status: 'SYNC_DELAY', connection: '143ms', group: 'Copy\\Pro', leverage: '1:100', balance: '$14,520', lastSync: '4m ago' },
+  { id: 'MT5-3', login: '8811020', userId: 'usr-20112', user: 'Elena Vance', server: 'LiveTrader-Live 01', status: 'CONNECTED', connection: '18ms', group: 'Institutional\\Copy', leverage: '1:50', balance: '$15,840', lastSync: '22s ago' },
+  { id: 'MT5-4', login: '8810881', userId: 'usr-18552', user: 'Kofi Arhin', server: 'LiveTrader-Live 02', status: 'LIMITED', connection: '64ms', group: 'Retail\\FX', leverage: '1:300', balance: '$2,820', lastSync: '2m ago' },
+  { id: 'MT5-5', login: '8810882', userId: 'usr-18552', user: 'Kofi Arhin', server: 'LiveTrader-Demo 01', status: 'DISCONNECTED', connection: 'Offline', group: 'Demo\\FX', leverage: '1:500', balance: '$1,300', lastSync: '22m ago' },
 ];
-
-export const mt5Logs = {
-  '8800124': [
-    { time: '09:44:12', event: 'Heartbeat acknowledged', source: 'Gateway A', level: 'Info' },
-    { time: '09:38:03', event: 'Equity synced to CRM', source: 'Bridge Service', level: 'Info' },
-    { time: '09:17:44', event: 'Password change propagated', source: 'Admin Console', level: 'Review' },
-  ],
-  '8809982': [
-    { time: '09:41:01', event: 'Quote sync delayed > 120s', source: 'Bridge Service', level: 'Warning' },
-    { time: '09:34:50', event: 'Reconnection attempt succeeded', source: 'Gateway B', level: 'Info' },
-    { time: '09:11:32', event: 'Server load spike detected', source: 'Infra Monitor', level: 'Warning' },
-  ],
-  '8811020': [
-    { time: '09:43:55', event: 'Trade history batch imported', source: 'Bridge Service', level: 'Info' },
-    { time: '09:40:14', event: 'Session token refreshed', source: 'Gateway A', level: 'Info' },
-  ],
-  '8810881': [
-    { time: '09:35:40', event: 'Margin level below threshold', source: 'Risk Engine', level: 'Critical' },
-    { time: '09:14:17', event: 'Permissions downgraded to close-only', source: 'Admin Console', level: 'Review' },
-  ],
-  '8810882': [
-    { time: '09:02:11', event: 'Account unreachable', source: 'Gateway C', level: 'Critical' },
-    { time: '08:41:09', event: 'Retry exhausted after 5 attempts', source: 'Bridge Service', level: 'Critical' },
-  ],
-};
-
-export function getUserById(userId) {
-  return users.find((user) => user.id === userId);
-}
