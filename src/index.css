@@ -38,6 +38,11 @@
   --color-warning: var(--warning);
   --color-secondary: var(--accent);
   --color-border-subtle: var(--glass);
+  --color-cyan: var(--cyan);
+  --color-purple: var(--purple);
+  
+  /* Dynamic shadows */
+  --shadow-card-subtle: var(--shadow-dynamic);
 }
 
 @layer base {
@@ -60,6 +65,8 @@
     --negative: #dc2626;
     --warning: #d97706;
     --accent: #2a4a8a;
+    --cyan: #0e9cb8;
+    --purple: #7c3aed;
 
     --border: rgba(66, 71, 84, 0.15);
     --glass: rgba(255, 255, 255, 0.1); /* Simplified */
@@ -71,6 +78,9 @@
     /* RGB Helpers */
     --primary-rgb: 42, 74, 138;
     --negative-rgb: 220, 38, 38;
+
+    /* Shadows */
+    --shadow-dynamic: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
   }
 
   .dark {
@@ -94,6 +104,8 @@
     --negative: #ffb3ad; /* Sophisticated Red */
     --warning: #f59e0b;
     --accent: #adc6ff;
+    --cyan: #22d3ee;  /* Accent cyan — dashboard stream / charts */
+    --purple: #a78bfa; /* Accent purple — dashboard KPIs / trading */
 
     --border: rgba(66, 71, 84, 0.15); /* Ghost Border */
     --glass: rgba(34, 47, 74, 0.15); /* Simplified */
@@ -105,6 +117,9 @@
     /* RGB Helpers */
     --primary-rgb: 173, 198, 255;
     --negative-rgb: 255, 179, 173;
+
+    /* Shadows */
+    --shadow-dynamic: 0 4px 16px -2px rgba(0, 0, 0, 0.45), 0 3px 6px -2px rgba(0, 0, 0, 0.35);
   }
 
   body {

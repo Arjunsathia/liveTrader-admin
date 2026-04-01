@@ -23,12 +23,12 @@ export function TabOverview({ user }) {
       <SectionLabel>Wallet Snapshot</SectionLabel>
       <div className="grid grid-cols-3 gap-2.5">
         <Field label="Balance" value={user.walletBalance} accent="var(--brand)" mono />
-        <Field label="Equity" value={user.equity} accent="#4ae176" mono />
-        <Field label="Free Margin" value={user.freeMargin} accent="#22d3ee" mono />
+        <Field label="Equity" value={user.equity} accent="var(--positive)" mono />
+        <Field label="Free Margin" value={user.freeMargin} accent="var(--cyan)" mono />
       </div>
 
       <SectionLabel>Operator Notes</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-3.5">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-3.5">
         <p className="text-[12px] leading-5 text-text-muted/80">{user.notesSummary}</p>
       </div>
       {user.risk.alerts.length > 0 && (
@@ -36,10 +36,10 @@ export function TabOverview({ user }) {
           {user.risk.alerts.map((alert, i) => (
             <div
               key={i}
-              className="flex items-start gap-2.5 rounded-[8px] border border-[#f59e0b]/25 bg-[#f59e0b]/06 px-3 py-2.5"
+              className="flex items-start gap-2.5 rounded-[8px] border border-[var(--warning)]/25 bg-[var(--warning)]/06 px-3 py-2.5"
             >
-              <AlertTriangle size={12} className="mt-0.5 flex-shrink-0 text-[#f59e0b]" />
-              <span className="text-[12px] leading-5 text-[#f59e0b]/85">{alert}</span>
+              <AlertTriangle size={12} className="mt-0.5 flex-shrink-0 text-[var(--warning)]" />
+              <span className="text-[12px] leading-5 text-[var(--warning)]/85">{alert}</span>
             </div>
           ))}
         </div>
@@ -86,7 +86,7 @@ export function TabProfile({ user }) {
 export function TabKyc({ user }) {
   const { kyc } = user;
   const statusColor = {
-    VERIFIED: '#4ae176', PENDING: '#f59e0b', REJECTED: '#ef4444', UNDER_REVIEW: '#22d3ee',
+    VERIFIED: 'var(--positive)', PENDING: 'var(--warning)', REJECTED: 'var(--negative)', UNDER_REVIEW: 'var(--cyan)',
   }[kyc.status] ?? '#888';
 
   return (
@@ -130,7 +130,7 @@ export function TabKyc({ user }) {
         {kyc.documents.map((doc) => (
           <div
             key={doc}
-            className="flex items-center justify-between gap-3 rounded-[8px] border border-border/40 bg-surface-elevated px-3.5 py-2.5"
+            className="flex items-center justify-between gap-3 rounded-[8px] border border-border/40 bg-surface-elevated shadow-card-subtle px-3.5 py-2.5"
           >
             <div className="flex items-center gap-2.5">
               <FileText size={13} className="text-text-muted/50" />
@@ -139,7 +139,7 @@ export function TabKyc({ user }) {
             <div className="flex items-center gap-2">
               <span
                 className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px]"
-                style={{ color: '#4ae176', background: '#4ae17618' }}
+                style={{ color: 'var(--positive)', background: 'var(--positive)18' }}
               >
                 RECEIVED
               </span>
@@ -155,7 +155,7 @@ export function TabKyc({ user }) {
       </div>
 
       <SectionLabel>AML / Compliance Notes</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-3.5">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-3.5">
         <p className="text-[12px] leading-5 text-text-muted/80">{kyc.aml}</p>
       </div>
     </div>
@@ -168,18 +168,18 @@ export function TabWallet({ user }) {
       <SectionLabel>Balances</SectionLabel>
       <div className="grid grid-cols-3 gap-2.5">
         <Field label="Total Balance" value={user.walletBalance} accent="var(--brand)" mono />
-        <Field label="Equity" value={user.equity} accent="#4ae176" mono />
-        <Field label="Margin Used" value={user.margin} accent="#f59e0b" mono />
-        <Field label="Free Margin" value={user.freeMargin} accent="#22d3ee" mono />
+        <Field label="Equity" value={user.equity} accent="var(--positive)" mono />
+        <Field label="Margin Used" value={user.margin} accent="var(--warning)" mono />
+        <Field label="Free Margin" value={user.freeMargin} accent="var(--cyan)" mono />
         <Field label="Margin Level" value={user.marginLevel} mono />
         <Field label="Funding State" value={user.fundingState} />
       </div>
 
       <SectionLabel>Asset Breakdown</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated overflow-hidden">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border/20 bg-surface-1/50">
+            <tr className="border-b border-border/20 bg-surface-elevated/50">
               {['Asset', 'Balance', 'Available', 'On Hold'].map((h) => (
                 <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/45">
                   {h}
@@ -189,11 +189,11 @@ export function TabWallet({ user }) {
           </thead>
           <tbody>
             {user.wallet.map((row) => (
-              <tr key={row.asset} className="border-b border-border/10 hover:bg-surface-1/30 transition-colors">
+              <tr key={row.asset} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
                 <td className="px-4 py-2.5 font-mono text-[12px] font-semibold text-text">{row.asset}</td>
                 <td className="px-4 py-2.5 font-mono text-[12px] text-text">{row.balance}</td>
-                <td className="px-4 py-2.5 font-mono text-[12px] text-[#4ae176]">{row.available}</td>
-                <td className="px-4 py-2.5 font-mono text-[12px] text-[#f59e0b]">{row.hold}</td>
+                <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--positive)]">{row.available}</td>
+                <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--warning)]">{row.hold}</td>
               </tr>
             ))}
           </tbody>
@@ -201,10 +201,10 @@ export function TabWallet({ user }) {
       </div>
 
       <SectionLabel>Transaction History</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated overflow-hidden">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border/20 bg-surface-1/50">
+            <tr className="border-b border-border/20 bg-surface-elevated/50">
               {['ID', 'Type', 'Method', 'Amount', 'Status', 'Date'].map((h) => (
                 <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/45">
                   {h}
@@ -214,13 +214,13 @@ export function TabWallet({ user }) {
           </thead>
           <tbody>
             {user.transactions.map((tx) => (
-              <tr key={tx.id} className="border-b border-border/10 hover:bg-surface-1/30 transition-colors">
+              <tr key={tx.id} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
                 <td className="px-4 py-2.5 font-mono text-[11px] text-text-muted/60">{tx.id}</td>
                 <td className="px-4 py-2.5 text-[12px] font-medium text-text">{tx.type}</td>
                 <td className="px-4 py-2.5 text-[11px] text-text-muted/70">{tx.method}</td>
                 <td
                   className="px-4 py-2.5 font-mono text-[12px] font-semibold"
-                  style={{ color: tx.amount.startsWith('+') ? '#4ae176' : '#ef4444' }}
+                  style={{ color: tx.amount.startsWith('+') ? 'var(--positive)' : 'var(--negative)' }}
                 >
                   {tx.amount}
                 </td>
@@ -228,8 +228,8 @@ export function TabWallet({ user }) {
                   <span
                     className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px]"
                     style={{
-                      color: tx.status === 'confirmed' || tx.status === 'approved' ? '#4ae176' : '#f59e0b',
-                      background: tx.status === 'confirmed' || tx.status === 'approved' ? '#4ae17618' : '#f59e0b18',
+                      color: tx.status === 'confirmed' || tx.status === 'approved' ? 'var(--positive)' : 'var(--warning)',
+                      background: tx.status === 'confirmed' || tx.status === 'approved' ? 'var(--positive)18' : 'var(--warning)18',
                     }}
                   >
                     {tx.status}
@@ -261,21 +261,21 @@ export function TabMt5({ user }) {
       </div>
 
       {user.mt5.map((a) => (
-        <div key={a.login} className="rounded-[10px] border border-border/40 bg-surface-elevated p-4">
+        <div key={a.login} className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-border/25"
-                style={{ background: '#4ae1761a' }}
+                style={{ background: 'var(--positive)1a' }}
               >
-                <Monitor size={16} style={{ color: '#4ae176' }} />
+                <Monitor size={16} style={{ color: 'var(--positive)' }} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-[14px] font-semibold text-text">#{a.login}</span>
                   <span
                     className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px]"
-                    style={{ color: '#4ae176', background: '#4ae17618' }}
+                    style={{ color: 'var(--positive)', background: 'var(--positive)18' }}
                   >
                     {a.status}
                   </span>
@@ -292,8 +292,8 @@ export function TabMt5({ user }) {
 
           <div className="grid grid-cols-3 gap-2.5">
             <Field label="Leverage" value={a.leverage} />
-            <Field label="Equity" value={a.equity} accent="#4ae176" mono />
-            <Field label="Margin Level" value={a.marginLevel} accent="#22d3ee" mono />
+            <Field label="Equity" value={a.equity} accent="var(--positive)" mono />
+            <Field label="Margin Level" value={a.marginLevel} accent="var(--cyan)" mono />
             <Field label="Last Sync" value={a.lastSync} mono />
             <Field label="Server" value={a.server} />
             <Field label="Group" value={a.group} mono />
@@ -308,10 +308,10 @@ export function TabTrading({ user }) {
   return (
     <div className="space-y-4">
       <SectionLabel>Open Positions ({user.openTrades.length})</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated overflow-hidden">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border/20 bg-surface-1/50">
+            <tr className="border-b border-border/20 bg-surface-elevated/50">
               {['Ticket', 'Symbol', 'Dir', 'Lots', 'Open Price', 'Current', 'Floating P&L', 'Swap', 'Opened'].map((h) => (
                 <th key={h} className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-text-muted/45">{h}</th>
               ))}
@@ -319,18 +319,18 @@ export function TabTrading({ user }) {
           </thead>
           <tbody>
             {user.openTrades.map((t) => (
-              <tr key={t.ticket} className="border-b border-border/10 hover:bg-surface-1/30 transition-colors">
+              <tr key={t.ticket} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
                 <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.ticket}</td>
                 <td className="px-3 py-2.5 font-mono text-[12px] font-semibold text-text">{t.symbol}</td>
                 <td className="px-3 py-2.5">
-                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-[3px]" style={{ color: t.side === 'BUY' ? '#4ae176' : '#ef4444', background: t.side === 'BUY' ? '#4ae17618' : '#ef444418' }}>
+                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-[3px]" style={{ color: t.side === 'BUY' ? 'var(--positive)' : 'var(--negative)', background: t.side === 'BUY' ? 'var(--positive)18' : 'var(--negative)18' }}>
                     {t.side}
                   </span>
                 </td>
                 <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.lots}</td>
                 <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.open}</td>
                 <td className="px-3 py-2.5 font-mono text-[12px] text-text">{t.current}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold" style={{ color: t.pnl.startsWith('+') ? '#4ae176' : '#ef4444' }}>{t.pnl}</td>
+                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold" style={{ color: t.pnl.startsWith('+') ? 'var(--positive)' : 'var(--negative)' }}>{t.pnl}</td>
                 <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.swap}</td>
                 <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.time}</td>
               </tr>
@@ -340,10 +340,10 @@ export function TabTrading({ user }) {
       </div>
 
       <SectionLabel>Closed Trades</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated overflow-hidden">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border/20 bg-surface-1/50">
+            <tr className="border-b border-border/20 bg-surface-elevated/50">
               {['Ticket', 'Symbol', 'Dir', 'Lots', 'Open', 'Close', 'P&L', 'Date'].map((h) => (
                 <th key={h} className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-text-muted/45">{h}</th>
               ))}
@@ -351,18 +351,18 @@ export function TabTrading({ user }) {
           </thead>
           <tbody>
             {user.tradingHistory.map((t) => (
-              <tr key={t.ticket} className="border-b border-border/10 hover:bg-surface-1/30 transition-colors">
+              <tr key={t.ticket} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
                 <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.ticket}</td>
                 <td className="px-3 py-2.5 font-mono text-[12px] font-semibold text-text">{t.symbol}</td>
                 <td className="px-3 py-2.5">
-                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-[3px]" style={{ color: t.side === 'BUY' ? '#4ae176' : '#ef4444', background: t.side === 'BUY' ? '#4ae17618' : '#ef444418' }}>
+                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-[3px]" style={{ color: t.side === 'BUY' ? 'var(--positive)' : 'var(--negative)', background: t.side === 'BUY' ? 'var(--positive)18' : 'var(--negative)18' }}>
                     {t.side}
                   </span>
                 </td>
                 <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.lots}</td>
                 <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.open}</td>
                 <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.close}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold" style={{ color: t.pnl.startsWith('+') ? '#4ae176' : '#ef4444' }}>{t.pnl}</td>
+                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold" style={{ color: t.pnl.startsWith('+') ? 'var(--positive)' : 'var(--negative)' }}>{t.pnl}</td>
                 <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.time}</td>
               </tr>
             ))}
@@ -375,10 +375,10 @@ export function TabTrading({ user }) {
 
 export function TabActivity({ user }) {
   const typeConfig = {
-    auth: { color: '#22d3ee', label: 'AUTH' },
-    finance: { color: '#f59e0b', label: 'FINANCE' },
-    kyc: { color: '#a78bfa', label: 'KYC' },
-    mt5: { color: '#4ae176', label: 'MT5' },
+    auth: { color: 'var(--cyan)', label: 'AUTH' },
+    finance: { color: 'var(--warning)', label: 'FINANCE' },
+    kyc: { color: 'var(--purple)', label: 'KYC' },
+    mt5: { color: 'var(--positive)', label: 'MT5' },
     admin: { color: 'var(--brand)', label: 'ADMIN' },
   };
 
@@ -391,7 +391,7 @@ export function TabActivity({ user }) {
           return (
             <div
               key={i}
-              className="flex items-start gap-3 rounded-[10px] border border-border/40 bg-surface-elevated px-4 py-3"
+              className="flex items-start gap-3 rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle px-4 py-3"
             >
               <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5">
                 <div className="h-2 w-2 rounded-full" style={{ background: cfg.color }} />
@@ -430,7 +430,7 @@ export function TabActivity({ user }) {
 
 export function TabRisk({ user }) {
   const { risk } = user;
-  const riskColor = { LOW: '#4ae176', WATCHLIST: '#f59e0b', ELEVATED: '#ef4444', FLAGGED: '#ef4444' }[risk.level] ?? '#888';
+  const riskColor = { LOW: 'var(--positive)', WATCHLIST: 'var(--warning)', ELEVATED: 'var(--negative)', FLAGGED: 'var(--negative)' }[risk.level] ?? '#888';
 
   return (
     <div className="space-y-4">
@@ -467,18 +467,18 @@ export function TabRisk({ user }) {
         <Field label="Risk Level" value={risk.level} accent={riskColor} />
         <Field label="Exposure" value={risk.exposure} mono />
         <Field label="Concentration" value={risk.concentration} />
-        <Field label="Max Drawdown" value={risk.drawdown} accent="#ef4444" mono />
-        <Field label="Margin Level" value={user.marginLevel} accent="#22d3ee" mono />
+        <Field label="Max Drawdown" value={risk.drawdown} accent="var(--negative)" mono />
+        <Field label="Margin Level" value={user.marginLevel} accent="var(--cyan)" mono />
       </div>
 
       <SectionLabel>Active Alerts</SectionLabel>
       {risk.alerts.length > 0 ? (
         <div className="space-y-2">
           {risk.alerts.map((alert, i) => (
-            <div key={i} className="flex items-start justify-between gap-3 rounded-[9px] border border-[#f59e0b]/25 bg-[#f59e0b]/06 px-3.5 py-3">
+            <div key={i} className="flex items-start justify-between gap-3 rounded-[9px] border border-[var(--warning)]/25 bg-[var(--warning)]/06 px-3.5 py-3">
               <div className="flex items-start gap-2.5">
-                <AlertTriangle size={13} className="mt-0.5 flex-shrink-0 text-[#f59e0b]" />
-                <span className="text-[12px] leading-5 text-[#f59e0b]/85">{alert}</span>
+                <AlertTriangle size={13} className="mt-0.5 flex-shrink-0 text-[var(--warning)]" />
+                <span className="text-[12px] leading-5 text-[var(--warning)]/85">{alert}</span>
               </div>
               <button className="flex-shrink-0 rounded-[5px] border border-border/30 px-2 py-0.5 text-[10px] font-semibold text-text-muted hover:text-text transition-colors">
                 Dismiss
@@ -487,14 +487,14 @@ export function TabRisk({ user }) {
           ))}
         </div>
       ) : (
-        <div className="rounded-[9px] border border-[#4ae176]/20 bg-[#4ae176]/06 px-4 py-3 flex items-center gap-2.5">
-          <CheckCircle2 size={14} className="text-[#4ae176]" />
-          <span className="text-[12px] text-[#4ae176]/80">No active risk alerts.</span>
+        <div className="rounded-[9px] border border-[var(--positive)]/20 bg-[var(--positive)]/06 px-4 py-3 flex items-center gap-2.5">
+          <CheckCircle2 size={14} className="text-[var(--positive)]" />
+          <span className="text-[12px] text-[var(--positive)]/80">No active risk alerts.</span>
         </div>
       )}
 
       <SectionLabel>Compliance Notes</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-3.5">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-3.5">
         <p className="text-[12px] leading-5 text-text-muted/80">{risk.compliance}</p>
       </div>
 
@@ -517,7 +517,7 @@ export function TabNotes({ user }) {
       <SectionLabel>Internal CRM Notes</SectionLabel>
       <div className="space-y-3">
         {user.notes.map((note, i) => (
-          <div key={i} className="rounded-[10px] border border-border/40 bg-surface-elevated p-4">
+          <div key={i} className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4">
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
                 <div
@@ -527,7 +527,7 @@ export function TabNotes({ user }) {
                   {note.author[0].toUpperCase()}
                 </div>
                 <span className="text-[12px] font-semibold text-text">{note.author}</span>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.12em] px-1.5 py-0.5 rounded-[3px]" style={{ color: '#a78bfa', background: '#a78bfa18' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.12em] px-1.5 py-0.5 rounded-[3px]" style={{ color: 'var(--purple)', background: 'var(--purple)18' }}>
                   INTERNAL
                 </span>
               </div>
@@ -539,7 +539,7 @@ export function TabNotes({ user }) {
       </div>
 
       <SectionLabel>Add Note</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-4 space-y-3">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4 space-y-3">
         <textarea
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}

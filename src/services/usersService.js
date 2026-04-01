@@ -1,4 +1,4 @@
-import { kycQueue, mt5Accounts, userActivityFeed, userMetrics, users } from '../features/users/mocks/usersData';
+import { kycQueue, mt5Accounts, userActivityFeed, userMetrics, users } from '../features/users/data/usersData';
 
 export const usersService = {
   getMetrics() {

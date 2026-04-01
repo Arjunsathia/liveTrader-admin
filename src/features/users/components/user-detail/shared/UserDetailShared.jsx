@@ -5,7 +5,7 @@ import { ArrowUpRight, ArrowDownRight, Ban, ChevronDown, Key, Lock } from 'lucid
 export function Field({ label, value, mono = false, accent, wide = false, className = '' }) {
   return (
     <div
-      className={`rounded-[10px] border border-border/40 bg-surface-elevated px-3 py-2.5 ${wide ? 'col-span-2' : ''} ${className}`}
+      className={`rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle px-3 py-2.5 ${wide ? 'col-span-2' : ''} ${className}`}
     >
       <div className="text-[10px] font-semibold uppercase tracking-[0.13em] text-text-muted/50 mb-1">
         {label}
@@ -35,7 +35,7 @@ export function SectionLabel({ children }) {
 /* Stat pill */
 export function StatPill({ label, value, color }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-[8px] border border-border/40 bg-surface-elevated px-2.5 py-1.5">
+    <div className="flex items-center gap-1.5 rounded-[8px] border border-border/40 bg-surface-elevated shadow-card-subtle px-2.5 py-1.5">
       <span
         className="h-1.5 w-1.5 rounded-full flex-shrink-0"
         style={{ background: color }}
@@ -72,7 +72,7 @@ export function ActionBtn({ label, Icon, onClick, variant = 'default', disabled 
 export function KpiCard({ label, value, sub, dir, accent, Icon }) {
   return (
     <div
-      className="relative flex flex-col gap-1.5 overflow-hidden rounded-[10px] border border-border/40 bg-surface-elevated p-3.5"
+      className="relative flex flex-col gap-1.5 overflow-hidden rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-3.5"
     >
       <div
         className="absolute inset-x-0 top-0 h-[2px] rounded-t-[10px]"
@@ -127,13 +127,13 @@ export function MoreActionsMenu({ onSuspend, onReset, onFreeze, suspended }) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex h-8 items-center gap-1.5 rounded-[8px] border border-border/40 bg-surface-elevated px-2.5 text-[11px] font-semibold text-text-muted hover:border-border/60 hover:text-text transition-all"
+        className="flex h-8 items-center gap-1.5 rounded-[8px] border border-border/40 bg-surface-elevated shadow-card-subtle px-2.5 text-[11px] font-semibold text-text-muted hover:border-border/60 hover:text-text transition-all"
       >
         More <ChevronDown size={11} />
       </button>
       {open && (
         <div
-          className="absolute right-0 top-full z-50 mt-1 w-[185px] rounded-[10px] border border-border/40 py-1 shadow-2xl"
+          className="absolute right-0 top-full z-50 mt-1 w-[185px] rounded-[10px] border border-border/40 py-1 shadow-card-subtle"
           style={{ background: 'var(--surface-elevated)' }}
         >
           {items.map(({ label, Icon, fn, danger }) => (

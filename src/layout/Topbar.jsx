@@ -15,25 +15,16 @@ import {
 } from 'lucide-react';
 import { useRouteMeta } from '../hooks/useRouteMeta';
 import { useNavigate } from 'react-router-dom';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenCommand }) {
   const routeMeta = useRouteMeta();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const profileRef = useClickOutside(() => setIsProfileOpen(false));
 
   return (
-    <header className="sticky top-0 z-40 h-16 flex items-center px-4 gap-3 bg-surface-elevated dark:bg-bg border-b border-border/40 dark:border-border/10 transition-all duration-300">
+    <header className="sticky top-0 z-40 h-16 flex items-center px-4 gap-3 bg-surface-elevated dark:bg-bg border-b border-border/40 dark:border-border/10 shadow-card-subtle transition-all duration-300">
 
       {/* ── LEFT ─────────────────────────────────────────── */}
       <div className="flex items-center gap-3 shrink-0">
@@ -67,7 +58,7 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
           <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wide text-text-muted/40 leading-none">
             <span className="hover:text-primary/70 transition-colors cursor-default uppercase tracking-[0.1em]">LiveTrade.PRO</span>
             <ChevronRight size={8} strokeWidth={3} className="shrink-0 opacity-40" />
-            <span className="text-text-muted/70 uppercase tracking-[0.1em]">{routeMeta.section ?? 'Terminal'}</span>
+            <span className="text-text-muted/80 uppercase tracking-[0.1em]">{routeMeta.section}</span>
           </div>
           {/* Page title */}
           <h1 className="font-heading font-semibold text-[18px] leading-none tracking-[-0.04em] text-text truncate max-w-[200px]">
@@ -83,7 +74,7 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
       <div className="flex-1 flex items-center justify-center px-2 min-w-0">
         <button
           onClick={onOpenCommand}
-          className="group relative flex items-center w-full max-w-[400px] h-9 rounded-lg bg-surface-elevated/30 border border-border/30 hover:bg-surface-elevated/50 transition-all duration-200 cursor-pointer outline-none overflow-hidden"
+          className="group relative flex items-center w-full max-w-[400px] h-9 rounded-lg bg-surface-elevated/30 border border-border/30 shadow-card-subtle hover:bg-surface-elevated/50 transition-all duration-200 cursor-pointer outline-none overflow-hidden"
         >
           {/* Icon */}
           <span className="pl-3 pr-2 flex items-center text-text-muted/40 group-hover:text-primary transition-colors duration-200">
@@ -211,7 +202,7 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
 
           {/* Profile Dropdown Menu */}
           {isProfileOpen && (
-            <div className="absolute top-full right-0 mt-2 w-52 bg-surface border border-border/40 rounded-xl shadow-lg animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 z-[100] p-1.5">
+            <div className="absolute top-full right-0 mt-2 w-52 bg-surface border border-border/40 rounded-xl shadow-card-subtle animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 z-[100] p-1.5">
               <div className="px-3 py-2 mb-1 border-b border-white/5">
                 <p className="text-[10px] font-bold text-text-muted/40 uppercase tracking-[0.12em]">Administration</p>
                 <p className="text-[12px] font-semibold text-text truncate">Arjun Sathia</p>

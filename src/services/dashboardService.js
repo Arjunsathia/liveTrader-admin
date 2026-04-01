@@ -1,4 +1,4 @@
-import { dashboardAnalytics, dashboardKpis, dashboardTables, operationsTasks, quickActions, recentActivity } from '../features/dashboard/mocks/dashboardData';
+import { dashboardAnalytics, dashboardKpis, dashboardTables, operationsTasks, quickActions, recentActivity } from '../features/dashboard/data/dashboardData';
 
 export const dashboardService = {
   getKpis() {

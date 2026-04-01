@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Download, Filter, Search, UserPlus, Users } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { FUNDING_OPTIONS, KYC_OPTIONS, RISK_OPTIONS } from '../config/userFormConfig';
+import { FUNDING_OPTIONS, KYC_OPTIONS, RISK_OPTIONS } from '../data/userFormConfig';
 
 const viewOptions = [
   { id: 'list', label: 'User List' },
@@ -108,7 +108,7 @@ export function UsersToolbar({
       : 'Search name, UID, email, phone, or segment';
 
   return (
-    <section className="rounded-[14px] border border-border/35 bg-surface-elevated p-4 shadow-[0_12px_32px_rgba(2,6,23,0.06)]">
+    <section className="rounded-[14px] border border-border/35 bg-surface-elevated p-4 shadow-card-subtle">
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           {/* 
@@ -123,10 +123,7 @@ export function UsersToolbar({
             </button>
           ))} 
           */}
-          <div className="ml-auto hidden items-center gap-2 rounded-full border border-border/30 bg-bg/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted/55 lg:flex">
-            <Users size={12} />
-            Operator workspace
-          </div>
+       
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

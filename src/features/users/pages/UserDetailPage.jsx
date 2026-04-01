@@ -9,7 +9,7 @@ import {
 import { PageShell } from '../../../layout/PageShell';
 import { StatusBadge } from '../../../components/feedback/StatusBadge';
 import { usersService } from '../../../services/usersService';
-import { enrichUser } from '../mocks/enrichUser';
+import { enrichUser } from '../data/enrichUser';
 
 import { ActionBtn, StatPill, KpiCard, MoreActionsMenu } from '../components/user-detail/shared/UserDetailShared';
 import { RightPanel } from '../components/user-detail/layout/RightPanel';
@@ -50,11 +50,11 @@ export function UserDetailPage() {
 
   const kpis = [
     { label: 'Wallet Balance', value: user.walletBalance, sub: `30d P&L ${user.pnl30d}`, dir: user.pnlDir, accent: 'var(--brand)', Icon: Wallet },
-    { label: 'Equity', value: user.equity, sub: `Margin ${user.margin}`, dir: 'up', accent: '#4ae176', Icon: TrendingUp },
-    { label: 'Open Positions', value: String(user.openPositions), sub: 'live trades', dir: null, accent: '#22d3ee', Icon: Activity },
-    { label: 'Total Deposits', value: user.totalDeposits, sub: 'lifetime', dir: 'up', accent: '#a78bfa', Icon: ArrowUpRight },
-    { label: 'Withdrawals', value: user.totalWithdrawals, sub: 'lifetime', dir: null, accent: '#f59e0b', Icon: ArrowDownRight },
-    { label: 'Net P&L', value: user.pnl, sub: 'all time', dir: 'up', accent: '#4ae176', Icon: BarChart2 },
+    { label: 'Equity', value: user.equity, sub: `Margin ${user.margin}`, dir: 'up', accent: 'var(--positive)', Icon: TrendingUp },
+    { label: 'Open Positions', value: String(user.openPositions), sub: 'live trades', dir: null, accent: 'var(--cyan)', Icon: Activity },
+    { label: 'Total Deposits', value: user.totalDeposits, sub: 'lifetime', dir: 'up', accent: 'var(--purple)', Icon: ArrowUpRight },
+    { label: 'Withdrawals', value: user.totalWithdrawals, sub: 'lifetime', dir: null, accent: 'var(--warning)', Icon: ArrowDownRight },
+    { label: 'Net P&L', value: user.pnl, sub: 'all time', dir: 'up', accent: 'var(--positive)', Icon: BarChart2 },
   ];
 
   const tabContent = {
@@ -84,8 +84,7 @@ export function UserDetailPage() {
 
       {/* ══ HEADER ══════════════════════════════════ */}
       <div
-        className="relative overflow-hidden rounded-[14px] border border-border/40 bg-surface-elevated p-5 mt-4"
-        style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+        className="relative overflow-hidden rounded-[14px] border border-border/40 bg-surface-elevated shadow-card-subtle p-5 mt-4"
       >
         {/* Accent glow top-left */}
         <div
@@ -105,7 +104,7 @@ export function UserDetailPage() {
                 className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2"
                 style={{
                   borderColor: 'var(--surface-elevated)',
-                  background: suspended ? '#ef4444' : '#4ae176',
+                  background: suspended ? 'var(--negative)' : 'var(--positive)',
                 }}
               />
             </div>
@@ -118,7 +117,7 @@ export function UserDetailPage() {
                 <StatusBadge status={user.kycStatus} />
                 <StatusBadge status={user.riskStatus} dot={false} />
                 {suspended && (
-                  <span className="text-[10px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-[4px] bg-[#ef444420] text-[#ef4444]">
+                  <span className="text-[10px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-[4px] bg-negative/10 text-negative border border-negative/20">
                     SUSPENDED
                   </span>
                 )}
@@ -140,7 +139,7 @@ export function UserDetailPage() {
                 <span className="flex items-center gap-1">
                   <span
                     className="h-1.5 w-1.5 rounded-full"
-                    style={{ background: '#4ae176' }}
+                    style={{ background: 'var(--positive)' }}
                   />
                   Last active {user.lastSeen}
                 </span>
@@ -180,11 +179,11 @@ export function UserDetailPage() {
         <div className="mt-4 flex flex-wrap gap-2 pt-4 border-t border-border/20 z-10 relative">
           {[
             { label: 'Balance', value: user.walletBalance, color: 'var(--brand)' },
-            { label: 'Equity', value: user.equity, color: '#4ae176' },
-            { label: 'Open', value: `${user.openPositions} positions`, color: '#22d3ee' },
-            { label: 'MT5', value: `${user.mt5.length} accounts`, color: '#a78bfa' },
-            { label: 'KYC', value: user.kycStatus, color: user.kycStatus === 'VERIFIED' ? '#4ae176' : '#f59e0b' },
-            { label: 'Risk', value: user.riskStatus, color: user.riskStatus === 'LOW' ? '#4ae176' : '#f59e0b' },
+            { label: 'Equity', value: user.equity, color: 'var(--positive)' },
+            { label: 'Open', value: `${user.openPositions} positions`, color: 'var(--cyan)' },
+            { label: 'MT5', value: `${user.mt5.length} accounts`, color: 'var(--purple)' },
+            { label: 'KYC', value: user.kycStatus, color: user.kycStatus === 'VERIFIED' ? 'var(--positive)' : 'var(--warning)' },
+            { label: 'Risk', value: user.riskStatus, color: user.riskStatus === 'LOW' ? 'var(--positive)' : 'var(--warning)' },
           ].map(({ label, value, color }) => (
             <StatPill key={label} label={label} value={value} color={color} />
           ))}
@@ -233,8 +232,7 @@ export function UserDetailPage() {
 
           {/* Tab body */}
           <div
-            className="rounded-[12px] border border-border/40 bg-surface-elevated p-5"
-            style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+            className="rounded-[12px] border border-border/40 bg-surface-elevated shadow-card-subtle p-5"
           >
             {tabContent}
           </div>

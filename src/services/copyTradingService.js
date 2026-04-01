@@ -1,4 +1,4 @@
-import { copyTradingWorkspaces } from '../features/copy-trading/mocks/copyTradingData';
+import { copyTradingWorkspaces } from '../features/copy-trading/data/copyTradingData';
 
 export const copyTradingService = {
   getWorkspace(slug = 'strategies') {

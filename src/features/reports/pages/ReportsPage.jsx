@@ -4,8 +4,8 @@ import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
-import { SectionHeader } from '../../../layout/SectionHeader';
-import { MetricStrip } from '../../../components/cards/MetricStrip';
+import { PageHeader } from '../../../components/ui/PageHeader';
+import { MetricGrid } from '../../../components/cards/MetricGrid';
 import { TableToolbar } from '../../../components/tables/TableToolbar';
 import { FilterBar } from '../../../components/filters/FilterBar';
 import { FilterChips } from '../../../components/filters/FilterChips';
@@ -42,7 +42,7 @@ export function ReportsPage() {
 
   return (
     <PageShell>
-      <SectionHeader
+      <PageHeader
         eyebrow={workspace.eyebrow}
         title={workspace.title}
         description={workspace.description}
@@ -54,7 +54,7 @@ export function ReportsPage() {
         )}
       />
 
-      <MetricStrip metrics={workspace.metrics} />
+      <MetricGrid metrics={workspace.metrics} />
 
       <TableToolbar searchValue={table.search} onSearchChange={table.setSearch} searchPlaceholder={`Search ${workspace.title.toLowerCase()} reports`}>
         <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />

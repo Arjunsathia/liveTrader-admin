@@ -191,6 +191,15 @@ export function Sidebar({ collapsed, isMobile }) {
     return 'users-list';
   };
 
+  const getFinanceActiveId = (pathname) => {
+    if (pathname.includes('/finance/deposits')) return 'finance-deposits';
+    if (pathname.includes('/finance/withdrawals')) return 'finance-withdrawals';
+    if (pathname.includes('/finance/transactions')) return 'finance-transactions';
+    if (pathname.includes('/finance/failed')) return 'finance-failed';
+    if (pathname.includes('/finance/approvals')) return 'finance-approvals';
+    return 'finance-deposits';
+  };
+
   const getActiveId = () => {
     const { pathname } = location;
     if (pathname === '/') return 'dashboard';
@@ -201,6 +210,7 @@ export function Sidebar({ collapsed, isMobile }) {
         if (sub) return sub.id;
       }
       if (pathname.startsWith('/users/') && item.id === 'users') return getUsersActiveId();
+      if (pathname.startsWith('/finance/') && item.id === 'finance') return getFinanceActiveId(pathname);
       if (pathname.startsWith('/support/tickets/') && item.id === 'support') return 'support-tickets';
     }
     return null;
@@ -214,6 +224,7 @@ export function Sidebar({ collapsed, isMobile }) {
         item.path === location.pathname ||
         item.subItems?.some((subItem) => subItem.path === location.pathname) ||
         (location.pathname.startsWith('/users/') && item.id === 'users') ||
+        (location.pathname.startsWith('/finance/') && item.id === 'finance') ||
         (location.pathname.startsWith('/support/tickets/') && item.id === 'support'),
     )?.id ?? null,
     [allowedItems, location.pathname],
@@ -390,7 +401,7 @@ export function Sidebar({ collapsed, isMobile }) {
             />
 
               <div
-              className="flex flex-col rounded-[12px] overflow-hidden min-w-[210px] border border-border/60"
+              className="flex flex-col rounded-[12px] overflow-hidden min-w-[210px] border border-border/60 shadow-card-subtle"
               style={{
                 backgroundColor: 'var(--surface-2)',
                 animation: 'sideTooltip 0.18s cubic-bezier(0.16,1,0.3,1)',

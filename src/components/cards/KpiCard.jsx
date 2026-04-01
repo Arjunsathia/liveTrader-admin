@@ -1,32 +1,70 @@
 import React from 'react';
+import { ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react';
 
-export function KpiCard({ label, value, delta, icon: Icon, tone = 'info', note }) {
-  const tones = {
-    info: 'bg-primary/10 text-primary',
-    success: 'bg-positive/10 text-positive',
-    warning: 'bg-warning/10 text-warning',
-    danger: 'bg-negative/10 text-negative',
-  };
+/**
+ * Canonical KPI Card — used by Dashboard, Users, and Finance sections.
+ *
+ * Props:
+ *   label    — string, the metric name (shown as small caps label)
+ *   value    — string | number, the primary display value
+ *   accent   — CSS color string (e.g. 'var(--brand)' or '#4ae176')
+ *   Icon     — Lucide icon component
+ *   sub      — string, secondary description text (optional)
+ *   trend    — string, e.g. '+3.2%' or '61' (optional)
+ *   trendUp  — bool, true = green arrow, false = red arrow (optional, if omitted no arrow)
+ */
+export function KpiCard({ label, value, accent = 'var(--brand)', Icon, sub, trend, trendUp }) {
+  const hasTrend = trend !== undefined && trend !== null && trend !== 'stable';
+  const isStable = trend === 'stable';
 
   return (
-    <div className="rounded-[10px] border border-border/40 bg-surface-elevated px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-300 hover:-translate-y-0.5">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted/65">{label}</p>
+    <div className="relative flex flex-col gap-2 rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4 overflow-hidden group hover:border-border/60 transition-all duration-300">
+      {/* Top accent bar */}
+      <div
+        className="absolute top-0 left-0 h-[2px] w-full"
+        style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }}
+      />
+
+      {/* Label + Icon */}
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/60">
+          {label}
+        </span>
         {Icon && (
-          <div className={`flex h-10 w-10 items-center justify-center rounded-[10px] ${tones[tone] ?? tones.info}`}>
-            <Icon size={18} strokeWidth={2.2} />
-          </div>
+          <span
+            className="flex h-7 w-7 items-center justify-center rounded-[8px] transition-transform duration-300 group-hover:scale-110"
+            style={{ background: `color-mix(in srgb, ${accent} 12%, transparent)` }}
+          >
+            <Icon size={14} style={{ color: accent }} />
+          </span>
         )}
       </div>
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <div className="font-mono text-[26px] font-semibold tracking-[-0.05em] text-text">{value}</div>
-        {delta && (
-          <div className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold ${tones[tone] ?? tones.info}`}>
-            {delta}
-          </div>
+
+      {/* Value */}
+      <div className="text-[22px] font-semibold tracking-[-0.03em] text-text leading-none mt-1">
+        {value}
+      </div>
+
+      {/* Trend + sub */}
+      <div className="flex items-center gap-1.5 mt-0.5">
+        {hasTrend ? (
+          <>
+            {trendUp === true && <ArrowUpRight size={11} className="text-positive shrink-0" />}
+            {trendUp === false && <ArrowDownRight size={11} className="text-negative shrink-0" />}
+            <span
+              className="text-[11px] font-semibold"
+              style={{ color: trendUp === true ? 'var(--positive)' : trendUp === false ? 'var(--negative)' : 'var(--text-muted)' }}
+            >
+              {trend}
+            </span>
+          </>
+        ) : isStable ? (
+          <Activity size={11} className="text-text-muted/50 shrink-0" />
+        ) : null}
+        {sub && (
+          <span className="text-[11px] text-text-muted/50">{sub}</span>
         )}
       </div>
-      {note && <p className="mt-2 text-[11px] text-text-muted/72">{note}</p>}
     </div>
   );
 }

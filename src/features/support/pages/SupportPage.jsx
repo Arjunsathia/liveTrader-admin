@@ -4,8 +4,8 @@ import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
-import { SectionHeader } from '../../../layout/SectionHeader';
-import { MetricStrip } from '../../../components/cards/MetricStrip';
+import { PageHeader } from '../../../components/ui/PageHeader';
+import { MetricGrid } from '../../../components/cards/MetricGrid';
 import { TableToolbar } from '../../../components/tables/TableToolbar';
 import { FilterBar } from '../../../components/filters/FilterBar';
 import { FilterChips } from '../../../components/filters/FilterChips';
@@ -39,9 +39,19 @@ export function SupportPage() {
 
   return (
     <PageShell>
+      <PageHeader
+        eyebrow={workspace.eyebrow}
+        title={workspace.title}
+        description={workspace.description}
+        actions={(
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `support-${slug}.csv`)}>Export</Button>
+            <Button variant="primary" icon={Eye}>Create Ticket</Button>
+          </>
+        )}
+      />
 
-
-      <MetricStrip metrics={workspace.metrics} />
+      <MetricGrid metrics={workspace.metrics} />
 
       <TableToolbar
         searchValue={table.search}

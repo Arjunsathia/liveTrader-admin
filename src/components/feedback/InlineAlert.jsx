@@ -19,7 +19,7 @@ export function InlineAlert({ tone = 'info', title, children }) {
   const Icon = icons[tone] ?? Info;
 
   return (
-    <div className={`rounded-[10px] border p-4 ${tones[tone] ?? tones.info}`}>
+    <div className={`rounded-[10px] border p-4 shadow-card-subtle ${tones[tone] ?? tones.info}`}>
       <div className="flex items-start gap-3">
         <div className="mt-0.5">
           <Icon size={16} strokeWidth={2.4} />

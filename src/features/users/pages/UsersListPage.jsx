@@ -10,7 +10,7 @@ import { usersService } from '../../../services/usersService';
 import {
   applyDraftToUser, buildUserDraft, createDefaultUserDraft,
   FUNDING_OPTIONS, KYC_OPTIONS, RISK_OPTIONS,
-} from '../config/userFormConfig';
+} from '../data/userFormConfig';
 import { AddUserDrawer } from '../components/AddUserDrawer';
 import { UsersKpiGrid } from '../components/UsersKpiGrid';
 import { UsersListTable } from '../components/UsersTables';
@@ -53,9 +53,9 @@ export function UsersListPage() {
 
   const kpis = useMemo(() => [
     { label: 'Total Users', value: userRows.length.toLocaleString(), subtext: 'registered accounts', trend: '+24', positive: true, Icon: Users, accent: 'var(--brand)' },
-    { label: 'Pending KYC', value: userRows.filter((user) => user.kycStatus === 'PENDING').length, subtext: 'awaiting review', trend: `${KYC_OPTIONS.length - 1} view`, positive: true, Icon: FileCheck, accent: '#f59e0b' },
-    { label: 'Funded Accounts', value: userRows.filter((user) => user.fundingState === 'FUNDED').length, subtext: 'live funding', trend: `${FUNDING_OPTIONS.length} modes`, positive: true, Icon: Wallet, accent: '#4ae176' },
-    { label: 'Flagged / Risk', value: userRows.filter((user) => ['ELEVATED', 'WATCHLIST', 'FLAGGED'].includes(user.riskStatus)).length, subtext: 'watchlist or elevated', trend: `${RISK_OPTIONS.length} groups`, positive: false, Icon: ShieldAlert, accent: '#ef4444' },
+    { label: 'Pending KYC', value: userRows.filter((user) => user.kycStatus === 'PENDING').length, subtext: 'awaiting review', trend: `${KYC_OPTIONS.length - 1} view`, positive: true, Icon: FileCheck, accent: 'var(--warning)' },
+    { label: 'Funded Accounts', value: userRows.filter((user) => user.fundingState === 'FUNDED').length, subtext: 'live funding', trend: `${FUNDING_OPTIONS.length} modes`, positive: true, Icon: Wallet, accent: 'var(--positive)' },
+    { label: 'Flagged / Risk', value: userRows.filter((user) => ['ELEVATED', 'WATCHLIST', 'FLAGGED'].includes(user.riskStatus)).length, subtext: 'watchlist or elevated', trend: `${RISK_OPTIONS.length} groups`, positive: false, Icon: ShieldAlert, accent: 'var(--negative)' },
   ], [userRows]);
 
   const openUser = (nextUserId) => navigate(`/users/${nextUserId}`);

@@ -8,7 +8,7 @@ export function AdminModal({ open, title, subtitle, children, footer, onClose, m
   return createPortal(
     <div className="fixed inset-0 z-[140] flex items-center justify-center p-6">
       <div className="absolute inset-0 bg-[#020617]/65 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full ${maxWidth} rounded-[16px] border border-border/40 bg-surface shadow-[0_20px_70px_rgba(2,6,23,0.45)]`}>
+      <div className={`relative w-full ${maxWidth} rounded-[16px] border border-border/40 bg-surface shadow-card-subtle`}>
         <div className="flex items-start justify-between gap-4 border-b border-border/30 px-6 py-5">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted/60">Create Action</p>

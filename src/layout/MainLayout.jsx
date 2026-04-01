@@ -49,22 +49,7 @@ export function MainLayout() {
         <main className="flex-1 p-4 md:p-8 max-w-[1720px] w-full mx-auto animate-fade-in relative z-10">
           <Outlet />
         </main>
-
-        {/* <footer className="h-10 border-t border-white/5 px-8 flex items-center justify-between text-[10px] text-text-muted/45 font-semibold uppercase tracking-[0.14em] bg-bg/40 backdrop-blur-sm shrink-0">
-          <div className="flex items-center gap-4">
-            <span>© 2026 LIVE-TRADER. PRO</span>
-            <div className="w-[1px] h-3 bg-white/10" />
-            <span>VERSION 4.2.1-BETA</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-positive">LOCAL CLOUD SERVER: ACTIVE</span>
-            <div className="w-[1px] h-3 bg-white/10" />
-            <span>LATENCY: 12ms</span>
-          </div>
-        </footer> */}
       </div>
-
-
 
       <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} />
     </div>

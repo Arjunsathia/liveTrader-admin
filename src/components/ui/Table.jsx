@@ -33,7 +33,7 @@ export function Table({
 export function TableRow({ children, className = '', ...props }) {
   return (
     <tr 
-      className={`bg-surface-elevated/55 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] hover:bg-surface-bright/35 transition-colors duration-200 group ${className}`} 
+      className={`bg-surface-elevated/55 shadow-card-subtle hover:bg-surface-bright/35 transition-colors duration-200 group ${className}`} 
       {...props}
     >
       {children}

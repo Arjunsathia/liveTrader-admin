@@ -1,4 +1,4 @@
-import { tradingWorkspaces } from '../features/trading/mocks/tradingData';
+import { tradingWorkspaces } from '../features/trading/data/tradingData';
 
 export const tradingService = {
   getWorkspace(slug = 'accounts') {

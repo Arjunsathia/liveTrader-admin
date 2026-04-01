@@ -4,7 +4,7 @@ import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
-import { SectionHeader } from '../../../layout/SectionHeader';
+import { PageHeader } from '../../../components/ui/PageHeader';
 import { StatusBadge } from '../../../components/feedback/StatusBadge';
 import { settingsService } from '../../../services/settingsService';
 
@@ -15,7 +15,7 @@ export function SettingsPage() {
 
   return (
     <PageShell>
-      <SectionHeader
+      <PageHeader
         eyebrow={workspace.eyebrow}
         title={workspace.title}
         description={workspace.description}

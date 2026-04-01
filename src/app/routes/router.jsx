@@ -10,10 +10,15 @@ import { KycQueuePage } from '../../features/users/pages/KycQueuePage';
 import { Mt5QueuePage } from '../../features/users/pages/Mt5QueuePage';
 import { UserDetailPage } from '../../features/users/pages/UserDetailPage';
 import { FinancePage } from '../../features/finance/pages/FinancePage';
-import { TradingPage } from '../../features/trading/pages/TradingPage';
+import { FinanceDetailPage } from '../../features/finance/pages/FinanceDetailPage';
+import { IBSystemPage } from '../../features/ib-system/pages/IBSystemPage';
+import { TradingAccountsPage } from '../../features/trading/pages/TradingAccountsPage';
+import { OrdersPage } from '../../features/trading/pages/OrdersPage';
+import { PositionsPage } from '../../features/trading/pages/PositionsPage';
+import { TradeHistoryPage } from '../../features/trading/pages/TradeHistoryPage';
+import { ExecutionLogsPage } from '../../features/trading/pages/ExecutionLogsPage';
 import { CopyTradingPage } from '../../features/copy-trading/pages/CopyTradingPage';
 import { PropTradingPage } from '../../features/prop-trading/pages/PropTradingPage';
-import { IBSystemPage } from '../../features/ib-system/pages/IBSystemPage';
 import { ReportsPage } from '../../features/reports/pages/ReportsPage';
 import { SupportPage } from '../../features/support/pages/SupportPage';
 import { TicketDetailPage } from '../../features/support/pages/TicketDetailPage';
@@ -49,13 +54,14 @@ export const adminRouter = createHashRouter([
       { path: 'finance/transactions', element: withPermission(PERMISSIONS.finance.view, <FinancePage />) },
       { path: 'finance/failed-payments', element: withPermission(PERMISSIONS.finance.view, <FinancePage />) },
       { path: 'finance/approvals', element: withPermission(PERMISSIONS.finance.approve, <FinancePage />) },
+      { path: 'finance/:slug/:id', element: withPermission(PERMISSIONS.finance.view, <FinanceDetailPage />) },
 
       { path: 'trading', element: <Navigate to="/trading/accounts" replace /> },
-      { path: 'trading/accounts', element: withPermission(PERMISSIONS.trading.view, <TradingPage />) },
-      { path: 'trading/orders', element: withPermission(PERMISSIONS.trading.view, <TradingPage />) },
-      { path: 'trading/positions', element: withPermission(PERMISSIONS.trading.view, <TradingPage />) },
-      { path: 'trading/history', element: withPermission(PERMISSIONS.trading.view, <TradingPage />) },
-      { path: 'trading/execution-logs', element: withPermission(PERMISSIONS.trading.view, <TradingPage />) },
+      { path: 'trading/accounts', element: withPermission(PERMISSIONS.trading.view, <TradingAccountsPage />) },
+      { path: 'trading/orders', element: withPermission(PERMISSIONS.trading.view, <OrdersPage />) },
+      { path: 'trading/positions', element: withPermission(PERMISSIONS.trading.view, <PositionsPage />) },
+      { path: 'trading/history', element: withPermission(PERMISSIONS.trading.view, <TradeHistoryPage />) },
+      { path: 'trading/execution-logs', element: withPermission(PERMISSIONS.trading.view, <ExecutionLogsPage />) },
 
       { path: 'copy-trading', element: <Navigate to="/copy-trading/strategies" replace /> },
       { path: 'copy-trading/strategies', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },

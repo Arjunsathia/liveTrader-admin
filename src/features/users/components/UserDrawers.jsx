@@ -11,10 +11,11 @@ import {
   Wallet,
 } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
+import { DrawerField, DrawerGrid } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';
 import { InlineAlert } from '../../../components/feedback/InlineAlert';
 import { StatusBadge } from '../../../components/feedback/StatusBadge';
-import { userDetailTabs } from '../config/userTabs';
+import { userDetailTabs } from '../data/userTabs';
 import { UserDetailContent } from './UserDetailContent';
 
 const tabIcons = {
@@ -65,7 +66,7 @@ export function UserDetailDrawer({
     >
       {user && (
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-border/25 bg-bg/55 p-4">
+          <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-border/25 bg-bg/55 shadow-card-subtle p-4">
             <div className="flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-semibold" style={getAvatarStyle(user.name)}>
               {user.name?.[0] ?? '?'}
             </div>
@@ -126,7 +127,7 @@ export function QuickUserDrawer({ user, onClose, onExpand }) {
           <InlineAlert tone="info" title="Operator Summary">
             {user.notesSummary}
           </InlineAlert>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <DrawerGrid>
             {[
               ['Email', user.email],
               ['Phone', user.phone],
@@ -135,12 +136,9 @@ export function QuickUserDrawer({ user, onClose, onExpand }) {
               ['Wallet', user.walletBalance],
               ['Equity', user.equity],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-[10px] border border-border/25 bg-bg/60 px-3 py-3">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/50">{label}</div>
-                <div className="mt-1 text-[13px] text-text">{value || 'N/A'}</div>
-              </div>
+              <DrawerField key={label} label={label} value={value} />
             ))}
-          </div>
+          </DrawerGrid>
         </div>
       )}
     </AdminDrawer>
@@ -181,7 +179,7 @@ export function Mt5AccountDrawer({ entry, onClose }) {
                     ? 'Bridge sync is delayed. Review before approving new trading actions.'
                     : 'Account connectivity is degraded and operator intervention is recommended.'}
               </InlineAlert>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <DrawerGrid>
                 {[
                   ['Login', entry.login],
                   ['Group', entry.group],
@@ -190,36 +188,21 @@ export function Mt5AccountDrawer({ entry, onClose }) {
                   ['Balance', entry.balance ?? entry.equity],
                   ['Last Sync', entry.lastSync],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-[10px] border border-border/25 bg-bg/60 px-3 py-3">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/50">{label}</div>
-                    <div className="mt-1 font-mono text-[13px] text-text">{value}</div>
-                  </div>
+                  <DrawerField key={label} label={label} value={value} mono />
                 ))}
-              </div>
+              </DrawerGrid>
             </>
           ) : (
             <div className="space-y-3">
               <InlineAlert tone="info" title="New MT5 setup">
                 A placeholder account will be prepared for the dealing desk using the settings defined in the user form.
               </InlineAlert>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-[10px] border border-border/25 bg-bg/60 px-3 py-3">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/50">User</div>
-                  <div className="mt-1 text-[13px] text-text">{entry.name}</div>
-                </div>
-                <div className="rounded-[10px] border border-border/25 bg-bg/60 px-3 py-3">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/50">Segment</div>
-                  <div className="mt-1 text-[13px] text-text">{entry.segment}</div>
-                </div>
-                <div className="rounded-[10px] border border-border/25 bg-bg/60 px-3 py-3">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/50">Tier</div>
-                  <div className="mt-1 text-[13px] text-text">{entry.tier}</div>
-                </div>
-                <div className="rounded-[10px] border border-border/25 bg-bg/60 px-3 py-3">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/50">Wallet</div>
-                  <div className="mt-1 font-mono text-[13px] text-text">{entry.walletBalance}</div>
-                </div>
-              </div>
+              <DrawerGrid>
+                <DrawerField label="User" value={entry.name} />
+                <DrawerField label="Segment" value={entry.segment} />
+                <DrawerField label="Tier" value={entry.tier} />
+                <DrawerField label="Wallet" value={entry.walletBalance} mono />
+              </DrawerGrid>
             </div>
           )}
         </div>

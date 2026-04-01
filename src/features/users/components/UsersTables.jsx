@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Ban, Edit2, Eye, Monitor, MoreHorizontal } from 'lucide-react';
 import { DataTable } from '../../../components/tables/DataTable';
 import { Pagination } from '../../../components/tables/Pagination';
 import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { useClickOutside } from '../../../hooks/useClickOutside';
 
 function getAvatarStyle(name = '?') {
   const seed = name.charCodeAt(0) * 37;
@@ -28,16 +29,7 @@ function RowActionsMenu({ user, onOpenUser, onQuickView, onEditUser, onSuspendUs
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (ref.current && !ref.current.contains(event.target)) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(ref, () => setOpen(false));
 
   const actions = [
     { label: 'Open User', Icon: Eye, onClick: () => onOpenUser(user.id) },
@@ -48,27 +40,24 @@ function RowActionsMenu({ user, onOpenUser, onQuickView, onEditUser, onSuspendUs
   ];
 
   return (
-    <div ref={ref} className="relative" onClick={(event) => event.stopPropagation()}>
+    <div ref={ref} className="relative" onClick={(e) => e.stopPropagation()}>
       <button
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => setOpen((v) => !v)}
         className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-border/25 bg-bg/70 text-text-muted transition-all hover:border-border/50 hover:text-text"
       >
         <MoreHorizontal size={14} />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-40 mt-1.5 w-[170px] rounded-[10px] border border-border/35 bg-surface p-1 shadow-[0_18px_40px_rgba(2,6,23,0.22)]">
+        <div className="absolute right-0 top-full z-40 mt-1.5 w-[170px] rounded-[10px] border border-border/35 bg-surface p-1 shadow-card-subtle">
           {actions.map((action) => (
             <button
               key={action.label}
               type="button"
-              onClick={() => {
-                action.onClick();
-                setOpen(false);
-              }}
+              onClick={() => { action.onClick(); setOpen(false); }}
               className="flex w-full items-center gap-2 rounded-[8px] px-3 py-2 text-left text-[12px] transition-colors hover:bg-surface-elevated"
-              style={{ color: action.danger ? '#ef4444' : 'var(--text)' }}
+              style={{ color: action.danger ? 'var(--negative)' : 'var(--text)' }}
             >
               <action.Icon size={13} />
               {action.label}
@@ -155,15 +144,12 @@ export function UsersListTable({
     },
     {
       key: 'actions',
-      label: '',
+      label: 'Actions',
       render: (user) => (
-        <div className="flex items-center justify-end gap-2" onClick={(event) => event.stopPropagation()}>
+        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onOpenUser(user.id);
-            }}
+            onClick={(e) => { e.stopPropagation(); onOpenUser(user.id); }}
             className="rounded-[8px] border border-border/25 bg-bg/70 px-3 py-1.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
           >
             Open

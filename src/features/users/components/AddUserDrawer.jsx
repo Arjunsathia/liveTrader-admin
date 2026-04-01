@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
+import { DrawerSection, DrawerGrid } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';
 import {
   FUNDING_OPTIONS,
@@ -10,7 +11,7 @@ import {
   SEGMENT_OPTIONS,
   SERVER_OPTIONS,
   TIER_OPTIONS,
-} from '../config/userFormConfig';
+} from '../data/userFormConfig';
 
 function TextField({ label, value, onChange, placeholder, type = 'text', mono = false }) {
   return (
@@ -67,7 +68,7 @@ function TextareaField({ label, value, onChange, placeholder, rows = 4 }) {
 
 function ToggleField({ label, checked, onChange, description }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-[10px] border border-border/20 bg-bg/50 px-3 py-3">
+    <div className="flex items-center justify-between gap-4 rounded-[10px] border border-border/20 bg-bg/50 px-3 py-3 shadow-card-subtle">
       <div>
         <div className="text-[12px] font-medium text-text">{label}</div>
         {description && <div className="mt-1 text-[11px] text-text-muted/60">{description}</div>}
@@ -87,29 +88,6 @@ function ToggleField({ label, checked, onChange, description }) {
   );
 }
 
-function DrawerSection({ title, children, collapsible = false }) {
-  const [open, setOpen] = useState(true);
-
-  return (
-    <section className="space-y-3 border-b border-border/15 pb-5 last:border-b-0 last:pb-0">
-      <button
-        type="button"
-        onClick={() => collapsible && setOpen((current) => !current)}
-        className="flex w-full items-center justify-between text-left"
-      >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted/55">{title}</span>
-        {collapsible && (
-          <ChevronDown
-            size={13}
-            className="text-text-muted/45 transition-transform"
-            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-          />
-        )}
-      </button>
-      {open && <div className="space-y-3">{children}</div>}
-    </section>
-  );
-}
 
 export function AddUserDrawer({
   open,
@@ -159,32 +137,36 @@ export function AddUserDrawer({
     >
       <div className="space-y-5">
         <DrawerSection title="Identity">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <DrawerGrid>
             <TextField label="Full Name" value={draft.name} onChange={setField('name')} placeholder="Jane Doe" />
             <TextField label="Email" value={draft.email} onChange={setField('email')} placeholder="jane@example.com" type="email" />
             <TextField label="Phone" value={draft.phone} onChange={setField('phone')} placeholder="+1 555 120 4567" />
             <TextField label="Country" value={draft.country} onChange={setField('country')} placeholder="US" mono />
             <TextField label="Nationality" value={draft.nationality} onChange={setField('nationality')} placeholder="US" mono />
             <TextField label="Referral / IB Code" value={draft.ibCode} onChange={setField('ibCode')} placeholder="IB-1024" mono />
+          </DrawerGrid>
+          <div className="mt-4">
+            <TextareaField label="Address" value={draft.address} onChange={setField('address')} placeholder="Street, city, state, postal code" />
           </div>
-          <TextareaField label="Address" value={draft.address} onChange={setField('address')} placeholder="Street, city, state, postal code" />
         </DrawerSection>
 
         <DrawerSection title="Account Setup">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <DrawerGrid>
             <SelectField label="Tier" value={draft.tier} onChange={setField('tier')} options={TIER_OPTIONS} />
             <SelectField label="Segment" value={draft.segment} onChange={setField('segment')} options={SEGMENT_OPTIONS} />
             <SelectField label="KYC Status" value={draft.kycStatus} onChange={setField('kycStatus')} options={KYC_OPTIONS} />
             <SelectField label="Risk Level" value={draft.riskLevel} onChange={setField('riskLevel')} options={RISK_OPTIONS} />
             <SelectField label="Funding State" value={draft.fundingState} onChange={setField('fundingState')} options={FUNDING_OPTIONS} />
             <TextField label="Initial Balance" value={draft.initialBalance} onChange={setField('initialBalance')} placeholder="1000" mono />
+          </DrawerGrid>
+          <div className="mt-4">
+            <ToggleField
+              label="Auto-create wallet"
+              checked={draft.autoWallet}
+              onChange={setField('autoWallet')}
+              description="Prepare wallet structures immediately after the record is saved."
+            />
           </div>
-          <ToggleField
-            label="Auto-create wallet"
-            checked={draft.autoWallet}
-            onChange={setField('autoWallet')}
-            description="Prepare wallet structures immediately after the record is saved."
-          />
         </DrawerSection>
 
         <DrawerSection title="MT5 Setup" collapsible>
@@ -195,12 +177,12 @@ export function AddUserDrawer({
             description="Create a placeholder MT5 account setup for the dealing desk."
           />
           {draft.createMt5 && (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <DrawerGrid className="mt-4">
               <SelectField label="Server" value={draft.mt5Server} onChange={setField('mt5Server')} options={SERVER_OPTIONS} placeholder="Select server" />
               <SelectField label="Leverage" value={draft.mt5Leverage} onChange={setField('mt5Leverage')} options={LEVERAGE_OPTIONS} placeholder="Select leverage" />
               <TextField label="Group" value={draft.mt5Group} onChange={setField('mt5Group')} placeholder="retail_usd_std" mono />
               <TextField label="Initial Deposit" value={draft.mt5Deposit} onChange={setField('mt5Deposit')} placeholder="1000" mono />
-            </div>
+            </DrawerGrid>
           )}
         </DrawerSection>
 

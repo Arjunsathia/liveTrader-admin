@@ -1,4 +1,4 @@
-import { settingsWorkspaces } from '../features/settings/mocks/settingsData';
+import { settingsWorkspaces } from '../features/settings/data/settingsData';
 
 export const settingsService = {
   getWorkspace(slug = 'api') {

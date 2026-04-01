@@ -1,4 +1,4 @@
-import { reportsWorkspaces } from '../features/reports/mocks/reportsData';
+import { reportsWorkspaces } from '../features/reports/data/reportsData';
 
 export const reportsService = {
   getWorkspace(slug = 'finance') {

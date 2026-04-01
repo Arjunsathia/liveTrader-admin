@@ -7,7 +7,7 @@ export function RightPanel({ user }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Live positions */}
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-4">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-[11px] font-black uppercase tracking-[0.15em] text-text-muted/55">
             Open Positions
@@ -61,7 +61,7 @@ export function RightPanel({ user }) {
       </div>
 
       {/* Risk snapshot */}
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-4">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4">
         <span className="text-[11px] font-black uppercase tracking-[0.15em] text-text-muted/55 block mb-3">
           Risk Snapshot
         </span>
@@ -94,7 +94,7 @@ export function RightPanel({ user }) {
       </div>
 
       {/* MT5 quick status */}
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-4">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4">
         <span className="text-[11px] font-black uppercase tracking-[0.15em] text-text-muted/55 block mb-3">
           MT5 Accounts
         </span>
@@ -122,7 +122,7 @@ export function RightPanel({ user }) {
       </div>
 
       {/* Recent activity mini */}
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-4">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-4">
         <span className="text-[11px] font-black uppercase tracking-[0.15em] text-text-muted/55 block mb-3">
           Recent Events
         </span>

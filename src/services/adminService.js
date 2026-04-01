@@ -1,4 +1,4 @@
-import { adminMgmtWorkspaces } from '../features/admin-mgmt/mocks/adminMgmtData';
+import { adminMgmtWorkspaces } from '../features/admin-mgmt/data/adminMgmtData';
 
 export const adminService = {
   getWorkspace(slug = 'users') {
