@@ -1,7 +1,5 @@
 import React from 'react';
 import { PageShell } from '../../../layout/PageShell';
-import { PageHeader } from '../../../components/ui/PageHeader';
-import { Badge } from '../../../components/ui/Badge';
 import { DashboardKpis } from '../components/DashboardKpis';
 import { DashboardChart } from '../components/DashboardChart';
 import { DashboardAlerts } from '../components/DashboardAlerts';
@@ -13,12 +11,6 @@ import { DashboardHealth } from '../components/DashboardHealth';
 export function DashboardPage() {
   return (
     <PageShell>
-      <PageHeader
-        eyebrow="Main Dashboard"
-        title="Command Center Overview"
-        description="Monitor platform health, financial flows, and active trading operations in real-time."
-      />
-
       {/* ── ROW 1: KPIs ───────────────────────────────── */}
       <DashboardKpis />
 

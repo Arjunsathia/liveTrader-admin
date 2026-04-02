@@ -4,7 +4,6 @@ import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
-import { PageHeader } from '../../../components/ui/PageHeader';
 import { MetricGrid } from '../../../components/cards/MetricGrid';
 import { TableToolbar } from '../../../components/tables/TableToolbar';
 import { FilterBar } from '../../../components/filters/FilterBar';
@@ -42,24 +41,18 @@ export function CopyTradingPage() {
 
   return (
     <PageShell>
-      <PageHeader
-        eyebrow={workspace.eyebrow}
-        title={workspace.title}
-        description={workspace.description}
-        actions={(
-          <>
-            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `copy-trading-${slug}.csv`)}>Export</Button>
-            <Button variant="secondary" icon={Eye}>Open Performance Lens</Button>
-          </>
-        )}
-      />
-
       <MetricGrid metrics={workspace.metrics} />
 
       <TableToolbar
         searchValue={table.search}
         onSearchChange={table.setSearch}
         searchPlaceholder={`Search ${workspace.title.toLowerCase()} records`}
+        actions={(
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `copy-trading-${slug}.csv`)}>Export</Button>
+            <Button variant="secondary" icon={Eye}>Open Performance Lens</Button>
+          </>
+        )}
       >
         <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />
       </TableToolbar>

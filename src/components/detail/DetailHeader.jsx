@@ -6,8 +6,8 @@ export function DetailHeader({ title, subtitle, badges, meta, actions, avatar })
       <div className="flex flex-wrap items-start gap-4">
         {avatar}
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[34px] font-semibold tracking-[-0.06em] text-text">{title}</h1>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="text-[20px] font-semibold tracking-[-0.02em] text-text leading-none">{title}</h1>
             {badges}
           </div>
           {subtitle && <div className="mt-1 text-[13px] text-text-muted">{subtitle}</div>}

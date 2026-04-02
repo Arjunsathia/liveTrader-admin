@@ -4,7 +4,6 @@ import { Download, Eye } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
-import { PageHeader } from '../../../components/ui/PageHeader';
 import { StatusBadge } from '../../../components/feedback/StatusBadge';
 import { settingsService } from '../../../services/settingsService';
 
@@ -15,17 +14,10 @@ export function SettingsPage() {
 
   return (
     <PageShell>
-      <PageHeader
-        eyebrow={workspace.eyebrow}
-        title={workspace.title}
-        description={workspace.description}
-        actions={(
-          <>
-            <Button variant="secondary" icon={Download}>Export Config</Button>
-            <Button variant="primary" icon={Eye}>Edit Group</Button>
-          </>
-        )}
-      />
+      <div className="flex justify-end gap-2 mb-2">
+        <Button variant="secondary" icon={Download}>Export Config</Button>
+        <Button variant="primary" icon={Eye}>Edit Group</Button>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {workspace.groups.map((group) => (

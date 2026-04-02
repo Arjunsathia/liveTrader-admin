@@ -7,7 +7,6 @@ import {
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
 import { Button } from '../../../components/ui/Button';
-import { PageHeader } from '../../../components/ui/PageHeader';
 import { Pagination } from '../../../components/tables/Pagination';
 import { DataTable } from '../../../components/tables/DataTable';
 import { useTableState } from '../../../hooks/useTableState';
@@ -178,17 +177,6 @@ export function FinancePage() {
 
   return (
     <PageShell>
-      <PageHeader
-        eyebrow="Financial Operations"
-        title="Transaction Ledger"
-        description={`Manage all ${slug} records, KYC funding states, and risk-adjusted payment approvals.`}
-        actions={(
-          <Button variant="primary" icon={Download} onClick={() => exportRows(filtered, `finance-${slug}.csv`)}>
-            Bulk Export
-          </Button>
-        )}
-      />
-
       {/* ── SECTION SWITCHER (Deposits / Withdrawals) ── */}
       <SectionSwitcher slug={slug} navigate={navigate} />
 
