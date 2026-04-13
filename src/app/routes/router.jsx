@@ -17,7 +17,13 @@ import { OrdersPage } from '../../features/trading/pages/OrdersPage';
 import { PositionsPage } from '../../features/trading/pages/PositionsPage';
 import { TradeHistoryPage } from '../../features/trading/pages/TradeHistoryPage';
 import { ExecutionLogsPage } from '../../features/trading/pages/ExecutionLogsPage';
-import { CopyTradingPage } from '../../features/copy-trading/pages/CopyTradingPage';
+import { StrategiesPage }    from '../../features/copy-trading/pages/StrategiesPage';
+import { ProvidersPage }     from '../../features/copy-trading/pages/ProvidersPage';
+import { FollowersPage }     from '../../features/copy-trading/pages/FollowersPage';
+import { SubscriptionsPage } from '../../features/copy-trading/pages/SubscriptionsPage';
+import { PerformancePage }   from '../../features/copy-trading/pages/PerformancePage';
+import { LogsPage }          from '../../features/copy-trading/pages/LogsPage';
+import { CopyTradingDetailPage } from '../../features/copy-trading/pages/CopyTradingDetailPage';
 import { PropTradingPage } from '../../features/prop-trading/pages/PropTradingPage';
 import { ReportsPage } from '../../features/reports/pages/ReportsPage';
 import { SupportPage } from '../../features/support/pages/SupportPage';
@@ -64,12 +70,13 @@ export const adminRouter = createHashRouter([
       { path: 'trading/execution-logs', element: withPermission(PERMISSIONS.trading.view, <ExecutionLogsPage />) },
 
       { path: 'copy-trading', element: <Navigate to="/copy-trading/strategies" replace /> },
-      { path: 'copy-trading/strategies', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },
-      { path: 'copy-trading/providers', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },
-      { path: 'copy-trading/followers', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },
-      { path: 'copy-trading/subscriptions', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },
-      { path: 'copy-trading/performance', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },
-      { path: 'copy-trading/logs', element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingPage />) },
+      { path: 'copy-trading/strategies',    element: withPermission(PERMISSIONS.copyTrading.view, <StrategiesPage />)    },
+      { path: 'copy-trading/providers',     element: withPermission(PERMISSIONS.copyTrading.view, <ProvidersPage />)     },
+      { path: 'copy-trading/followers',     element: withPermission(PERMISSIONS.copyTrading.view, <FollowersPage />)     },
+      { path: 'copy-trading/subscriptions', element: withPermission(PERMISSIONS.copyTrading.view, <SubscriptionsPage />) },
+      { path: 'copy-trading/performance',   element: withPermission(PERMISSIONS.copyTrading.view, <PerformancePage />)   },
+      { path: 'copy-trading/logs',          element: withPermission(PERMISSIONS.copyTrading.view, <LogsPage />)          },
+      { path: 'copy-trading/:slug/:id',     element: withPermission(PERMISSIONS.copyTrading.view, <CopyTradingDetailPage />) },
 
       { path: 'prop-trading', element: withPermission(PERMISSIONS.propTrading.view, <PropTradingPage />) },
       { path: 'prop-trading/challenge-configurations', element: withPermission(PERMISSIONS.propTrading.manage, <PropTradingPage />) },

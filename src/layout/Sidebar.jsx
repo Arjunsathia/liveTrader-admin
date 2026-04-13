@@ -212,6 +212,10 @@ export function Sidebar({ collapsed, isMobile }) {
       if (pathname.startsWith('/users/') && item.id === 'users') return getUsersActiveId();
       if (pathname.startsWith('/finance/') && item.id === 'finance') return getFinanceActiveId(pathname);
       if (pathname.startsWith('/support/tickets/') && item.id === 'support') return 'support-tickets';
+      if (pathname.startsWith('/copy-trading/') && item.id === 'copy-trading') {
+        const slug = pathname.split('/')[2];
+        return slug ? `copy-${slug}` : 'copy-strategies';
+      }
     }
     return null;
   };
@@ -225,7 +229,8 @@ export function Sidebar({ collapsed, isMobile }) {
         item.subItems?.some((subItem) => subItem.path === location.pathname) ||
         (location.pathname.startsWith('/users/') && item.id === 'users') ||
         (location.pathname.startsWith('/finance/') && item.id === 'finance') ||
-        (location.pathname.startsWith('/support/tickets/') && item.id === 'support'),
+        (location.pathname.startsWith('/support/tickets/') && item.id === 'support') ||
+        (location.pathname.startsWith('/copy-trading/') && item.id === 'copy-trading'),
     )?.id ?? null,
     [allowedItems, location.pathname],
   );
