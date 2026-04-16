@@ -13,7 +13,8 @@ import {
   Tooltip, ResponsiveContainer, BarChart, Bar,
 } from 'recharts';
 import { PageShell } from '../../../layout/PageShell';
-
+import { Card } from '../../../components/ui/Card';
+import { KpiCard } from '../../../components/cards/KpiCard';
 import { strategiesConfig } from '../configs/strategies.config';
 import { providersConfig } from '../configs/providers.config';
 import { followersConfig } from '../configs/followers.config';
@@ -95,9 +96,9 @@ function Field({ label, value, mono, accent, wide, copyable, className = '' }) {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div className={`group relative rounded-[10px] border border-white/[0.06] bg-white/[0.025] px-3 py-2.5 transition-all duration-200 hover:border-white/[0.1] ${wide ? 'col-span-2' : ''} ${className}`}>
-      <div className="text-[9.5px] font-bold uppercase tracking-[0.15em] text-text-muted/40 mb-1.5 font-heading select-none">{label}</div>
-      <div className={`text-[13px] leading-snug truncate ${mono ? 'font-mono tracking-tight' : 'font-medium font-heading'}`} style={{ color: accent ?? 'var(--text)' }}>
+    <div className={`group relative rounded-[10px] border border-border/30 bg-surface-elevated shadow-card-subtle px-3 py-2.5 transition-all duration-200 hover:border-border/55 ${wide ? 'col-span-2' : ''} ${className}`}>
+      <div className="text-[9.5px] font-bold uppercase tracking-[0.14em] text-text-muted/50 mb-1.5 font-heading select-none">{label}</div>
+      <div className={`text-[13px] leading-snug truncate ${mono ? 'font-mono tracking-tight' : 'font-semibold font-heading'}`} style={{ color: accent ?? 'var(--text)' }}>
         {value ?? '—'}
       </div>
       {copyable && value && (
@@ -127,14 +128,14 @@ function ActionBtn({ label, Icon: Ic, variant = 'default', onClick, small, disab
     warning: { border: '1px solid rgba(217,119,6,0.25)', background: 'rgba(217,119,6,0.07)', color: '#d97706' },
     brand:   { border: '1px solid rgba(var(--brand-rgb),0.25)', background: 'rgba(var(--brand-rgb),0.08)', color: 'var(--brand)' },
     cyan:    { border: '1px solid rgba(6,182,212,0.25)', background: 'rgba(6,182,212,0.07)', color: 'var(--cyan)' },
-    default: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)' },
+    default: { border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text-muted)' },
   };
   const h = small ? 'h-7 text-[10.5px] px-2.5' : 'h-8 text-[11px] px-3.5';
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex ${h} w-full justify-center items-center gap-2 rounded-[8px] font-bold font-heading transition-all duration-200 hover:brightness-110 active:scale-[0.97] disabled:opacity-30 cursor-pointer select-none`}
+      className={`flex ${h} w-full justify-center items-center gap-2 rounded-[8px] font-semibold font-heading transition-all duration-200 hover:brightness-110 active:scale-[0.97] disabled:opacity-30 cursor-pointer select-none`}
       style={variantStyles[variant] ?? variantStyles.default}
     >
       {Ic && <Ic size={small ? 11 : 12} />}
@@ -145,38 +146,10 @@ function ActionBtn({ label, Icon: Ic, variant = 'default', onClick, small, disab
 
 function StatPill({ label, value, color }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-[8px] border border-white/[0.06] bg-white/[0.02] px-2.5 py-1.5 transition-all hover:bg-white/[0.04]">
+    <div className="flex items-center gap-1.5 rounded-[8px] border border-border/30 bg-bg/50 px-2.5 py-1.5 transition-all hover:bg-bg/80">
       <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ background: color, boxShadow: `0 0 4px ${color}` }} />
-      <span className="text-[10px] font-bold text-text-muted/40 uppercase tracking-wider">{label}</span>
-      <span className="font-mono text-[11px] font-bold text-text/90 tracking-tight">{value}</span>
-    </div>
-  );
-}
-
-function KpiCard({ label, value, sub, dir, accent, Icon }) {
-  return (
-    <div className="relative flex flex-col gap-1.5 overflow-hidden rounded-[12px] border border-white/[0.06] bg-white/[0.02] p-4 group transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]">
-      {/* Accent glow top */}
-      <div className="absolute inset-x-0 top-0 h-[2px] opacity-20 group-hover:opacity-60 transition-opacity" style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }} />
-      
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-muted/35 font-heading text-ellipsis overflow-hidden whitespace-nowrap">{label}</span>
-        <div className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-white/[0.03] border border-white/[0.05] group-hover:border-white/[0.1] transition-all shrink-0">
-          <Icon size={12} style={{ color: accent }} className="opacity-60 group-hover:opacity-100" />
-        </div>
-      </div>
-      
-      <div className="font-mono text-[22px] font-bold tracking-[-0.03em] leading-none" style={{ color: accent }}>
-        {value}
-      </div>
-      
-      {sub && (
-        <div className="flex items-center gap-1 mt-1">
-          {dir === 'up' && <TrendingUp size={10} className="text-positive" />}
-          {dir === 'down' && <TrendingDown size={10} className="text-negative" />}
-          <span className="text-[10.5px] font-medium text-text-muted/40 font-heading truncate">{sub}</span>
-        </div>
-      )}
+      <span className="text-[10px] font-bold text-text-muted/60 uppercase tracking-[0.14em]">{label}</span>
+      <span className="font-mono text-[11px] font-bold text-text tracking-tight">{value}</span>
     </div>
   );
 }
@@ -188,12 +161,12 @@ function KpiCard({ label, value, sub, dir, accent, Icon }) {
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-[10px] border border-white/[0.1] bg-surface-elevated shadow-lg px-3 py-2.5 text-[11px] font-mono">
-      <div className="text-text-muted/50 mb-1.5 font-heading font-semibold uppercase tracking-widest text-[9px]">{label}</div>
+    <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-lg px-3 py-2.5 text-[11px] font-mono">
+      <div className="text-text-muted/60 mb-1.5 font-heading font-semibold uppercase tracking-[0.14em] text-[10px]">{label}</div>
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full" style={{ background: p.color }} />
-          <span className="text-text-muted/60 capitalize">{p.dataKey}:</span>
+          <span className="text-text-muted capitalize">{p.dataKey}:</span>
           <span className="font-semibold" style={{ color: p.color }}>{typeof p.value === 'number' && p.value > 0 ? '+' : ''}{p.value}</span>
         </div>
       ))}
@@ -493,19 +466,19 @@ function OperatorSidebar({ row, onFlush }) {
   return (
     <div className="space-y-4 lg:sticky lg:top-4">
       {/* 1. Entity Card */}
-       <div className="rounded-[14px] border border-white/[0.1] bg-surface-elevated p-6 shadow-2xl relative overflow-hidden">
+       <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-6 shadow-card-subtle relative overflow-hidden">
         {/* Animated background pulse */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/5 rounded-full blur-[80px]" />
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/[0.03] rounded-full blur-[80px]" />
         
         <div className="relative z-10">
           <SectionLabel title="Status Monitor" Icon={Terminal} />
           <div className="space-y-3 mt-4">
-            <div className="flex items-center justify-between p-3 rounded-[10px] bg-black/20 border border-white/[0.06] shadow-sm">
-              <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/40">Current State</span>
+            <div className="flex items-center justify-between p-3 rounded-[8px] bg-bg/50 border border-border/30 shadow-sm">
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/60">Current State</span>
               <StatusBadge value={status} size="lg" />
             </div>
-            <div className="flex items-center justify-between p-3 rounded-[10px] bg-black/20 border border-white/[0.06] shadow-sm">
-              <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/40">Risk Profile</span>
+            <div className="flex items-center justify-between p-3 rounded-[8px] bg-bg/50 border border-border/30 shadow-sm">
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/60">Risk Profile</span>
               <span className="text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-1 rounded-[6px]" style={{ color: riskColor, background: `color-mix(in srgb, ${riskColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${riskColor} 20%, transparent)` }}>{row.risk || 'MEDIUM'} LEVEL</span>
             </div>
           </div>
@@ -513,7 +486,7 @@ function OperatorSidebar({ row, onFlush }) {
       </div>
 
       {/* 2. Main Actions */}
-      <div className="rounded-[14px] border border-white/[0.1] bg-surface-elevated p-6 shadow-xl">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-6 shadow-card-subtle">
         <SectionLabel title="Control Panel" Icon={Zap} />
         <div className="space-y-2 mt-4">
           <ActionBtn label="Approve Strategy" Icon={CheckCircle2} variant="success" onClick={() => onFlush('Entity approved')} />
@@ -524,7 +497,7 @@ function OperatorSidebar({ row, onFlush }) {
       </div>
 
       {/* 3. Internal Notes */}
-      <div className="rounded-[14px] border border-white/[0.1] bg-surface-elevated p-6 shadow-xl">
+      <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-6 shadow-card-subtle">
         <SectionLabel title="Administrator Note" Icon={MessageSquare} />
         <div className="mt-4 space-y-3">
           <textarea
@@ -588,12 +561,12 @@ export function CopyTradingDetailPage() {
   ];
 
   const kpis = [
-    { label: 'Followers', value: row.followers ?? '0', sub: 'total copying', dir: 'up', accent: 'var(--brand)', Icon: Users },
-    { label: 'Managed Capital', value: row.copiedVolume ?? row.aum ?? '$0', sub: 'AUM volume', dir: 'up', accent: 'var(--cyan)', Icon: Wallet },
-    { label: 'Net ROI', value: row.roi ?? '0.0%', sub: 'all time impact', dir: row.roi?.startsWith('+') ? 'up' : 'down', accent: 'var(--positive)', Icon: BarChart2 },
-    { label: 'Commission', value: '$12,240', sub: 'last 30 days', dir: 'up', accent: 'var(--warning)', Icon: CreditCard },
-    { label: 'Success Rate', value: row.winRate ?? '0%', sub: 'execution', dir: null, accent: 'var(--positive)', Icon: Star },
-    { label: 'Health Score', value: '4.9', sub: 'system poll', dir: null, accent: 'var(--purple)', Icon: ShieldCheck },
+    { label: 'Followers', value: row.followers ?? '0', sub: 'total copying', accent: 'var(--brand)', Icon: Users },
+    { label: 'Managed Capital', value: row.copiedVolume ?? row.aum ?? '$0', sub: 'AUM volume', accent: 'var(--cyan)', Icon: Wallet },
+    { label: 'Net ROI', value: row.roi ?? '0.0%', sub: 'all time impact', trendUp: row.roi?.startsWith('+'), trend: ' ', accent: 'var(--positive)', Icon: BarChart2 },
+    { label: 'Commission', value: '$12,240', sub: 'last 30 days', accent: 'var(--warning)', Icon: CreditCard },
+    { label: 'Success Rate', value: row.winRate ?? '0%', sub: 'execution', accent: 'var(--positive)', Icon: Star },
+    { label: 'Health Score', value: '4.9', sub: 'system poll', accent: 'var(--purple)', Icon: ShieldCheck },
   ];
 
   const triggerToast = (msg) => {
@@ -615,15 +588,15 @@ export function CopyTradingDetailPage() {
       </button>
 
       {/* 2. Standardized Header Block */}
-      <div className="relative overflow-hidden rounded-[18px] border border-white/[0.1] bg-surface-elevated p-8 mb-6 shadow-2xl">
+      <div className="relative overflow-hidden rounded-[10px] border border-border/40 bg-surface-elevated p-8 mb-6 shadow-card-subtle">
         {/* Dynamic theme glow */}
-        <div className="absolute -top-24 -left-24 w-60 h-60 rounded-full opacity-[0.08] pointer-events-none blur-[100px]" style={{ background: avatarText }} />
+        <div className="absolute -top-24 -left-24 w-60 h-60 rounded-full opacity-[0.05] pointer-events-none blur-[100px]" style={{ background: avatarText }} />
 
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-10 relative z-10">
           {/* Entity Profile */}
           <div className="flex items-center gap-6">
             <div
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[22px] text-[24px] font-black z-10 border-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-transform hover:scale-105"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[14px] text-[24px] font-black border-2 shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition-transform hover:scale-105"
               style={{ background: avatarBg, color: avatarText, borderColor: avatarBorder }}
             >
               {initials}
@@ -654,7 +627,7 @@ export function CopyTradingDetailPage() {
         </div>
 
         {/* Vital Info Strip */}
-        <div className="mt-8 pt-6 border-t border-white/[0.08] flex flex-wrap gap-2 z-10 relative">
+        <div className="mt-8 pt-6 border-t border-border/30 flex flex-wrap gap-2">
           <StatPill label="Public Success" value={row.winRate ?? '0.0%'} color="var(--positive)" />
           <StatPill label="Copy Followers" value={row.followers ?? '0'} color="var(--brand)" />
           <StatPill label="Peak Drawdown" value={row.drawdown ?? '0.0%'} color="var(--negative)" />
@@ -673,15 +646,15 @@ export function CopyTradingDetailPage() {
         {/* Module Content */}
         <div className="min-w-0">
           {/* Premium Segmented Navigation */}
-          <div className="flex gap-1 overflow-x-auto rounded-[14px] border border-white/[0.1] bg-black/30 p-1.5 mb-6 shadow-inner no-scrollbar">
+          <div className="flex gap-1 overflow-x-auto rounded-[10px] border border-border/30 bg-bg p-1.5 mb-6 shadow-inner no-scrollbar">
             {tabs.map((tab) => {
               const active = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2.5 rounded-[10px] px-5 py-2.5 text-[12px] font-bold transition-all duration-300 outline-none flex-shrink-0 cursor-pointer select-none
-                    ${active ? 'bg-surface-2 text-text shadow-xl border border-white/[0.1] scale-[1.02]' : 'text-text-muted/30 hover:text-text-muted/60'}`}
+                  className={`flex items-center gap-2.5 rounded-[8px] px-5 py-2.5 text-[12px] font-bold transition-all duration-300 outline-none flex-shrink-0 cursor-pointer select-none
+                    ${active ? 'bg-surface-elevated text-text shadow-sm border border-border/50 scale-[1.02]' : 'border border-transparent text-text-muted/50 hover:text-text-muted/80 hover:bg-white/[0.02]'}`}
                 >
                   <tab.Icon size={13} className={active ? 'text-primary' : ''} />
                   {tab.label}
@@ -690,7 +663,7 @@ export function CopyTradingDetailPage() {
             })}
           </div>
 
-          <div className="rounded-[20px] border border-white/[0.1] bg-surface-elevated/40 backdrop-blur-sm p-8 shadow-card-subtle">
+          <div className="rounded-[10px] border border-border/40 bg-surface-elevated p-8 shadow-card-subtle">
             {activeTab === 'overview' && <TabOverview row={row} slug={slug} />}
             {activeTab === 'performance' && <TabPerformance row={row} />}
             {activeTab === 'followers' && <TabFollowers />}

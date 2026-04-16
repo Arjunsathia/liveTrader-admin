@@ -86,11 +86,13 @@ export const adminRouter = createHashRouter([
       { path: 'prop-trading/fees-coupons', element: withPermission(PERMISSIONS.propTrading.manage, <PropTradingPage />) },
       { path: 'prop-trading/rules-risk', element: withPermission(PERMISSIONS.propTrading.manage, <PropTradingPage />) },
 
-      { path: 'ib-system', element: <Navigate to="/ib-system/referrals" replace /> },
-      { path: 'ib-system/referrals', element: withPermission(PERMISSIONS.ibSystem.view, <IBSystemPage />) },
-      { path: 'ib-system/commissions', element: withPermission(PERMISSIONS.ibSystem.view, <IBSystemPage />) },
-      { path: 'ib-system/payouts', element: withPermission(PERMISSIONS.ibSystem.payouts, <IBSystemPage />) },
-      { path: 'ib-system/performance', element: withPermission(PERMISSIONS.ibSystem.view, <IBSystemPage />) },
+      { path: 'ib-system', element: <Navigate to="/ib-system/overview" replace /> },
+      { path: 'ib-system/overview',     element: withPermission(PERMISSIONS.ibSystem.view,    <IBSystemPage />) },
+      { path: 'ib-system/referrals',    element: withPermission(PERMISSIONS.ibSystem.view,    <IBSystemPage />) },
+      { path: 'ib-system/commissions',  element: withPermission(PERMISSIONS.ibSystem.view,    <IBSystemPage />) },
+      { path: 'ib-system/payouts',      element: withPermission(PERMISSIONS.ibSystem.payouts, <IBSystemPage />) },
+      { path: 'ib-system/performance',  element: withPermission(PERMISSIONS.ibSystem.view,    <IBSystemPage />) },
+      { path: 'ib-system/tree',         element: withPermission(PERMISSIONS.ibSystem.view,    <IBSystemPage />) },
 
       { path: 'reports', element: <Navigate to="/reports/finance" replace /> },
       { path: 'reports/finance', element: withPermission(PERMISSIONS.reports.view, <ReportsPage />) },
