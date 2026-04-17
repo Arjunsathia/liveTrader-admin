@@ -1,13 +1,10 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Download, Eye } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
 import { MetricGrid } from '../../../components/cards/MetricGrid';
-import { TableToolbar } from '../../../components/tables/TableToolbar';
-import { FilterBar } from '../../../components/filters/FilterBar';
-import { FilterChips } from '../../../components/filters/FilterChips';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
 import { DataTable } from '../../../components/tables/DataTable';
 import { Pagination } from '../../../components/tables/Pagination';
 import { StatusBadge } from '../../../components/feedback/StatusBadge';
@@ -39,25 +36,31 @@ export function ReportsPage() {
     render: (row) => renderCell(row, column),
   }));
 
+  // Bridge workspace.filters → PageToolbar filterSets shape
+  const filterSets = (workspace.filters ?? []).map((f) => ({
+    label: f.label,
+    get:   table.filters[f.key] ?? 'all',
+    set:   (v) => table.setFilter(f.key, v === 'all' ? undefined : v),
+    opts:  f.options,
+  }));
+
+  const actions = [
+    { label: 'Export',          icon: Download, variant: 'secondary', onClick: () => exportRows(table.items, `reports-${slug}.csv`) },
+    { label: 'Generate Report', icon: Eye,      variant: 'primary',   onClick: () => {} },
+  ];
+
   return (
     <PageShell>
       <MetricGrid metrics={workspace.metrics} />
 
-      <TableToolbar 
-        searchValue={table.search} 
-        onSearchChange={table.setSearch} 
-        searchPlaceholder={`Search ${workspace.title.toLowerCase()} reports`}
-        actions={(
-          <>
-            <Button variant="secondary" icon={Download} onClick={() => exportRows(table.items, `reports-${slug}.csv`)}>Export</Button>
-            <Button variant="primary" icon={Eye}>Generate Report</Button>
-          </>
-        )}
-      >
-        <FilterBar filters={workspace.filters} values={table.filters} onChange={table.setFilter} />
-      </TableToolbar>
-
-      <FilterChips filters={table.filters} onClear={(key) => table.setFilter(key, 'all')} />
+      <PageToolbar
+        search={table.search}
+        onSearchChange={table.setSearch}
+        placeholder={`Search ${workspace.title.toLowerCase()} reports`}
+        filterSets={filterSets}
+        actions={actions}
+        className="mb-6"
+      />
 
       <Card title={workspace.tableTitle} subtitle={workspace.tableSubtitle} padding={false}>
         <DataTable
@@ -68,7 +71,12 @@ export function ReportsPage() {
               label: 'Action',
               render: (row) => (
                 <div className="text-right">
-                  <Button size="sm" variant="secondary" onClick={() => drawer.open(row)}>Open</Button>
+                  <button
+                    onClick={() => drawer.open(row)}
+                    className="inline-flex items-center gap-1.5 h-7 rounded-[6px] border border-border/25 bg-bg/60 px-3 text-[11px] font-semibold text-text-muted transition-all hover:border-primary/40 hover:text-primary hover:bg-primary/5"
+                  >
+                    Open
+                  </button>
                 </div>
               ),
             },

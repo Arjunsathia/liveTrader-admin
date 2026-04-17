@@ -1,4 +1,4 @@
-import { financeWorkspaces } from '../features/finance/data/financeData';
+import { WORKSPACE as financeWorkspaces } from '../features/finance/data/financeMockData';
 
 export const financeService = {
   getWorkspace(slug = 'deposits') {

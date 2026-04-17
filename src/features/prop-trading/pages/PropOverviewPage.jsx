@@ -2,7 +2,7 @@ import React from 'react';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts';
 import { CircleDollarSign, Filter, CheckCircle2, Zap, Plus, Download, AlertOctagon, Settings, Target, Users } from 'lucide-react';
 import { overviewKpis, payoutTrend, completionTrend, funnelData, recentApprovals } from '../configs/overview.config';
-import { Card, SectionHead, IconBtn, RiskBadge, CustomTooltip } from '../components/PropShared';
+import { Card, SectionHead, IconBtn, RiskBadge, CustomTooltip } from '../components/PropTradingShared';
 import { PropStatsCards } from '../components/PropStatsCards';
 import { PropQuickActions } from '../components/PropQuickActions';
 

@@ -11,10 +11,12 @@ export function Button({
   const baseStyles = 'inline-flex items-center justify-center gap-2 font-semibold tracking-[-0.01em] transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none rounded-[8px] border';
   
   const variants = {
-    primary: 'bg-primary text-text-on-accent border-primary/20 hover:bg-primary-strong',
+    primary:   'bg-primary text-text-on-accent border-primary/20 hover:bg-primary-strong',
     secondary: 'bg-surface-elevated border-border/20 text-text-muted hover:text-text hover:bg-surface-bright',
-    ghost: 'bg-transparent border-transparent text-text-muted hover:text-text hover:bg-white/5',
-    danger: 'bg-negative text-white border-negative/20 hover:bg-negative/90',
+    ghost:     'bg-transparent border-transparent text-text-muted hover:text-text hover:bg-white/5',
+    danger:    'bg-negative text-white border-negative/20 hover:bg-negative/90',
+    warning:   'bg-warning/[0.12] text-warning border-warning/25 hover:bg-warning/20',
+    success:   'bg-positive/[0.12] text-positive border-positive/25 hover:bg-positive/20',
   };
   
   const sizes = {

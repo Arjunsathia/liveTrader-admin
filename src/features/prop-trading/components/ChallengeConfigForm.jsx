@@ -1,6 +1,6 @@
 import React from 'react';
 import { Edit2, Zap, Check, Trash2, FileText, Layers } from 'lucide-react';
-import { Card, SectionHead, FormField, TextInput, SelectInput, IconBtn } from './PropShared';
+import { Card, SectionHead, FormField, TextInput, SelectInput, IconBtn } from './PropTradingShared';
 
 export function ChallengeConfigForm({ selected, isNew, form, setForm, setSelected, showToast }) {
   const f = (k) => form[k] ?? '';

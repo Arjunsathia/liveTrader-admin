@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sliders, TrendingDown, Clock, Globe, Bell, ShieldOff, Plus, X, ShieldAlert, AlertOctagon, RefreshCw, Check, CheckCircle2 } from 'lucide-react';
 import { defaultRules } from '../configs/rules.config';
-import { SectionHead, Card, FormField, SelectInput, TextInput, IconBtn } from './PropShared';
+import { SectionHead, Card, FormField, SelectInput, TextInput, IconBtn } from './PropTradingShared';
 
 function ToggleRow({ val, onChange, label, hint, danger }) {
   const onColor  = danger ? 'var(--negative)' : 'var(--positive)';

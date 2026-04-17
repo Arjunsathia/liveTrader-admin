@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Download, Filter, Search, X } from 'lucide-react';
+import { ChevronDown, Filter, Search, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 /* ─── ToolbarFilterDropdown ───────────────────────────────────
@@ -70,19 +70,20 @@ export function ToolbarFilterDropdown({ label, value, onChange, options }) {
 }
 
 /* ─── PageToolbar ─────────────────────────────────────────────
-   Unified toolbar used by Users, Finance, and Trading pages.
+   Unified toolbar used across ALL feature pages (Users, Finance,
+   Trading, Prop Trading, IB System, Copy Trading).
 
    Props:
-     search        – string
-     onSearchChange– (val: string) => void
-     placeholder   – string
-     filterSets    – { label, get, set, opts }[]
-                      get/set = current value / setter
-                      opts    = { value, label }[] or string[]
-     actions       – { label, icon, onClick, variant? }[]
-                      rendered right side of the search row
-     showFilters   – boolean (default true) – hide filter row entirely
-     className     – extra class for the outer <section>
+     search         – string
+     onSearchChange – (val: string) => void
+     placeholder    – string
+     filterSets     – { label, get, set, opts }[]
+                       get/set = current value / setter
+                       opts    = { value, label }[] or string[]
+     actions        – { label, icon, onClick, variant? }[]
+                       rendered right of the search input
+     showFilters    – boolean (default true) — hide filter row entirely
+     className      – extra class for the outer <section>
 ─────────────────────────────────────────────────────────────── */
 export function PageToolbar({
   search,

@@ -9,7 +9,7 @@ import { STATUS_COLOR, RISK_COLOR, SCAN_COLOR } from '../data/financeConstants';
 /* ─── StatusChip ───────────────────────────────────────────── */
 /**
  * Thin wrapper — uses the shared Badge with a colorMap.
- * Replaces both `StatusChip` (FinanceComponents) and `Chip` (FinanceDetailPage).
+ * Replaces both `StatusChip` (FinanceShared) and `Chip` (FinanceDetailPage).
  */
 export function FinanceChip({ value, colorMap = STATUS_COLOR }) {
   return (

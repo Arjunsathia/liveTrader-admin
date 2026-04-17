@@ -11,7 +11,7 @@ import { PageShell } from '../../../layout/PageShell';
 import {
   FinanceChip, Field, SectionLabel, ScanBadge, MoreMenu,
   STATUS_COLOR, RISK_COLOR,
-} from '../components/FinanceDetailComponents';
+} from '../components/FinanceDetailShared';
 
 /* ─────────────────────────────────────────────────────────────
    MOCK DATA

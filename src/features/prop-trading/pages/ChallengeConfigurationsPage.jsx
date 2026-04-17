@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Download, CheckCircle2, Edit2, Zap, Check, Trash2, ChevronRight, Layers, FileText } from 'lucide-react';
 import { challengeRows } from '../configs/challenge.config';
-import { Card, SectionHead, IconBtn, Badge, FormField, TextInput, SelectInput } from '../components/PropShared';
+import { Card, SectionHead, IconBtn, Badge, FormField, TextInput, SelectInput } from '../components/PropTradingShared';
+import { ActionToast } from '../../../components/ui/FeatureUI';
 import { PropToolbar } from '../components/PropToolbar';
 import { ChallengeConfigForm } from '../components/ChallengeConfigForm';
 
@@ -27,11 +28,7 @@ export function ChallengeConfigurationsPage() {
         ]}
       />
 
-      {toast && (
-        <div className="flex items-center gap-2.5 rounded-[9px] border border-positive/20 bg-positive/[0.07] px-4 py-2.5 text-[12px] font-semibold text-positive font-heading animate-in fade-in duration-200">
-          <CheckCircle2 size={13} /> {toast}
-        </div>
-      )}
+      <ActionToast msg={toast} />
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-5 items-start">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

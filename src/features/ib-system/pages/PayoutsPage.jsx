@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { AlertOctagon, Check, CheckCircle2, Download, Flag, ShieldAlert, X } from 'lucide-react';
-import { PageToolbar } from '../../../components/shared/PageToolbar';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
 import { Card } from '../../../components/ui/Card';
-import { IBTable } from '../components/IBTable';
-import { IBBadge, IBRiskBadge, TraderAvatar, IBToast } from '../components/IBShared';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { IBBadge, IBRiskBadge, TraderAvatar, IBToast, TableActionBtn } from '../components/IBSystemShared';
 import { PayoutDrawer } from '../components/IBDrawer';
 import { payoutsRows, PAYOUT_FILTERS } from '../configs/payouts.config';
 
@@ -37,10 +37,10 @@ export function PayoutsPage() {
     { key: '_a', label: '', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {(r.status === 'PENDING' || r.status === 'REVIEW') && (
-            <button onClick={e => { e.stopPropagation(); act('Approved', r.id); }} className="w-6 h-6 rounded-[5px] border border-positive/20 bg-positive/[0.07] text-positive flex items-center justify-center cursor-pointer"><Check size={10} /></button>
+            <TableActionBtn variant="success" Icon={Check} onClick={e => { e.stopPropagation(); act('Approved', r.id); }} />
           )}
-          <button onClick={e => { e.stopPropagation(); act('Rejected', r.id); }} className="w-6 h-6 rounded-[5px] border border-negative/20 bg-negative/[0.07] text-negative flex items-center justify-center cursor-pointer"><X size={10} /></button>
-          <button onClick={e => { e.stopPropagation(); act('Flagged', r.id); }}  className="w-6 h-6 rounded-[5px] border border-warning/20 flex items-center justify-center text-warning/60 hover:text-warning cursor-pointer"><Flag size={10} /></button>
+          <TableActionBtn variant="danger" Icon={X} onClick={e => { e.stopPropagation(); act('Rejected', r.id); }} />
+          <TableActionBtn variant="warning" Icon={Flag} onClick={e => { e.stopPropagation(); act('Flagged', r.id); }} />
         </div>
     )},
   ];
@@ -62,7 +62,7 @@ export function PayoutsPage() {
           <AlertOctagon size={14} className="text-negative flex-shrink-0 mt-0.5" />
           <div>
             <div className="text-[12px] font-bold text-negative font-heading">High-Risk Payouts Require Manual Review</div>
-            <div className="text-[11px] text-negative/70 font-heading mt-0.5">{payoutsRows.filter(r => r.risk === 'HIGH').length} payout(s) flagged — verify partner identity and fund source before processing.</div>
+            <div className="text-[11px] text-negative/70 font-heading mt-0.5">{payoutsRows.filter(r => r.risk === 'HIGH' && ['PENDING','REVIEW','FROZEN'].includes(r.status)).length} payout(s) flagged — verify partner identity and fund source before processing.</div>
           </div>
         </div>
       )}
@@ -80,7 +80,7 @@ export function PayoutsPage() {
         ))}
       </div>
       <Card title="Payout Requests" subtitle={`${filtered.length} record${filtered.length !== 1 ? 's' : ''} matched · click row to open`} padding={false}>
-        <IBTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
+        <FeatureTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
       </Card>
       <PayoutDrawer row={drawer} open={!!drawer} onClose={() => setDrawer(null)} onAction={act} />
     </div>

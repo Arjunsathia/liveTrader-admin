@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerField, DrawerGrid } from '../../../components/overlays/DrawerUI';
+import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';
-import { StatusChip } from './FinanceComponents';
+import { StatusChip } from './FinanceShared';
+import { ActionBtn } from '../../../components/ui/FeatureUI';
 import { RISK_COLOR, STATUS_COLOR } from '../data/financeMockData';
 import { AlertTriangle, Check, CheckCircle2, Download, Eye, Flag, Lock, Send, X } from 'lucide-react';
 
@@ -17,7 +18,6 @@ const STATUS_HISTORY_WDR = [
   { status: 'REVIEWING', by: 'auto-aml', time: '2024-01-15 08:12' },
   { status: 'PENDING', by: 'james.risk', time: '2024-01-15 08:15' },
 ];
-
 
 export function FinanceDetailDrawer({ open, row, slug, onClose }) {
   const [note, setNote] = useState('');
@@ -117,47 +117,31 @@ export function FinanceDetailDrawer({ open, row, slug, onClose }) {
                   <p className="text-[12.5px] leading-relaxed text-text-muted/70 italic">"{row.note}"</p>
                 </div>
               )}
-              <textarea
+              <TextareaField
+                label="Operator Investigation Note"
                 value={note}
-                onChange={(e) => setNote(e.target.value)}
+                onChange={setNote}
                 placeholder="Add an operator investigation note…"
                 rows={4}
-                className="w-full rounded-[10px] border border-border/25 bg-bg/60 px-4 py-3 text-[12.5px] text-text outline-none transition-all placeholder:text-text-muted/30 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 resize-none shadow-sm"
               />
-              <div className="flex justify-start">
-                <Button 
-                  icon={Send} 
-                  disabled={!note.trim()} 
-                  className="h-9 px-5 shadow-button-glow"
-                  onClick={() => { setNote(''); setActionDone('Note saved successfully'); }}
-                >
-                  Save Note
-                </Button>
-              </div>
             </div>
           </DrawerSection>
 
           <DrawerSection title="Record Actions">
             <div className="grid grid-cols-2 gap-2 mt-1">
               {[
-                { label: 'Approve Record', color: 'var(--positive)', action: 'approved', Icon: Check },
-                { label: 'Reject / Flag', color: 'var(--negative)', action: 'rejected', Icon: X },
-                { label: 'Compliance Lock', color: '#a78bfa', action: 'frozen', Icon: Lock },
-                { label: 'Download Audit', color: 'var(--text-muted)', action: null, Icon: Download },
-              ].map(({ label, color, action, Icon: Ic }) => (
-                <button
+                { label: 'Approve Record', variant: 'success', action: 'approved', Icon: Check },
+                { label: 'Reject / Flag', variant: 'danger', action: 'rejected', Icon: X },
+                { label: 'Compliance Lock', variant: 'cyan', action: 'frozen', Icon: Lock },
+                { label: 'Download Audit', variant: 'default', action: null, Icon: Download },
+              ].map(({ label, variant, action, Icon: Ic }) => (
+                <ActionBtn
                   key={label}
+                  label={label}
+                  variant={variant}
+                  Icon={Ic}
                   onClick={() => action && setActionDone(label)}
-                  className="flex items-center justify-center gap-2.5 rounded-[10px] border py-3 text-[11px] font-bold uppercase tracking-wider transition-all hover:brightness-110 active:scale-[0.98] group"
-                  style={{ 
-                    color, 
-                    background: `color-mix(in srgb, ${color} 10%, transparent)`, 
-                    borderColor: `color-mix(in srgb, ${color} 25%, transparent)` 
-                  }}
-                >
-                  <Ic size={13} className="group-hover:scale-110 transition-transform" />
-                  {label}
-                </button>
+                />
               ))}
             </div>
             {actionDone && (

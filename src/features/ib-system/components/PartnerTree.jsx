@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, GitBranch, Network, Users, X, CircleDollarSign, Edit2, Lock } from 'lucide-react';
-import { IBCard, IBTierBadge, IBBadge, SectionHead, IBIconBtn } from './IBShared';
+import { IBCard, IBTierBadge, IBBadge, SectionHead, IBIconBtn } from './IBSystemShared';
 import { TIER_CLR, STATUS_CLR } from '../configs/shared.config';
 
 export function TreeNode({ node, depth = 0, selectedId, onSelect }) {

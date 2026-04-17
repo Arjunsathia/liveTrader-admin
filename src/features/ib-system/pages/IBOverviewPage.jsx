@@ -11,11 +11,55 @@ import { KpiCard } from '../../../components/cards/KpiCard';
 import {
   overviewKpis, referralGrowth, commissionTrend, topPartners, payoutAlerts,
 } from '../configs/overview.config';
-import { IBCard, IBBadge, IBRiskBadge, IBTierBadge, SectionHead, IBChartTip, TraderAvatar, IBToast, IBIconBtn } from '../components/IBShared';
+import { IBCard, IBRiskBadge, IBTierBadge, SectionHead, IBChartTip, TraderAvatar, IBToast, IBIconBtn } from '../components/IBSystemShared';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
+
+// Column definitions for Top IB Partners
+const partnerCols = [
+  {
+    key: '_rank', label: '#', render: (_, r, i) => (
+      <span className={`text-[13px] font-black font-heading ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-600' : 'text-text-muted/30'}`}>
+        #{(i ?? 0) + 1}
+      </span>
+    ),
+  },
+  {
+    key: 'name', label: 'Partner', render: (v, r) => (
+      <div className="flex items-center gap-2.5">
+        <TraderAvatar name={v} />
+        <div>
+          <div className="text-[12px] font-semibold font-heading text-text/80">{v}</div>
+          <div className="text-[10px] font-mono text-text-muted/40">{r.id}</div>
+        </div>
+      </div>
+    ),
+  },
+  { key: 'region',   label: 'Region',    render: (v) => <span className="text-text-muted/50 font-heading">{v}</span> },
+  { key: 'referrals',label: 'Referrals', render: (v) => <span className="font-mono text-brand font-bold">{v?.toLocaleString()}</span> },
+  { key: 'revenue',  label: 'Revenue',   render: (v) => <span className="font-mono font-bold text-text/75">{v}</span> },
+  { key: 'tier',     label: 'Tier',      render: (v) => <IBTierBadge value={v} /> },
+  { key: 'trend',    label: 'Growth',    render: (v) => <span className={`font-mono font-bold text-[11px] ${v?.startsWith('+') ? 'text-positive' : 'text-negative'}`}>{v}</span> },
+];
 
 export function IBOverviewPage() {
   const [toast, setToast] = useState(null);
   const act = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+
+  // Inject index into topPartners so rank col can use it
+  const rankedPartners = topPartners.map((p, i) => ({ ...p, _rank: i + 1 }));
+  // Override render for _rank to access index
+  const rankedCols = partnerCols.map((c) =>
+    c.key === '_rank'
+      ? { ...c, render: (_, r) => {
+          const i = r._rank - 1;
+          return (
+            <span className={`text-[13px] font-black font-heading ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-600' : 'text-text-muted/30'}`}>
+              #{r._rank}
+            </span>
+          );
+        }}
+      : c
+  );
 
   return (
     <div className="space-y-5">
@@ -92,42 +136,7 @@ export function IBOverviewPage() {
             <SectionHead title="Top IB Partners" Icon={Trophy} />
             <button className="text-[10px] text-primary font-bold hover:underline cursor-pointer font-heading">View all →</button>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-[11px]">
-              <thead>
-                <tr className="border-b border-border/20">
-                  {['#', 'Partner', 'Region', 'Referrals', 'Revenue', 'Tier', 'Growth'].map(h => (
-                    <th key={h} className="px-5 py-2.5 text-left text-[9.5px] font-black uppercase tracking-[0.12em] text-text-muted/50 font-heading bg-bg/40">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {topPartners.map((p, i) => (
-                  <tr key={p.id} className="border-b border-border/20 hover:bg-bg/60 transition-colors last:border-0">
-                    <td className="px-5 py-3">
-                      <span className={`text-[13px] font-black font-heading ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-600' : 'text-text-muted/30'}`}>#{i + 1}</span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <TraderAvatar name={p.name} />
-                        <div>
-                          <div className="text-[12px] font-semibold font-heading text-text/80">{p.name}</div>
-                          <div className="text-[10px] font-mono text-text-muted/40">{p.id}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3 text-text-muted/50 font-heading">{p.region}</td>
-                    <td className="px-5 py-3 font-mono text-brand font-bold">{p.referrals?.toLocaleString()}</td>
-                    <td className="px-5 py-3 font-mono font-bold text-text/75">{p.revenue}</td>
-                    <td className="px-5 py-3"><IBTierBadge value={p.tier} /></td>
-                    <td className="px-5 py-3">
-                      <span className={`font-mono font-bold text-[11px] ${p.trend.startsWith('+') ? 'text-positive' : 'text-negative'}`}>{p.trend}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <FeatureTable cols={rankedCols} rows={rankedPartners} rowKey="id" />
         </IBCard>
 
         <IBCard>

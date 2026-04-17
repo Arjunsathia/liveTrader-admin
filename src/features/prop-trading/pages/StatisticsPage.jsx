@@ -3,11 +3,38 @@ import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tool
 import { Download, Users, BarChart2, BarChart3 } from 'lucide-react';
 import { statsKpis, appTrend, challengeStats } from '../configs/statistics.config';
 import { completionTrend } from '../configs/overview.config';
-import { SectionHead, Card, IconBtn, CustomTooltip } from '../components/PropShared';
+import { SectionHead, Card, IconBtn, CustomTooltip } from '../components/PropTradingShared';
 import { PropStatsCards } from '../components/PropStatsCards';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
+
+const perfCols = [
+  { key: 'name',    label: 'Challenge',    render: (v) => <span className="font-heading font-semibold text-text/75">{v}</span> },
+  { key: 'apps',    label: 'Applications', render: (v) => <span className="font-mono text-text-muted/60">{v.toLocaleString()}</span> },
+  { key: 'pass',    label: 'Pass Rate',    render: (v) => (
+    <div className="flex items-center gap-2">
+      <div className="w-16 h-1.5 rounded-full bg-white/[0.05]">
+        <div className="h-full rounded-full bg-positive" style={{ width: `${v}%` }} />
+      </div>
+      <span className="font-mono font-bold text-positive">{v}%</span>
+    </div>
+  )},
+  { key: 'fail',    label: 'Fail Rate',    render: (v) => <span className="font-mono text-negative">{v}%</span> },
+  { key: 'funded',  label: 'Funded',       render: (v) => <span className="font-mono text-brand font-bold">{v}</span> },
+  { key: 'revenue', label: 'Revenue',      render: (v) => <span className="font-mono font-bold text-text/70">{v}</span> },
+  { key: 'avgDays', label: 'Avg. Days',    render: (_, r, i) => <span className="font-mono text-text-muted/50">~{12 + (i ?? 0) * 1}d</span> },
+];
 
 export function StatisticsPage() {
   const [period, setPeriod] = useState('3M');
+
+  // Inject index for avgDays fake metric calculation map over rows
+  const rankedStats = challengeStats.map((r, i) => ({ ...r, _idx: i }));
+  // Override render to use _idx
+  const cols = perfCols.map(c => 
+    c.key === 'avgDays' 
+    ? { ...c, render: (_, r) => <span className="font-mono text-text-muted/50">~{12 + r._idx * 1}d</span> }
+    : c
+  );
 
   return (
     <div className="space-y-5">
@@ -16,7 +43,7 @@ export function StatisticsPage() {
           {['1M', '3M', '6M', '1Y', 'ALL'].map(p => (
             <button key={p} onClick={() => setPeriod(p)}
               className={`px-3 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all duration-150 border
-                ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-white/[0.06] text-text-muted/40 hover:text-text-muted bg-transparent'}`}>
+                ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-border/10 text-text-muted/40 hover:text-text-muted bg-transparent'}`}>
               {p}
             </button>
           ))}
@@ -78,40 +105,10 @@ export function StatisticsPage() {
       </div>
 
       <Card pad={false}>
-        <div className="px-5 py-4 border-b border-white/[0.05]">
+        <div className="px-5 py-4 border-b border-border/25">
           <SectionHead title="Challenge Performance Breakdown" Icon={BarChart3} />
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-[11px]">
-            <thead>
-              <tr className="border-b border-white/[0.05]">
-                {['Challenge', 'Applications', 'Pass Rate', 'Fail Rate', 'Funded', 'Revenue', 'Avg. Days'].map(h => (
-                  <th key={h} className="px-5 py-3 text-left text-[9.5px] font-black uppercase tracking-[0.12em] text-text-muted/30 font-heading whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {challengeStats.map(r => (
-                <tr key={r.name} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                  <td className="px-5 py-3 font-heading font-semibold text-text/75">{r.name}</td>
-                  <td className="px-5 py-3 font-mono text-text-muted/60">{r.apps.toLocaleString()}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-1.5 rounded-full bg-white/[0.05]">
-                        <div className="h-full rounded-full bg-positive" style={{ width: `${r.pass}%` }} />
-                      </div>
-                      <span className="font-mono font-bold text-positive">{r.pass}%</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 font-mono text-negative">{r.fail}%</td>
-                  <td className="px-5 py-3 font-mono text-brand font-bold">{r.funded}</td>
-                  <td className="px-5 py-3 font-mono font-bold text-text/70">{r.revenue}</td>
-                  <td className="px-5 py-3 font-mono text-text-muted/50">~{12 + challengeStats.indexOf(r) * 1}d</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <FeatureTable cols={cols} rows={rankedStats} rowKey="name" />
       </Card>
     </div>
   );

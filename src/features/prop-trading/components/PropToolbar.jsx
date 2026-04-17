@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageToolbar } from '../../../components/shared/PageToolbar';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
 
 /**
  * PropToolbar — wraps the canonical PageToolbar (same as CopyTradingToolbar / TradingToolbar).

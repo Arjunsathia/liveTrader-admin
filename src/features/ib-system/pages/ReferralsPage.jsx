@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Check, Download, Edit2, Lock, UserPlus, X } from 'lucide-react';
-import { PageToolbar } from '../../../components/shared/PageToolbar';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
 import { Card } from '../../../components/ui/Card';
-import { IBTable } from '../components/IBTable';
-import { IBBadge, IBTierBadge, TraderAvatar, IBToast } from '../components/IBShared';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { IBBadge, IBTierBadge, TraderAvatar, IBToast, TableActionBtn } from '../components/IBSystemShared';
 import { ReferralDrawer } from '../components/IBDrawer';
 import { referralsRows, REFERRAL_FILTERS } from '../configs/referrals.config';
 
@@ -45,8 +45,8 @@ export function ReferralsPage() {
     { key: 'lastActivity', label: 'Last Active',render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
     { key: '_a', label: '', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={e => { e.stopPropagation(); act('Edited', r.id); }} className="w-6 h-6 rounded-[5px] border border-border/30 flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer"><Edit2 size={10} /></button>
-          <button onClick={e => { e.stopPropagation(); act('Suspended', r.id); }} className="w-6 h-6 rounded-[5px] border border-negative/20 flex items-center justify-center text-negative/50 hover:text-negative cursor-pointer"><Lock size={10} /></button>
+          <TableActionBtn variant="default" Icon={Edit2} onClick={e => { e.stopPropagation(); act('Edited', r.id); }} />
+          <TableActionBtn variant="danger" Icon={Lock} onClick={e => { e.stopPropagation(); act('Suspended', r.id); }} />
         </div>
     )},
   ];
@@ -78,7 +78,7 @@ export function ReferralsPage() {
         ))}
       </div>
       <Card title="IB Partners" subtitle={`${filtered.length} record${filtered.length !== 1 ? 's' : ''} matched · click row to open`} padding={false}>
-        <IBTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
+        <FeatureTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
       </Card>
       <ReferralDrawer row={drawer} open={!!drawer} onClose={() => setDrawer(null)} onAction={act} />
     </div>

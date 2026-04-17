@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Check, CheckCircle2, Download, PauseCircle, X } from 'lucide-react';
-import { PageToolbar } from '../../../components/shared/PageToolbar';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
 import { Card } from '../../../components/ui/Card';
-import { IBTable } from '../components/IBTable';
-import { IBBadge, IBTierBadge, TraderAvatar, IBToast } from '../components/IBShared';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { IBBadge, IBTierBadge, TraderAvatar, IBToast, TableActionBtn } from '../components/IBSystemShared';
 import { CommissionDrawer } from '../components/IBDrawer';
 import { commissionsRows, COMMISSION_FILTERS } from '../configs/commissions.config';
 
@@ -39,10 +39,10 @@ export function CommissionsPage() {
     { key: '_a', label: '', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {r.approval === 'REVIEW' && <>
-            <button onClick={e => { e.stopPropagation(); act('Approved', r.id); }} className="w-6 h-6 rounded-[5px] border border-positive/20 bg-positive/[0.07] text-positive flex items-center justify-center cursor-pointer"><Check size={10} /></button>
-            <button onClick={e => { e.stopPropagation(); act('Rejected', r.id); }} className="w-6 h-6 rounded-[5px] border border-negative/20 bg-negative/[0.07] text-negative flex items-center justify-center cursor-pointer"><X size={10} /></button>
+            <TableActionBtn variant="success" Icon={Check} onClick={e => { e.stopPropagation(); act('Approved', r.id); }} />
+            <TableActionBtn variant="danger" Icon={X} onClick={e => { e.stopPropagation(); act('Rejected', r.id); }} />
           </>}
-          <button onClick={e => { e.stopPropagation(); act('Held', r.id); }} className="w-6 h-6 rounded-[5px] border border-border/30 flex items-center justify-center text-text-muted/40 hover:text-warning cursor-pointer"><PauseCircle size={10} /></button>
+          <TableActionBtn variant="default" Icon={PauseCircle} onClick={e => { e.stopPropagation(); act('Held', r.id); }} />
         </div>
     )},
   ];
@@ -72,7 +72,7 @@ export function CommissionsPage() {
         ))}
       </div>
       <Card title="Commission Records" subtitle={`${filtered.length} record${filtered.length !== 1 ? 's' : ''} matched · click row to open`} padding={false}>
-        <IBTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
+        <FeatureTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
       </Card>
       <CommissionDrawer row={drawer} open={!!drawer} onClose={() => setDrawer(null)} onAction={act} />
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { CircleDollarSign, Download, UserPlus } from 'lucide-react';
-import { PageToolbar } from '../../../components/shared/PageToolbar';
-import { IBCard, SectionHead } from '../components/IBShared';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
+import { IBCard, SectionHead } from '../components/IBSystemShared';
 import { TreeNode, TreeDetailPanel } from '../components/PartnerTree';
 import { partnerTree } from '../configs/tree.config';
 import { TIER_CLR } from '../configs/shared.config';

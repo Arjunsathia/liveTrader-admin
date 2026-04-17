@@ -4,7 +4,7 @@ import {
   Download, Eye,
   ArrowUpRight, ArrowDownRight, AlertTriangle
 } from 'lucide-react';
-import { PageToolbar } from '../../../components/shared/PageToolbar';
+import { PageToolbar } from '../../../components/toolbar/PageToolbar';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../layout/PageShell';
 import { Pagination } from '../../../components/tables/Pagination';
@@ -14,7 +14,7 @@ import { exportRows } from '../../../utils/exporters';
 
 import { WORKSPACE } from '../data/financeMockData';
 import { RISK_COLOR, STATUS_COLOR } from '../data/financeConstants';
-import { StatusChip, KpiCard, SectionSwitcher } from '../components/FinanceComponents';
+import { StatusChip, KpiCard, SectionSwitcher } from '../components/FinanceShared';
 import { FinanceDetailDrawer } from '../components/FinanceDetailDrawer';
 
 /* ─────────────────────────────────────────────
