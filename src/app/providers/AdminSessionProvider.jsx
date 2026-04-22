@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { ROLE_PRESETS } from '../config/permissions';
+import { ROLE_PRESETS } from '@config/permissions/permissions';
 
 const AdminSessionContext = createContext(null);
 

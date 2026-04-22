@@ -1,5 +1,5 @@
 /**
- * Finance color maps — shared between FinancePage, FinanceDetailPage,
+ * Finance color maps — shared between FinanceScreen, FinanceDetailScreen,
  * and any Finance sub-components.
  *
  * Each entry: { c: color, bg: background, border?: borderColor }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Download, RefreshCw } from 'lucide-react';
-import { PageToolbar } from '../../../components/toolbar/PageToolbar';
+import { PageToolbar } from '../../../components/common/PageToolbar';
 
 /**
  * TradingToolbar — thin wrapper around the shared PageToolbar.

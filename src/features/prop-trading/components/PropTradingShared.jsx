@@ -7,7 +7,7 @@ import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
 // ── Re-export canonical shared primitives ──────────────────────
-export { StatusChip as Badge, RiskChip as RiskBadge, SectionHead, ActionBtn as IconBtn, ActionToast } from '../../../components/ui/FeatureUI';
+export { StatusChip as Badge, RiskChip as RiskBadge, SectionHead, ActionBtn as IconBtn, ActionToast } from '../../../components/ui';
 
 // STATUS_COLOR kept for backward compat (used in PropDrawer)
 export const STATUS_COLOR = {

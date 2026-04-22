@@ -3,5 +3,8 @@ export { Button } from './Button';
 export { Card } from './Card';
 export { ErrorBoundary } from './ErrorBoundary';
 export { Table, TableRow, TableCell } from './Table';
-// Shared feature-level UI primitives
-export { StatusChip, RiskChip, SectionHead, ActionBtn, ActionToast } from './FeatureUI';
+export { StatusChip, RiskChip } from './StatusChip';
+export { SectionHead } from './SectionHead';
+export { ActionBtn } from './ActionBtn';
+export { ActionToast } from './ActionToast';
+export { TableActionBtn } from './TableActionBtn';

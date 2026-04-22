@@ -13,8 +13,8 @@ import {
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
 import { DrawerField, DrawerGrid } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';
-import { InlineAlert } from '../../../components/feedback/InlineAlert';
-import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { InlineAlert } from '../../../components/common/feedback/InlineAlert';
+import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
 import { userDetailTabs } from '../data/userTabs';
 import { UserDetailContent } from './UserDetailContent';
 

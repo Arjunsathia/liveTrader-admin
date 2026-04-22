@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '../../components/ui/Card';
 import { useAdminSession } from '../providers/AdminSessionProvider';
-import { hasPermission } from '../config/permissions';
+import { hasPermission } from '@config/permissions/permissions';
 
 export function PermissionGuard({ permission, children }) {
   const { permissions } = useAdminSession();

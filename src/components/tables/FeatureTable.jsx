@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, TableRow, TableCell } from '../ui/Table';
-import { EmptyState } from '../feedback/EmptyState';
+import { EmptyState } from '../common/feedback/EmptyState';
 
 /**
  * FeatureTable — canonical table wrapper for all feature sub-pages.

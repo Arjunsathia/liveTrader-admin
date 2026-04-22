@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { DataTable } from '../../../components/tables/DataTable';
-import { STATUS_COLORS, SEVERITY_COLORS, TRADING_LOG_COLORS } from '../../../utils/statusMaps';
+import { STATUS_COLORS, SEVERITY_COLORS, TRADING_LOG_COLORS } from '@config/constants/status.constants';
 
 /* ─── StatusChip (Trading-local) ──────────────────────────── */
 function StatusChip({ value }) {
@@ -86,7 +86,7 @@ const renderers = {
 
 /**
  * TradingTable — wraps DataTable with Trading-specific cell renderers.
- * Color maps imported from utils/statusMaps (single source of truth).
+ * Color maps are centralized in config/constants/status.constants.
  */
 export function TradingTable({ columns: configCols, items, onRowClick }) {
   const columns = [

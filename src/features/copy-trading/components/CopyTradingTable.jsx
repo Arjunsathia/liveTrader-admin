@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, Star, TrendingDown, TrendingUp } from 'lucide-react';
 import { DataTable } from '../../../components/tables/DataTable';
-import { STATUS_COLORS, RISK_COLORS, SEVERITY_COLORS, COPY_LOG_COLORS } from '../../../utils/statusMaps';
+import { STATUS_COLORS, RISK_COLORS, SEVERITY_COLORS, COPY_LOG_COLORS } from '@config/constants/status.constants';
 
 /* ─── Chip primitives ──────────────────────────────────────── */
 function ColorChip({ value, colorMap }) {
@@ -90,7 +90,7 @@ const renderers = {
 
 /**
  * CopyTradingTable — wraps DataTable with Copy Trading cell renderers.
- * Color maps imported from utils/statusMaps (single source of truth).
+ * Color maps are centralized in config/constants/status.constants.
  */
 export function CopyTradingTable({ columns: configCols, items, onRowClick, slug }) {
   const actionLabel = slug === 'subscriptions' ? 'Manage' : slug === 'logs' ? 'Inspect' : 'Open';

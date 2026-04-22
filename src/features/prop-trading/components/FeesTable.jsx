@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit2, PauseCircle, PlayCircle, CircleDollarSign } from 'lucide-react';
 import { Card, SectionHead, IconBtn } from './PropTradingShared';
-import { StatusChip as Badge } from '../../../components/ui/FeatureUI';
+import { StatusChip as Badge } from '../../../components/ui';
 import { FeatureTable } from '../../../components/tables/FeatureTable';
 
 const feesCols = [

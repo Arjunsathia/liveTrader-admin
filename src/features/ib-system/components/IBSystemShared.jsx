@@ -5,11 +5,11 @@
  */
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
-import { IB_TIER_COLORS } from '../../../utils/statusMaps';
-import { STATUS_CLR, TIER_CLR } from '../configs/shared.config';
+import { IB_TIER_COLORS } from '@config/constants/status.constants';
+import { STATUS_CLR, TIER_CLR } from '../data/workspaces/shared.workspace';
 
 // ── Re-export canonical shared primitives ──────────────────────
-export { StatusChip as IBBadge, RiskChip as IBRiskBadge, SectionHead, ActionBtn as IBIconBtn, ActionToast as IBToast, TableActionBtn } from '../../../components/ui/FeatureUI';
+export { StatusChip as IBBadge, RiskChip as IBRiskBadge, SectionHead, ActionBtn as IBIconBtn, ActionToast as IBToast, TableActionBtn } from '../../../components/ui';
 
 // ── IBCard (IB-specific card wrapper) ─────────────────────────
 export function IBCard({ children, className = '', pad = true }) {

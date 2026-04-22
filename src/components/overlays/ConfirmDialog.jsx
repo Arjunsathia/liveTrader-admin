@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../ui/Button';
 import { AdminModal } from './AdminModal';
 
 export function ConfirmDialog({ open, title, description, confirmLabel = 'Confirm', onClose, onConfirm }) {

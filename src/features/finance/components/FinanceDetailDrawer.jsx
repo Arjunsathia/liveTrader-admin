@@ -3,7 +3,7 @@ import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
 import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';
 import { StatusChip } from './FinanceShared';
-import { ActionBtn } from '../../../components/ui/FeatureUI';
+import { ActionBtn } from '../../../components/ui';
 import { RISK_COLOR, STATUS_COLOR } from '../data/financeMockData';
 import { AlertTriangle, Check, CheckCircle2, Download, Eye, Flag, Lock, Send, X } from 'lucide-react';
 

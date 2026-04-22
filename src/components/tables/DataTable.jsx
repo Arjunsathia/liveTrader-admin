@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, TableCell, TableRow } from '../../components/ui/Table';
-import { EmptyState } from '../feedback/EmptyState';
+import { EmptyState } from '../common/feedback/EmptyState';
 
 export function DataTable({
   columns,

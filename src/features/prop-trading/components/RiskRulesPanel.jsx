@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sliders, TrendingDown, Clock, Globe, Bell, ShieldOff, Plus, X, ShieldAlert, AlertOctagon, RefreshCw, Check, CheckCircle2 } from 'lucide-react';
-import { defaultRules } from '../configs/rules.config';
+import { defaultRules } from '../data/workspaces/rules.workspace';
 import { SectionHead, Card, FormField, SelectInput, TextInput, IconBtn } from './PropTradingShared';
 
 function ToggleRow({ val, onChange, label, hint, danger }) {

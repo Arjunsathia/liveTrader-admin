@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Ban, Edit2, Eye, Monitor, MoreHorizontal } from 'lucide-react';
 import { DataTable } from '../../../components/tables/DataTable';
 import { Pagination } from '../../../components/tables/Pagination';
-import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
 import { useClickOutside } from '../../../hooks/useClickOutside';
 
 function getAvatarStyle(name = '?') {

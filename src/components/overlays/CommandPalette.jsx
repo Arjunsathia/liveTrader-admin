@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search, Command, Users, LayoutDashboard, Wallet, LineChart, ShieldCheck } from 'lucide-react';
-import { adminNavigation } from '../../app/config/navigation';
+import { adminNavigation } from '@config/sidebar/admin-sidebar.config';
 
 export function CommandPalette({ isOpen, onClose }) {
   const [query, setQuery] = useState('');

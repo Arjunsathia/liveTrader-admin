@@ -7,14 +7,14 @@ import { STATUS_COLOR, RISK_COLOR } from '../data/financeConstants';
 
 /* ─── StatusChip ─────────────────────────────────────────────
    Thin forward to Badge with Finance colorMaps.
-   Kept as a named export so FinancePage doesn't need changes.
+   Kept as a named export so FinanceScreen doesn't need changes.
 ─────────────────────────────────────────────────────────────── */
 export function StatusChip({ value, colorMap = STATUS_COLOR }) {
   return <Badge colorMap={colorMap}>{value}</Badge>;
 }
 
 /* ─── KpiCard ────────────────────────────────────────────────
-   Re-export the shared canonical KpiCard so FinancePage import
+   Re-export the shared canonical KpiCard so FinanceScreen import
    `{ KpiCard }` from this file still works without change.
 ─────────────────────────────────────────────────────────────── */
 export { KpiCard };
@@ -109,5 +109,5 @@ export function SectionSwitcher({ slug, navigate }) {
   );
 }
 
-/* Re-export constants so FinancePage can import from here */
+/* Re-export constants so FinanceScreen can import from here */
 export { STATUS_COLOR, RISK_COLOR };

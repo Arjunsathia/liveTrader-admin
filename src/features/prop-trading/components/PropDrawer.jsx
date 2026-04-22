@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, XCircle, Flag, ShieldCheck, CircleDollarSign, AlertTriangle, Lock, Eye } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
-import { StatusChip } from '../../../components/ui/FeatureUI';
+import { StatusChip } from '../../../components/ui';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
 import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';

@@ -11,7 +11,8 @@ import {
   SEGMENT_OPTIONS,
   SERVER_OPTIONS,
   TIER_OPTIONS,
-} from '../data/userFormConfig';
+} from '../config/user-form.constants';
+import { isUserDraftValid } from '../config/user-form.validation';
 
 export function AddUserDrawer({
   open,
@@ -21,7 +22,7 @@ export function AddUserDrawer({
   onSubmit,
   onClose,
 }) {
-  const isValid = draft.name.trim() && draft.email.trim() && draft.country.trim();
+  const isValid = isUserDraftValid(draft);
   const title = mode === 'edit' ? 'Edit User' : 'Create User';
   const subtitle = mode === 'edit'
     ? 'Update identity, onboarding, and account settings without leaving the users workspace.'

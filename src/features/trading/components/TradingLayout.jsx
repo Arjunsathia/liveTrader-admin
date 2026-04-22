@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Monitor, BookOpen, Activity, BarChart2, Terminal, RefreshCw } from 'lucide-react';
-import { PageShell } from '../../../layout/PageShell';
+import { PageShell } from '../../../components/common/PageShell';
 
 const SUB_PAGES = [
   { slug: 'accounts', label: 'Accounts', icon: Monitor },

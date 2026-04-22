@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
 import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays/DrawerUI';
-import { STATUS_CLR, TIER_CLR } from '../configs/shared.config';
-import { ActionBtn as IconBtn, StatusChip } from '../../../components/ui/FeatureUI';
+import { STATUS_CLR, TIER_CLR } from '../data/workspaces/shared.workspace';
+import { ActionBtn as IconBtn, StatusChip } from '../../../components/ui';
 import { Button } from '../../../components/ui/Button';
 
 /* ─── Referral Drawer ────────────────────────────────────────── */

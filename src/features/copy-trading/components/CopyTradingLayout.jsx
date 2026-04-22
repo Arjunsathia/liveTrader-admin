@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageShell } from '../../../layout/PageShell';
+import { PageShell } from '../../../components/common/PageShell';
 
 /**
  * CopyTradingLayout — simple page wrapper.

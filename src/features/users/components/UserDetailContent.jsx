@@ -1,5 +1,5 @@
-import { InlineAlert } from '../../../components/feedback/InlineAlert';
-import { StatusBadge } from '../../../components/feedback/StatusBadge';
+import { InlineAlert } from '../../../components/common/feedback/InlineAlert';
+import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
 import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays/DrawerUI';
 
 
