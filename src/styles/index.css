@@ -250,3 +250,61 @@
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
+
+/* ── no-scrollbar utility ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Sidebar collapsed tooltip animation ── */
+@keyframes sideTooltip {
+  from { opacity: 0; transform: translateX(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateX(0)   scale(1); }
+}
+
+/* ── animate-in (Tailwind Animate compatible) ─────────────────
+   Enables: animate-in + fade-in, slide-in-from-*, zoom-in-*
+   Used across drawers, palettes, overlays, page transitions.
+───────────────────────────────────────────────────────────── */
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform:
+      translate3d(
+        var(--tw-enter-translate-x, 0),
+        var(--tw-enter-translate-y, 0),
+        0
+      )
+      scale3d(
+        var(--tw-enter-scale, 1),
+        var(--tw-enter-scale, 1),
+        var(--tw-enter-scale, 1)
+      );
+  }
+}
+
+.animate-in {
+  animation-name: enter;
+  animation-duration: var(--tw-anim-duration, 150ms);
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+/* Duration modifiers for animate-in */
+.animate-in.duration-150 { --tw-anim-duration: 150ms; }
+.animate-in.duration-200 { --tw-anim-duration: 200ms; }
+.animate-in.duration-300 { --tw-anim-duration: 300ms; }
+.animate-in.duration-500 { --tw-anim-duration: 500ms; }
+
+/* Entry effect modifiers */
+.fade-in                  { --tw-enter-opacity: 0; }
+.zoom-in                  { --tw-enter-scale: 0.95; }
+.zoom-in-95               { --tw-enter-scale: 0.95; }
+.zoom-in-98               { --tw-enter-scale: 0.98; }
+.slide-in-from-top-1      { --tw-enter-translate-y: -0.25rem; }
+.slide-in-from-top-2      { --tw-enter-translate-y: -0.5rem; }
+.slide-in-from-top-5      { --tw-enter-translate-y: -1.25rem; }
+.slide-in-from-bottom-2   { --tw-enter-translate-y: 0.5rem; }
+.slide-in-from-right-4    { --tw-enter-translate-x: 1rem; }
+.slide-in-from-left-2     { --tw-enter-translate-x: -0.5rem; }
+.fill-mode-both           { animation-fill-mode: both; }
+

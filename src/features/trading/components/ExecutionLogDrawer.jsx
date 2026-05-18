@@ -25,7 +25,7 @@ export function ExecutionLogDrawer({ open, row, onClose }) {
       subtitle={`${row.type} · ${row.bridge}`}
       onClose={onClose}
       actionDone={actionDone}
-      width="max-w-[500px]"
+      width="max-w-[720px]"
     >
       <div className="space-y-6">
         <DrawerSection title="Event Context">
@@ -34,11 +34,11 @@ export function ExecutionLogDrawer({ open, row, onClose }) {
             <DrawerField label="Type" value={row.type} />
             <DrawerField label="Bridge" value={row.bridge} mono />
             <DrawerField label="Symbol" value={row.symbol} />
-            <DrawerField 
-              label="Latency" 
-              value={row.latency} 
-              mono 
-              accent={parseInt(row.latency) > 500 ? 'var(--negative)' : parseInt(row.latency) > 200 ? 'var(--warning)' : 'var(--positive)'} 
+            <DrawerField
+              label="Latency"
+              value={row.latency}
+              mono
+              accent={parseInt(row.latency) > 500 ? 'var(--negative)' : parseInt(row.latency) > 200 ? 'var(--warning)' : 'var(--positive)'}
             />
             <DrawerField label="Status Code" value={row.code} mono />
             <DrawerField label="Severity" value={row.severity} />

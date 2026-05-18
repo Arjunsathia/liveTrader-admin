@@ -18,10 +18,10 @@ export function TradeHistoryScreen() {
   return (
     <TradingLayout>
       <TradingStatsCards kpis={historyConfig.kpis} />
-      
-      <TradingToolbar 
-        search={ws.search} 
-        onSearchChange={ws.setSearch} 
+
+      <TradingToolbar
+        search={ws.search}
+        onSearchChange={ws.setSearch}
         filterSets={ws.filterSets}
         placeholder="Search history by ticket, symbol, account or user..."
         onExport={() => exportRows(ws.filtered, 'trade-history.csv')}
@@ -29,10 +29,10 @@ export function TradeHistoryScreen() {
       />
 
       <Card title={historyConfig.tableTitle} subtitle={historyConfig.tableSubtitle} padding={false}>
-        <TradingTable 
-          columns={historyConfig.columns} 
-          items={ws.table.items} 
-          onRowClick={setDrawerRow} 
+        <TradingTable
+          columns={historyConfig.columns}
+          items={ws.table.items}
+          onRowClick={setDrawerRow}
         />
         <Pagination
           page={ws.table.page}

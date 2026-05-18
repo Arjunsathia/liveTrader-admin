@@ -49,6 +49,15 @@ export const SEVERITY_COLORS = {
   CRITICAL: 'var(--negative)',
 };
 
+/** SEV_CLR — used in audit logs, system reports, activity logs */
+export const SEV_CLR = {
+  INFO: 'var(--cyan)',
+  WARNING: 'var(--warning)',
+  ERROR: 'var(--negative)',
+  CRITICAL: 'var(--negative)',
+};
+
+
 export const TRADING_LOG_COLORS = {
   EXECUTION: 'var(--positive)',
   SYNC: 'var(--cyan)',

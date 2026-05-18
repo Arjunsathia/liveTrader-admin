@@ -21,10 +21,10 @@ export function PositionsScreen() {
   return (
     <TradingLayout>
       <TradingStatsCards kpis={positionsConfig.kpis} />
-      
-      <TradingToolbar 
-        search={ws.search} 
-        onSearchChange={ws.setSearch} 
+
+      <TradingToolbar
+        search={ws.search}
+        onSearchChange={ws.setSearch}
         filterSets={ws.filterSets}
         placeholder="Search positions by symbol, ticket or account..."
         onExport={() => exportRows(ws.filtered, 'trading-positions.csv')}
@@ -32,10 +32,10 @@ export function PositionsScreen() {
       />
 
       <Card title={positionsConfig.tableTitle} subtitle={positionsConfig.tableSubtitle} padding={false}>
-        <TradingTable 
-          columns={positionsConfig.columns} 
-          items={ws.table.items} 
-          onRowClick={setDrawerRow} 
+        <TradingTable
+          columns={positionsConfig.columns}
+          items={ws.table.items}
+          onRowClick={setDrawerRow}
         />
         <Pagination
           page={ws.table.page}

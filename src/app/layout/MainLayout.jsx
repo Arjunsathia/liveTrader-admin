@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAdminUi } from '../providers/AdminUiProvider';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { CommandPalette } from '../../components/overlays/CommandPalette';
-import { useEffect, useState } from 'react';
+
 export function MainLayout() {
   const { collapsed, isMobile, setCollapsed, theme, toggleTheme } = useAdminUi();
   const [cmdOpen, setCmdOpen] = useState(false);

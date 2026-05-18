@@ -155,16 +155,8 @@ export const adminRouteModules = [
           { pattern: '/finance/approvals', title: 'Manual Approvals', section: 'Finance', permission: PERMISSIONS.finance.approve },
         ],
       },
-      {
-        id: 'finance-detail',
-        path: '/finance/:slug/:id',
-        pageKey: 'finance/finance-detail',
-        permission: PERMISSIONS.finance.view,
-        meta: [
-          { pattern: '/finance/:slug/:id', title: 'Finance Details', section: 'Finance', permission: PERMISSIONS.finance.view },
-        ],
-      },
     ],
+
   },
   {
     id: 'trading',
@@ -461,8 +453,18 @@ export const adminRouteModules = [
     icon: FileText,
     navSection: 'management',
     permission: PERMISSIONS.reports.view,
-    defaultPath: '/reports/finance',
+    defaultPath: '/reports/overview',
     routes: [
+      {
+        id: 'reports-overview',
+        path: '/reports/overview',
+        pageKey: 'reports/reports-workspace',
+        navLabel: 'Overview',
+        permission: PERMISSIONS.reports.view,
+        meta: [
+          { pattern: '/reports/overview', title: 'Reports Overview', section: 'Reports', permission: PERMISSIONS.reports.view },
+        ],
+      },
       {
         id: 'reports-finance',
         path: '/reports/finance',
@@ -691,7 +693,7 @@ export const adminRedirectRoutes = [
   { path: '/trading', to: '/trading/accounts' },
   { path: '/copy-trading', to: '/copy-trading/strategies' },
   { path: '/ib-system', to: '/ib-system/overview' },
-  { path: '/reports', to: '/reports/finance' },
+  { path: '/reports', to: '/reports/overview' },
   { path: '/support', to: '/support/tickets' },
   { path: '/settings', to: '/settings/api' },
   { path: '/admin-mgmt', to: '/admin-mgmt/users' },

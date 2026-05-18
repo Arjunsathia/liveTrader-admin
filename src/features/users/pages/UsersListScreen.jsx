@@ -59,7 +59,7 @@ export function UsersListScreen() {
   ], [userRows]);
 
   const openUser = (nextUserId) => navigate(`/users/${nextUserId}`);
-  
+
   const handleSaveUser = () => {
     if (formMode === 'edit' && editingUserId) {
       setUserRows((rows) => rows.map((user) => (user.id === editingUserId ? applyDraftToUser(user, userDraft) : user)));

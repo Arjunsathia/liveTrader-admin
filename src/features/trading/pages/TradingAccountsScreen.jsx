@@ -21,10 +21,10 @@ export function TradingAccountsScreen() {
   return (
     <TradingLayout>
       <TradingStatsCards kpis={accountsConfig.kpis} />
-      
-      <TradingToolbar 
-        search={ws.search} 
-        onSearchChange={ws.setSearch} 
+
+      <TradingToolbar
+        search={ws.search}
+        onSearchChange={ws.setSearch}
         filterSets={ws.filterSets}
         placeholder="Search accounts by login, name or group..."
         onExport={() => exportRows(ws.filtered, 'trading-accounts.csv')}
@@ -32,10 +32,10 @@ export function TradingAccountsScreen() {
       />
 
       <Card title={accountsConfig.tableTitle} subtitle={accountsConfig.tableSubtitle} padding={false}>
-        <TradingTable 
-          columns={accountsConfig.columns} 
-          items={ws.table.items} 
-          onRowClick={setDrawerRow} 
+        <TradingTable
+          columns={accountsConfig.columns}
+          items={ws.table.items}
+          onRowClick={setDrawerRow}
         />
         <Pagination
           page={ws.table.page}

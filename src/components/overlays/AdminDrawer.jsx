@@ -9,24 +9,34 @@ export function AdminDrawer({
   children,
   footer,
   onClose,
-  width = 'max-w-[640px]',
+  width = 'max-w-[720px]',
   eyebrow = 'Quick Edit',
 }) {
   const [active, setActive] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
+    let mountTimer;
+    let activeTimer;
+    let unmountTimer;
+
     if (open) {
-      setShouldRender(true);
-      // Small timeout to trigger CSS transition after mounting
-      const timer = setTimeout(() => setActive(true), 10);
-      return () => clearTimeout(timer);
+      mountTimer = setTimeout(() => {
+        setShouldRender(true);
+        activeTimer = setTimeout(() => setActive(true), 10);
+      }, 0);
     } else {
-      setActive(false);
-      // Match duration-400 below
-      const timer = setTimeout(() => setShouldRender(false), 400);
-      return () => clearTimeout(timer);
+      mountTimer = setTimeout(() => {
+        setActive(false);
+        unmountTimer = setTimeout(() => setShouldRender(false), 400);
+      }, 0);
     }
+
+    return () => {
+      clearTimeout(mountTimer);
+      clearTimeout(activeTimer);
+      clearTimeout(unmountTimer);
+    };
   }, [open]);
 
   if (!shouldRender) return null;

@@ -17,10 +17,10 @@ export function ExecutionLogsScreen() {
   return (
     <TradingLayout>
       <TradingStatsCards kpis={logsConfig.kpis} />
-      
-      <TradingToolbar 
-        search={ws.search} 
-        onSearchChange={ws.setSearch} 
+
+      <TradingToolbar
+        search={ws.search}
+        onSearchChange={ws.setSearch}
         filterSets={ws.filterSets}
         placeholder="Search event logs by message, ticket or source..."
         onExport={() => exportRows(ws.filtered, 'execution-logs.csv')}
@@ -28,10 +28,10 @@ export function ExecutionLogsScreen() {
       />
 
       <Card title={logsConfig.tableTitle} subtitle={logsConfig.tableSubtitle} padding={false}>
-        <TradingTable 
-          columns={logsConfig.columns} 
-          items={ws.table.items} 
-          onRowClick={setDrawerRow} 
+        <TradingTable
+          columns={logsConfig.columns}
+          items={ws.table.items}
+          onRowClick={setDrawerRow}
         />
         <Pagination
           page={ws.table.page}

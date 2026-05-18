@@ -11,7 +11,7 @@ export function ReferralsScreen() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('ALL');
   const [drawer, setDrawer] = useState(null);
-  const [toast, setToast]   = useState(null);
+  const [toast, setToast] = useState(null);
   const act = (msg, id) => { setToast(`${msg}: ${id}`); setTimeout(() => setToast(null), 3000); };
 
   const filtered = useMemo(() => {
@@ -26,8 +26,9 @@ export function ReferralsScreen() {
   }, [search, filter]);
 
   const cols = [
-    { key: 'id',   label: 'ID',       render: v => <span className="font-mono text-text-muted/55 text-[10.5px]">{v}</span> },
-    { key: 'name', label: 'Partner',  render: (v, r) => (
+    { key: 'id', label: 'ID', render: v => <span className="font-mono text-text-muted/55 text-[10.5px]">{v}</span> },
+    {
+      key: 'name', label: 'Partner', render: (v, r) => (
         <div className="flex items-center gap-2.5">
           <TraderAvatar name={v} />
           <div>
@@ -35,20 +36,23 @@ export function ReferralsScreen() {
             <div className="text-[10px] font-mono text-text-muted/40">{r.code}</div>
           </div>
         </div>
-    )},
-    { key: 'region',       label: 'Region',     render: v => <span className="text-text-muted/55 font-heading font-semibold text-[11px]">{v}</span> },
-    { key: 'referred',     label: 'Referred',   render: v => <span className="font-mono font-bold text-brand">{v?.toLocaleString()}</span> },
-    { key: 'active',       label: 'Active',     render: v => <span className="font-mono text-positive font-semibold">{v?.toLocaleString()}</span> },
-    { key: 'share',        label: 'Rev. Share', render: v => <span className="font-mono font-bold text-warning">{v}</span> },
-    { key: 'tier',         label: 'Tier',       render: v => <IBTierBadge value={v} /> },
-    { key: 'status',       label: 'Status',     render: v => <IBBadge value={v} /> },
-    { key: 'lastActivity', label: 'Last Active',render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
-    { key: '_a', label: '', render: (_, r) => (
+      )
+    },
+    { key: 'region', label: 'Region', render: v => <span className="text-text-muted/55 font-heading font-semibold text-[11px]">{v}</span> },
+    { key: 'referred', label: 'Referred', render: v => <span className="font-mono font-bold text-brand">{v?.toLocaleString()}</span> },
+    { key: 'active', label: 'Active', render: v => <span className="font-mono text-positive font-semibold">{v?.toLocaleString()}</span> },
+    { key: 'share', label: 'Rev. Share', render: v => <span className="font-mono font-bold text-warning">{v}</span> },
+    { key: 'tier', label: 'Tier', render: v => <IBTierBadge value={v} /> },
+    { key: 'status', label: 'Status', render: v => <IBBadge value={v} /> },
+    { key: 'lastActivity', label: 'Last Active', render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
+    {
+      key: '_a', label: '', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <TableActionBtn variant="default" Icon={Edit2} onClick={e => { e.stopPropagation(); act('Edited', r.id); }} />
           <TableActionBtn variant="danger" Icon={Lock} onClick={e => { e.stopPropagation(); act('Suspended', r.id); }} />
         </div>
-    )},
+      )
+    },
   ];
 
   return (
@@ -58,17 +62,17 @@ export function ReferralsScreen() {
         filterSets={[{ label: 'Status / Tier', get: filter === 'ALL' ? 'all' : filter, set: v => setFilter(v === 'all' ? 'ALL' : v), opts: REFERRAL_FILTERS.map(f => ({ value: f, label: f })) }]}
         actions={[
           { label: 'Add IB Partner', icon: UserPlus, variant: 'primary', onClick: () => act('Add IB', 'form opened') },
-          { label: 'Export',         icon: Download,                     onClick: () => act('Exported', 'referrals CSV') },
+          { label: 'Export', icon: Download, onClick: () => act('Exported', 'referrals CSV') },
         ]}
       />
       <IBToast msg={toast} />
       <div className="flex gap-2 flex-wrap">
         {[
-          { label: 'Total IBs',  val: referralsRows.length,                                             color: 'var(--text-muted)' },
-          { label: 'Active',     val: referralsRows.filter(r => r.status === 'ACTIVE').length,          color: 'var(--positive)'   },
-          { label: 'Paused',     val: referralsRows.filter(r => r.status === 'PAUSED').length,          color: 'var(--warning)'    },
-          { label: 'Suspended',  val: referralsRows.filter(r => r.status === 'SUSPENDED').length,       color: 'var(--negative)'   },
-          { label: 'Total Refs', val: referralsRows.reduce((s, r) => s + r.referred, 0).toLocaleString(),color: 'var(--brand)'     },
+          { label: 'Total IBs', val: referralsRows.length, color: 'var(--text-muted)' },
+          { label: 'Active', val: referralsRows.filter(r => r.status === 'ACTIVE').length, color: 'var(--positive)' },
+          { label: 'Paused', val: referralsRows.filter(r => r.status === 'PAUSED').length, color: 'var(--warning)' },
+          { label: 'Suspended', val: referralsRows.filter(r => r.status === 'SUSPENDED').length, color: 'var(--negative)' },
+          { label: 'Total Refs', val: referralsRows.reduce((s, r) => s + r.referred, 0).toLocaleString(), color: 'var(--brand)' },
         ].map(p => (
           <div key={p.label} className="flex items-center gap-2 rounded-[8px] border border-border/30 bg-bg/60 px-3 py-1.5">
             <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: p.color }} />

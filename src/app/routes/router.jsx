@@ -13,7 +13,6 @@ import { KycQueueScreen } from '@features/kyc/pages/KycQueueScreen';
 import { Mt5QueueScreen } from '@features/users/pages/Mt5QueueScreen';
 import { UserDetailScreen } from '@features/users/pages/UserDetailScreen';
 import { FinanceScreen } from '@features/finance/pages/FinanceScreen';
-import { FinanceDetailScreen } from '@features/finance/pages/FinanceDetailScreen';
 import { TradingAccountsScreen } from '@features/trading/pages/TradingAccountsScreen';
 import { OrdersScreen } from '@features/trading/pages/OrdersScreen';
 import { PositionsScreen } from '@features/trading/pages/PositionsScreen';
@@ -33,7 +32,7 @@ import { SupportScreen } from '@features/support/pages/SupportScreen';
 import { TicketDetailScreen } from '@features/support/pages/TicketDetailScreen';
 import { SettingsScreen } from '@features/settings/pages/SettingsScreen';
 import { RolesPermissionsScreen } from '@features/roles-permissions/pages/RolesPermissionsScreen';
-import { AuditLogsScreen } from '@features/audit-logs/pages/AuditLogsScreen';
+
 import { NotFoundScreen } from '@features/not-found/NotFoundScreen';
 
 const pageRegistry = {
@@ -43,7 +42,6 @@ const pageRegistry = {
   'users/mt5-queue': Mt5QueueScreen,
   'users/user-detail': UserDetailScreen,
   'finance/finance-workspace': FinanceScreen,
-  'finance/finance-detail': FinanceDetailScreen,
   'trading/trading-accounts': TradingAccountsScreen,
   'trading/orders': OrdersScreen,
   'trading/positions': PositionsScreen,
@@ -63,7 +61,7 @@ const pageRegistry = {
   'support/ticket-detail': TicketDetailScreen,
   'settings/settings-workspace': SettingsScreen,
   'admin-mgmt/roles-permissions-workspace': RolesPermissionsScreen,
-  'admin-mgmt/audit-logs-workspace': RolesPermissionsScreen,
+  'admin-mgmt/audit-logs-workspace': RolesPermissionsScreen, // access-logs + activity-logs are sub-tabs inside RolesPermissionsScreen
 };
 
 function withPermission(permission, PageComponent) {

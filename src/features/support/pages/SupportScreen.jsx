@@ -1,94 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Download, Eye } from 'lucide-react';
-import { Card } from '../../../components/ui/Card';
-import { PageShell } from '../../../components/common/PageShell';
-import { MetricGrid } from '../../../components/cards/MetricGrid';
-import { PageToolbar } from '../../../components/common/PageToolbar';
-import { DataTable } from '../../../components/tables/DataTable';
-import { Pagination } from '../../../components/tables/Pagination';
-import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
-import { useTableState } from '../../../hooks/useTableState';
-import { exportRows } from '../../../utils/exporters';
-import { supportService } from '../services/support.service';
+import { AlertOctagon, Inbox } from 'lucide-react';
+import { PageShell } from '@components/common/PageShell';
+import { TicketsPage }    from '@features/support/pages/TicketsPage';
+import { EscalatedPage }  from '@features/support/pages/EscalatedPage';
+import { ticketsData }    from '@features/support/data/support.data';
 
-function renderCell(row, column) {
-  if (column.type === 'status') return <StatusBadge status={row[column.key]} dot={false} />;
-  if (column.type === 'mono') return <span className="font-mono text-[12px] text-text-muted">{row[column.key]}</span>;
-  return row[column.key];
-}
+/* ── Sub-navigation definition ─────────────────────────── */
+const NAV_ITEMS = [
+  {
+    id:    'tickets',
+    path:  '/support/tickets',
+    label: 'Tickets',
+    Icon:  Inbox,
+    badge: () => ticketsData.filter((t) => t.status === 'OPEN').length,
+  },
+  {
+    id:    'escalated',
+    path:  '/support/escalated',
+    label: 'Escalated',
+    Icon:  AlertOctagon,
+    badge: () => ticketsData.filter((t) => t.status === 'ESCALATED').length,
+    urgent: true,
+  },
+];
 
+const PAGE_MAP = {
+  tickets:   TicketsPage,
+  escalated: EscalatedPage,
+};
+
+/* ── Main dispatcher ────────────────────────────────────── */
 export function SupportScreen() {
   const location = useLocation();
   const navigate = useNavigate();
-  const slug = location.pathname.split('/')[2] || 'tickets';
-  const workspace = supportService.getWorkspace(slug);
-  const table = useTableState(workspace.rows, {
-    searchFields: ['ticket', 'user', 'subject', 'owner'],
-    initialPageSize: 10,
-  });
+  const [activeId, setActiveId] = useState('tickets');
 
-  const columns = workspace.columns.map((column) => ({
-    ...column,
-    render: (row) => renderCell(row, column),
-  }));
+  useEffect(() => {
+    const slug = location.pathname.split('/').filter(Boolean).pop();
+    const found = NAV_ITEMS.find((n) => n.id === slug);
+    setActiveId(found?.id ?? 'tickets');
+  }, [location.pathname]);
 
-  // Bridge workspace.filters → PageToolbar filterSets shape
-  const filterSets = (workspace.filters ?? []).map((f) => ({
-    label: f.label,
-    get:   table.filters[f.key] ?? 'all',
-    set:   (v) => table.setFilter(f.key, v === 'all' ? undefined : v),
-    opts:  f.options,
-  }));
-
-  const actions = [
-    { label: 'Export',        icon: Download, variant: 'secondary', onClick: () => exportRows(table.items, `support-${slug}.csv`) },
-    { label: 'Create Ticket', icon: Eye,      variant: 'primary',   onClick: () => {} },
-  ];
+  const PageComponent = PAGE_MAP[activeId] ?? TicketsPage;
 
   return (
-    <PageShell>
-      <MetricGrid metrics={workspace.metrics} />
-
-      <PageToolbar
-        search={table.search}
-        onSearchChange={table.setSearch}
-        placeholder={`Search ${workspace.title.toLowerCase()} records`}
-        filterSets={filterSets}
-        actions={actions}
-        className="mb-6"
-      />
-
-      <Card title={workspace.tableTitle} subtitle={workspace.tableSubtitle} padding={false}>
-        <DataTable
-          columns={[
-            ...columns,
-            {
-              key: 'action',
-              label: 'Action',
-              render: (row) => (
-                <div className="text-right">
-                  <button
-                    onClick={() => navigate(`/support/tickets/${row.ticket}`)}
-                    className="inline-flex items-center gap-1.5 h-7 rounded-[6px] border border-border/25 bg-bg/60 px-3 text-[11px] font-semibold text-text-muted transition-all hover:border-primary/40 hover:text-primary hover:bg-primary/5"
+    <PageShell className="!pt-0">
+      {/* ── Sticky sub-nav — exact same pattern as ReportsScreen ── */}
+      <div
+        className="sticky top-[68px] z-20 -mx-6 px-6 mb-5 pt-4 pb-3 border-b border-border/20"
+        style={{ backgroundColor: 'var(--bg)' }}
+      >
+        <div className="flex gap-1 overflow-x-auto no-scrollbar">
+          {NAV_ITEMS.map(({ id, path, label, Icon, badge, urgent }) => {
+            const active    = activeId === id;
+            const badgeVal  = badge();
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => navigate(path)}
+                className={[
+                  'flex flex-shrink-0 items-center gap-1.5 rounded-[9px] border px-3 py-2',
+                  'text-[12px] font-semibold font-heading transition-all duration-200',
+                  active
+                    ? 'border-primary/25 bg-primary/10 text-primary'
+                    : 'border-transparent bg-transparent text-text-muted hover:border-border/35 hover:bg-bg/50 hover:text-text',
+                ].join(' ')}
+              >
+                <Icon size={13} className="flex-shrink-0" />
+                {label}
+                {badgeVal > 0 && (
+                  <span
+                    className={[
+                      'min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-black font-heading',
+                      'flex items-center justify-center leading-none',
+                      urgent
+                        ? 'bg-negative/[0.15] border border-negative/[0.25] text-negative'
+                        : 'bg-positive/[0.15] border border-positive/[0.25] text-positive',
+                    ].join(' ')}
                   >
-                    Open
-                  </button>
-                </div>
-              ),
-            },
-          ]}
-          data={table.items}
-          rowKey="id"
-        />
-        <Pagination
-          page={table.page}
-          totalPages={table.totalPages}
-          onPageChange={table.setPage}
-          pageSize={table.pageSize}
-          onPageSizeChange={table.setPageSize}
-        />
-      </Card>
+                    {badgeVal}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Active page ── */}
+      <div className="animate-in fade-in duration-200">
+        <PageComponent />
+      </div>
     </PageShell>
   );
 }
+
+export default SupportScreen;

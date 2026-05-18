@@ -1,4 +1,4 @@
-import { supportWorkspaces, ticketDetails } from '@features/support/data/supportData';
+import { supportWorkspaces, ticketDetails, ticketsData } from '@features/support/data/support.data';
 
 export const supportService = {
   getWorkspace(slug = 'tickets') {
@@ -11,7 +11,9 @@ export const supportService = {
     return this.getWorkspace(slug).rows;
   },
   getById(ticketId) {
-    return ticketDetails[ticketId];
+    // Check rich dataset first, then legacy ticketDetails
+    const rich = ticketsData.find((t) => t.id === ticketId);
+    return rich ?? ticketDetails[ticketId] ?? null;
   },
   create(payload) {
     return { id: `TKT-${Date.now()}`, ...payload };

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Fingerprint, Search } from 'lucide-react';
 import { rolesData } from '../data/workspaces/admin-mgmt.workspace';
+import { SEV_CLR } from '@config/constants/status.constants';
+export { SEV_CLR };
 
 export const STATUS_CLR = {
   ACTIVE: 'var(--positive)', INACTIVE: 'var(--text-muted)', LOCKED: 'var(--negative)',
   PENDING: 'var(--warning)', DRAFT: 'var(--warning)', SUCCESS: 'var(--positive)',
   FAILED: 'var(--negative)', BLOCKED: 'var(--negative)', LOCKED_OUT: 'var(--negative)',
 };
-export const SEV_CLR = {
-  INFO: 'var(--cyan)', WARNING: 'var(--warning)', ERROR: 'var(--negative)', CRITICAL: 'var(--negative)',
-};
+
 export const ROLE_CLR = {
   SUPER_ADMIN: '#e5c07b', RISK_OFFICER: '#ef4444', COMPLIANCE: '#a78bfa',
   FINANCE: 'var(--brand)', SUPPORT: 'var(--cyan)', READ_ONLY: 'rgba(255,255,255,0.35)',

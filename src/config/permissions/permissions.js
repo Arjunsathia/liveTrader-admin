@@ -51,10 +51,6 @@ export const PERMISSIONS = {
   auditLogs: {
     view: 'admin-mgmt.view',
   },
-  adminMgmt: {
-    view: 'admin-mgmt.view',
-    manage: 'admin-mgmt.manage',
-  },
 };
 
 export const ROLE_PRESETS = {

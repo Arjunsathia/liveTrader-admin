@@ -1,7 +1,7 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Copy } from 'lucide-react';
 
-export function DrawerSection({ title, children, className = "", collapsible = false, defaultOpen = true }) {
+export function DrawerSection({ title, children, className = '', collapsible = false, defaultOpen = true }) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
@@ -12,14 +12,14 @@ export function DrawerSection({ title, children, className = "", collapsible = f
         onClick={() => collapsible && setIsOpen(!isOpen)}
         className={`flex w-full items-center gap-3 group/section ${collapsible ? 'cursor-pointer' : 'cursor-default'}`}
       >
-        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary/60 group-hover/section:text-primary transition-colors">
+        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary/60 transition-colors group-hover/section:text-primary">
           {title}
         </span>
-        <div className="flex-1 h-[1px] bg-border/20 shadow-[0_1px_0_rgba(255,255,255,0.02)]" />
+        <div className="h-[1px] flex-1 bg-border/20 shadow-[0_1px_0_rgba(255,255,255,0.02)]" />
         {collapsible && (
-          <ChevronDown 
-            size={12} 
-            className={`text-text-muted/40 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`} 
+          <ChevronDown
+            size={12}
+            className={`text-text-muted/40 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
           />
         )}
       </button>
@@ -32,29 +32,51 @@ export function DrawerSection({ title, children, className = "", collapsible = f
   );
 }
 
-export function DrawerField({ label, value, mono = false, accent, className = "" }) {
+export function DrawerField({ label, value, mono = false, accent, className = '', copyable = false }) {
+  const [copied, setCopied] = React.useState(false);
+  const hasValue = value !== undefined && value !== null && value !== '';
+
+  const handleCopy = () => {
+    if (!hasValue) return;
+    navigator.clipboard.writeText(String(value));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
+    <div className={`flex min-w-0 flex-col gap-1.5 ${className}`}>
       <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">
         {label}
       </span>
-      <div 
-        className={`flex h-10 items-center rounded-[10px] border border-border/25 bg-bg px-3 text-[12px] text-text transition-all hover:border-border/40 ${mono ? 'font-mono' : ''} shrink-0`}
+      <div
+        className={`group relative flex h-10 min-w-0 shrink-0 items-center rounded-[10px] border border-border/25 bg-bg px-3 text-[12px] text-text transition-all hover:border-border/40 ${copyable ? 'pr-9' : ''} ${mono ? 'font-mono' : ''}`}
         style={{ color: accent ?? 'var(--text)' }}
       >
-        {value || <span className="opacity-20">—</span>}
+        <span className="min-w-0 truncate">
+          {hasValue ? value : <span className="opacity-20">-</span>}
+        </span>
+        {copyable && hasValue && (
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-[7px] text-text-muted/35 opacity-0 transition-all hover:bg-surface-bright/20 hover:text-text group-hover:opacity-100"
+            aria-label={`Copy ${label}`}
+          >
+            {copied ? <Check size={11} /> : <Copy size={11} />}
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-export function DrawerGrid({ children, cols = 2, gap = 2 }) {
+export function DrawerGrid({ children, cols = 2, gap = 2, className = '' }) {
   const colClasses = {
     1: 'grid-cols-1',
-    2: 'grid-cols-2',
-    3: 'grid-cols-3',
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3',
   };
-  
+
   const gapClasses = {
     1: 'gap-1',
     2: 'gap-2',
@@ -62,23 +84,19 @@ export function DrawerGrid({ children, cols = 2, gap = 2 }) {
   };
 
   return (
-    <div className={`grid ${colClasses[cols]} ${gapClasses[gap]}`}>
+    <div className={`grid ${colClasses[cols]} ${gapClasses[gap]} ${className}`}>
       {children}
     </div>
   );
 }
 
-/* ──────────────────────────────────────────────────────────
-   Form Elements ported from AddUserDrawer standard
-───────────────────────────────────────────────────────────── */
-
-export function TextField({ label, value, onChange, placeholder, type = 'text', mono = false }) {
+export function TextField({ label, value, onChange, placeholder, type = 'text', mono = false, className = '' }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className={`flex flex-col gap-1.5 ${className}`}>
       <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{label}</span>
       <input
         type={type}
-        value={value}
+        value={value ?? ''}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         className={`h-10 rounded-[10px] border border-border/25 bg-bg px-3 text-[12px] text-text outline-none transition-all placeholder:text-text-muted/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 ${mono ? 'font-mono' : ''}`}
@@ -87,13 +105,13 @@ export function TextField({ label, value, onChange, placeholder, type = 'text', 
   );
 }
 
-export function SelectField({ label, value, onChange, options, placeholder }) {
+export function SelectField({ label, value, onChange, options, placeholder, className = '' }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className={`flex flex-col gap-1.5 ${className}`}>
       <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{label}</span>
       <div className="relative">
         <select
-          value={value}
+          value={value ?? ''}
           onChange={(event) => onChange(event.target.value)}
           className="h-10 w-full appearance-none rounded-[10px] border border-border/25 bg-bg px-3 pr-8 text-[12px] text-text outline-none transition-all focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
         >
@@ -110,16 +128,16 @@ export function SelectField({ label, value, onChange, options, placeholder }) {
   );
 }
 
-export function TextareaField({ label, value, onChange, placeholder, rows = 4 }) {
+export function TextareaField({ label, value, onChange, placeholder, rows = 4, className = '' }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className={`flex flex-col gap-1.5 ${className}`}>
       <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{label}</span>
       <textarea
         rows={rows}
-        value={value}
+        value={value ?? ''}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="rounded-[10px] border border-border/25 bg-bg px-3 py-2.5 text-[12px] text-text outline-none transition-all placeholder:text-text-muted/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+        className="resize-none rounded-[10px] border border-border/25 bg-bg px-3 py-2.5 text-[12px] text-text outline-none transition-all placeholder:text-text-muted/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
       />
     </label>
   );

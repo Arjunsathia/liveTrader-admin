@@ -11,7 +11,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid } from '../../../components/overlays/DrawerUI';
+import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays/DrawerUI';
 import { Button } from '../../../components/ui/Button';
 import { InlineAlert } from '../../../components/common/feedback/InlineAlert';
 import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
@@ -66,7 +66,7 @@ export function UserDetailDrawer({
     >
       {user && (
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-border/25 bg-bg/55 shadow-card-subtle p-4">
+          <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-border/25 bg-bg/55 p-4 shadow-card-subtle">
             <div className="flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-semibold" style={getAvatarStyle(user.name)}>
               {user.name?.[0] ?? '?'}
             </div>
@@ -113,7 +113,7 @@ export function QuickUserDrawer({ user, onClose, onExpand }) {
       title={user?.name ?? 'Quick View'}
       subtitle={user ? `UID ${user.uid} | ${user.segment}` : ''}
       eyebrow="Quick View"
-      width="max-w-[560px]"
+      width="max-w-[720px]"
       onClose={onClose}
       footer={(
         <div className="flex justify-end gap-2">
@@ -123,22 +123,24 @@ export function QuickUserDrawer({ user, onClose, onExpand }) {
       )}
     >
       {user && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <InlineAlert tone="info" title="Operator Summary">
             {user.notesSummary}
           </InlineAlert>
-          <DrawerGrid>
-            {[
-              ['Email', user.email],
-              ['Phone', user.phone],
-              ['Country', user.country],
-              ['Funding', user.fundingState],
-              ['Wallet', user.walletBalance],
-              ['Equity', user.equity],
-            ].map(([label, value]) => (
-              <DrawerField key={label} label={label} value={value} />
-            ))}
-          </DrawerGrid>
+          <DrawerSection title="User Snapshot">
+            <DrawerGrid>
+              {[
+                ['Email', user.email],
+                ['Phone', user.phone],
+                ['Country', user.country],
+                ['Funding', user.fundingState],
+                ['Wallet', user.walletBalance],
+                ['Equity', user.equity],
+              ].map(([label, value]) => (
+                <DrawerField key={label} label={label} value={value} />
+              ))}
+            </DrawerGrid>
+          </DrawerSection>
         </div>
       )}
     </AdminDrawer>
@@ -154,7 +156,7 @@ export function Mt5AccountDrawer({ entry, onClose }) {
       title={entry ? `MT5 | ${entry.name ?? entry.user}` : 'MT5 Account'}
       subtitle={entry?.server ?? entry?.segment ?? ''}
       eyebrow="MT5 Console"
-      width="max-w-[620px]"
+      width="max-w-[720px]"
       onClose={onClose}
       footer={(
         <div className="flex justify-end gap-2">
@@ -179,30 +181,34 @@ export function Mt5AccountDrawer({ entry, onClose }) {
                     ? 'Bridge sync is delayed. Review before approving new trading actions.'
                     : 'Account connectivity is degraded and operator intervention is recommended.'}
               </InlineAlert>
-              <DrawerGrid>
-                {[
-                  ['Login', entry.login],
-                  ['Group', entry.group],
-                  ['Leverage', entry.leverage],
-                  ['Connection', entry.connection ?? entry.status],
-                  ['Balance', entry.balance ?? entry.equity],
-                  ['Last Sync', entry.lastSync],
-                ].map(([label, value]) => (
-                  <DrawerField key={label} label={label} value={value} mono />
-                ))}
-              </DrawerGrid>
+              <DrawerSection title="Account Snapshot">
+                <DrawerGrid>
+                  {[
+                    ['Login', entry.login],
+                    ['Group', entry.group],
+                    ['Leverage', entry.leverage],
+                    ['Connection', entry.connection ?? entry.status],
+                    ['Balance', entry.balance ?? entry.equity],
+                    ['Last Sync', entry.lastSync],
+                  ].map(([label, value]) => (
+                    <DrawerField key={label} label={label} value={value} mono />
+                  ))}
+                </DrawerGrid>
+              </DrawerSection>
             </>
           ) : (
             <div className="space-y-3">
               <InlineAlert tone="info" title="New MT5 setup">
                 A placeholder account will be prepared for the dealing desk using the settings defined in the user form.
               </InlineAlert>
-              <DrawerGrid>
-                <DrawerField label="User" value={entry.name} />
-                <DrawerField label="Segment" value={entry.segment} />
-                <DrawerField label="Tier" value={entry.tier} />
-                <DrawerField label="Wallet" value={entry.walletBalance} mono />
-              </DrawerGrid>
+              <DrawerSection title="Setup Snapshot">
+                <DrawerGrid>
+                  <DrawerField label="User" value={entry.name} />
+                  <DrawerField label="Segment" value={entry.segment} />
+                  <DrawerField label="Tier" value={entry.tier} />
+                  <DrawerField label="Wallet" value={entry.walletBalance} mono />
+                </DrawerGrid>
+              </DrawerSection>
             </div>
           )}
         </div>

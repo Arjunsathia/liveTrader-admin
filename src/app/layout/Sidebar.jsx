@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -43,6 +43,7 @@ function SidebarItem({
     >
       <button
         ref={ref}
+        data-active={isActive && !hasSubItems}
         onClick={handleClick}
         className={`
           group/btn relative flex items-center outline-none cursor-pointer select-none
@@ -77,7 +78,7 @@ function SidebarItem({
         {!collapsed && (
           <span className="flex-1 flex items-center justify-between min-w-0">
             <span
-              className={`text-[13px] font-heading font-medium tracking-[-0.025em] truncate transition-colors duration-200
+              className={`text-[14px] font-heading font-medium tracking-[-0.025em] truncate transition-colors duration-200
                 ${isActive ? 'text-text' : 'text-text-muted/60 group-hover/btn:text-text/80'}`}
             >
               {item.label}
@@ -118,11 +119,11 @@ function SidebarItem({
                 return (
                   <button
                     key={sub.id}
+                    data-active={isSub}
                     onClick={() => navigate(sub.path)}
                     className={`group/sub relative flex items-center gap-2.5 pl-4 pr-3 py-[7px] rounded-[8px]
-                      text-[12px] font-heading font-medium tracking-[-0.01em]
+                      text-[13px] font-heading font-medium tracking-[-0.01em]
                       outline-none cursor-pointer transition-all duration-200
-                      hover:translate-x-0.5
                       ${isSub
                         ? 'bg-primary/[0.1] text-primary'
                         : 'text-text-muted/50 hover:bg-white/[0.04] hover:text-text/75'
@@ -244,6 +245,21 @@ export function Sidebar({ collapsed, isMobile }) {
     setManualExpandedId(expandedId === id ? null : id);
   };
 
+  const navRef = useRef(null);
+
+  // Auto-scroll to active item
+  useEffect(() => {
+    if (activeId && !collapsed && navRef.current) {
+      const activeEl = navRef.current.querySelector('[data-active="true"]');
+      if (activeEl) {
+        const timer = setTimeout(() => {
+          activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 150);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [activeId, collapsed, expandedId]);
+
   const handleHoverStart = (item, rect) => {
     if (isMobile) return;
     clearTimeout(hoverTimer.current);
@@ -279,11 +295,6 @@ export function Sidebar({ collapsed, isMobile }) {
         boxShadow: 'none',
       }}
     >
-      {/* Scrollbar suppression */}
-      <style>{`
-        .sb-scroll::-webkit-scrollbar { display: none; }
-        .sb-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
 
       {/* ── LOGO ─────────────────────────────────────────── */}
       <div
@@ -324,7 +335,7 @@ export function Sidebar({ collapsed, isMobile }) {
       </div>
 
       {/* ── NAV ──────────────────────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden sb-scroll relative">
+      <nav ref={navRef} className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative">
         <div className={`flex flex-col pt-3 pb-8 ${collapsed ? 'items-center gap-1 px-2' : 'gap-0.5 px-3'}`}>
 
           {groupedItems.map((section) => (
@@ -358,13 +369,18 @@ export function Sidebar({ collapsed, isMobile }) {
         createPortal(
           <div
             className="fixed z-[99999]"
-            style={{ top: hoverNode.rect.top, left: 76 }}
+            style={{ 
+              top: hoverNode.rect.top > window.innerHeight - 300 ? 'auto' : hoverNode.rect.top, 
+              bottom: hoverNode.rect.top > window.innerHeight - 300 ? (window.innerHeight - hoverNode.rect.bottom) : 'auto',
+              left: 76 
+            }}
             onMouseEnter={() => clearTimeout(hoverTimer.current)}
             onMouseLeave={handleHoverEnd}
           >
             {/* Arrow connector */}
             <div
-              className="absolute left-0 top-4 w-2 h-2 rotate-45 -translate-x-1 border-l border-b border-border/30"
+              className={`absolute left-0 w-2 h-2 rotate-45 -translate-x-1 border-l border-b border-border/30
+                ${hoverNode.rect.top > window.innerHeight - 300 ? 'bottom-4' : 'top-4'}`}
               style={{ backgroundColor: 'var(--surface-2)' }}
             />
 
@@ -421,13 +437,7 @@ export function Sidebar({ collapsed, isMobile }) {
         )
       }
 
-      {/* Portal animation keyframes */}
-      <style>{`
-        @keyframes sideTooltip {
-          from { opacity: 0; transform: translateX(-6px) scale(0.97); }
-          to   { opacity: 1; transform: translateX(0)   scale(1); }
-        }
-      `}</style>
+
     </aside>
   );
 }

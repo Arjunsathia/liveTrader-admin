@@ -3,12 +3,15 @@ import { RouterProvider } from 'react-router-dom';
 import { adminRouter } from './routes/router';
 import { AdminSessionProvider } from './providers/AdminSessionProvider';
 import { AdminUiProvider } from './providers/AdminUiProvider';
+import { UniversalDrawerProvider } from '../components/overlays';
 
 function App() {
   return (
     <AdminSessionProvider>
       <AdminUiProvider>
-        <RouterProvider router={adminRouter} />
+        <UniversalDrawerProvider>
+          <RouterProvider router={adminRouter} />
+        </UniversalDrawerProvider>
       </AdminUiProvider>
     </AdminSessionProvider>
   );

@@ -9,6 +9,8 @@ import { DataTable } from '../../../components/tables/DataTable';
 import { Pagination } from '../../../components/tables/Pagination';
 import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
+import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays/DrawerUI';
+import { Button } from '../../../components/ui/Button';
 import { useDrawerState } from '../../../hooks/useDrawerState';
 import { useTableState } from '../../../hooks/useTableState';
 import { exportRows } from '../../../utils/exporters';
@@ -53,7 +55,7 @@ export function AuditLogsScreen() {
         filterSets={filterSets}
         actions={[
           { label: 'Export', icon: Download, variant: 'secondary', onClick: () => exportRows(table.items, `audit-logs-${slug}.csv`) },
-          { label: 'Open Security Review', icon: Eye, variant: 'primary', onClick: () => {} },
+          { label: 'Open Security Review', icon: Eye, variant: 'primary', onClick: () => { } },
         ]}
         className="mb-6"
       />
@@ -94,17 +96,30 @@ export function AuditLogsScreen() {
         open={drawer.isOpen}
         title={drawer.value?.id ?? 'Audit Record'}
         subtitle={drawer.value?.admin ?? drawer.value?.event ?? ''}
+        eyebrow="Audit Record"
+        width="max-w-[720px]"
         onClose={drawer.close}
+        footer={(
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="secondary" onClick={drawer.close}>Close</Button>
+            <Button variant="primary">Open Security Review</Button>
+          </div>
+        )}
       >
         {drawer.value && (
-          <div className="grid grid-cols-2 gap-3">
-            {Object.entries(drawer.value).map(([key, value]) => (
-              <div key={key} className="rounded-[10px] border border-border/30 bg-bg/70 p-3">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{key}</div>
-                <div className="mt-1 text-[13px] text-text">{String(value)}</div>
-              </div>
-            ))}
-          </div>
+          <DrawerSection title="Record Details">
+            <DrawerGrid>
+              {Object.entries(drawer.value).map(([key, value]) => (
+                <DrawerField
+                  key={key}
+                  label={key}
+                  value={String(value)}
+                  mono={key.toLowerCase().includes('id') || key.toLowerCase().includes('ip')}
+                  copyable={key.toLowerCase().includes('id') || key.toLowerCase().includes('ip')}
+                />
+              ))}
+            </DrawerGrid>
+          </DrawerSection>
         )}
       </AdminDrawer>
     </PageShell>

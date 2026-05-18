@@ -21,10 +21,10 @@ export function OrdersScreen() {
   return (
     <TradingLayout>
       <TradingStatsCards kpis={ordersConfig.kpis} />
-      
-      <TradingToolbar 
-        search={ws.search} 
-        onSearchChange={ws.setSearch} 
+
+      <TradingToolbar
+        search={ws.search}
+        onSearchChange={ws.setSearch}
         filterSets={ws.filterSets}
         placeholder="Search orders by ticket, symbol or account..."
         onExport={() => exportRows(ws.filtered, 'trading-orders.csv')}
@@ -32,10 +32,10 @@ export function OrdersScreen() {
       />
 
       <Card title={ordersConfig.tableTitle} subtitle={ordersConfig.tableSubtitle} padding={false}>
-        <TradingTable 
-          columns={ordersConfig.columns} 
-          items={ws.table.items} 
-          onRowClick={setDrawerRow} 
+        <TradingTable
+          columns={ordersConfig.columns}
+          items={ws.table.items}
+          onRowClick={setDrawerRow}
         />
         <Pagination
           page={ws.table.page}

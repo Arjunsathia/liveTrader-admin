@@ -11,3 +11,4 @@ export {
   TextareaField,
   ToggleField,
 } from './DrawerUI';
+export { UniversalDrawerProvider, useUniversalDrawer } from './UniversalDrawerContext';
