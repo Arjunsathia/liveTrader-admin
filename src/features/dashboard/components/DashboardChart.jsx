@@ -91,11 +91,11 @@ export function DashboardChart() {
       <div className="p-5 border-b border-border/15">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <div className="text-[13px] font-semibold text-text flex items-center gap-2">
+            <div className="text-[14px] font-semibold text-text flex items-center gap-2">
               <BarChart2 size={16} className="text-primary" />
               Liquidity Flow &amp; Revenue
             </div>
-            <div className="text-[11px] text-text-muted/60 mt-1">
+            <div className="text-[12px] text-text-muted/60 mt-1">
               Real-time platform volume, deposits, and performance metrics
             </div>
           </div>
@@ -105,7 +105,7 @@ export function DashboardChart() {
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
-                className="rounded-[6px] px-3 py-1 text-[11px] font-semibold transition-all"
+                className="rounded-[6px] px-3 py-1 text-[12px] font-semibold transition-all"
                 style={{
                   background: activeFilter === f ? 'var(--brand)' : 'transparent',
                   color: activeFilter === f ? 'var(--text-on-accent)' : 'var(--text-muted)',
@@ -126,10 +126,10 @@ export function DashboardChart() {
               key={label}
               className="rounded-[8px] border border-border/20 bg-bg/50 px-4 py-3 flex flex-col group hover:bg-surface/40 hover:border-border/40 transition-colors cursor-default"
             >
-              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">
                 {label}
               </div>
-              <div className="mt-1.5 text-[18px] font-bold tracking-[-0.03em]" style={{ color }}>
+              <div className="mt-1.5 text-[20px] font-bold tracking-[-0.03em]" style={{ color }}>
                 {value}
               </div>
             </div>
@@ -141,7 +141,7 @@ export function DashboardChart() {
           {LEGEND.map(({ label, color }) => (
             <div key={label} className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full" style={{ background: color }} />
-              <span className="text-[11px] text-text-muted/70 font-medium">{label}</span>
+              <span className="text-[12px] text-text-muted/70 font-medium">{label}</span>
             </div>
           ))}
         </div>

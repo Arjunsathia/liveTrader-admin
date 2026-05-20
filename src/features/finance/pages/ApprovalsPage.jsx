@@ -1,15 +1,18 @@
-/**
- * finance/pages/ApprovalsPage.jsx
- */
 import React, { useState, useMemo } from 'react';
-import { ArrowUpRight, Check, CheckCircle2, Clock, Copy, Download, Eye, FileText, Lock, MessageSquare, ShieldAlert, Timer, User, X, XCircle, Zap } from 'lucide-react';
-
+import { ArrowUpRight, Check, CheckCircle2, Clock, Copy, Download, Eye, FileText, Lock, MessageSquare, ShieldAlert, Timer, User, X, XCircle, Zap, Search } from 'lucide-react';
+import { PageShell } from '../../../components/common/PageShell';
 import { approvalsData, RISK_CLR } from '../data/financeMockData';
-import { KpiCard, StatusBadge, RiskBadge, PriorityBadge, SummaryPills, Toast, IconBtn } from '../components/FinanceShared';
-import { FinanceTable, FinanceToolbar, FilterRow, UserCell, FinanceDrawer, DrawerSection, DF, DGrid, DrawerNoteEditor, RiskPanel, Pagination } from '../components/FinanceDrawer';
-import { Card } from '../../../components/ui/Card';
+import { KpiCard, StatusBadge, RiskBadge, PriorityBadge, Toast, IconBtn } from '../components/FinanceShared';
+import { UserCell, FinanceDrawer, DrawerSection, DF, DGrid, DrawerNoteEditor, RiskPanel, Pagination } from '../components/FinanceDrawer';
 
-function ApprovalsPage() {
+const PAGE = {
+  accent: 'var(--warning)',
+  eyebrow: 'Finance Operations',
+  title: 'Manual Approvals',
+  description: 'AML thresholds, high-risk flags, and daily limit compliance audits requiring reviewer sign-off.',
+};
+
+export function ApprovalsPage() {
   const [search, setSearch] = useState('');
   const [typeF, setTypeF] = useState('ALL');
   const [riskF, setRiskF] = useState('ALL');
@@ -18,6 +21,7 @@ function ApprovalsPage() {
   const [page, setPage] = useState(1);
   const [drawer, setDrawer] = useState(null);
   const [toast, setToast] = useState(null);
+  
   const PER = 7;
   const act = (msg, id) => setToast(`${msg}: ${id}`);
 
@@ -27,7 +31,14 @@ function ApprovalsPage() {
     if (riskF !== 'ALL') r = r.filter(x => x.risk === riskF);
     if (priorityF !== 'ALL') r = r.filter(x => x.priority === priorityF);
     if (statusF !== 'ALL') r = r.filter(x => x.status === statusF);
-    if (search) r = r.filter(x => x.id.includes(search) || x.user.name.toLowerCase().includes(search.toLowerCase()) || x.rule.includes(search));
+    if (search) {
+      const q = search.toLowerCase();
+      r = r.filter(x => 
+        x.id.toLowerCase().includes(q) || 
+        x.user.name.toLowerCase().includes(q) || 
+        x.rule.toLowerCase().includes(q)
+      );
+    }
     return r;
   }, [search, typeF, riskF, priorityF, statusF]);
 
@@ -45,92 +56,304 @@ function ApprovalsPage() {
   const SlaBar = ({ pct }) => {
     const color = pct === 0 ? 'var(--negative)' : pct < 30 ? 'var(--warning)' : 'var(--positive)';
     return (
-      <div className="flex items-center gap-2 min-w-[80px]">
+      <div className="flex items-center gap-2 min-w-[85px]">
         <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-          <div className="h-full rounded-full" style={{ width: `${Math.max(0, pct)}%`, background: color }} />
+          <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(0, pct)}%`, background: color }} />
         </div>
-        <span className="text-[9.5px] font-mono flex-shrink-0" style={{ color }}>{pct}%</span>
+        <span className="text-[10px] font-mono font-bold flex-shrink-0" style={{ color }}>{pct}%</span>
       </div>
     );
   };
 
-  const cols = [
-    { key: 'id', label: 'Record ID', render: v => <span className="font-mono text-text-muted/55 text-[10.5px]">{v}</span> },
-    { key: 'user', label: 'User', render: v => <UserCell u={v} /> },
-    { key: 'amount', label: 'Amount', render: v => <span className="font-mono font-bold text-[12.5px] text-brand">{v}</span> },
-    { key: 'type', label: 'Type', render: v => <span className="text-[10.5px] font-bold font-heading" style={{ color: v === 'DEPOSIT' ? 'var(--positive)' : 'var(--negative)' }}>{v}</span> },
-    { key: 'risk', label: 'Risk', render: v => <RiskBadge value={v} /> },
-    { key: 'priority', label: 'Priority', render: v => <PriorityBadge value={v} /> },
-    { key: 'rule', label: 'Rule Triggered', render: v => <span className="text-[10px] font-mono text-text-muted/55">{v.replace(/_/g, ' ')}</span> },
-    { key: 'reviewer', label: 'Reviewer', render: v => <span className={`text-[11px] font-heading ${v === 'Unassigned' ? 'text-negative font-bold' : 'text-text-muted/55'}`}>{v}</span> },
-    { key: 'sla', label: 'SLA', render: v => <SlaBar pct={v} /> },
-    { key: 'status', label: 'Status', render: v => <StatusBadge value={v} /> },
-    {
-      key: '_act', label: '', render: (_, r) => (
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {r.status === 'PENDING' && <>
-            <button onClick={e => { e.stopPropagation(); act('Approved', r.id); }} className="w-6 h-6 rounded-[5px] border border-positive/20 bg-positive/[0.07] text-positive flex items-center justify-center cursor-pointer hover:brightness-110" title="Approve"><Check size={10} /></button>
-            <button onClick={e => { e.stopPropagation(); act('Rejected', r.id); }} className="w-6 h-6 rounded-[5px] border border-negative/20 bg-negative/[0.07] text-negative flex items-center justify-center cursor-pointer hover:brightness-110" title="Reject"><X size={10} /></button>
-            <button onClick={e => { e.stopPropagation(); act('Escalated', r.id); }} className="w-6 h-6 rounded-[5px] border border-warning/20 flex items-center justify-center text-warning/60 hover:text-warning cursor-pointer" title="Escalate"><ArrowUpRight size={10} /></button>
-            <button onClick={e => { e.stopPropagation(); act('Locked', r.id); }} className="w-6 h-6 rounded-[5px] border border-white/[0.08] flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer" title="Lock"><Lock size={10} /></button>
-          </>}
-        </div>
-      )
-    },
-  ];
-
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">{kpis.map(k => <KpiCard key={k.label}{...k} />)}</div>
+    <PageShell>
+      <div className="space-y-5 animate-fade-up">
 
-      {approvalsData.filter(a => a.status === 'PENDING' && a.sla < 20).length > 0 && (
-        <div className="flex items-start gap-3 rounded-[10px] border border-negative/20 bg-negative/[0.04] px-4 py-3">
-          <Timer size={14} className="text-negative flex-shrink-0 mt-0.5 animate-pulse" />
-          <div className="flex-1">
-            <div className="text-[12px] font-bold text-negative font-heading">
-              {approvalsData.filter(a => a.status === 'PENDING' && a.sla < 20).length} Approval{approvalsData.filter(a => a.status === 'PENDING' && a.sla < 20).length > 1 ? 's' : ''} Approaching SLA Breach
-            </div>
-            <div className="text-[11px] text-negative/70 font-heading mt-0.5">Critical and high-risk items require immediate review to maintain SLA compliance.</div>
+        {/* ── Page Header ── */}
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+              {PAGE.eyebrow}
+            </p>
+            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+              {PAGE.title}
+            </h2>
+            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+              {PAGE.description}
+            </p>
           </div>
-          <IconBtn label="Review Critical" Icon={Eye} variant="danger" small onClick={() => { setPriorityF('CRITICAL'); setStatusF('PENDING'); }} />
-        </div>
-      )}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => act('Bulk approved', 'eligible items')}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+            >
+              <CheckCircle2 size={12} /> Bulk Approve
+            </button>
+            <button
+              type="button"
+              onClick={() => act('Exported', 'approvals queue')}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+            >
+              <Download size={12} /> Export Approvals
+            </button>
+          </div>
+        </header>
 
-      <Toast msg={toast} onDone={() => setToast(null)} />
+        {/* ── KPI Grid ── */}
+        <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+          {kpis.map((k) => (
+            <KpiCard key={k.label} {...k} />
+          ))}
+        </section>
 
-      <Card padding={false}>
-        <div className="px-5 py-4 border-b border-border/15">
-          <FinanceToolbar
-            search={search} setSearch={setSearch}
-            filters={['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'ESCALATED']}
-            activeFilter={statusF} setFilter={v => { setStatusF(v); setPage(1); }}
-            actions={[
-              { label: 'Bulk Approve', Icon: CheckCircle2, primary: true, onClick: () => act('Bulk approved', 'eligible items') },
-              { label: 'Export', Icon: Download, onClick: () => act('Exported', 'approvals queue') },
-            ]}
-            extra={
-              <>
-                <SummaryPills items={[
-                  { label: 'Pending', val: approvalsData.filter(a => a.status === 'PENDING').length, color: 'var(--warning)' },
-                  { label: 'Approved', val: approvalsData.filter(a => a.status === 'APPROVED').length, color: 'var(--positive)' },
-                  { label: 'Rejected', val: approvalsData.filter(a => a.status === 'REJECTED').length, color: 'var(--negative)' },
-                  { label: 'Escalated', val: approvalsData.filter(a => a.status === 'ESCALATED').length, color: 'var(--warning)' },
-                  { label: 'Critical', val: approvalsData.filter(a => a.priority === 'CRITICAL').length, color: 'var(--negative)' },
-                ]} />
-                <FilterRow filters={[
-                  { label: 'Type', value: typeF, set: setTypeF, options: ['ALL', 'DEPOSIT', 'WITHDRAWAL'] },
-                  { label: 'Risk', value: riskF, set: setRiskF, options: ['ALL', 'LOW', 'MEDIUM', 'HIGH'] },
-                  { label: 'Priority', value: priorityF, set: setPriorityF, options: ['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] },
-                ]} />
-              </>
-            }
-          />
-        </div>
-        <FinanceTable cols={cols} rows={paged} onRow={r => setDrawer(r)}
-          footer={<Pagination total={filtered.length} page={page} perPage={PER} setPage={setPage} />} />
-      </Card>
+        {/* SLA Breaches alert */}
+        {approvalsData.filter(a => a.status === 'PENDING' && a.sla < 20).length > 0 && (
+          <div className="flex items-start gap-3 rounded-[12px] border border-negative/20 bg-negative/[0.04] px-4 py-3 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="relative mt-0.5 shrink-0 flex items-center justify-center">
+              <span className="absolute h-2 w-2 animate-pulse rounded-full bg-negative" />
+              <Timer size={14} className="text-negative relative z-10" />
+            </div>
+            <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-[12px] font-bold text-negative font-heading">
+                  {approvalsData.filter(a => a.status === 'PENDING' && a.sla < 20).length} Approval{approvalsData.filter(a => a.status === 'PENDING' && a.sla < 20).length > 1 ? 's' : ''} Approaching SLA Breach
+                </h4>
+                <p className="text-[11px] text-negative/70 font-heading mt-0.5 leading-relaxed">
+                  Critical and high-risk items require immediate review to maintain SLA compliance.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setPriorityF('CRITICAL'); setStatusF('PENDING'); }}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-negative bg-negative/10 text-negative hover:bg-negative/20 text-[10px] font-bold font-heading uppercase tracking-wide transition-all cursor-pointer self-start md:self-auto"
+              >
+                <Eye size={11} /> Review Critical
+              </button>
+            </div>
+          </div>
+        )}
 
-      {/* Approval Drawer */}
+        <Toast msg={toast} onDone={() => setToast(null)} />
+
+        {/* ── Table Card ── */}
+        <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+
+          {/* Table Header */}
+          <div className="px-5 py-3.5 border-b border-border/12 flex items-center justify-between gap-3 bg-surface-elevated flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-1 h-5 rounded-full"
+                style={{ background: PAGE.accent }}
+              />
+              <h3 className="font-black text-[12px] tracking-widest uppercase text-text/80">
+                Approvals Registry
+              </h3>
+              <span
+                className="px-1.5 py-0.5 rounded-[5px] text-[10px] font-black border font-mono"
+                style={{ color: PAGE.accent, background: `color-mix(in srgb, ${PAGE.accent} 10%, transparent)`, borderColor: `color-mix(in srgb, ${PAGE.accent} 22%, transparent)` }}
+              >
+                {filtered.length}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="relative">
+                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                  placeholder="Search approvals…"
+                  className="h-7 pl-7 pr-3 w-36 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text placeholder:text-text-muted/35 outline-none focus:border-brand/40 focus:w-48 transition-all"
+                />
+              </div>
+
+              {/* Status Select */}
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                <select
+                  value={statusF}
+                  onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  {['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'ESCALATED'].map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Type Select */}
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Type:</span>
+                <select
+                  value={typeF}
+                  onChange={(e) => { setTypeF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  {['ALL', 'DEPOSIT', 'WITHDRAWAL'].map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Risk Select */}
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Risk:</span>
+                <select
+                  value={riskF}
+                  onChange={(e) => { setRiskF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  {['ALL', 'LOW', 'MEDIUM', 'HIGH'].map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Priority Select */}
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Priority:</span>
+                <select
+                  value={priorityF}
+                  onChange={(e) => { setPriorityF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
+                  <th className="px-4 py-3">Record ID</th>
+                  <th className="px-4 py-3">User</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Risk</th>
+                  <th className="px-4 py-3">Priority</th>
+                  <th className="px-4 py-3">Rule Triggered</th>
+                  <th className="px-4 py-3">Reviewer</th>
+                  <th className="px-4 py-3">SLA</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/8">
+                {paged.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
+                      No approvals found matching filters.
+                    </td>
+                  </tr>
+                ) : (
+                  paged.map((row) => {
+                    const isCritical = row.priority === 'CRITICAL' || row.priority === 'HIGH';
+                    const isPending = row.status === 'PENDING';
+
+                    return (
+                      <tr
+                        key={row.id}
+                        onClick={() => setDrawer(row)}
+                        className={`group cursor-pointer transition-colors border-l-2 border-transparent ${
+                          isCritical
+                            ? 'hover:bg-negative/5 hover:border-l-negative'
+                            : isPending
+                            ? 'hover:bg-warning/5 hover:border-l-warning'
+                            : 'hover:bg-positive/5 hover:border-l-positive'
+                        }`}
+                      >
+                        <td className="px-4 py-3.5 font-mono text-[11px] font-bold text-brand">{row.id}</td>
+                        <td className="px-4 py-3.5"><UserCell u={row.user} /></td>
+                        <td className="px-4 py-3.5">
+                          <span className="font-mono font-bold text-[12.5px] text-brand">
+                            {row.amount}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
+                            style={{ 
+                              color: row.type === 'DEPOSIT' ? 'var(--positive)' : 'var(--negative)', 
+                              background: `color-mix(in srgb, ${row.type === 'DEPOSIT' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
+                            }}
+                          >
+                            {row.type}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5"><RiskBadge value={row.risk} /></td>
+                        <td className="px-4 py-3.5"><PriorityBadge value={row.priority} /></td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-[11px] font-mono text-text-muted/60" title={row.rule}>
+                            {row.rule.replace(/_/g, ' ')}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className={`text-[11px] font-semibold ${row.reviewer === 'Unassigned' ? 'text-negative' : 'text-text-muted/70'}`}>
+                            {row.reviewer}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5"><SlaBar pct={row.sla} /></td>
+                        <td className="px-4 py-3.5"><StatusBadge value={row.status} /></td>
+                        <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                            {row.status === 'PENDING' && (
+                              <>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); act('Approved', row.id); }} 
+                                  className="w-6 h-6 rounded-[5px] border border-positive/20 bg-positive/[0.07] text-positive flex items-center justify-center cursor-pointer hover:brightness-110 transition-colors" 
+                                  title="Approve"
+                                >
+                                  <Check size={10} />
+                                </button>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); act('Rejected', row.id); }} 
+                                  className="w-6 h-6 rounded-[5px] border border-negative/20 bg-negative/[0.07] text-negative flex items-center justify-center cursor-pointer hover:brightness-110 transition-colors" 
+                                  title="Reject"
+                                >
+                                  <X size={10} />
+                                </button>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); act('Escalated', row.id); }} 
+                                  className="w-6 h-6 rounded-[5px] border border-warning/20 bg-warning/[0.07] text-warning flex items-center justify-center cursor-pointer hover:brightness-110 transition-colors" 
+                                  title="Escalate"
+                                >
+                                  <ArrowUpRight size={10} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="border-t border-border/10">
+            <Pagination
+              total={filtered.length}
+              page={page}
+              perPage={PER}
+              setPage={setPage}
+            />
+          </div>
+        </section>
+      </div>
+
+      {/* Approvals Drawer */}
       <FinanceDrawer open={!!drawer} onClose={() => setDrawer(null)} title={`Approval — ${drawer?.id}`} subtitle="Review rule triggers, SLA status, and approve or reject the request." footer={
         drawer ? (
           <div className="flex flex-col gap-2 w-full">
@@ -155,7 +378,7 @@ function ApprovalsPage() {
       }>
         {drawer && (
           <>
-            {/* Header */}
+            {/* Header Banner inside drawer */}
             <div className="rounded-[12px] border border-white/[0.07] overflow-hidden">
               <div className="px-4 py-3.5 flex items-center justify-between"
                 style={{ background: `color-mix(in srgb, ${RISK_CLR[drawer.risk] || 'rgba(255,255,255,0.1)'} 6%, transparent)`, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -191,7 +414,6 @@ function ApprovalsPage() {
               </DGrid>
             </DrawerSection>
 
-            {/* Risk analysis */}
             <DrawerSection title="Risk Analysis">
               <RiskPanel risk={drawer.risk} />
               <div className="mt-2 rounded-[9px] border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
@@ -201,13 +423,13 @@ function ApprovalsPage() {
             </DrawerSection>
 
             <DrawerSection title="Notes" collapsible>
-              <DrawerNoteEditor onSave={n => act('Note saved', drawer.id)} />
+              <DrawerNoteEditor onSave={() => act('Note saved', drawer.id)} />
             </DrawerSection>
           </>
         )}
       </FinanceDrawer>
-    </div>
+    </PageShell>
   );
 }
 
-export { ApprovalsPage };
+export default ApprovalsPage;

@@ -1,5 +1,8 @@
 import React from 'react';
-import { Check, ChevronDown, Copy } from 'lucide-react';
+import { Check, ChevronDown, Copy, Send } from 'lucide-react';
+import { AdminDrawer } from './AdminDrawer';
+import { ActionBtn } from '../ui/ActionBtn';
+import { StatusChip } from '../ui/StatusChip';
 
 export function DrawerSection({ title, children, className = '', collapsible = false, defaultOpen = true }) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
@@ -32,7 +35,7 @@ export function DrawerSection({ title, children, className = '', collapsible = f
   );
 }
 
-export function DrawerField({ label, value, mono = false, accent, className = '', copyable = false }) {
+export function DrawerField({ label, value, mono = false, accent, className = '', copyable = false, wide = false }) {
   const [copied, setCopied] = React.useState(false);
   const hasValue = value !== undefined && value !== null && value !== '';
 
@@ -44,7 +47,7 @@ export function DrawerField({ label, value, mono = false, accent, className = ''
   };
 
   return (
-    <div className={`flex min-w-0 flex-col gap-1.5 ${className}`}>
+    <div className={`flex min-w-0 flex-col gap-1.5 ${wide ? 'col-span-2' : ''} ${className}`}>
       <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">
         {label}
       </span>
@@ -71,20 +74,19 @@ export function DrawerField({ label, value, mono = false, accent, className = ''
 }
 
 export function DrawerGrid({ children, cols = 2, gap = 2, className = '' }) {
-  const colClasses = {
+  const colMap = {
     1: 'grid-cols-1',
-    2: 'grid-cols-1 sm:grid-cols-2',
-    3: 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
   };
-
-  const gapClasses = {
+  const gapMap = {
     1: 'gap-1',
     2: 'gap-2',
     3: 'gap-3',
   };
 
   return (
-    <div className={`grid ${colClasses[cols]} ${gapClasses[gap]} ${className}`}>
+    <div className={`grid ${colMap[cols] ?? 'grid-cols-2'} ${gapMap[gap] ?? 'gap-2'} ${className}`}>
       {children}
     </div>
   );
@@ -162,5 +164,173 @@ export function ToggleField({ label, checked, onChange, description }) {
         />
       </button>
     </div>
+  );
+}
+
+export function DrawerActionGrid({ actions = [], cols = 2, className = '' }) {
+  if (!actions.length) return null;
+  const colClass = cols === 1 ? 'sm:grid-cols-1' : cols === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2';
+
+  return (
+    <div className={`grid grid-cols-1 gap-2 ${colClass} ${className}`}>
+      {actions.map(({ label, icon, Icon, variant = 'default', onClick, disabled, closeOnClick }, index) => (
+        <ActionBtn
+          key={label ?? index}
+          label={label}
+          Icon={Icon ?? icon}
+          variant={variant}
+          disabled={disabled}
+          onClick={onClick}
+          closeOnClick={closeOnClick}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function DrawerSummary({ title, subtitle, status, meta = [], accent = 'var(--brand)', children }) {
+  return (
+    <div
+      className="rounded-[12px] border bg-bg/40 px-4 py-3.5"
+      style={{
+        borderColor: `color-mix(in srgb, ${accent} 22%, var(--border))`,
+        background: `color-mix(in srgb, ${accent} 5%, transparent)`,
+      }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {title && <div className="truncate text-[16px] font-black tracking-[-0.02em] text-text">{title}</div>}
+          {subtitle && <div className="mt-1 font-mono text-[10px] text-text-muted/45">{subtitle}</div>}
+        </div>
+        {status && <StatusChip value={status} size="lg" />}
+      </div>
+      {meta.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {meta.map((item) => (
+            <span key={`${item.label}-${item.value}`} className="rounded-[5px] border border-border/25 px-2 py-0.5 text-[10px] font-semibold text-text-muted/65">
+              {item.label ? `${item.label}: ` : ''}{item.value}
+            </span>
+          ))}
+        </div>
+      )}
+      {children && <div className="mt-3">{children}</div>}
+    </div>
+  );
+}
+
+export function DrawerAuditTrail({ entries = [] }) {
+  if (!entries.length) return null;
+
+  return (
+    <div className="relative space-y-0">
+      <div className="absolute bottom-3 left-[7px] top-3 w-px bg-border/20" />
+      {entries.map((entry, index) => (
+        <div key={`${entry.action}-${entry.ts}-${index}`} className="flex gap-3 pb-3">
+          <div className="z-10 mt-1 h-3.5 w-3.5 flex-shrink-0 rounded-full border border-border/30 bg-surface-elevated" style={{ boxShadow: '0 0 0 2px var(--bg)' }} />
+          <div className="min-w-0">
+            <div className="text-[11.5px] font-semibold text-text/75">{entry.action}</div>
+            <div className="mt-0.5 font-mono text-[10px] text-text-muted/40">{entry.by} · {entry.ts}</div>
+            {entry.note && <div className="mt-0.5 text-[10.5px] text-text-muted/50">{entry.note}</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function OperatorNoteSection({ value, onChange, onSave, placeholder = 'Add an internal note...', defaultOpen = false }) {
+  return (
+    <DrawerSection title="Operator Note" collapsible defaultOpen={defaultOpen}>
+      <div className="mt-2 space-y-2">
+        <TextareaField
+          label="Audit Log Note"
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          rows={3}
+        />
+        <div className="flex justify-end">
+          <ActionBtn
+            label="Save Note"
+            Icon={Send}
+            variant="brand"
+            disabled={!String(value ?? '').trim()}
+            onClick={onSave}
+            small
+          />
+        </div>
+      </div>
+    </DrawerSection>
+  );
+}
+
+export function RecordDrawer({
+  open,
+  onClose,
+  title,
+  subtitle,
+  eyebrow = 'Record Details',
+  width = 'max-w-[720px]',
+  record,
+  summary,
+  sections = [],
+  actions = [],
+  auditTrail,
+  noteConfig,
+  footer,
+  children,
+}) {
+  const computedFooter = footer ?? (
+    actions.length > 0
+      ? <DrawerActionGrid actions={actions.map((action) => ({ ...action, onClick: action.onClick ? () => action.onClick(record) : undefined }))} />
+      : null
+  );
+
+  return (
+    <AdminDrawer
+      open={open}
+      onClose={onClose}
+      title={title}
+      subtitle={subtitle}
+      eyebrow={eyebrow}
+      width={width}
+      footer={computedFooter}
+    >
+      <div className="space-y-6">
+        {summary && <DrawerSummary {...summary} />}
+        {sections.map((section) => (
+          <DrawerSection
+            key={section.title}
+            title={section.title}
+            collapsible={section.collapsible}
+            defaultOpen={section.defaultOpen}
+          >
+            {section.children ?? (
+              <DrawerGrid cols={section.cols ?? 2}>
+                {(section.fields ?? []).map((field) => (
+                  <DrawerField
+                    key={field.key ?? field.label}
+                    label={field.label}
+                    value={typeof field.value === 'function' ? field.value(record) : field.value}
+                    mono={field.mono}
+                    accent={field.accent}
+                    copyable={field.copyable}
+                    wide={field.wide}
+                    className={field.className}
+                  />
+                ))}
+              </DrawerGrid>
+            )}
+          </DrawerSection>
+        ))}
+        {children}
+        {noteConfig && <OperatorNoteSection {...noteConfig} />}
+        {auditTrail?.length > 0 && (
+          <DrawerSection title="Audit Trail" collapsible defaultOpen={false}>
+            <DrawerAuditTrail entries={auditTrail} />
+          </DrawerSection>
+        )}
+      </div>
+    </AdminDrawer>
   );
 }

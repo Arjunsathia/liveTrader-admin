@@ -3,7 +3,7 @@ export { Button } from './Button';
 export { Card } from './Card';
 export { ErrorBoundary } from './ErrorBoundary';
 export { Table, TableRow, TableCell } from './Table';
-export { StatusChip, RiskChip } from './StatusChip';
+export { StatusChip, RiskChip, PriorityChip, CatChip } from './StatusChip';
 export { SectionHead } from './SectionHead';
 export { ActionBtn } from './ActionBtn';
 export { ActionToast } from './ActionToast';

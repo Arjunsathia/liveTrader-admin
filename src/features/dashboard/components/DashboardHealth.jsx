@@ -31,10 +31,10 @@ function HealthBar({ item }) {
         />
         <div className="w-1.5 h-1.5 rounded-full relative z-10" style={{ background: color }} />
       </div>
-      <span className="text-[12px] text-text-muted flex-1 truncate group-hover:text-text transition-colors">
+      <span className="text-[13px] text-text-muted flex-1 truncate group-hover:text-text transition-colors">
         {item.name}
       </span>
-      <span className="font-mono text-[11px] text-text-muted/60 w-16 text-right">{item.metric}</span>
+      <span className="font-mono text-[12px] text-text-muted/60 w-16 text-right">{item.metric}</span>
       <div className="w-20 h-1 rounded-full bg-border/20 overflow-hidden">
         <div className="h-full rounded-full transition-all" style={{ width: `${item.value}%`, background: color }} />
       </div>
@@ -46,11 +46,11 @@ export function DashboardHealth() {
   return (
     <Card className="flex-1">
       <div className="flex items-center justify-between mb-3 border-b border-border/15 pb-3">
-        <div className="text-[13px] font-semibold text-text flex items-center gap-2">
+        <div className="text-[14px] font-semibold text-text flex items-center gap-2">
           <HeartPulse size={13} className="text-positive" />
           System Health
         </div>
-        <button className="flex items-center gap-1 text-[11px] text-text-muted/50 hover:text-text transition-colors">
+        <button className="flex items-center gap-1 text-[12px] text-text-muted/50 hover:text-text transition-colors">
           <RefreshCw size={10} /> Ping
         </button>
       </div>
@@ -68,8 +68,8 @@ export function DashboardHealth() {
             key={label}
             className="text-center rounded-[8px] border border-border/15 bg-bg/40 py-2"
           >
-            <div className="font-mono text-[13px] font-semibold" style={{ color }}>{value}</div>
-            <div className="text-[10px] text-text-muted/50 mt-0.5">{label}</div>
+            <div className="font-mono text-[14px] font-semibold" style={{ color }}>{value}</div>
+            <div className="text-[11px] text-text-muted/50 mt-0.5">{label}</div>
           </div>
         ))}
       </div>

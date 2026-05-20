@@ -123,7 +123,6 @@ export function ExportCenterScreen() {
 
           <div className="grid grid-cols-1 gap-3">
             {filtered.length > 0 ? filtered.map(tpl => {
-              const typeColor = TYPE_CLR[tpl.type] || 'rgba(255,255,255,0.3)';
               const FmtIc = FORMAT_ICONS[tpl.format] || FileText;
               const fmtColor = FORMAT_CLR[tpl.format] || 'var(--text-muted)';
               const fqColor = freqColor[tpl.freq] || 'var(--text-muted)';

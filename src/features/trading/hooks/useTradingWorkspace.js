@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useTableState } from '../../../hooks/useTableState';
 
 export function useTradingWorkspace(config) {
@@ -52,7 +52,7 @@ export function useTradingWorkspace(config) {
       }
     }
     return rows;
-  }, [config, search, filters]);
+  }, [config, search, filterSets]);
 
   const table = useTableState(filtered, { searchFields: [], initialPageSize: 10 });
 

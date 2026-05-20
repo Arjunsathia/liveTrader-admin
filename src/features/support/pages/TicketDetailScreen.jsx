@@ -31,7 +31,6 @@ const AGENTS = ['Marcus Webb', 'Priya Sharma', 'Lena Fischer', 'Dev Kapoor', 'Ke
 export function TicketDetailScreen() {
   const { ticketId }  = useParams();
   const navigate      = useNavigate();
-  const bottomRef     = useRef(null);
 
   /* ── Find ticket ── */
   const ticket = ticketsData.find((t) => t.id === ticketId);

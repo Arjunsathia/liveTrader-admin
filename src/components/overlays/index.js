@@ -10,5 +10,10 @@ export {
   SelectField,
   TextareaField,
   ToggleField,
+  DrawerActionGrid,
+  DrawerSummary,
+  DrawerAuditTrail,
+  OperatorNoteSection,
+  RecordDrawer,
 } from './DrawerUI';
 export { UniversalDrawerProvider, useUniversalDrawer } from './UniversalDrawerContext';

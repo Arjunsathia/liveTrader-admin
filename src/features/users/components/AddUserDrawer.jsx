@@ -22,6 +22,8 @@ export function AddUserDrawer({
   onSubmit,
   onClose,
 }) {
+  if (!open || !draft) return null;
+
   const isValid = isUserDraftValid(draft);
   const title = mode === 'edit' ? 'Edit User' : 'Create User';
   const subtitle = mode === 'edit'
@@ -52,10 +54,21 @@ export function AddUserDrawer({
             </div>
           )}
           <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Cancel</Button>
-            <Button variant="primary" onClick={onSubmit} disabled={!isValid}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex items-center justify-center h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={!isValid}
+              className="flex items-center justify-center h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+            >
               {mode === 'edit' ? 'Save Changes' : 'Create User'}
-            </Button>
+            </button>
           </div>
         </div>
       )}

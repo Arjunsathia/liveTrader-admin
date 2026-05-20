@@ -6,18 +6,19 @@ import { TreeNode, TreeDetailPanel } from '../components/PartnerTree';
 import { partnerTree } from '../data/workspaces/tree.workspace';
 import { TIER_CLR } from '../data/workspaces/shared.workspace';
 
+const filterTree = (nodes, q) => {
+  if (!q) return nodes;
+  return nodes
+    .map(n => ({ ...n, subIBs: filterTree(n.subIBs, q) }))
+    .filter(n => n.name.toLowerCase().includes(q.toLowerCase()) || n.id.includes(q) || n.subIBs.length > 0);
+};
+const countNodes  = (nodes) => nodes.reduce((s, n) => s + 1 + countNodes(n.subIBs), 0);
+
 export function PartnerTreeScreen() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const filterTree = (nodes, q) => {
-    if (!q) return nodes;
-    return nodes
-      .map(n => ({ ...n, subIBs: filterTree(n.subIBs, q) }))
-      .filter(n => n.name.toLowerCase().includes(q.toLowerCase()) || n.id.includes(q) || n.subIBs.length > 0);
-  };
   const visibleTree = useMemo(() => filterTree(partnerTree, search), [search]);
-  const countNodes  = (nodes) => nodes.reduce((s, n) => s + 1 + countNodes(n.subIBs), 0);
 
   return (
     <div className="space-y-4">

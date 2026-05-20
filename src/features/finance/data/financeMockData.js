@@ -4,7 +4,6 @@
  */
 import { Building2, CreditCard, Bitcoin, CircleDollarSign, Database } from 'lucide-react';
 
-const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const uid = (n) => `UID-${n}`;
 const users = [
   { name: 'Marcus Chen', uid: uid(7823), email: 'marcus@email.com', region: 'SG' },

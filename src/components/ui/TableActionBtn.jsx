@@ -1,6 +1,7 @@
 import React from 'react';
 
-export function TableActionBtn({ Icon: Ic, onClick, variant = 'default' }) {
+export function TableActionBtn(props) {
+  const { Icon, onClick, variant = 'default' } = props;
   const variantClass = {
     success: 'border-positive/20 bg-positive/[0.07] text-positive',
     danger: 'border-negative/20 bg-negative/[0.07] text-negative',
@@ -14,7 +15,7 @@ export function TableActionBtn({ Icon: Ic, onClick, variant = 'default' }) {
       onClick={onClick}
       className={`flex h-6 w-6 items-center justify-center rounded-[5px] border cursor-pointer transition-all hover:brightness-110 active:scale-90 ${variantClass}`}
     >
-      <Ic size={10} />
+      <Icon size={10} />
     </button>
   );
 }

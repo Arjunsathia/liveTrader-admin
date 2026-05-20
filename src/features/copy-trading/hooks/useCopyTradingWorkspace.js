@@ -49,7 +49,7 @@ export function useCopyTradingWorkspace(config) {
       if (fs.get !== 'all') rows = rows.filter((r) => r[fs.key] === fs.get);
     }
     return rows;
-  }, [config, search, filters]);
+  }, [config, search, filterSets]);
 
   const table = useTableState(filtered, { searchFields: [], initialPageSize: 10 });
 

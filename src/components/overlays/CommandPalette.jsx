@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search, Command, Users, LayoutDashboard, Wallet, LineChart, ShieldCheck } from 'lucide-react';
@@ -7,8 +7,17 @@ import { adminNavigation } from '@config/sidebar/admin-sidebar.config';
 export function CommandPalette({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [prevIsOpen, setPrevIsOpen] = useState(false);
   const inputRef = useRef(null);
   const navigate = useNavigate();
+
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setQuery('');
+      setSelectedIndex(0);
+    }
+  }
 
   // Flatten navigation for search
   const flatNav = adminNavigation.reduce((acc, item) => {
@@ -28,18 +37,26 @@ export function CommandPalette({ isOpen, onClose }) {
 
   const results = query
     ? actions.filter(item => 
-        item.label.toLowerCase().includes(query.toLowerCase()) || 
-        (item.parentLabel && item.parentLabel.toLowerCase().includes(query.toLowerCase()))
-      )
+      item.label.toLowerCase().includes(query.toLowerCase()) || 
+      (item.parentLabel && item.parentLabel.toLowerCase().includes(query.toLowerCase()))
+    )
     : actions.slice(0, 8); // default suggestions
 
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery('');
-      setSelectedIndex(0);
     }
   }, [isOpen]);
+
+  const handleSelect = useCallback((item) => {
+    if (item.type === 'nav') {
+      navigate(item.path);
+    } else if (item.id === 'action-add-user') {
+      navigate('/users');
+      // Ideally trigger user create modal, but for now navigate to users
+    }
+    onClose();
+  }, [navigate, onClose]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -67,17 +84,7 @@ export function CommandPalette({ isOpen, onClose }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, selectedIndex, onClose]);
-
-  const handleSelect = (item) => {
-    if (item.type === 'nav') {
-      navigate(item.path);
-    } else if (item.id === 'action-add-user') {
-      navigate('/users');
-      // Ideally trigger user create modal, but for now navigate to users
-    }
-    onClose();
-  };
+  }, [isOpen, results, selectedIndex, onClose, handleSelect]);
 
   if (!isOpen) return null;
 

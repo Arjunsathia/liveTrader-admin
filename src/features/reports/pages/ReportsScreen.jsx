@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, DollarSign, TrendingUp, Users, Cpu, Send } from 'lucide-react';
 import { PageShell } from '@components/common/PageShell';
@@ -30,12 +30,9 @@ const PAGE_MAP = {
 export function ReportsScreen() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeId, setActiveId] = useState('overview');
 
-  useEffect(() => {
-    const active = NAV_ITEMS.find((n) => n.path === location.pathname);
-    setActiveId(active?.id ?? 'overview');
-  }, [location.pathname]);
+  const active = NAV_ITEMS.find((n) => n.path === location.pathname);
+  const activeId = active?.id ?? 'overview';
 
   const PageComponent = PAGE_MAP[activeId] ?? PAGE_MAP.overview;
 
@@ -45,7 +42,8 @@ export function ReportsScreen() {
       <div className="sticky top-[68px] z-20 -mx-6 px-6 mb-5 pt-4 pb-3 border-b border-border/20"
         style={{ backgroundColor: 'var(--bg)' }}>
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
-          {NAV_ITEMS.map(({ id, path, label, Icon }) => {
+          {NAV_ITEMS.map((item) => {
+            const { id, path, label, Icon } = item;
             const active = activeId === id;
             return (
               <button

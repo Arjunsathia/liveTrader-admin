@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { PageShell } from '../../../components/common/PageShell';
 import { NAV_ITEMS } from '../data/workspaces/shared.workspace';
@@ -13,13 +13,9 @@ import { PartnerTreeScreen } from './PartnerTreeScreen';
 
 export function IBSystemScreen() {
   const location = useLocation();
-  const [page, setPage] = useState('overview');
-
-  useEffect(() => {
-    const slug = location.pathname.split('/').filter(Boolean).pop();
-    const item = NAV_ITEMS.find(n => n.id === slug);
-    setPage(item?.id ?? 'overview');
-  }, [location.pathname]);
+  const slug = location.pathname.split('/').filter(Boolean).pop();
+  const item = NAV_ITEMS.find(n => n.id === slug);
+  const page = item?.id ?? 'overview';
 
   const renderScreen = () => {
     switch (page) {

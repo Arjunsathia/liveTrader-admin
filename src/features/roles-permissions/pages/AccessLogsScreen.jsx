@@ -18,7 +18,6 @@ export function AccessLogsScreen() {
     if (filter !== 'ALL') {
       if (['INFO', 'WARNING', 'ERROR', 'CRITICAL'].includes(filter)) rows = rows.filter(r => r.severity === filter);
       else if (['SUCCESS', 'FAILED', 'BLOCKED', 'LOCKED'].includes(filter)) rows = rows.filter(r => r.status === filter);
-      else rows = rows;
     }
     if (search) rows = rows.filter(r =>
       r.admin.toLowerCase().includes(search.toLowerCase()) ||

@@ -16,9 +16,6 @@ export function ChallengeConfigurationsScreen() {
   const openNew = () => { setForm({ id: 'NEW', name: '', size: '', fee: '', profitTarget: '10%', maxDaily: '5%', maxTotal: '10%', leverage: '1:100', minDays: 10, phases: 2, status: 'DRAFT', restricted: '' }); setIsNew(true); setSelected({}); };
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
-  const f = (k) => form[k] ?? '';
-  const set = (k) => (v) => setForm(p => ({ ...p, [k]: v }));
-
   return (
     <div className="space-y-5">
       <PropToolbar

@@ -7,7 +7,6 @@ export function UsersToolbar({
   view,
   search,
   onSearchChange,
-  onChangeView,
   onOpenAdd,
   onExport,
   kycFilter,

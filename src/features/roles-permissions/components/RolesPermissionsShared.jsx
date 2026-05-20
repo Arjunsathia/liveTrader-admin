@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import { Fingerprint, Search } from 'lucide-react';
 import { rolesData } from '../data/workspaces/admin-mgmt.workspace';

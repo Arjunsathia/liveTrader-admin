@@ -3,7 +3,16 @@ import {
   AlertTriangle, Check, CheckCircle2, Copy, Download, Edit2, Eye, FileText,
   Flag, MessageSquare, Monitor, Plus, Send, Shield, ShieldCheck, Terminal, X, XCircle, BarChart2
 } from 'lucide-react';
+import { FeatureTable } from '../../../../../components/tables/FeatureTable';
 import { Field, SectionLabel, ActionBtn } from '../shared/UserDetailShared';
+
+function DetailTable({ columns, data, rowKey }) {
+  return (
+    <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
+      <FeatureTable columns={columns} data={data} rowKey={rowKey} />
+    </div>
+  );
+}
 
 export function TabOverview({ user }) {
   return (
@@ -176,71 +185,30 @@ export function TabWallet({ user }) {
       </div>
 
       <SectionLabel>Asset Breakdown</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border/20 bg-surface-elevated/50">
-              {['Asset', 'Balance', 'Available', 'On Hold'].map((h) => (
-                <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/45">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {user.wallet.map((row) => (
-              <tr key={row.asset} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
-                <td className="px-4 py-2.5 font-mono text-[12px] font-semibold text-text">{row.asset}</td>
-                <td className="px-4 py-2.5 font-mono text-[12px] text-text">{row.balance}</td>
-                <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--positive)]">{row.available}</td>
-                <td className="px-4 py-2.5 font-mono text-[12px] text-[var(--warning)]">{row.hold}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DetailTable
+        rowKey="asset"
+        data={user.wallet}
+        columns={[
+          { key: 'asset', label: 'Asset', type: 'mono' },
+          { key: 'balance', label: 'Balance', type: 'mono' },
+          { key: 'available', label: 'Available', render: (value) => <span className="font-mono text-[12px] text-positive">{value}</span> },
+          { key: 'hold', label: 'On Hold', render: (value) => <span className="font-mono text-[12px] text-warning">{value}</span> },
+        ]}
+      />
 
       <SectionLabel>Transaction History</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border/20 bg-surface-elevated/50">
-              {['ID', 'Type', 'Method', 'Amount', 'Status', 'Date'].map((h) => (
-                <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/45">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {user.transactions.map((tx) => (
-              <tr key={tx.id} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
-                <td className="px-4 py-2.5 font-mono text-[11px] text-text-muted/60">{tx.id}</td>
-                <td className="px-4 py-2.5 text-[12px] font-medium text-text">{tx.type}</td>
-                <td className="px-4 py-2.5 text-[11px] text-text-muted/70">{tx.method}</td>
-                <td
-                  className="px-4 py-2.5 font-mono text-[12px] font-semibold"
-                  style={{ color: tx.amount.startsWith('+') ? 'var(--positive)' : 'var(--negative)' }}
-                >
-                  {tx.amount}
-                </td>
-                <td className="px-4 py-2.5">
-                  <span
-                    className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px]"
-                    style={{
-                      color: tx.status === 'confirmed' || tx.status === 'approved' ? 'var(--positive)' : 'var(--warning)',
-                      background: tx.status === 'confirmed' || tx.status === 'approved' ? 'var(--positive)18' : 'var(--warning)18',
-                    }}
-                  >
-                    {tx.status}
-                  </span>
-                </td>
-                <td className="px-4 py-2.5 font-mono text-[11px] text-text-muted/55">{tx.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DetailTable
+        rowKey="id"
+        data={user.transactions}
+        columns={[
+          { key: 'id', label: 'ID', type: 'mono' },
+          { key: 'type', label: 'Type', type: 'text' },
+          { key: 'method', label: 'Method', type: 'text' },
+          { key: 'amount', label: 'Amount', type: 'pnl' },
+          { key: 'status', label: 'Status', render: (value) => <span className="rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold" style={{ color: value === 'confirmed' || value === 'approved' ? 'var(--positive)' : 'var(--warning)', background: value === 'confirmed' || value === 'approved' ? 'var(--positive)18' : 'var(--warning)18' }}>{value}</span> },
+          { key: 'date', label: 'Date', type: 'mono' },
+        ]}
+      />
 
       <SectionLabel>Wallet Actions</SectionLabel>
       <div className="flex flex-wrap gap-2">
@@ -308,67 +276,37 @@ export function TabTrading({ user }) {
   return (
     <div className="space-y-4">
       <SectionLabel>Open Positions ({user.openTrades.length})</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border/20 bg-surface-elevated/50">
-              {['Ticket', 'Symbol', 'Dir', 'Lots', 'Open Price', 'Current', 'Floating P&L', 'Swap', 'Opened'].map((h) => (
-                <th key={h} className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-text-muted/45">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {user.openTrades.map((t) => (
-              <tr key={t.ticket} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
-                <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.ticket}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold text-text">{t.symbol}</td>
-                <td className="px-3 py-2.5">
-                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-[3px]" style={{ color: t.side === 'BUY' ? 'var(--positive)' : 'var(--negative)', background: t.side === 'BUY' ? 'var(--positive)18' : 'var(--negative)18' }}>
-                    {t.side}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.lots}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.open}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] text-text">{t.current}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold" style={{ color: t.pnl.startsWith('+') ? 'var(--positive)' : 'var(--negative)' }}>{t.pnl}</td>
-                <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.swap}</td>
-                <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.time}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DetailTable
+        rowKey="ticket"
+        data={user.openTrades}
+        columns={[
+          { key: 'ticket', label: 'Ticket', type: 'mono' },
+          { key: 'symbol', label: 'Symbol', type: 'mono' },
+          { key: 'side', label: 'Dir', type: 'side' },
+          { key: 'lots', label: 'Lots', type: 'mono' },
+          { key: 'open', label: 'Open Price', type: 'mono' },
+          { key: 'current', label: 'Current', type: 'mono' },
+          { key: 'pnl', label: 'Floating P&L', type: 'pnl' },
+          { key: 'swap', label: 'Swap', type: 'mono' },
+          { key: 'time', label: 'Opened', type: 'mono' },
+        ]}
+      />
 
       <SectionLabel>Closed Trades</SectionLabel>
-      <div className="rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border/20 bg-surface-elevated/50">
-              {['Ticket', 'Symbol', 'Dir', 'Lots', 'Open', 'Close', 'P&L', 'Date'].map((h) => (
-                <th key={h} className="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-text-muted/45">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {user.tradingHistory.map((t) => (
-              <tr key={t.ticket} className="border-b border-border/10 hover:bg-surface-elevated/30 transition-colors">
-                <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.ticket}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold text-text">{t.symbol}</td>
-                <td className="px-3 py-2.5">
-                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-[3px]" style={{ color: t.side === 'BUY' ? 'var(--positive)' : 'var(--negative)', background: t.side === 'BUY' ? 'var(--positive)18' : 'var(--negative)18' }}>
-                    {t.side}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.lots}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.open}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] text-text-muted">{t.close}</td>
-                <td className="px-3 py-2.5 font-mono text-[12px] font-semibold" style={{ color: t.pnl.startsWith('+') ? 'var(--positive)' : 'var(--negative)' }}>{t.pnl}</td>
-                <td className="px-3 py-2.5 font-mono text-[11px] text-text-muted/55">{t.time}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DetailTable
+        rowKey="ticket"
+        data={user.tradingHistory}
+        columns={[
+          { key: 'ticket', label: 'Ticket', type: 'mono' },
+          { key: 'symbol', label: 'Symbol', type: 'mono' },
+          { key: 'side', label: 'Dir', type: 'side' },
+          { key: 'lots', label: 'Lots', type: 'mono' },
+          { key: 'open', label: 'Open', type: 'mono' },
+          { key: 'close', label: 'Close', type: 'mono' },
+          { key: 'pnl', label: 'P&L', type: 'pnl' },
+          { key: 'time', label: 'Date', type: 'mono' },
+        ]}
+      />
     </div>
   );
 }

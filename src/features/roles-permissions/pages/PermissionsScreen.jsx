@@ -3,6 +3,7 @@ import { Shield, Check, CheckCircle2, XCircle, X } from 'lucide-react';
 import { IconBtn, ROLE_CLR } from '../components/RolesPermissionsShared';
 import { rolesData, PERM_MODULES, PERM_ACTIONS, buildInitialMatrix } from '../data/workspaces/admin-mgmt.workspace';
 import { Card } from '../../../components/ui/Card';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
 
 export function PermissionsScreen() {
   const [matrix, setMatrix] = useState(buildInitialMatrix);
@@ -59,6 +60,69 @@ export function PermissionsScreen() {
   const countActive = () => PERM_MODULES.reduce((s, m) =>
     s + PERM_ACTIONS.filter(a => matrix[activeRole][m.id][a]).length, 0);
 
+  const permColumns = [
+    {
+      key: 'label',
+      label: 'Module',
+      width: '240px',
+      render: (_, mod) => {
+        const IconComp = mod.Icon;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated shadow-card-subtle">
+              <IconComp size={13} className="text-text-muted/50 transition-colors group-hover:text-primary/70" />
+            </div>
+            <span className="text-[13px] font-semibold text-text/80">{mod.label}</span>
+          </div>
+        );
+      },
+    },
+    {
+      key: '_all',
+      label: 'All',
+      align: 'center',
+      render: (_, mod) => {
+        const rowPerms = matrix[activeRole]?.[mod.id] || {};
+        const allRowOn = PERM_ACTIONS.every(a => rowPerms[a]);
+        const someRowOn = PERM_ACTIONS.some(a => rowPerms[a]);
+        return (
+          <button onClick={() => toggleRow(mod.id)}
+            className={`mx-auto flex h-5 w-5 items-center justify-center rounded-[4px] border transition-all hover:scale-110
+              ${allRowOn ? 'border-brand/40 bg-brand/[0.12]' : someRowOn ? 'border-warning/40 bg-warning/[0.08]' : 'border-border/30 hover:border-border/60'}`}>
+            {allRowOn ? <Check size={9} strokeWidth={3} className="text-brand" />
+              : someRowOn ? <span className="h-0.5 w-2 rounded-full bg-warning" />
+                : null}
+          </button>
+        );
+      },
+    },
+    ...PERM_ACTIONS.map(action => {
+      const allOn = PERM_MODULES.every(m => matrix[activeRole]?.[m.id]?.[action]);
+      return {
+        key: action,
+        align: 'center',
+        label: (
+          <div className="flex flex-col items-center gap-2">
+            <span>{action}</span>
+            <button onClick={(event) => { event.stopPropagation(); toggleCol(action); }}
+              className={`flex h-5 w-5 items-center justify-center rounded-[4px] border transition-all hover:scale-110
+                ${allOn ? 'border-cyan/30 bg-cyan/[0.12] text-cyan' : 'border-border/30 text-transparent hover:border-border/60'}`}>
+              <Check size={9} strokeWidth={3} />
+            </button>
+          </div>
+        ),
+        render: (_, mod) => (
+          <div className="flex justify-center">
+            <PermCheck
+              active={matrix[activeRole]?.[mod.id]?.[action] || false}
+              onClick={() => togglePerm(activeRole, mod.id, action)}
+            />
+          </div>
+        ),
+      };
+    }),
+  ];
+
   return (
     <div className="space-y-4">
       {/* Role selector */}
@@ -107,79 +171,8 @@ export function PermissionsScreen() {
           </div>
         </div>
 
-        {/* MATRIX */}
-        <div className="overflow-x-auto custom-scrollbar border-t border-border/15">
-          <table className="w-full min-w-[820px] text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-elevated/30 border-b border-border/20">
-                {/* Module header */}
-                <th className="px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/60 font-heading w-[200px]">
-                  Module
-                </th>
-                {/* Row toggle */}
-                <th className="px-3 py-4 text-center text-[9px] font-semibold uppercase tracking-[0.1em] text-text-muted/50 font-heading w-[50px]">All</th>
-                {/* Action columns */}
-                {PERM_ACTIONS.map(action => {
-                  const allOn = PERM_MODULES.every(m => matrix[activeRole]?.[m.id]?.[action]);
-                  return (
-                    <th key={action} className="px-2 py-4 text-center w-[80px]">
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-text-muted/60 font-heading">{action}</span>
-                        {/* Column toggle */}
-                        <button onClick={() => toggleCol(action)}
-                          className={`w-5 h-5 rounded-[4px] flex items-center justify-center border transition-all cursor-pointer hover:scale-110
-                            ${allOn ? 'border-cyan/30 bg-cyan/[0.12] text-cyan' : 'border-border/30 text-transparent hover:border-border/60'}`}>
-                          <Check size={9} strokeWidth={3} />
-                        </button>
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {PERM_MODULES.map((mod, mi) => {
-                const rowPerms = matrix[activeRole]?.[mod.id] || {};
-                const allRowOn = PERM_ACTIONS.every(a => rowPerms[a]);
-                const someRowOn = PERM_ACTIONS.some(a => rowPerms[a]);
-                const IconComp = mod.Icon;
-                return (
-                  <tr key={mod.id} className="group border-b border-border/10 transition-colors hover:bg-surface-bright/20 last:border-0">
-                    {/* Module label */}
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-[8px] bg-surface-elevated shadow-card-subtle flex items-center justify-center flex-shrink-0">
-                          <IconComp size={13} className="text-text-muted/50 group-hover:text-primary/70 transition-colors" />
-                        </div>
-                        <span className="text-[13px] font-semibold font-heading text-text/80">{mod.label}</span>
-                      </div>
-                    </td>
-                    {/* Row toggle */}
-                    <td className="px-3 py-3 text-center">
-                      <button onClick={() => toggleRow(mod.id)}
-                        className={`w-5 h-5 rounded-[4px] mx-auto flex items-center justify-center border transition-all cursor-pointer hover:scale-110
-                          ${allRowOn ? 'border-brand/40 bg-brand/[0.12]' : someRowOn ? 'border-warning/40 bg-warning/[0.08]' : 'border-border/30 hover:border-border/60'}`}>
-                        {allRowOn ? <Check size={9} strokeWidth={3} className="text-brand" />
-                          : someRowOn ? <span className="w-2 h-0.5 bg-warning rounded-full" />
-                            : null}
-                      </button>
-                    </td>
-                    {/* Permission cells */}
-                    {PERM_ACTIONS.map(action => (
-                      <td key={action} className="px-2 py-3 text-center">
-                        <div className="flex justify-center">
-                          <PermCheck
-                            active={rowPerms[action] || false}
-                            onClick={() => togglePerm(activeRole, mod.id, action)}
-                          />
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="border-t border-border/15">
+          <FeatureTable columns={permColumns} data={PERM_MODULES} rowKey="id" />
         </div>
       </Card>
 

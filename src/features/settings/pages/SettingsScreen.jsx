@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell, CheckCircle2, CreditCard, Eye, EyeOff,
@@ -392,6 +392,35 @@ function Toast({ msg }) {
   );
 }
 
+function SettingsContent({ ws }) {
+  const [toggles, setToggles] = useState({});
+  const [toast,   setToast]   = useState(null);
+
+  const handleToggle = (label, val) => setToggles((p) => ({ ...p, [label]: val }));
+  const handleAction = (label) => {
+    setToast(`${label} — done`);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  return (
+    <div className="space-y-5 animate-in fade-in duration-200">
+      <StatStrip stats={ws.stats} />
+      <Toast msg={toast} />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 items-start">
+        {ws.sections.map((section) => (
+          <SectionCard
+            key={section.title}
+            section={section}
+            toggleStates={toggles}
+            onToggle={handleToggle}
+            onAction={handleAction}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    MAIN SCREEN
 ═══════════════════════════════════════════════════════════ */
@@ -403,17 +432,6 @@ export function SettingsScreen() {
   const activeId = NAV_ITEMS.find((n) => n.id === slug)?.id ?? 'api';
   const ws       = WORKSPACES[activeId] ?? WORKSPACES.api;
 
-  const [toggles, setToggles] = useState({});
-  const [toast,   setToast]   = useState(null);
-
-  useEffect(() => { setToggles({}); }, [activeId]);
-
-  const handleToggle = (label, val) => setToggles((p) => ({ ...p, [label]: val }));
-  const handleAction = (label) => {
-    setToast(`${label} — done`);
-    setTimeout(() => setToast(null), 3000);
-  };
-
   return (
     <PageShell className="!pt-0">
       {/* ── Sticky sub-nav ── */}
@@ -422,7 +440,8 @@ export function SettingsScreen() {
         style={{ backgroundColor: 'var(--bg)' }}
       >
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
-          {NAV_ITEMS.map(({ id, path, label, Icon }) => {
+          {NAV_ITEMS.map((item) => {
+            const { id, path, label, Icon } = item;
             const active = activeId === id;
             return (
               <button
@@ -445,21 +464,7 @@ export function SettingsScreen() {
       </div>
 
       {/* ── Content ── */}
-      <div className="space-y-5 animate-in fade-in duration-200">
-        <StatStrip stats={ws.stats} />
-        <Toast msg={toast} />
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 items-start">
-          {ws.sections.map((section) => (
-            <SectionCard
-              key={section.title}
-              section={section}
-              toggleStates={toggles}
-              onToggle={handleToggle}
-              onAction={handleAction}
-            />
-          ))}
-        </div>
-      </div>
+      <SettingsContent key={activeId} ws={ws} />
     </PageShell>
   );
 }

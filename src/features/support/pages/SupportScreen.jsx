@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertOctagon, Inbox } from 'lucide-react';
 import { PageShell } from '@components/common/PageShell';
@@ -34,13 +34,10 @@ const PAGE_MAP = {
 export function SupportScreen() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeId, setActiveId] = useState('tickets');
 
-  useEffect(() => {
-    const slug = location.pathname.split('/').filter(Boolean).pop();
-    const found = NAV_ITEMS.find((n) => n.id === slug);
-    setActiveId(found?.id ?? 'tickets');
-  }, [location.pathname]);
+  const slug = location.pathname.split('/').filter(Boolean).pop();
+  const found = NAV_ITEMS.find((n) => n.id === slug);
+  const activeId = found?.id ?? 'tickets';
 
   const PageComponent = PAGE_MAP[activeId] ?? TicketsPage;
 
@@ -52,7 +49,8 @@ export function SupportScreen() {
         style={{ backgroundColor: 'var(--bg)' }}
       >
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
-          {NAV_ITEMS.map(({ id, path, label, Icon, badge, urgent }) => {
+          {NAV_ITEMS.map((item) => {
+            const { id, path, label, Icon, badge, urgent } = item;
             const active    = activeId === id;
             const badgeVal  = badge();
             return (

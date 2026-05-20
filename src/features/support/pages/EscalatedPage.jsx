@@ -5,6 +5,7 @@ import {
   Flag, ShieldAlert, Timer, UserPlus,
 } from 'lucide-react';
 import { Card } from '@components/ui/Card';
+import { FeatureTable } from '@components/tables/FeatureTable';
 import { Pagination } from '@components/tables/Pagination';
 import { escalatedData } from '@features/support/data/support.data';
 import {
@@ -17,7 +18,7 @@ const PER_PAGE = 10;
 
 export function EscalatedPage() {
   const navigate      = useNavigate();
-  const [search,  setSearch]  = useState('');
+  const [search]  = useState('');
   const [priorityF, setPriority] = useState('all');
   const [catF,    setCatF]    = useState('all');
   const [page,    setPage]    = useState(1);
@@ -50,6 +51,68 @@ export function EscalatedPage() {
     { label: 'Compliance',        val: escalatedData.filter((t) => t.category === 'Compliance').length,           color: 'var(--warning)' },
     { label: 'Financial',         val: escalatedData.filter((t) => ['Finance', 'Prop'].includes(t.category)).length, color: 'var(--warning)' },
     { label: 'Unassigned',        val: escalatedData.filter((t) => t.owner === 'Unassigned').length,              color: 'var(--negative)', urgent: true },
+  ];
+
+  const columns = [
+    {
+      key: 'id',
+      label: 'Ticket ID',
+      render: (value, row) => (
+        <div className="flex items-center gap-1.5">
+          {row.priority === 'CRITICAL' && <AlertOctagon size={11} className="flex-shrink-0 animate-pulse text-negative" />}
+          <span className="font-mono text-[10.5px] text-text-muted/55">{value}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'user',
+      label: 'User',
+      render: (_, row) => (
+        <div className="flex items-center gap-2">
+          <UserAvatar name={row.user} />
+          <div>
+            <div className="text-[12px] font-semibold text-text/85">{row.user}</div>
+            <div className="font-mono text-[9.5px] text-text-muted/35">{row.uid} · {row.region}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'subject',
+      label: 'Issue',
+      render: (value, row) => (
+        <div className="max-w-[220px]">
+          <div className="truncate text-[11.5px] font-medium text-text/75">{value}</div>
+          <CatTag value={row.category} />
+        </div>
+      ),
+    },
+    { key: 'priority', label: 'Priority', render: (value) => <PriorityBadge value={value} /> },
+    { key: 'escalationReason', label: 'Escalation Reason', render: (value) => <span className="line-clamp-1 text-[11px] text-warning/80">{value ?? 'Senior review required'}</span> },
+    {
+      key: 'owner',
+      label: 'Owner',
+      render: (value) => (
+        <span className={`text-[11px] font-semibold ${value === 'Unassigned' ? 'text-negative' : 'text-text-muted/55'}`}>
+          {value === 'Unassigned' && <AlertCircle size={10} className="mr-1 inline" />}
+          {value}
+        </span>
+      ),
+    },
+    { key: 'sla', label: 'SLA Time Left', render: (_, row) => <SlaBar pct={row.sla} slaMins={row.slaMins} /> },
+    { key: 'status', label: 'Status', render: (value) => <SupportStatusBadge value={value} /> },
+    {
+      key: '_actions',
+      label: '',
+      align: 'right',
+      render: (_, row) => (
+        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/support/tickets/${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-border/25 text-text-muted/40 hover:text-text"><Eye size={10} /></button>
+          <button type="button" onClick={(e) => { e.stopPropagation(); act(`Assigned: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-cyan/20 text-cyan/50 hover:text-cyan"><UserPlus size={10} /></button>
+          <button type="button" onClick={(e) => { e.stopPropagation(); act(`Resolved: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-positive/20 text-positive/50 hover:text-positive"><Check size={10} /></button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -129,90 +192,14 @@ export function EscalatedPage() {
 
       <SupportToast msg={toast} onDone={() => setToast(null)} />
 
-      {/* ── Escalated table ── */}
+      {/* Escalated table */}
       <Card padding={false}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-[11px]">
-            <thead>
-              <tr className="border-b border-negative/[0.12]" style={{ background: 'color-mix(in srgb,var(--negative) 4%, transparent)' }}>
-                {['Ticket ID', 'User', 'Issue', 'Priority', 'Escalation Reason', 'Owner', 'SLA Time Left', 'Status', ''].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-left text-[9.5px] font-black uppercase tracking-[0.12em] text-negative/40 font-heading whitespace-nowrap">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-text-muted/30 font-heading">
-                    No escalated tickets match filters
-                  </td>
-                </tr>
-              )}
-              {paginated.map((row) => {
-                const isUnassigned = row.owner === 'Unassigned';
-                return (
-                  <tr
-                    key={row.id}
-                    onClick={() => navigate(`/support/tickets/${row.id}`)}
-                    className={[
-                      'border-b border-border/10 cursor-pointer transition-all duration-150 group',
-                      row.priority === 'CRITICAL' ? 'bg-negative/[0.04] hover:bg-negative/[0.07]' : 'hover:bg-bg/40',
-                    ].join(' ')}
-                  >
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        {row.priority === 'CRITICAL' && (
-                          <AlertOctagon size={11} className="text-negative animate-pulse flex-shrink-0" />
-                        )}
-                        <span className="font-mono text-text-muted/55 text-[10.5px]">{row.id}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <UserAvatar name={row.user} />
-                        <div>
-                          <div className="text-[12px] font-semibold font-heading text-text/85">{row.user}</div>
-                          <div className="text-[9.5px] font-mono text-text-muted/35">{row.uid} · {row.region}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 max-w-[200px]">
-                      <div className="truncate text-[11.5px] font-heading text-text/75 font-medium">{row.subject}</div>
-                      <CatTag value={row.category} />
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap"><PriorityBadge value={row.priority} /></td>
-                    <td className="px-4 py-3 max-w-[180px]">
-                      <span className="text-[11px] font-heading text-warning/80 line-clamp-1">
-                        {row.escalationReason ?? 'Senior review required'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`text-[11px] font-heading font-semibold ${isUnassigned ? 'text-negative' : 'text-text-muted/55'}`}>
-                        {isUnassigned && <AlertCircle size={10} className="inline mr-1" />}
-                        {row.owner}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <SlaBar pct={row.sla} slaMins={row.slaMins} />
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap"><SupportStatusBadge value={row.status} /></td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => { e.stopPropagation(); navigate(`/support/tickets/${row.id}`); }} className="w-6 h-6 rounded-[5px] border border-border/25 flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer"><Eye size={10} /></button>
-                        <button onClick={(e) => { e.stopPropagation(); act(`Assigned: ${row.id}`); }} className="w-6 h-6 rounded-[5px] border border-cyan/20 flex items-center justify-center text-cyan/50 hover:text-cyan cursor-pointer"><UserPlus size={10} /></button>
-                        <button onClick={(e) => { e.stopPropagation(); act(`Resolved: ${row.id}`); }} className="w-6 h-6 rounded-[5px] border border-positive/20 flex items-center justify-center text-positive/50 hover:text-positive cursor-pointer"><Check size={10} /></button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {totalPages > 1 && (
-          <div className="border-t border-border/15">
+        <FeatureTable
+          columns={columns}
+          data={paginated}
+          onRowClick={(row) => navigate(`/support/tickets/${row.id}`)}
+          emptyMsg="No escalated tickets match filters"
+          footer={totalPages > 1 ? (
             <Pagination
               page={page}
               totalPages={totalPages}
@@ -220,8 +207,8 @@ export function EscalatedPage() {
               pageSize={PER_PAGE}
               onPageSizeChange={() => {}}
             />
-          </div>
-        )}
+          ) : null}
+        />
       </Card>
     </div>
   );

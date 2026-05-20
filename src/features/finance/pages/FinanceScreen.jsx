@@ -1,6 +1,81 @@
 /**
- * FinanceScreen.jsx
- * Thin entry-point wrapper — mounts the self-contained FinanceModule.
- * All logic, data, pages, and drawers live in FinanceDetailScreen.jsx (FinanceModule).
+ * finance/pages/FinanceScreen.jsx
+ *
+ * Finance Module shell — mounts the correct sub-page based on the URL.
+ * All data, components, and page logic live in their own files.
  */
-export { FinanceModule as FinanceScreen } from './FinanceDetailScreen';
+
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import {
+  ArrowDownLeft, ArrowLeftRight, ArrowUpRight,
+  CheckCircle2, PackageX,
+} from 'lucide-react';
+
+import { DepositsPage }       from './DepositsPage';
+import { WithdrawalsPage }    from './WithdrawalsPage';
+import { TransactionsPage }   from './TransactionsPage';
+import { FailedPaymentsPage } from './FailedPaymentsPage';
+import { ApprovalsPage }      from './ApprovalsPage';
+
+import {
+  depositsData, withdrawalsData,
+  failedPaymentsData, approvalsData,
+} from '../data/financeMockData';
+
+/* ── URL slug ↔ internal page key map ──────────────────────────────────── */
+const SLUG_MAP = {
+  deposits:          'deposits',
+  withdrawals:       'withdrawals',
+  transactions:      'transactions',
+  'failed-payments': 'failed',
+  approvals:         'approvals',
+};
+
+/* ── Nav items (kept for potential future sidebar/tab use) ─────────────── */
+const FINANCE_NAV_ITEMS = [
+  {
+    id: 'deposits',     label: 'Deposits',       Icon: ArrowDownLeft,
+    badge: depositsData.filter(d => d.status === 'PENDING').length,
+  },
+  {
+    id: 'withdrawals',  label: 'Withdrawals',    Icon: ArrowUpRight,
+    badge: withdrawalsData.filter(d => ['PENDING', 'FROZEN'].includes(d.status)).length,
+  },
+  { id: 'transactions', label: 'Transactions',   Icon: ArrowLeftRight },
+  {
+    id: 'failed',       label: 'Failed Payments', Icon: PackageX,
+    badge: failedPaymentsData.filter(f => f.status === 'UNRESOLVED').length, urgent: true,
+  },
+  {
+    id: 'approvals',    label: 'Approvals',      Icon: CheckCircle2,
+    badge: approvalsData.filter(a => a.status === 'PENDING').length, urgent: true,
+  },
+];
+
+/* ── Module Shell ───────────────────────────────────────────────────────── */
+export function FinanceScreen() {
+  const location = useLocation();
+
+  const urlSlug = location.pathname.split('/')[2] || 'deposits';
+  const page    = SLUG_MAP[urlSlug] ?? 'deposits';
+
+  const renderPage = () => {
+    switch (page) {
+      case 'deposits':     return <DepositsPage />;
+      case 'withdrawals':  return <WithdrawalsPage />;
+      case 'transactions': return <TransactionsPage />;
+      case 'failed':       return <FailedPaymentsPage />;
+      case 'approvals':    return <ApprovalsPage />;
+      default:             return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      <div className="space-y-5">{renderPage()}</div>
+    </div>
+  );
+}
+
+export default FinanceScreen;

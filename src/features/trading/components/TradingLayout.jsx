@@ -3,8 +3,8 @@ import { PageShell } from '../../../components/common/PageShell';
 
 export function TradingLayout({ children }) {
   return (
-    <PageShell title="Trading Operations">
-      <div className="space-y-6">
+    <PageShell>
+      <div className="space-y-6 animate-fade-up">
         {children}
       </div>
     </PageShell>

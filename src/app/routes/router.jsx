@@ -18,12 +18,7 @@ import { OrdersScreen } from '@features/trading/pages/OrdersScreen';
 import { PositionsScreen } from '@features/trading/pages/PositionsScreen';
 import { TradeHistoryScreen } from '@features/trading/pages/TradeHistoryScreen';
 import { ExecutionLogsScreen } from '@features/trading/pages/ExecutionLogsScreen';
-import { StrategiesScreen } from '@features/copy-trading/pages/StrategiesScreen';
-import { ProvidersScreen } from '@features/copy-trading/pages/ProvidersScreen';
-import { FollowersScreen } from '@features/copy-trading/pages/FollowersScreen';
-import { SubscriptionsScreen } from '@features/copy-trading/pages/SubscriptionsScreen';
-import { PerformanceScreen } from '@features/copy-trading/pages/PerformanceScreen';
-import { LogsScreen } from '@features/copy-trading/pages/LogsScreen';
+import { CopyTradingScreen } from '@features/copy-trading/pages/CopyTradingScreen';
 import { CopyTradingDetailScreen } from '@features/copy-trading/pages/CopyTradingDetailScreen';
 import { IBSystemScreen } from '@features/ib-system/pages/IBSystemScreen';
 import { PropTradingScreen } from '@features/prop-trading/pages/PropTradingScreen';
@@ -47,12 +42,12 @@ const pageRegistry = {
   'trading/positions': PositionsScreen,
   'trading/trade-history': TradeHistoryScreen,
   'trading/execution-logs': ExecutionLogsScreen,
-  'copy-trading/strategies': StrategiesScreen,
-  'copy-trading/providers': ProvidersScreen,
-  'copy-trading/followers': FollowersScreen,
-  'copy-trading/subscriptions': SubscriptionsScreen,
-  'copy-trading/performance': PerformanceScreen,
-  'copy-trading/logs': LogsScreen,
+  'copy-trading/strategies':    CopyTradingScreen,
+  'copy-trading/providers':     CopyTradingScreen,
+  'copy-trading/followers':     CopyTradingScreen,
+  'copy-trading/subscriptions': CopyTradingScreen,
+  'copy-trading/performance':   CopyTradingScreen,
+  'copy-trading/logs':          CopyTradingScreen,
   'copy-trading/copy-trading-detail': CopyTradingDetailScreen,
   'ib-system/ib-system-workspace': IBSystemScreen,
   'prop-trading/prop-trading-workspace': PropTradingScreen,

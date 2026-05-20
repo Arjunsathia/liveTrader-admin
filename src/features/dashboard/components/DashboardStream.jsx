@@ -1,6 +1,7 @@
 import React from 'react';
 import { Activity, ArrowDownRight, ArrowUpRight, FileCheck, ShieldAlert, Zap } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
+import { FeatureTable } from '../../../components/tables/FeatureTable';
 
 const UNIFIED_STREAM = [
   { id: 'T-88421', type: 'trade', user: 'k.mueller', icon: Activity, detail: 'EUR/USD Buy 2.00 Lots', value: '+$342', status: 'open', time: 'Just now', color: 'var(--cyan)' },
@@ -23,86 +24,67 @@ const STATUS_STYLE = {
   closed:     { color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.04)' },
 };
 
-function StreamRow({ item }) {
+function StreamRefCell({ item }) {
   const Icon = item.icon;
+  return (
+    <div className="flex items-center gap-2.5">
+      <div
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] transition-transform group-hover:scale-110"
+        style={{ background: `color-mix(in srgb, ${item.color} 12%, transparent)`, color: item.color }}
+      >
+        <Icon size={11} strokeWidth={2.5} />
+      </div>
+      <span className="font-mono text-[12px] font-medium tracking-wider text-text-muted/60">{item.id}</span>
+    </div>
+  );
+}
+
+function StreamValueCell({ item }) {
   const isGain = item.value.startsWith('+') || item.status === 'confirmed';
   const isLoss = item.value.startsWith('-') || item.status === 'action req';
   const valColor = isGain ? 'var(--positive)' : isLoss ? 'var(--negative)' : item.color;
+  return <span className="font-mono text-[13px] font-bold" style={{ color: valColor }}>{item.value}</span>;
+}
+
+function StreamStatusCell({ item }) {
   const ss = STATUS_STYLE[item.status] ?? { color: 'var(--text-muted)', bg: 'transparent' };
 
   return (
-    <tr className="border-b border-border/10 last:border-0 hover:bg-surface/40 transition-colors group">
-      <td className="py-2.5 pl-4 pr-3 whitespace-nowrap">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-5 h-5 rounded-[5px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
-            style={{ background: `color-mix(in srgb, ${item.color} 12%, transparent)`, color: item.color }}
-          >
-            <Icon size={11} strokeWidth={2.5} />
-          </div>
-          <span className="font-mono text-[11px] font-medium text-text-muted/60 tracking-wider">{item.id}</span>
-        </div>
-      </td>
-      <td className="py-2.5 pr-3 whitespace-nowrap">
-        <span className="text-[12px] font-medium text-text">{item.user}</span>
-      </td>
-      <td className="py-2.5 pr-3 whitespace-nowrap">
-        <span className="text-[11px] font-medium text-text-muted">{item.detail}</span>
-      </td>
-      <td className="py-2.5 pr-3 text-right whitespace-nowrap">
-        <span className="font-mono text-[12px] font-bold" style={{ color: valColor }}>{item.value}</span>
-      </td>
-      <td className="py-2.5 pr-5 text-right whitespace-nowrap text-[10px]">
-        <span
-          className="font-bold uppercase tracking-[0.12em] px-1.5 py-0.5 rounded-[4px]"
-          style={{ color: ss.color, background: ss.bg }}
-        >
-          {item.status}
-        </span>
-      </td>
-      <td className="py-2.5 pr-4 text-right whitespace-nowrap">
-        <span className="font-mono text-[11px] text-text-muted/40 font-medium tracking-wide">{item.time}</span>
-      </td>
-    </tr>
+    <span
+      className="rounded-[4px] px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em]"
+      style={{ color: ss.color, background: ss.bg }}
+    >
+      {item.status}
+    </span>
   );
 }
+
+const streamColumns = [
+  { key: 'id', label: 'Ref', render: (_, row) => <StreamRefCell item={row} /> },
+  { key: 'user', label: 'User', render: (value) => <span className="text-[13px] font-medium text-text">{value}</span> },
+  { key: 'detail', label: 'Detail', render: (value) => <span className="whitespace-nowrap text-[12px] font-medium text-text-muted">{value}</span> },
+  { key: 'value', label: 'Value', align: 'right', render: (_, row) => <StreamValueCell item={row} /> },
+  { key: 'status', label: 'Status', align: 'right', render: (_, row) => <StreamStatusCell item={row} /> },
+  { key: 'time', label: 'Time', align: 'right', render: (value) => <span className="font-mono text-[12px] font-medium tracking-wide text-text-muted/40">{value}</span> },
+];
 
 export function DashboardStream() {
   return (
     <Card className="h-full p-0">
       {/* Header */}
       <div className="px-5 py-4 border-b border-border/15 flex items-center justify-between">
-        <div className="text-[13px] font-semibold text-text flex items-center gap-2">
+        <div className="text-[14px] font-semibold text-text flex items-center gap-2">
           <Zap size={14} className="text-cyan fill-cyan/20" style={{ color: 'var(--cyan)' }} />
           Global Activity Ledger
         </div>
-        <span className="flex items-center gap-1.5 px-2 py-1 rounded-[6px] bg-bg/50 text-[10px] font-bold uppercase tracking-[0.1em] text-text-muted/70 border border-border/20">
+        <span className="flex items-center gap-1.5 px-2 py-1 rounded-[6px] bg-bg/50 text-[11px] font-bold uppercase tracking-[0.1em] text-text-muted/70 border border-border/20">
           <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
           Live Stream
         </span>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto pb-2 p-1">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-border/20">
-              {['Ref', 'User', 'Detail', 'Value', 'Status', 'Time'].map((h, i) => (
-                <th
-                  key={h}
-                  className={`pb-2 pt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/50 ${i === 0 ? 'pl-4 pr-3' : i >= 3 ? 'pr-4 text-right' : 'pr-3'}`}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {UNIFIED_STREAM.map((item) => (
-              <StreamRow key={item.id} item={item} />
-            ))}
-          </tbody>
-        </table>
+      <div className="pb-2 p-1">
+        <FeatureTable columns={streamColumns} data={UNIFIED_STREAM} rowKey="id" />
       </div>
     </Card>
   );

@@ -1,50 +1,43 @@
 /**
  * SupportShared.jsx
  * Shared atoms, constants, and micro-components for the Support feature.
- * All other pages import from here — never define these locally.
+ *
+ * All generic primitives re-export from canonical component layer.
+ * Only Support-specific components that are not in the global design system live here.
  */
 
+/* eslint-disable react-refresh/only-export-components */
 import React, { useEffect } from 'react';
 import { Check, CheckCircle2, X } from 'lucide-react';
+import { PRIORITY_COLORS, CATEGORY_COLORS, STATUS_COLORS } from '@config/constants/status.constants';
 
-/* ── Color maps ─────────────────────────────────────────── */
+/* ── Color maps (re-exported for backward compat) ────────────── */
 
-export const PRIORITY_CLR = {
-  CRITICAL: 'var(--negative)',
-  HIGH:     '#f97316',
-  MEDIUM:   'var(--warning)',
-  LOW:      'var(--cyan)',
-};
+export const PRIORITY_CLR = PRIORITY_COLORS;
 
 export const PRIORITY_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
 
 export const STATUS_CLR = {
-  OPEN:      'var(--positive)',
-  PENDING:   'var(--warning)',
-  ESCALATED: 'var(--negative)',
-  RESOLVED:  'var(--text-muted)',
-  CLOSED:    'rgba(255,255,255,0.25)',
+  OPEN:      STATUS_COLORS.OPEN,
+  PENDING:   STATUS_COLORS.PENDING,
+  ESCALATED: STATUS_COLORS.ESCALATED,
+  RESOLVED:  STATUS_COLORS.RESOLVED,
+  CLOSED:    STATUS_COLORS.CLOSED,
 };
 
-export const CAT_CLR = {
-  Finance:    'var(--brand)',
-  Technical:  'var(--cyan)',
-  KYC:        '#a78bfa',
-  Account:    'var(--warning)',
-  Trading:    'var(--positive)',
-  IB:         'rgba(74,225,118,0.7)',
-  Prop:       '#f97316',
-  Compliance: 'var(--negative)',
-};
+export const CAT_CLR = CATEGORY_COLORS;
 
 export const KYC_CLR   = { VERIFIED: 'var(--positive)', PENDING: 'var(--warning)', REVIEW: 'var(--warning)', FAILED: 'var(--negative)' };
 export const WALL_CLR  = { ACTIVE: 'var(--positive)',   INACTIVE: 'var(--text-muted)',  FROZEN: 'var(--negative)' };
 export const TRADE_CLR = { ACTIVE: 'var(--positive)',   NONE:     'var(--text-muted)',  SUSPENDED: 'var(--negative)' };
 
-/* ── Micro-components ───────────────────────────────────── */
+/* ── Canonical re-exports ─────────────────────────────────────── */
+export { ActionBtn as SupportIconBtn } from '../../../components/ui/ActionBtn';
+export { ActionBtn as IconBtn } from '../../../components/ui/ActionBtn';
 
+/* ── Support-specific: PriorityBadge ─────────────────────────── */
 export function PriorityBadge({ value, size = 'sm' }) {
-  const color  = PRIORITY_CLR[value] || 'var(--text-muted)';
+  const color  = PRIORITY_COLORS[value] || 'var(--text-muted)';
   const cls    = size === 'lg' ? 'px-2.5 py-1 text-[11px]' : 'px-2 py-[3px] text-[9.5px]';
   const dotSz  = size === 'lg' ? 'w-1.5 h-1.5' : 'w-1 h-1';
   return (
@@ -58,8 +51,9 @@ export function PriorityBadge({ value, size = 'sm' }) {
   );
 }
 
+/* ── Support-specific: SupportStatusBadge ────────────────────── */
 export function SupportStatusBadge({ value, size = 'sm' }) {
-  const color = STATUS_CLR[value] || 'var(--text-muted)';
+  const color = STATUS_COLORS[value] || 'var(--text-muted)';
   const cls   = size === 'lg' ? 'px-2.5 py-1 text-[11px]' : 'px-2 py-[3px] text-[9.5px]';
   return (
     <span
@@ -72,8 +66,9 @@ export function SupportStatusBadge({ value, size = 'sm' }) {
   );
 }
 
+/* ── Support-specific: CatTag ────────────────────────────────── */
 export function CatTag({ value }) {
-  const color = CAT_CLR[value] || 'rgba(255,255,255,0.35)';
+  const color = CATEGORY_COLORS[value] || 'rgba(255,255,255,0.35)';
   return (
     <span
       className="inline-flex items-center rounded-[5px] px-1.5 py-[2px] text-[9px] font-bold uppercase tracking-[0.09em] whitespace-nowrap font-heading"
@@ -84,6 +79,7 @@ export function CatTag({ value }) {
   );
 }
 
+/* ── Support-specific: SlaBar ────────────────────────────────── */
 export function SlaBar({ pct, slaMins }) {
   const isBreached = pct === 0 || (slaMins != null && slaMins < 0);
   const isWarning  = pct < 30 && !isBreached;
@@ -115,6 +111,7 @@ export function SlaBar({ pct, slaMins }) {
   );
 }
 
+/* ── Support-specific: UserAvatar ────────────────────────────── */
 export function UserAvatar({ name, size = 'sm' }) {
   const initials = name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
   const dim =
@@ -128,7 +125,7 @@ export function UserAvatar({ name, size = 'sm' }) {
   );
 }
 
-/** Stat card matching the IB System / Reports pattern */
+/* ── Support-specific: SupportStatCard ──────────────────────── */
 export function SupportStatCard({ label, val, color, urgent = false }) {
   return (
     <div className={`rounded-[10px] border px-4 py-3 ${urgent ? 'border-negative/25 bg-negative/[0.04]' : 'border-border/30 bg-surface-elevated shadow-card-subtle'}`}>
@@ -143,6 +140,7 @@ export function SupportStatCard({ label, val, color, urgent = false }) {
   );
 }
 
+/* ── Support-specific: SupportSectionHead ────────────────────── */
 export function SupportSectionHead({ title, Icon: Ic, action }) {
   return (
     <div className="flex items-center gap-2 mb-3">
@@ -154,30 +152,7 @@ export function SupportSectionHead({ title, Icon: Ic, action }) {
   );
 }
 
-/** Small action button — matches the variant style used in IB/Reports features */
-export function SupportIconBtn({ Icon: Ic, label, variant = 'default', onClick, small = false }) {
-  const vs = {
-    danger:  { border: '1px solid color-mix(in srgb,var(--negative) 22%,transparent)',  bg: 'color-mix(in srgb,var(--negative) 7%,transparent)',  color: 'var(--negative)' },
-    success: { border: '1px solid color-mix(in srgb,var(--positive) 22%,transparent)',  bg: 'color-mix(in srgb,var(--positive) 7%,transparent)',  color: 'var(--positive)' },
-    warning: { border: '1px solid color-mix(in srgb,var(--warning) 22%,transparent)',   bg: 'color-mix(in srgb,var(--warning) 7%,transparent)',   color: 'var(--warning)'  },
-    cyan:    { border: '1px solid color-mix(in srgb,var(--cyan) 22%,transparent)',      bg: 'color-mix(in srgb,var(--cyan) 7%,transparent)',      color: 'var(--cyan)'     },
-    brand:   { border: '1px solid color-mix(in srgb,var(--brand) 25%,transparent)',     bg: 'color-mix(in srgb,var(--brand) 9%,transparent)',     color: 'var(--brand)'    },
-    orange:  { border: '1px solid rgba(249,115,22,0.25)',                                bg: 'rgba(249,115,22,0.09)',                               color: '#f97316'         },
-    default: { border: '1px solid var(--border)',                                        bg: 'transparent',                                        color: 'var(--text-muted)' },
-  };
-  const s = vs[variant] ?? vs.default;
-  const h = small ? 'h-7 px-2.5 text-[10.5px]' : 'h-8 px-3 text-[11px]';
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-1.5 ${h} rounded-[7px] font-semibold font-heading transition-all duration-200 hover:brightness-110 active:scale-[0.97] cursor-pointer whitespace-nowrap`}
-      style={{ border: s.border, background: s.bg, color: s.color }}
-    >
-      {Ic && <Ic size={small ? 11 : 12} />}{label}
-    </button>
-  );
-}
-
+/* ── Support-specific: SupportToast ──────────────────────────── */
 export function SupportToast({ msg, onDone }) {
   useEffect(() => {
     if (msg) {
@@ -194,7 +169,7 @@ export function SupportToast({ msg, onDone }) {
   );
 }
 
-/** Shared SLA status cards for right-panel meta */
+/* ── Support-specific: SlaCheckRow ──────────────────────────── */
 export function SlaCheckRow({ label, sla, met }) {
   return (
     <div className="flex items-center justify-between text-[11px]">

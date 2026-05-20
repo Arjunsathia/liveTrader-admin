@@ -1,22 +1,37 @@
 /**
  * finance/components/FinanceDrawer.jsx
- * Drawer system, drawer sub-components, table shell, toolbar, UserCell, QuickActions.
+ * Drawer system, toolbar, UserCell, QuickActions for Finance feature.
+ *
+ * Table rendering is delegated to the canonical FeatureTable.
+ * Pagination is delegated to the canonical Pagination.
+ * All badges use the canonical StatusChip / RiskChip / PriorityChip.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  Activity, AlertTriangle, ArrowUpRight, Check, CheckCircle2,
-  ChevronDown, Copy, Download, Eye, FileText, Flag, Lock,
+  AlertTriangle, ArrowUpRight, Check, CheckCircle2,
+  ChevronDown, Copy, Download, Eye, Flag, Lock,
   MessageSquare, Play, RefreshCw, Search, Send, ShieldAlert,
-  User, X, XCircle, Zap,
+  User, X, XCircle,
 } from 'lucide-react';
-import { STATUS_CLR, RISK_CLR } from '../data/financeMockData';
-import { IconBtn, SectionHead, StatusBadge, RiskBadge, MethodBadge, Pagination } from './FinanceShared';
+import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR } from '../data/financeMockData';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
 import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays/DrawerUI';
-import { Table, TableRow, TableCell } from '../../../components/ui/Table';
+import { ActionBtn as IconBtn } from '../../../components/ui/ActionBtn';
+import { StatusChip, RiskChip, PriorityChip } from '../../../components/ui/StatusChip';
 
-// Re-export shared atoms so pages importing them from FinanceDrawer continue to work
-export { IconBtn, Pagination, SectionHead } from './FinanceShared';
+// Re-export so existing page imports keep working
+export { IconBtn };
+export { DrawerSection };
+export { DrawerField as DF };
+export { DrawerGrid as DGrid };
+export { StatusChip as StatusBadge };
+export { RiskChip as RiskBadge };
+// SectionHead for any page that imports it via FinanceDrawer
+export { SectionHead } from '../../../components/ui/SectionHead';
+
+
+/* ── Pagination re-export (Finance pages import from here) ───── */
+export { Pagination } from '../../../components/tables/Pagination';
 
 /* ── Base drawer shell ───────────────────────────────────────── */
 function FinanceDrawer({ open, onClose, title, subtitle, children, footer }) {
@@ -29,21 +44,15 @@ function FinanceDrawer({ open, onClose, title, subtitle, children, footer }) {
   );
 }
 
-/* ── Drawer field ────────────────────────────────────────────── */
-const DF = DrawerField;
-
-/* ── Drawer grid ─────────────────────────────────────────────── */
-const DGrid = DrawerGrid;
-
 /* ── Audit trail ─────────────────────────────────────────────── */
 function DrawerAuditTrail({ entries }) {
   return (
     <div className="space-y-0 relative">
-      <div className="absolute left-[7px] top-3 bottom-3 w-px bg-white/[0.06]" />
+      <div className="absolute left-[7px] top-3 bottom-3 w-px bg-border/20" />
       {entries.map((e, i) => (
         <div key={i} className="flex gap-3 pb-3">
-          <div className="w-3.5 h-3.5 rounded-full border border-white/[0.12] bg-white/[0.06] flex-shrink-0 mt-1 z-10"
-            style={{ boxShadow: '0 0 0 2px var(--surface-elevated,#131313)' }} />
+          <div className="w-3.5 h-3.5 rounded-full border border-border/30 bg-surface-elevated flex-shrink-0 mt-1 z-10"
+            style={{ boxShadow: '0 0 0 2px var(--bg)' }} />
           <div className="min-w-0">
             <div className="text-[11.5px] font-heading font-semibold text-text/75">{e.action}</div>
             <div className="text-[10px] font-mono text-text-muted/35 mt-0.5">{e.by} · {e.ts}</div>
@@ -89,7 +98,7 @@ function RiskPanel({ risk, flags = [] }) {
           <ShieldAlert size={14} style={{ color }} />
           <span className="text-[12px] font-bold font-heading" style={{ color }}>Risk Level: {risk}</span>
         </div>
-        <RiskBadge value={risk} />
+        <RiskChip value={risk} />
       </div>
       <div className="space-y-1.5">
         {allFlags.map((f, i) => {
@@ -109,86 +118,110 @@ function RiskPanel({ risk, flags = [] }) {
   );
 }
 
-/* ── Generic record drawer (Deposits + Withdrawals) ─────────── */
+/* ── Generic record drawer (Deposits + Withdrawals + Transactions) ─────────── */
 function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
   const [localNote, setLocalNote] = useState('');
   if (!row) return null;
 
   const u = row.user;
+  const isTxn = type === 'Transaction';
+  const rowTs = row.created || row.ts;
+
   const auditBase = [
-    { action: 'Record created',                  by: 'System',     ts: row.created, note: `Source: ${row.method || row.type}` },
-    { action: 'Auto-risk assessment completed',  by: 'RiskEngine', ts: row.created, note: `Risk level: ${row.risk}` },
+    { action: 'Record created',                  by: 'System',     ts: rowTs, note: `Source: ${row.method || row.type}` },
   ];
+  if (row.risk) {
+    auditBase.push({ action: 'Auto-risk assessment completed',  by: 'RiskEngine', ts: rowTs, note: `Risk level: ${row.risk}` });
+  }
   if (row.reviewedBy && row.reviewedBy !== '—' && row.reviewedBy !== 'Auto')
-    auditBase.push({ action: 'Manual review initiated', by: row.reviewedBy, ts: row.created, note: null });
+    auditBase.push({ action: 'Manual review initiated', by: row.reviewedBy, ts: rowTs, note: null });
   if (['APPROVED', 'PAID', 'SETTLED'].includes(row.status))
-    auditBase.push({ action: 'Record approved', by: row.reviewedBy || 'System', ts: row.created, note: null });
+    auditBase.push({ action: 'Record approved', by: row.reviewedBy || 'System', ts: rowTs, note: null });
   if (['FLAGGED', 'FROZEN'].includes(row.status))
-    auditBase.push({ action: 'Flagged for compliance review', by: row.reviewedBy || 'System', ts: row.created, note: 'Awaiting compliance team action' });
+    auditBase.push({ action: 'Flagged for compliance review', by: row.reviewedBy || 'System', ts: rowTs, note: 'Awaiting compliance team action' });
+
+  const statusColor = STATUS_CLR[row.status] || 'var(--text-muted)';
 
   return (
     <FinanceDrawer open={open} onClose={onClose} title={`${type} — ${row.id}`} subtitle="Inspect record details, user context, and audit logs." footer={
       <div className="grid grid-cols-2 gap-2 w-full">
-        {row.status === 'PENDING' && <>
-          <IconBtn label="Approve"      Icon={CheckCircle2} variant="success" onClick={() => { onAction('Approved', row.id); onClose(); }} />
-          <IconBtn label="Reject"       Icon={XCircle}      variant="danger"  onClick={() => { onAction('Rejected', row.id); onClose(); }} />
-        </>}
-        {(row.status === 'FLAGGED' || row.status === 'FROZEN') && <>
-          <IconBtn label="Release Hold" Icon={Play}         variant="warning" onClick={() => { onAction('Hold released', row.id); onClose(); }} />
-          <IconBtn label="Escalate"     Icon={ArrowUpRight} variant="orange"  onClick={() => { onAction('Escalated', row.id);    onClose(); }} />
-        </>}
-        {row.status === 'FAILED' && <>
-          <IconBtn label="Retry"        Icon={RefreshCw}    variant="warning" onClick={() => { onAction('Retried', row.id);      onClose(); }} />
-        </>}
-        <IconBtn label="Copy Record ID" Icon={Copy}         variant="default" onClick={() => { navigator.clipboard.writeText(row.id); onAction('ID copied', row.id); }} />
-        <IconBtn label="Export Record"  Icon={Download}     variant="default" onClick={() => onAction('Exported', row.id)} />
-        <IconBtn label="View User"      Icon={User}         variant="cyan"    onClick={() => onAction('User profile opened', row.id)} />
-        {row.status !== 'REJECTED' && row.status !== 'PAID' && row.status !== 'SETTLED' &&
-          <IconBtn label="Lock Record"  Icon={Lock}         variant="danger"  onClick={() => { onAction('Locked', row.id); onClose(); }} />
-        }
+        {isTxn ? (
+          <>
+            <IconBtn label="Copy Record ID" Icon={Copy}         variant="default" onClick={() => { navigator.clipboard.writeText(row.id); onAction('ID copied', row.id); }} />
+            <IconBtn label="Export Record"  Icon={Download}     variant="default" onClick={() => onAction('Exported', row.id)} />
+            <IconBtn label="View User"      Icon={User}         variant="cyan"    onClick={() => onAction('User profile opened', row.id)} />
+            {row.status === 'FLAGGED' && (
+              <IconBtn label="Review"       Icon={Eye}          variant="warning" onClick={() => { onAction('Reviewed', row.id); onClose(); }} />
+            )}
+          </>
+        ) : (
+          <>
+            {row.status === 'PENDING' && <>
+              <IconBtn label="Approve"      Icon={CheckCircle2} variant="success" onClick={() => { onAction('Approved', row.id); onClose(); }} />
+              <IconBtn label="Reject"       Icon={XCircle}      variant="danger"  onClick={() => { onAction('Rejected', row.id); onClose(); }} />
+            </>}
+            {(row.status === 'FLAGGED' || row.status === 'FROZEN') && <>
+              <IconBtn label="Release Hold" Icon={Play}         variant="warning" onClick={() => { onAction('Hold released', row.id); onClose(); }} />
+              <IconBtn label="Escalate"     Icon={ArrowUpRight} variant="orange"  onClick={() => { onAction('Escalated', row.id);    onClose(); }} />
+            </>}
+            {row.status === 'FAILED' && <>
+              <IconBtn label="Retry"        Icon={RefreshCw}    variant="warning" onClick={() => { onAction('Retried', row.id);      onClose(); }} />
+            </>}
+            <IconBtn label="Copy Record ID" Icon={Copy}         variant="default" onClick={() => { navigator.clipboard.writeText(row.id); onAction('ID copied', row.id); }} />
+            <IconBtn label="Export Record"  Icon={Download}     variant="default" onClick={() => onAction('Exported', row.id)} />
+            <IconBtn label="View User"      Icon={User}         variant="cyan"    onClick={() => onAction('User profile opened', row.id)} />
+            {row.status !== 'REJECTED' && row.status !== 'PAID' && row.status !== 'SETTLED' &&
+              <IconBtn label="Lock Record"  Icon={Lock}         variant="danger"  onClick={() => { onAction('Locked', row.id); onClose(); }} />
+            }
+          </>
+        )}
       </div>
     }>
       {/* Status header */}
-      <div className="rounded-[12px] border border-white/[0.07] overflow-hidden">
-        <div className="px-4 py-3.5 flex items-center justify-between"
-          style={{ background: `color-mix(in srgb, ${STATUS_CLR[row.status] || 'rgba(255,255,255,0.1)'} 6%, transparent)`, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div>
-            <div className="text-[16px] font-black font-heading text-text tracking-[-0.02em]">{row.amount}</div>
-            <div className="text-[10px] font-mono text-text-muted/40 mt-0.5">{row.id} · {row.created}</div>
+      <DrawerSection title="Status Overview">
+        <div className="rounded-[12px] border overflow-hidden"
+          style={{ borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))` }}>
+          <div className="px-4 py-3.5 flex items-center justify-between"
+            style={{ background: `color-mix(in srgb, ${statusColor} 6%, transparent)`, borderBottom: '1px solid var(--border)' }}>
+            <div>
+              <div className="text-[16px] font-black font-heading text-text tracking-[-0.02em]">{row.amount}</div>
+              <div className="text-[10px] font-mono text-text-muted/40 mt-0.5">{row.id} · {rowTs}</div>
+            </div>
+            <div className="flex flex-col items-end gap-1.5">
+              <StatusChip value={row.status} size="lg" />
+              {row.risk && <RiskChip value={row.risk} />}
+            </div>
           </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <StatusBadge value={row.status} size="lg" />
-            {row.risk && <RiskBadge value={row.risk} />}
+          <div className="px-4 py-2.5 flex gap-4 flex-wrap">
+            {row.method && <MethodBadge value={row.method} />}
+            {row.rail && <span className="text-[10px] font-heading text-text-muted/40 border border-border/30 px-2 py-0.5 rounded-[4px]">{row.rail}</span>}
           </div>
         </div>
-        <div className="px-4 py-2.5 flex gap-4 flex-wrap">
-          {row.method && <MethodBadge value={row.method} />}
-          {row.rail && <span className="text-[10px] font-heading text-text-muted/40 border border-white/[0.06] px-2 py-0.5 rounded-[4px]">{row.rail}</span>}
-        </div>
-      </div>
+      </DrawerSection>
 
       {/* Transaction Summary */}
       <DrawerSection title="Transaction Summary">
-        <DGrid>
-          <DF label="Record ID"     value={row.id}      mono copyable />
-          <DF label="Status"        value={row.status}  accent={STATUS_CLR[row.status]} />
-          <DF label="Amount"        value={row.amount}  mono accent={row.amtRaw > 0 ? 'var(--positive)' : 'var(--negative)'} />
-          <DF label="Method"        value={row.method} />
-          {row.rail        && <DF label="Provider/Rail"    value={row.rail}        mono />}
-          {row.reference   && <DF label="Reference"        value={row.reference}   mono copyable />}
-          {row.destination && <DF label="Destination"      value={row.destination} mono copyable wide />}
-          {row.hash        && <DF label="Tx Hash"          value={row.hash}        mono copyable wide />}
-          {row.compliance  && <DF label="Compliance Check" value={row.compliance}  accent={row.compliance === 'PASS' ? 'var(--positive)' : 'var(--negative)'} />}
-          {row.aml         && <DF label="AML Status"       value={row.aml}         accent={row.aml === 'CLEAR' ? 'var(--positive)' : row.aml === 'REVIEW' ? 'var(--warning)' : 'var(--negative)'} />}
-          <DF label="Created"       value={row.created} mono />
-          <DF label="Reviewed By"   value={row.reviewedBy || 'Unassigned'} />
-        </DGrid>
+        <DrawerGrid>
+          <DrawerField label="Record ID"     value={row.id}      mono copyable />
+          <DrawerField label="Status"        value={row.status}  accent={STATUS_CLR[row.status]} />
+          <DrawerField label="Amount"        value={row.amount}  mono accent={row.amtRaw > 0 ? 'var(--positive)' : 'var(--negative)'} />
+          <DrawerField label="Method"        value={row.method} />
+          {row.type && <DrawerField label="Tx Type" value={row.type} accent={TXN_TYPE_CLR[row.type]} />}
+          {row.rail        && <DrawerField label="Provider/Rail"    value={row.rail}        mono />}
+          {row.reference   && <DrawerField label="Reference"        value={row.reference}   mono copyable />}
+          {row.destination && <DrawerField label="Destination"      value={row.destination} mono copyable wide />}
+          {row.hash        && <DrawerField label="Tx Hash"          value={row.hash}        mono copyable wide />}
+          {row.compliance  && <DrawerField label="Compliance Check" value={row.compliance}  accent={row.compliance === 'PASS' ? 'var(--positive)' : 'var(--negative)'} />}
+          {row.aml         && <DrawerField label="AML Status"       value={row.aml}         accent={row.aml === 'CLEAR' ? 'var(--positive)' : row.aml === 'REVIEW' ? 'var(--warning)' : 'var(--negative)'} />}
+          <DrawerField label="Timestamp"       value={rowTs} mono />
+          {row.reviewedBy && <DrawerField label="Reviewed By"   value={row.reviewedBy || 'Unassigned'} />}
+        </DrawerGrid>
       </DrawerSection>
 
       {/* User Context */}
       <DrawerSection title="User Context">
-        <div className="rounded-[10px] border border-white/[0.06] bg-white/[0.025] p-3.5">
-          <div className="flex items-center gap-3 mb-3 pb-3 border-b border-white/[0.05]">
+        <div className="rounded-[10px] border border-border/25 bg-bg/50 p-3.5">
+          <div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/15">
             <div className="w-9 h-9 rounded-[9px] bg-primary/[0.1] border border-primary/[0.18] flex items-center justify-center text-[12px] font-bold text-primary font-heading flex-shrink-0">
               {u.name.split(' ').map(n => n[0]).join('')}
             </div>
@@ -216,16 +249,35 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
         </DrawerSection>
       )}
 
+      {/* Ledger Mapping specific to Transactions */}
+      {isTxn && (
+        <DrawerSection title="Ledger Mapping">
+          <div className="rounded-[10px] border border-border/20 bg-bg/30 px-4 py-3 space-y-2">
+            {[
+              { label: 'Debit Account', val: row.amtRaw > 0 ? 'External Gateway' : 'User Wallet' },
+              { label: 'Credit Account', val: row.amtRaw > 0 ? 'User Wallet' : 'External Gateway' },
+              { label: 'Ledger Entry', val: `${row.reference} · ${rowTs}` },
+              { label: 'Settled', val: row.status === 'SETTLED' ? 'Yes' : 'No' },
+            ].map(l => (
+              <div key={l.label} className="flex justify-between text-[11px] font-heading">
+                <span className="text-text-muted/45">{l.label}</span>
+                <span className="font-semibold text-text/80">{l.val}</span>
+              </div>
+            ))}
+          </div>
+        </DrawerSection>
+      )}
+
       {/* Internal Notes */}
       <DrawerSection title="Internal Notes" collapsible>
         {row.note && (
-          <div className="rounded-[9px] border border-white/[0.06] bg-white/[0.025] px-3 py-2.5 mb-2.5 text-[12px] text-text-muted/65 font-heading leading-snug">
+          <div className="rounded-[9px] border border-border/25 bg-bg/50 px-3 py-2.5 mb-2.5 text-[12px] text-text-muted/65 font-heading leading-snug">
             {row.note}
           </div>
         )}
         <DrawerNoteEditor onSave={n => { setLocalNote(n); onAction('Note saved', row.id); }} />
         {localNote && (
-          <div className="rounded-[9px] border border-purple-500/20 bg-purple-500/[0.05] px-3 py-2.5 mt-2 text-[12px] text-purple-300/80 font-heading leading-snug">
+          <div className="rounded-[9px] border border-purple/20 bg-purple/[0.05] px-3 py-2.5 mt-2 text-[12px] text-purple-300/80 font-heading leading-snug">
             {localNote}
           </div>
         )}
@@ -239,41 +291,6 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
   );
 }
 
-/* ── Table shell ─────────────────────────────────────────────── */
-function FinanceTable({ cols, rows, onRow, empty = 'No records found', footer }) {
-  if (!rows?.length) {
-    return (
-      <div className="p-6">
-        <div className="text-center text-text-muted/50 font-heading">{empty}</div>
-        {footer && <div className="mt-4">{footer}</div>}
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <Table
-        headers={cols.map(c => c.label)}
-        data={rows}
-        rowRenderer={(row, ri) => (
-          <TableRow
-            key={row.id ?? ri}
-            className={onRow ? 'cursor-pointer' : ''}
-            onClick={onRow ? () => onRow(row) : undefined}
-          >
-            {cols.map(c => (
-              <TableCell key={c.key}>
-                {c.render ? c.render(row[c.key], row) : <span className="text-[12px] text-text/70">{row[c.key] ?? '—'}</span>}
-              </TableCell>
-            ))}
-          </TableRow>
-        )}
-      />
-      {footer && <div className="px-5 pb-5 mt-2">{footer}</div>}
-    </>
-  );
-}
-
 /* ── Search + filter toolbar ─────────────────────────────────── */
 function FinanceToolbar({ search, setSearch, filters, activeFilter, setFilter, actions, extra }) {
   return (
@@ -282,7 +299,7 @@ function FinanceToolbar({ search, setSearch, filters, activeFilter, setFilter, a
         <div className="relative flex-1 min-w-[200px] max-w-[320px]">
           <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by ID, user, UID, email…"
-            className="w-full h-8 pl-8 pr-3 rounded-[8px] border border-border/25 bg-bg text-[12px] text-text placeholder:text-text-muted/30 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all font-heading" />
+            className="w-full h-9 pl-8 pr-3 rounded-[9px] border border-border/25 bg-bg text-[12px] text-text placeholder:text-text-muted/30 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all font-heading" />
         </div>
         {filters && (
           <div className="flex gap-1 flex-wrap">
@@ -299,7 +316,7 @@ function FinanceToolbar({ search, setSearch, filters, activeFilter, setFilter, a
           {actions?.map((a, i) => (
             <button key={i} onClick={a.onClick}
               className={`flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[11px] font-semibold font-heading border transition-all duration-200 cursor-pointer
-                ${a.primary ? 'bg-brand text-black border-brand/80 hover:brightness-110 shadow-[0_0_15px_rgba(var(--brand-rgb),0.2)]' : 'border-border/25 bg-surface-bright/10 text-text-muted/70 hover:text-text hover:border-border/40'}`}>
+                ${a.primary ? 'bg-brand text-text-on-accent border-brand/80 hover:brightness-110' : 'border-border/25 bg-surface-bright/10 text-text-muted/70 hover:text-text hover:border-border/40'}`}>
               {a.Icon && <a.Icon size={12} />}{a.label}
             </button>
           ))}
@@ -347,6 +364,15 @@ function UserCell({ u }) {
   );
 }
 
+/* ── Method badge (Finance-specific) ─────────────────────────── */
+function MethodBadge({ value }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[10.5px] font-heading font-semibold text-text-muted/55">
+      {value}
+    </span>
+  );
+}
+
 /* ── Row quick-action buttons ────────────────────────────────── */
 function QuickActions({ row, onApprove, onReject, onFlag, onRetry }) {
   return (
@@ -364,7 +390,8 @@ function QuickActions({ row, onApprove, onReject, onFlag, onRetry }) {
 }
 
 export {
-  FinanceDrawer, DF, DGrid, DrawerAuditTrail, DrawerNoteEditor, DrawerSection,
+  FinanceDrawer, DrawerAuditTrail, DrawerNoteEditor,
   RiskPanel, FinanceRecordDrawer,
-  FinanceTable, FinanceToolbar, FilterRow, UserCell, QuickActions,
+  FinanceToolbar, FilterRow, UserCell, QuickActions, MethodBadge,
+  PriorityChip as PriorityBadge,
 };

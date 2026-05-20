@@ -69,7 +69,8 @@ export function ActionBtn({ label, Icon, onClick, variant = 'default', disabled 
 }
 
 /* KPI card */
-export function KpiCard({ label, value, sub, dir, accent, Icon }) {
+export function KpiCard(props) {
+  const { label, value, sub, dir, accent, Icon } = props;
   return (
     <div
       className="relative flex flex-col gap-1.5 overflow-hidden rounded-[10px] border border-border/40 bg-surface-elevated shadow-card-subtle p-3.5"
@@ -136,17 +137,20 @@ export function MoreActionsMenu({ onSuspend, onReset, onFreeze, suspended }) {
           className="absolute right-0 top-full z-50 mt-1 w-[185px] rounded-[10px] border border-border/40 py-1 shadow-card-subtle"
           style={{ background: 'var(--surface-elevated)' }}
         >
-          {items.map(({ label, Icon, fn, danger }) => (
-            <button
-              key={label}
-              onClick={() => { fn?.(); setOpen(false); }}
-              className="flex w-full items-center gap-2.5 px-3 py-1.5 text-[12px] font-medium transition-colors hover:bg-surface-1"
-              style={{ color: danger ? '#ef4444' : 'var(--text)' }}
-            >
-              <Icon size={12} />
-              {label}
-            </button>
-          ))}
+          {items.map((item) => {
+            const { label, Icon, fn, danger } = item;
+            return (
+              <button
+                key={label}
+                onClick={() => { fn?.(); setOpen(false); }}
+                className="flex w-full items-center gap-2.5 px-3 py-1.5 text-[12px] font-medium transition-colors hover:bg-surface-1"
+                style={{ color: danger ? '#ef4444' : 'var(--text)' }}
+              >
+                <Icon size={12} />
+                {label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

@@ -12,9 +12,7 @@
 
 const toggle  = (label, hint, on = true)       => ({ type: 'toggle',  label, hint, value: on });
 const field   = (label, value, mono = true, masked = false) => ({ type: 'field',  label, value, mono, masked });
-const select  = (label, value, opts)           => ({ type: 'select',  label, value, opts });
 const btn     = (label, variant = 'default', icon = null) => ({ type: 'button', label, variant, icon });
-const divider = (title)                        => ({ type: 'divider', title });
 
 /* ═══════════════════════════════════════════════════════════
    1. API CONFIG

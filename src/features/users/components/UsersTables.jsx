@@ -77,112 +77,131 @@ export function UsersListTable({
   onSuspendUser,
   onOpenMt5,
 }) {
-  const columns = [
-    {
-      key: 'user',
-      label: 'User',
-      render: (user) => (
-        <div className="flex items-center gap-3">
-          <UserAvatar name={user.name} />
-          <div className="min-w-0">
-            <div className="text-[13px] font-semibold text-text">{user.name}</div>
-            <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-text-muted/55">UID {user.uid}</div>
-            <div className="truncate text-[11px] text-text-muted/60">{user.email}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'segment',
-      label: 'Segment',
-      render: (user) => (
-        <div>
-          <div className="text-[12px] font-medium text-text">{user.segment}</div>
-          <div className="text-[11px] text-text-muted/60">{user.tier}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'kyc',
-      label: 'KYC',
-      render: (user) => <StatusBadge status={user.kycStatus} />,
-    },
-    {
-      key: 'wallet',
-      label: 'Wallet',
-      render: (user) => (
-        <div>
-          <div className="font-mono text-[12px] font-semibold text-text">{user.walletBalance}</div>
-          <div className="text-[11px] text-text-muted/60">EQ {user.equity}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'mt5',
-      label: 'MT5',
-      render: (user) => (
-        <div>
-          <div className="text-[12px] font-medium text-text">{user.mt5Accounts} accounts</div>
-          <div className="text-[11px] text-text-muted/60">{user.openPositions} open positions</div>
-        </div>
-      ),
-    },
-    {
-      key: 'risk',
-      label: 'Risk',
-      render: (user) => <StatusBadge status={user.riskStatus} dot={false} />,
-    },
-    {
-      key: 'lastSeen',
-      label: 'Last Active',
-      render: (user) => (
-        <div>
-          <div className="font-mono text-[12px] text-text-muted/80">{user.lastSeen}</div>
-          <div className="text-[11px] text-text-muted/55">{user.source}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'actions',
-      label: 'Actions',
-      render: (user) => (
-        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onOpenUser(user.id); }}
-            className="rounded-[8px] border border-border/25 bg-bg/70 px-3 py-1.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
-          >
-            Open
-          </button>
-          <RowActionsMenu
-            user={user}
-            onOpenUser={onOpenUser}
-            onQuickView={onQuickView}
-            onEditUser={onEditUser}
-            onSuspendUser={onSuspendUser}
-            onOpenMt5={onOpenMt5}
-          />
-        </div>
-      ),
-    },
-  ];
+  const paged = tableState.items;
 
   return (
     <>
-      <DataTable
-        columns={columns}
-        data={tableState.items}
-        onRowClick={(user) => onOpenUser(user.id)}
-        emptyTitle="No users matched the current filters"
-        emptyDescription="Try adjusting the search or filter combinations."
-      />
-      <Pagination
-        page={tableState.page}
-        totalPages={tableState.totalPages}
-        onPageChange={tableState.setPage}
-        pageSize={tableState.pageSize}
-        onPageSizeChange={tableState.setPageSize}
-      />
+      <div className="overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
+              <th className="px-4 py-3">User Profile</th>
+              <th className="px-4 py-3">Segment / Tier</th>
+              <th className="px-4 py-3">KYC Status</th>
+              <th className="px-4 py-3">Collateral Wallet</th>
+              <th className="px-4 py-3">MT5 terminals</th>
+              <th className="px-4 py-3">Risk Assessment</th>
+              <th className="px-4 py-3">Last Active</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/8">
+            {paged.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
+                  No users matched the current filter criteria.
+                </td>
+              </tr>
+            ) : (
+              paged.map((row) => {
+                const isSuspended = row.suspended;
+                const isFlagged = ['FLAGGED', 'ELEVATED'].includes(row.riskStatus) || row.kycStatus === 'REJECTED';
+                const isPending = row.kycStatus === 'PENDING' || row.riskStatus === 'WATCHLIST';
+
+                return (
+                  <tr
+                    key={row.id}
+                    onClick={() => onOpenUser(row.id)}
+                    className={`group cursor-pointer transition-colors border-l-2 border-transparent ${isSuspended || isFlagged
+                      ? 'hover:bg-negative/5 hover:border-l-negative'
+                      : isPending
+                        ? 'hover:bg-warning/5 hover:border-l-warning'
+                        : 'hover:bg-positive/5 hover:border-l-positive'
+                      }`}
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <UserAvatar name={row.name} />
+                        <div className="min-w-0">
+                          <div className="text-[13px] font-black text-text group-hover:text-brand transition-colors">{row.name}</div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] font-mono font-bold text-text-muted/50 tracking-wider">UID {row.uid}</span>
+                            {isSuspended && (
+                              <span className="px-1 rounded-[3px] text-[8.5px] font-bold border border-negative/20 bg-negative/5 text-negative uppercase tracking-wide">
+                                Suspended
+                              </span>
+                            )}
+                          </div>
+                          <div className="truncate text-[10.5px] text-text-muted/50 font-medium font-mono">{row.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div>
+                        <div className="text-[12px] font-bold text-text">{row.segment}</div>
+                        <div className="text-[10.5px] text-text-muted/55 font-bold text-brand">{row.tier}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={row.kycStatus} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div>
+                        <div className="font-mono text-[12px] font-bold text-text">{row.walletBalance}</div>
+                        <div className="text-[10px] font-mono text-text-muted/50">EQ {row.equity}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div>
+                        <div className="text-[12.5px] font-bold text-text">{row.mt5Accounts} terminals</div>
+                        <div className="text-[10.5px] text-text-muted/50 font-medium">{row.openPositions} open trades</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={row.riskStatus} dot={false} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div>
+                        <div className="font-mono text-[11.5px] text-text font-semibold">{row.lastSeen}</div>
+                        <div className="text-[10px] text-text-muted/55 font-semibold">{row.source}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => onOpenUser(row.id)}
+                          className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer animate-fade-in"
+                        >
+                          Open
+                        </button>
+                        <RowActionsMenu
+                          user={row}
+                          onOpenUser={onOpenUser}
+                          onQuickView={onQuickView}
+                          onEditUser={onEditUser}
+                          onSuspendUser={onSuspendUser}
+                          onOpenMt5={onOpenMt5}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="border-t border-border/10">
+        <Pagination
+          page={tableState.page}
+          totalPages={tableState.totalPages}
+          onPageChange={tableState.setPage}
+          pageSize={tableState.pageSize}
+          onPageSizeChange={tableState.setPageSize}
+        />
+      </div>
     </>
   );
 }
@@ -224,7 +243,24 @@ export function UsersKycTable({ tableState, onReviewUser }) {
 
   return (
     <>
-      <DataTable columns={columns} data={tableState.items} rowKey="id" emptyTitle="No KYC cases matched the current search" />
+      <DataTable
+        columns={columns}
+        data={tableState.items}
+        rowKey="id"
+        emptyTitle="No KYC cases matched the current search"
+        rowClassName={(item) => {
+          const isFlagged = ['REJECTED', 'FAILED', 'FLAGGED'].includes(item.status);
+          const isPending = ['PENDING', 'NONE'].includes(item.status);
+
+          if (isFlagged) {
+            return 'hover:bg-negative/5 [&>td:first-child]:border-l-2 [&>td:first-child]:border-l-transparent hover:[&>td:first-child]:border-l-negative [&>td:first-child]:transition-colors [&>td:first-child]:duration-200';
+          }
+          if (isPending) {
+            return 'hover:bg-warning/5 [&>td:first-child]:border-l-2 [&>td:first-child]:border-l-transparent hover:[&>td:first-child]:border-l-warning [&>td:first-child]:transition-colors [&>td:first-child]:duration-200';
+          }
+          return 'hover:bg-positive/5 [&>td:first-child]:border-l-2 [&>td:first-child]:border-l-transparent hover:[&>td:first-child]:border-l-positive [&>td:first-child]:transition-colors [&>td:first-child]:duration-200';
+        }}
+      />
       <Pagination
         page={tableState.page}
         totalPages={tableState.totalPages}
@@ -237,63 +273,101 @@ export function UsersKycTable({ tableState, onReviewUser }) {
 }
 
 export function UsersMt5Table({ tableState, onOpenUser, onOpenMt5 }) {
-  const columns = [
-    {
-      key: 'login',
-      label: 'Login',
-      render: (account) => (
-        <div>
-          <div className="font-mono text-[12px] font-semibold text-text">{account.login}</div>
-          <div className="text-[11px] text-text-muted/60">{account.leverage}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'user',
-      label: 'User',
-      render: (account) => (
-        <div>
-          <div className="text-[12px] font-medium text-text">{account.user}</div>
-          <button
-            type="button"
-            className="text-[11px] font-semibold text-primary hover:underline"
-            onClick={() => onOpenUser(account.userId, 'mt5-accounts')}
-          >
-            Open user
-          </button>
-        </div>
-      ),
-    },
-    { key: 'server', label: 'Server', render: (account) => <span className="font-mono text-[11px] text-text-muted">{account.server}</span> },
-    { key: 'status', label: 'Status', render: (account) => <StatusBadge status={account.status} /> },
-    { key: 'group', label: 'Group', render: (account) => <span className="font-mono text-[11px] text-text-muted">{account.group}</span> },
-    { key: 'balance', label: 'Balance', render: (account) => <span className="font-mono text-[12px] font-semibold text-text">{account.balance}</span> },
-    { key: 'lastSync', label: 'Last Sync', render: (account) => <span className="font-mono text-[11px] text-text-muted/75">{account.lastSync}</span> },
-    {
-      key: 'action',
-      label: '',
-      render: (account) => (
-        <button
-          type="button"
-          onClick={() => onOpenMt5(account)}
-          className="rounded-[8px] border border-border/25 px-3 py-1.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
-        >
-          Details
-        </button>
-      ),
-    },
-  ];
+  const paged = tableState.items;
 
   return (
     <>
-      <DataTable columns={columns} data={tableState.items} rowKey="id" emptyTitle="No MT5 accounts matched the current search" />
-      <Pagination
-        page={tableState.page}
-        totalPages={tableState.totalPages}
-        onPageChange={tableState.setPage}
-        pageSize={tableState.pageSize}
-        onPageSizeChange={tableState.setPageSize}
-      />
+      <div className="overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
+              <th className="px-4 py-3">Login</th>
+              <th className="px-4 py-3">User</th>
+              <th className="px-4 py-3">Server</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Group</th>
+              <th className="px-4 py-3">Balance</th>
+              <th className="px-4 py-3">Last Sync</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/8">
+            {paged.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
+                  No MT5 accounts matched the current search.
+                </td>
+              </tr>
+            ) : (
+              paged.map((row) => {
+                const isFailed = row.status === 'DISCONNECTED';
+                const isWarning = row.status === 'SYNC_DELAY';
+
+                return (
+                  <tr
+                    key={row.id}
+                    onClick={() => onOpenMt5(row)}
+                    className={`group cursor-pointer transition-colors border-l-2 border-transparent ${isFailed
+                      ? 'hover:bg-negative/5 hover:border-l-negative'
+                      : isWarning
+                        ? 'hover:bg-warning/5 hover:border-l-warning'
+                        : 'hover:bg-positive/5 hover:border-l-positive'
+                      }`}
+                  >
+                    <td className="px-4 py-3.5">
+                      <div>
+                        <div className="font-mono text-[12px] font-semibold text-text">{row.login}</div>
+                        <div className="text-[10px] text-text-muted/55 font-medium">{row.leverage}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <div>
+                        <div className="text-[12px] font-semibold text-text">{row.user}</div>
+                        <button
+                          type="button"
+                          className="text-[10.5px] font-bold text-brand hover:underline cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenUser(row.userId, 'mt5-accounts');
+                          }}
+                        >
+                          Open user
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/80">{row.server}</td>
+                    <td className="px-4 py-3.5">
+                      <StatusBadge status={row.status} />
+                    </td>
+                    <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/80">{row.group}</td>
+                    <td className="px-4 py-3.5 font-mono text-[12px] font-bold text-text">{row.balance}</td>
+                    <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.lastSync}</td>
+                    <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => onOpenMt5(row)}
+                        className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer"
+                      >
+                        Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="border-t border-border/10">
+        <Pagination
+          page={tableState.page}
+          totalPages={tableState.totalPages}
+          onPageChange={tableState.setPage}
+          pageSize={tableState.pageSize}
+          onPageSizeChange={tableState.setPageSize}
+        />
+      </div>
     </>
   );
 }

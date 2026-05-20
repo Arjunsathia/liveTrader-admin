@@ -29,20 +29,20 @@ function AlertItem({ alert }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span
-              className="text-[9px] font-black uppercase tracking-[0.18em] px-1.5 py-0.5 rounded-[4px]"
+              className="text-[10px] font-black uppercase tracking-[0.18em] px-1.5 py-0.5 rounded-[4px]"
               style={{ color, background: `color-mix(in srgb, ${color} 12%, transparent)` }}
             >
               {alert.level}
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/50">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted/50">
               {alert.cat}
             </span>
-            <span className="ml-auto font-mono text-[10px] text-text-muted/40">{alert.stamp}</span>
+            <span className="ml-auto font-mono text-[11px] text-text-muted/40">{alert.stamp}</span>
           </div>
-          <div className="text-[12px] font-semibold text-text leading-snug group-hover:text-primary transition-colors">
+          <div className="text-[13px] font-semibold text-text leading-snug group-hover:text-primary transition-colors">
             {alert.title}
           </div>
-          <div className="mt-1 text-[11px] leading-5 text-text-muted/70">{alert.text}</div>
+          <div className="mt-1 text-[12px] leading-5 text-text-muted/70">{alert.text}</div>
         </div>
         <div className="shrink-0 pt-1">
           <span className="flex items-center justify-center h-6 w-6 rounded-md bg-surface/50 text-text-muted/50 group-hover:text-text group-hover:bg-surface transition-colors border border-border/20 group-hover:border-border/60">
@@ -59,11 +59,11 @@ export function DashboardAlerts() {
     <Card>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="text-[13px] font-semibold text-text flex items-center gap-2">
+          <div className="text-[14px] font-semibold text-text flex items-center gap-2">
             <ShieldAlert size={14} className="text-negative" />
             Operations Queue
           </div>
-          <div className="text-[11px] text-text-muted/60 mt-0.5">
+          <div className="text-[12px] text-text-muted/60 mt-0.5">
             <span className="text-negative font-semibold">2 critical</span> • 2 warnings
           </div>
         </div>

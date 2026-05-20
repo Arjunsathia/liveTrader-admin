@@ -3,7 +3,7 @@
  * IB-specific components (IBTierBadge, TraderAvatar, IBChartTip, IBDrawerGrid)
  * remain here since they are only used in the IB System feature.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { Star } from 'lucide-react';
 import { IB_TIER_COLORS } from '@config/constants/status.constants';
 import { STATUS_CLR, TIER_CLR } from '../data/workspaces/shared.workspace';

@@ -19,16 +19,16 @@ function PairRow({ pair }) {
           className="w-[2px] h-3 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
           style={{ background: color }}
         />
-        <span className="font-mono text-[11px] font-semibold text-text-muted w-14 group-hover:text-text transition-colors">
+        <span className="font-mono text-[12px] font-semibold text-text-muted w-14 group-hover:text-text transition-colors">
           {pair.pair}
         </span>
       </div>
       <div className="flex-1 flex justify-end gap-3 items-center">
-        <span className="font-mono text-[11px] font-semibold text-text">{pair.bid}</span>
-        <span className="text-[9px] text-text-muted/30 font-mono w-6 text-right">s{pair.spread}</span>
+        <span className="font-mono text-[12px] font-semibold text-text">{pair.bid}</span>
+        <span className="text-[10px] text-text-muted/30 font-mono w-6 text-right">s{pair.spread}</span>
       </div>
       <div className="w-[50px] flex justify-end items-center">
-        <span className="font-mono text-[10px] font-bold" style={{ color }}>{pair.chg}</span>
+        <span className="font-mono text-[11px] font-bold" style={{ color }}>{pair.chg}</span>
       </div>
     </div>
   );
@@ -38,16 +38,16 @@ export function DashboardMarket() {
   return (
     <Card>
       <div className="flex items-center justify-between mb-3 border-b border-border/15 pb-3">
-        <div className="text-[13px] font-semibold text-text flex items-center gap-2">
+        <div className="text-[14px] font-semibold text-text flex items-center gap-2">
           <Globe size={13} style={{ color: 'var(--cyan)' }} />
           Market Pricing
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-positive" />
-          <span className="text-[10px] font-semibold text-positive">LIVE</span>
+          <span className="text-[11px] font-semibold text-positive">LIVE</span>
         </div>
       </div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/50 pb-1.5 mb-0.5 border-b border-border/15">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted/50 pb-1.5 mb-0.5 border-b border-border/15">
         Pair — Bid — Chg
       </div>
       <div className="flex flex-col">

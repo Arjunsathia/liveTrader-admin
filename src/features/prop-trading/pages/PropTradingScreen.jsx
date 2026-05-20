@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { PieChart, Layers, Clipboard, Trophy, BarChart2, Tag, Shield } from 'lucide-react';
 import { PageShell } from '@components/common/PageShell';
 import { PropOverviewScreen }          from './PropOverviewScreen';
@@ -32,13 +32,9 @@ const PAGE_MAP = {
 
 export function PropTradingScreen() {
   const location = useLocation();
-  const navigate  = useNavigate();
-  const [activeId, setActiveId] = useState('overview');
 
-  useEffect(() => {
-    const found = NAV_ITEMS.find((n) => n.path === location.pathname);
-    setActiveId(found?.id ?? 'overview');
-  }, [location.pathname]);
+  const found = NAV_ITEMS.find((n) => n.path === location.pathname);
+  const activeId = found?.id ?? 'overview';
 
   const PageComponent = PAGE_MAP[activeId] ?? PropOverviewScreen;
 
