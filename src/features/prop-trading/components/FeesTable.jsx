@@ -1,8 +1,8 @@
 import React from 'react';
 import { Edit2, PauseCircle, PlayCircle, CircleDollarSign } from 'lucide-react';
-import { Card, SectionHead, IconBtn } from './PropTradingShared';
+import { Card, SectionHead, IconBtn } from './PropComponents';
 import { StatusChip as Badge } from '../../../components/ui';
-import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { FeatureTable } from '../../../components/tables';
 
 const feesCols = [
   { key: 'challenge',  label: 'Challenge',   render: (v) => <span className="font-heading font-semibold text-text/75">{v}</span> },

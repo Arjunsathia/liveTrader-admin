@@ -5,7 +5,7 @@ import {
   RefreshCw, User, UserCheck, Users, Wallet, XCircle, Copy, Send
 } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays/DrawerUI';
+import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays';
 import { STATUS_CLR, TIER_CLR } from '../data/workspaces/shared.workspace';
 import { ActionBtn as IconBtn, StatusChip } from '../../../components/ui';
 import { Button } from '../../../components/ui/Button';

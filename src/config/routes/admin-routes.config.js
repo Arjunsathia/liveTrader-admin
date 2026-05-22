@@ -13,6 +13,23 @@ import {
 } from 'lucide-react';
 import { PERMISSIONS } from '@config/permissions/permissions';
 
+/**
+ * Admin Route Modules Configuration
+ * 
+ * This file serves as the single source of truth for the frontend routing schema.
+ * It defines the top-level route modules (which become main navigation items)
+ * and their nested child routes (which become sub-navigation and actual pages).
+ * 
+ * Each module contains:
+ * - `id`: Unique identifier
+ * - `label`: The display name for the sidebar main section
+ * - `icon`: Lucide-react icon component
+ * - `navSection`: Grouping under the sidebar sections (e.g., 'main', 'management', 'system')
+ * - `permission`: The global permission required to view this module
+ * - `routes`: Array of nested routes. Routes with `navLabel` will appear in the sidebar.
+ *   - `pageKey`: Used by `router.jsx` to map to the actual React component.
+ *   - `meta`: Used for breadcrumbs, page headers, or search palette.
+ */
 export const adminRouteModules = [
   {
     id: 'dashboard',
@@ -664,26 +681,7 @@ export const adminRouteModules = [
           { pattern: '/admin-mgmt/permissions', title: 'Permissions Matrix', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
         ],
       },
-      {
-        id: 'admin-access-logs',
-        path: '/admin-mgmt/access-logs',
-        pageKey: 'admin-mgmt/audit-logs-workspace',
-        navLabel: 'Access Logs',
-        permission: PERMISSIONS.auditLogs.view,
-        meta: [
-          { pattern: '/admin-mgmt/access-logs', title: 'Access Logs', section: 'Admin', permission: PERMISSIONS.auditLogs.view },
-        ],
-      },
-      {
-        id: 'admin-activity-logs',
-        path: '/admin-mgmt/activity-logs',
-        pageKey: 'admin-mgmt/audit-logs-workspace',
-        navLabel: 'Activity Logs',
-        permission: PERMISSIONS.auditLogs.view,
-        meta: [
-          { pattern: '/admin-mgmt/activity-logs', title: 'Activity Logs', section: 'Admin', permission: PERMISSIONS.auditLogs.view },
-        ],
-      },
+
     ],
   },
 ];

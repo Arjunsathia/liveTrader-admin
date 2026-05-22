@@ -13,7 +13,7 @@ import { ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react';
  *   trend    — string, e.g. '+3.2%' or '61' (optional)
  *   trendUp  — bool, true = green arrow, false = red arrow (optional, if omitted no arrow)
  */
-export function KpiCard({ label, value, accent = 'var(--brand)', Icon, sub, trend, trendUp }) {
+export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, trend, trendUp }) {
   const hasTrend = trend !== undefined && trend !== null && trend !== 'stable';
   const isStable = trend === 'stable';
 
@@ -68,3 +68,5 @@ export function KpiCard({ label, value, accent = 'var(--brand)', Icon, sub, tren
     </div>
   );
 }
+
+export { KPICard as KpiCard };

@@ -1,3 +1,9 @@
+/**
+ * Global Permissions Registry
+ * 
+ * Defines all available frontend granular permissions for rendering specific UI modules,
+ * buttons, and routes. Helps safely disable/hide elements for roles without access.
+ */
 export const PERMISSIONS = {
   dashboard: {
     view: 'dashboard.view',
@@ -48,11 +54,15 @@ export const PERMISSIONS = {
     view: 'admin-mgmt.view',
     manage: 'admin-mgmt.manage',
   },
-  auditLogs: {
-    view: 'admin-mgmt.view',
-  },
+
 };
 
+/**
+ * Role Presets
+ * 
+ * Maps generic roles (e.g., 'super-admin', 'operations') to an array of specific PERMISSIONS.
+ * Use '*' for wildcard access to everything.
+ */
 export const ROLE_PRESETS = {
   'super-admin': ['*'],
   operations: [
@@ -87,10 +97,17 @@ export const ROLE_PRESETS = {
     PERMISSIONS.reports.view,
     PERMISSIONS.support.view,
     PERMISSIONS.rolesPermissions.view,
-    PERMISSIONS.auditLogs.view,
   ],
 };
 
+/**
+ * Utility to check if a set of granted permissions covers a required permission.
+ * Supports '*' wildcards and arrays of required permissions.
+ *
+ * @param {string[]} grantedPermissions - Array of permissions the user possesses.
+ * @param {string|string[]} requiredPermission - The permission(s) required to pass.
+ * @returns {boolean} True if access is granted, otherwise false.
+ */
 export function hasPermission(grantedPermissions = [], requiredPermission) {
   if (!requiredPermission) return true;
 

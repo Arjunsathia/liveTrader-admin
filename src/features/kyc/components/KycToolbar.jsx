@@ -1,9 +1,9 @@
 import React from 'react';
 import { Download } from 'lucide-react';
-import { PageToolbar } from '../../../components/common/PageToolbar';
-import { KYC_OPTIONS } from '../../users/config/user-form.constants';
+import { PageToolbar } from '../../../components/layout/PageToolbar';
+import { KYC_OPTIONS } from '../../users/forms/user-form.constants';
 
-export function KycToolbar({
+export function KYCToolbar({
   search,
   onSearchChange,
   onExport,

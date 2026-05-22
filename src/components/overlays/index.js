@@ -15,5 +15,5 @@ export {
   DrawerAuditTrail,
   OperatorNoteSection,
   RecordDrawer,
-} from './DrawerUI';
+} from './BaseDrawer';
 export { UniversalDrawerProvider, useUniversalDrawer } from './UniversalDrawerContext';

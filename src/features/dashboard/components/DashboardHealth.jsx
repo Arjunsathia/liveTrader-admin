@@ -19,8 +19,8 @@ const QUICK_METRICS = [
 function HealthBar({ item }) {
   const color =
     item.status === 'ok' ? 'var(--positive)' :
-    item.status === 'warn' ? 'var(--warning)' :
-    'var(--negative)';
+      item.status === 'warn' ? 'var(--warning)' :
+        'var(--negative)';
 
   return (
     <div className="flex items-center gap-2.5 py-1.5 group">

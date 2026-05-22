@@ -5,14 +5,14 @@ import {
   Flag, ShieldAlert, Timer, UserPlus,
 } from 'lucide-react';
 import { Card } from '@components/ui/Card';
-import { FeatureTable } from '@components/tables/FeatureTable';
+import { FeatureTable } from '@components/tables';
 import { Pagination } from '@components/tables/Pagination';
-import { escalatedData } from '@features/support/data/support.data';
+import { escalatedData } from '@features/support/data/mockData';
 import {
   PRIORITY_CLR,
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
   UserAvatar, SupportStatCard, SupportIconBtn, SupportToast,
-} from '@features/support/components/SupportShared';
+} from '@features/support/components/SupportComponents';
 
 const PER_PAGE = 10;
 

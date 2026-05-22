@@ -20,7 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection, TextareaField } from '../../../components/overlays/DrawerUI';
+import { DrawerField, DrawerGrid, DrawerSection, TextareaField } from '../../../components/overlays';
 import { ActionBtn, Button } from '../../../components/ui';
 import {
   AdminAvatar,
@@ -30,7 +30,7 @@ import {
   SEV_CLR,
   STATUS_CLR,
   TwoFABadge,
-} from './RolesPermissionsShared';
+} from './RolesComponents';
 import { adminNotes, PERM_ACTIONS, rolesData } from '../data/workspaces/admin-mgmt.workspace';
 
 function InlinePill({ children, active = true, color = 'var(--text-muted)', icon: Icon }) {

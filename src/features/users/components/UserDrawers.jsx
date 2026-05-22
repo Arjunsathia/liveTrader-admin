@@ -15,12 +15,12 @@ import {
   History,
 } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection, SelectField } from '../../../components/overlays/DrawerUI';
+import { DrawerField, DrawerGrid, DrawerSection, SelectField } from '../../../components/overlays';
 import { Button } from '../../../components/ui/Button';
-import { InlineAlert } from '../../../components/common/feedback/InlineAlert';
-import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
-import { StatusChip } from '../../../components/ui/StatusChip';
-import { userDetailTabs } from '../data/userTabs';
+import { InlineAlert } from '../../../components/feedback/InlineAlert';
+import { StatusBadge } from '../../../components/ui';
+import { StatusChip } from '../../../components/ui';
+import { userDetailTabs } from '../data/user-tabs';
 import { UserDetailContent } from './UserDetailContent';
 
 const tabIcons = {

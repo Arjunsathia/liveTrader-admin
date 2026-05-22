@@ -1,4 +1,4 @@
-import { ibSystemWorkspaces } from '@features/ib-system/data/ibSystemData';
+import { ibSystemWorkspaces } from '@features/ib-system/data/mockData';
 
 export const ibSystemService = {
   getWorkspace(slug = 'referrals') {

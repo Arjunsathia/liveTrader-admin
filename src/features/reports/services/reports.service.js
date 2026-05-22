@@ -1,4 +1,13 @@
-import { reportsWorkspaces } from '@features/reports/data/reportsData';
+import { financeRows, tradingRows, userRows, systemRows } from '@features/reports/data/mockData';
+
+const reportsWorkspaces = {
+  finance:     { rows: financeRows },
+  trading:     { rows: tradingRows },
+  users:       { rows: userRows },
+  system:      { rows: systemRows },
+  overview:    { rows: [] },
+  exports:     { rows: [] },
+};
 
 export const reportsService = {
   getWorkspace(slug = 'finance') {

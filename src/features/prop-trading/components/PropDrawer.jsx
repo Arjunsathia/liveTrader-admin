@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { StatusChip } from '../../../components/ui';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays/DrawerUI';
+import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays';
 import { Button } from '../../../components/ui/Button';
-import { STATUS_COLOR } from './PropTradingShared';
+import { STATUS_COLOR } from './PropComponents';
 
 /* ─── Evaluation Drawer ──────────────────────────────────────── */
 export function EvaluationDrawer({ row, open, onClose, onAction }) {

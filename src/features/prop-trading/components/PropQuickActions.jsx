@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, CheckCircle2, Download, AlertOctagon, CircleDollarSign, Settings, Zap } from 'lucide-react';
-import { Card, SectionHead, IconBtn } from './PropTradingShared';
+import { Card, SectionHead, IconBtn } from './PropComponents';
 
 export function PropQuickActions() {
   const actions = [

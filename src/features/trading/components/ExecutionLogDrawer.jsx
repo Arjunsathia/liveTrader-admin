@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RefreshCw, Check, AlertTriangle, Terminal } from 'lucide-react';
 import { TradingDrawer, TradingQuickActions } from './TradingDrawer';
-import { DrawerSection, DrawerField, DrawerGrid } from '../../../components/overlays/DrawerUI';
+import { DrawerSection, DrawerField, DrawerGrid } from '../../../components/overlays';
 
 const SEVERITY_META = {
   INFO:     { color: 'var(--positive)', bg: 'bg-positive/8 border-positive/20',   label: 'ℹ INFO' },

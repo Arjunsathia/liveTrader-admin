@@ -1,4 +1,4 @@
-import { propTradingWorkspaces } from '@features/prop-trading/data/propTradingData';
+import { propTradingWorkspaces } from '@features/prop-trading/data/mockData';
 
 export const propTradingService = {
   getWorkspace(slug = 'overview') {

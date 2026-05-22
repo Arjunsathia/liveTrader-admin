@@ -1,2 +1,2 @@
-export { KpiCard } from './KpiCard';
+export { KPICard, KpiCard } from './KPICard';
 export { MetricGrid } from './MetricGrid';

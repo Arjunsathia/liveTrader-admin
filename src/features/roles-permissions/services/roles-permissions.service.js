@@ -1,4 +1,4 @@
-import { rolesPermissionsWorkspaces } from '../data/roles-permissions-data';
+import { rolesPermissionsWorkspaces } from '../data/mockData';
 
 export const rolesPermissionsService = {
   getWorkspace(slug = 'users') {

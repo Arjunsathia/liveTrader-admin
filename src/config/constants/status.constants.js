@@ -1,3 +1,11 @@
+/**
+ * Status Constants & Theming
+ * 
+ * Maps business logic status states (e.g., ACTIVE, PENDING) to their respective 
+ * semantic CSS variables (e.g., var(--positive)). This ensures that badges, text, 
+ * and indicators share consistent coloring across the whole UI.
+ * Used extensively in the frontend design components.
+ */
 export const STATUS_COLORS = {
   // ── Positive ───────────────────────────────────
   ACTIVE:    'var(--positive)',
@@ -52,6 +60,9 @@ export const STATUS_COLORS = {
   CLOSED:    'var(--text-muted)',
 };
 
+/** 
+ * Risk levels mapped to semantic severity colors 
+ */
 export const RISK_COLORS = {
   LOW:    'var(--positive)',
   MEDIUM: 'var(--warning)',
@@ -120,6 +131,11 @@ export const IB_TIER_COLORS = {
   STANDARD: 'rgba(100,116,139,1)',
 };
 
+/**
+ * Maps standard string keywords to generic variant names.
+ * These variant names (success, info, warning, danger) are generally 
+ * picked up by generic UI components (like Badges) to automatically apply styles.
+ */
 export const statusVariantMap = {
   active: 'success',
   verified: 'success',
@@ -185,6 +201,13 @@ export const statusVariantMap = {
   expired: 'danger',
 };
 
+/**
+ * Helper to get a generic variant ('success', 'warning', 'danger', 'info', or 'muted')
+ * from any arbitrary status string by normalizing it first.
+ *
+ * @param {string} status - The raw status string (e.g., 'In Progress', 'APPROVED')
+ * @returns {string} The resolved UI variant.
+ */
 export function getStatusVariant(status = '') {
   const normalized = String(status)
     .toLowerCase()

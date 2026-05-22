@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerGrid, TextField, SelectField, TextareaField, ToggleField } from '../../../components/overlays/DrawerUI';
+import { DrawerSection, DrawerGrid, TextField, SelectField, TextareaField, ToggleField } from '../../../components/overlays';
 import { Button } from '../../../components/ui/Button';
 import {
   FUNDING_OPTIONS,
@@ -11,8 +11,8 @@ import {
   SEGMENT_OPTIONS,
   SERVER_OPTIONS,
   TIER_OPTIONS,
-} from '../config/user-form.constants';
-import { isUserDraftValid } from '../config/user-form.validation';
+} from '../forms/user-form.constants';
+import { isUserDraftValid } from '../forms/user-form.validation';
 
 export function AddUserDrawer({
   open,

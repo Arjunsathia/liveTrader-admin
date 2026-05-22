@@ -1,3 +1,13 @@
+/**
+ * Design Tokens
+ * 
+ * Maps frontend semantic variables to actual CSS variables defined in the global stylesheet.
+ * Since this is currently a frontend design section, these tokens help ensure consistent
+ * theming (colors, backgrounds, text) across all components before real data integration.
+ * 
+ * @example
+ * <div style={{ background: designTokens.bg, color: designTokens.text }} />
+ */
 export const designTokens = {
   bg: 'var(--bg)',
   surface: 'var(--surface)',

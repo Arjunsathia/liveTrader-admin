@@ -1,7 +1,7 @@
 import React from 'react';
 import { Download, UserPlus } from 'lucide-react';
-import { PageToolbar } from '../../../components/common/PageToolbar';
-import { FUNDING_OPTIONS, KYC_OPTIONS, RISK_OPTIONS } from '../config/user-form.constants';
+import { PageToolbar } from '../../../components/layout/PageToolbar';
+import { FUNDING_OPTIONS, KYC_OPTIONS, RISK_OPTIONS } from '../forms/user-form.constants';
 
 export function UsersToolbar({
   view,

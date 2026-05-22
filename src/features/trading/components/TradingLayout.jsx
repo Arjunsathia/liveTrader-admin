@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageShell } from '../../../components/common/PageShell';
+import { PageShell } from '../../../components/layout/PageShell';
 
 export function TradingLayout({ children }) {
   return (

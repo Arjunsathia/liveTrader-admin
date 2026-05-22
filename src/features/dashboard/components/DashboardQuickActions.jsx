@@ -4,10 +4,10 @@ import { Activity, Copy, CreditCard, Search, Terminal, UserCheck } from 'lucide-
 import { Card } from '../../../components/ui/Card';
 
 const QUICK_ACTIONS = [
-  { label: 'Approve KYC', Icon: UserCheck, path: '/compliance/kyc', accent: 'var(--positive)' },
+  { label: 'Approve KYC', Icon: UserCheck, path: '/users/kyc', accent: 'var(--positive)' },
   { label: 'Review W/D', Icon: CreditCard, path: '/finance/withdrawals', accent: 'var(--warning)' },
   { label: 'Open User', Icon: Search, path: '/users', accent: 'var(--brand)' },
-  { label: 'Trade Log', Icon: Terminal, path: '/trading/logs', accent: 'var(--purple)' },
+  { label: 'Trade Log', Icon: Terminal, path: '/trading/execution-logs', accent: 'var(--purple)' },
   { label: 'Copy Trading', Icon: Copy, path: '/copy-trading', accent: 'var(--cyan)' },
   { label: 'Support Ticket', Icon: Activity, path: '/support', accent: 'var(--negative)' },
 ];

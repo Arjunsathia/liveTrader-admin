@@ -5,14 +5,14 @@ import {
   Search, Timer, UserPlus,
 } from 'lucide-react';
 import { Card } from '@components/ui/Card';
-import { FeatureTable } from '@components/tables/FeatureTable';
+import { FeatureTable } from '@components/tables';
 import { Pagination } from '@components/tables/Pagination';
-import { ticketsData } from '@features/support/data/support.data';
+import { ticketsData } from '@features/support/data/mockData';
 import {
   PRIORITY_CLR, PRIORITY_ORDER,
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
   UserAvatar, SupportStatCard, SupportToast,
-} from '@features/support/components/SupportShared';
+} from '@features/support/components/SupportComponents';
 
 const PER_PAGE = 8;
 

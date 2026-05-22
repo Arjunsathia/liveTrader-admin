@@ -1,4 +1,4 @@
-import { mt5Accounts, userActivityFeed, userMetrics, users } from '@features/users/data/usersData';
+import { mt5Accounts, userActivityFeed, userMetrics, users } from '@features/users/data/mockData';
 
 export const usersService = {
   getMetrics() {
@@ -14,7 +14,7 @@ export const usersService = {
     return mt5Accounts;
   },
   getById(userId) {
-    return users.find((user) => user.id === userId);
+    return users.find((user) => user.id === userId || user.uid === userId);
   },
   create(payload) {
     return {
@@ -58,16 +58,31 @@ export const usersService = {
     };
   },
   update(userId, payload) {
-    const user = users.find((item) => item.id === userId);
-    return { ...user, ...payload };
+    const userIndex = users.findIndex((item) => item.id === userId || item.uid === userId);
+    if (userIndex !== -1) {
+      users[userIndex] = { ...users[userIndex], ...payload };
+      return users[userIndex];
+    }
+    return null;
   },
   approve(item) {
+    const user = users.find((u) => u.id === item.id || u.uid === item.id);
+    if (user) {
+      user.kycStatus = 'VERIFIED';
+      if (user.kyc) user.kyc.status = 'VERIFIED';
+    }
     return { ...item, status: 'APPROVED' };
   },
   reject(item) {
+    const user = users.find((u) => u.id === item.id || u.uid === item.id);
+    if (user) {
+      user.kycStatus = 'REJECTED';
+      if (user.kyc) user.kyc.status = 'REJECTED';
+    }
     return { ...item, status: 'REJECTED' };
   },
   export() {
     return users;
   },
 };
+

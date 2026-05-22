@@ -1,8 +1,8 @@
 import React from 'react';
-import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
+import { StatusBadge, RiskChip } from '../../../components/ui';
 import { Pagination } from '../../../components/tables/Pagination';
 
-export function KycTable({ tableState, onReviewUser }) {
+export function KYCTable({ tableState, onReviewUser }) {
   const paged = tableState.items;
 
   return (
@@ -38,10 +38,10 @@ export function KycTable({ tableState, onReviewUser }) {
                     key={row.id}
                     onClick={() => onReviewUser(row.userId)}
                     className={`group cursor-pointer transition-colors border-l-2 border-transparent ${isFlagged
-                        ? 'hover:bg-negative/5 hover:border-l-negative'
-                        : isPending
-                          ? 'hover:bg-warning/5 hover:border-l-warning'
-                          : 'hover:bg-positive/5 hover:border-l-positive'
+                      ? 'hover:bg-negative/5 hover:border-l-negative'
+                      : isPending
+                        ? 'hover:bg-warning/5 hover:border-l-warning'
+                        : 'hover:bg-positive/5 hover:border-l-positive'
                       }`}
                   >
                     <td className="px-4 py-3.5 font-mono text-[11px] font-bold text-brand">{row.id}</td>
@@ -61,7 +61,7 @@ export function KycTable({ tableState, onReviewUser }) {
                       <StatusBadge status={row.status} />
                     </td>
                     <td className="px-4 py-3.5">
-                      <StatusBadge status={row.risk} dot={false} />
+                      <RiskChip value={row.risk} />
                     </td>
                     <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.eta}</td>
                     <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>

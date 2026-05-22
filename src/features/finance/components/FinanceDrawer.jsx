@@ -13,11 +13,11 @@ import {
   MessageSquare, Play, RefreshCw, Search, Send, ShieldAlert,
   User, X, XCircle,
 } from 'lucide-react';
-import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR } from '../data/financeMockData';
+import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR } from '../data/mockData';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays/DrawerUI';
-import { ActionBtn as IconBtn } from '../../../components/ui/ActionBtn';
-import { StatusChip, RiskChip, PriorityChip } from '../../../components/ui/StatusChip';
+import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays';
+import { ActionBtn as IconBtn } from '../../../components/ui';
+import { StatusChip, RiskChip, PriorityChip } from '../../../components/ui';
 
 // Re-export so existing page imports keep working
 export { IconBtn };

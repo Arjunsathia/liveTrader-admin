@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { KeyRound, RefreshCw, Check, History } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection, SelectField } from '../../../components/overlays/DrawerUI';
+import { DrawerField, DrawerGrid, DrawerSection, SelectField } from '../../../components/overlays';
 import { Button } from '../../../components/ui/Button';
-import { InlineAlert } from '../../../components/common/feedback/InlineAlert';
-import { StatusChip } from '../../../components/ui/StatusChip';
+import { InlineAlert } from '../../../components/feedback/InlineAlert';
+import { StatusChip } from '../../../components/ui';
 
 export function TradingAccountsDrawer({ open, row, onClose, onSave, onSync, onResetPassword }) {
   const [leverage, setLeverage] = useState('');

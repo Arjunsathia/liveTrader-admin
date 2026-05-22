@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, ArrowDownRight, ArrowUpRight, FileCheck, ShieldAlert, Zap } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
-import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { FeatureTable } from '../../../components/tables';
 
 const UNIFIED_STREAM = [
   { id: 'T-88421', type: 'trade', user: 'k.mueller', icon: Activity, detail: 'EUR/USD Buy 2.00 Lots', value: '+$342', status: 'open', time: 'Just now', color: 'var(--cyan)' },
@@ -15,13 +15,13 @@ const UNIFIED_STREAM = [
 ];
 
 const STATUS_STYLE = {
-  open:       { color: 'var(--cyan)',     bg: 'color-mix(in srgb, var(--cyan) 10%, transparent)' },
-  resolved:   { color: 'var(--cyan)',     bg: 'color-mix(in srgb, var(--cyan) 10%, transparent)' },
-  pending:    { color: 'var(--warning)',  bg: 'color-mix(in srgb, var(--warning) 10%, transparent)' },
+  open: { color: 'var(--cyan)', bg: 'color-mix(in srgb, var(--cyan) 10%, transparent)' },
+  resolved: { color: 'var(--cyan)', bg: 'color-mix(in srgb, var(--cyan) 10%, transparent)' },
+  pending: { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 10%, transparent)' },
   'review req': { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 10%, transparent)' },
-  confirmed:  { color: 'var(--positive)', bg: 'color-mix(in srgb, var(--positive) 10%, transparent)' },
+  confirmed: { color: 'var(--positive)', bg: 'color-mix(in srgb, var(--positive) 10%, transparent)' },
   'action req': { color: 'var(--negative)', bg: 'color-mix(in srgb, var(--negative) 10%, transparent)' },
-  closed:     { color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.04)' },
+  closed: { color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.04)' },
 };
 
 function StreamRefCell({ item }) {

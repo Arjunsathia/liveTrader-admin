@@ -14,11 +14,11 @@ import {
   Activity, 
   AlertTriangle 
 } from 'lucide-react';
-import { InlineAlert } from '../../../components/common/feedback/InlineAlert';
-import { StatusBadge } from '../../../components/common/feedback/StatusBadge';
-import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays/DrawerUI';
+import { InlineAlert } from '../../../components/feedback/InlineAlert';
+import { StatusBadge } from '../../../components/ui';
+import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays';
 
-export function UserDetailContent({ user, activeTab }) {
+export function UserDetailContent({ user, activeTab, onUpdateUser }) {
   
   // ── 1. OVERVIEW TAB ──
   if (activeTab === 'overview') {
@@ -110,6 +110,34 @@ export function UserDetailContent({ user, activeTab }) {
     const isVerified = user.kycStatus === 'VERIFIED';
     const isRejected = user.kycStatus === 'REJECTED';
 
+    const handleApprove = () => {
+      if (onUpdateUser) {
+        onUpdateUser({
+          kycStatus: 'VERIFIED',
+          kyc: {
+            ...user.kyc,
+            status: 'VERIFIED',
+            reviewer: 'Compliance Officer',
+            submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16),
+          }
+        });
+      }
+    };
+
+    const handleReject = () => {
+      if (onUpdateUser) {
+        onUpdateUser({
+          kycStatus: 'REJECTED',
+          kyc: {
+            ...user.kyc,
+            status: 'REJECTED',
+            reviewer: 'Compliance Officer',
+            submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16),
+          }
+        });
+      }
+    };
+
     return (
       <div className="space-y-5 animate-fade-up">
         <div className={`flex items-start gap-3 rounded-[10px] border p-4 shadow-sm
@@ -144,6 +172,31 @@ export function UserDetailContent({ user, activeTab }) {
             </p>
           </div>
         </div>
+
+        {user.kycStatus === 'PENDING' && (
+          <div className="rounded-[12px] border border-brand/25 bg-brand/[0.02] p-5 shadow-card-subtle flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div>
+              <h4 className="text-[13.5px] font-black text-text tracking-tight">Compliance Action Center</h4>
+              <p className="text-[11px] text-text-muted/65 mt-1 max-w-md leading-relaxed">
+                Review the submitted documents below. As a compliance operator, you can verify and approve the credentials or reject the submission.
+              </p>
+            </div>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <button 
+                onClick={handleReject}
+                className="flex items-center justify-center gap-1.5 px-4 h-9 rounded-[8px] border border-negative/20 bg-negative/5 hover:bg-negative/10 text-negative text-[11px] font-bold transition-all cursor-pointer hover:border-negative/30"
+              >
+                Reject Submission
+              </button>
+              <button 
+                onClick={handleApprove}
+                className="flex items-center justify-center gap-1.5 px-4 h-9 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 hover:bg-brand-hover text-[11px] font-bold transition-all duration-300 transform-gpu hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-sm"
+              >
+                Approve Documents
+              </button>
+            </div>
+          </div>
+        )}
 
         <DrawerSection title="KYC Audit Details">
           <DrawerGrid cols={2} className="mt-2">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Download, Eye } from 'lucide-react';
-import { PageToolbar } from '../../../components/common/PageToolbar';
+import { PageToolbar } from '../../../components/layout/PageToolbar';
 
 /**
  * CopyTradingToolbar — mirrors TradingToolbar.

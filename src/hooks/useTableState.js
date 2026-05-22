@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { applyTableQuery } from '../utils/tableQuery';
+import { applyTableQuery } from '../utils/table-query';
 
 export function useTableState(items, options = {}) {
   const [search, setSearch] = useState(options.initialSearch ?? '');

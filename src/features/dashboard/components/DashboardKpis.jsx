@@ -1,5 +1,5 @@
 import React from 'react';
-import { KpiCard } from '../../../components/cards/KpiCard';
+import { KpiCard } from '../../../components/cards';
 import {
   DollarSign, Users, FileCheck, Wallet, BarChart2, Wifi,
 } from 'lucide-react';

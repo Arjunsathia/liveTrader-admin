@@ -1,4 +1,4 @@
-import { supportWorkspaces, ticketDetails, ticketsData } from '@features/support/data/support.data';
+import { supportWorkspaces, ticketDetails, ticketsData } from '@features/support/data/mockData';
 
 export const supportService = {
   getWorkspace(slug = 'tickets') {

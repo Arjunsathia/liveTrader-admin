@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, X } from 'lucide-react';
 import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { OperatorNoteSection } from '../../../components/overlays/DrawerUI';
+import { OperatorNoteSection } from '../../../components/overlays';
 import { Button } from '../../../components/ui/Button';
 
 export function TradingDrawer({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Activity, Star, TrendingDown, TrendingUp } from 'lucide-react';
-import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { FeatureTable } from '../../../components/tables';
 import { COPY_LOG_COLORS } from '@config/constants/status.constants';
 
 function logTypeCell(value) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FeatureTable } from '../../../components/tables/FeatureTable';
+import { FeatureTable } from '../../../components/tables';
 import { ChevronRight } from 'lucide-react';
 
 function latencyCell(value) {

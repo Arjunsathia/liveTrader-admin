@@ -1,10 +1,8 @@
-export { Badge } from './Badge';
+export { Badge, StatusChip, RiskChip, PriorityChip, CatChip, StatusBadge } from './Badge';
 export { Button } from './Button';
 export { Card } from './Card';
 export { ErrorBoundary } from './ErrorBoundary';
-export { Table, TableRow, TableCell } from './Table';
-export { StatusChip, RiskChip, PriorityChip, CatChip } from './StatusChip';
 export { SectionHead } from './SectionHead';
-export { ActionBtn } from './ActionBtn';
-export { ActionToast } from './ActionToast';
-export { TableActionBtn } from './TableActionBtn';
+export { IconButton, ActionBtn } from './IconButton';
+export { Toast, ActionToast } from './Toast';
+export { TableRowActions, TableActionBtn } from './TableRowActions';

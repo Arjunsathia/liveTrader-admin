@@ -1,4 +1,4 @@
-import { kycQueue } from '../data/kyc-data';
+import { kycQueue } from '../data/mockData';
 
 export const kycService = {
   list() {
@@ -7,10 +7,36 @@ export const kycService = {
   getById(caseId) {
     return kycQueue.find((item) => item.id === caseId);
   },
-  approve(item) {
-    return { ...item, status: 'VERIFIED' };
+  approve(caseId) {
+    const item = kycQueue.find((i) => i.id === caseId);
+    if (item) {
+      item.status = 'VERIFIED';
+      item.eta = 'Completed';
+      return { ...item };
+    }
+    return null;
   },
-  reject(item) {
-    return { ...item, status: 'REJECTED' };
+  reject(caseId) {
+    const item = kycQueue.find((i) => i.id === caseId);
+    if (item) {
+      item.status = 'REJECTED';
+      item.eta = 'Requires outreach';
+      return { ...item };
+    }
+    return null;
+  },
+  updateStatusByUserId(userId, status) {
+    const item = kycQueue.find((i) => i.userId === userId);
+    if (item) {
+      item.status = status;
+      if (status === 'VERIFIED') {
+        item.eta = 'Completed';
+      } else if (status === 'REJECTED') {
+        item.eta = 'Requires outreach';
+      }
+      return { ...item };
+    }
+    return null;
   },
 };
+

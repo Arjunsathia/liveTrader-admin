@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowUpRight, Check, CheckCircle2, Clock, Copy, Download, Eye, FileText, Lock, MessageSquare, ShieldAlert, Timer, User, X, XCircle, Zap, Search } from 'lucide-react';
-import { PageShell } from '../../../components/common/PageShell';
-import { approvalsData, RISK_CLR } from '../data/financeMockData';
-import { KpiCard, StatusBadge, RiskBadge, PriorityBadge, Toast, IconBtn } from '../components/FinanceShared';
+import { PageShell } from '../../../components/layout/PageShell';
+import { approvalsData, RISK_CLR } from '../data/mockData';
+import { KpiCard, StatusBadge, RiskBadge, PriorityBadge, Toast, IconBtn } from '../components/FinanceComponents';
 import { UserCell, FinanceDrawer, DrawerSection, DF, DGrid, DrawerNoteEditor, RiskPanel, Pagination } from '../components/FinanceDrawer';
 
 const PAGE = {

@@ -1,3 +1,4 @@
-export { DataTable } from './DataTable';
+export { DataTable, FeatureTable } from './DataTable';
 export { Pagination } from './Pagination';
-export { FeatureTable } from './FeatureTable';
+export { TableToolbar } from './TableToolbar';
+export { renderTableCell } from './CellRenderers';

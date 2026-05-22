@@ -5,7 +5,7 @@ import {
   operationsTasks,
   quickActions,
   recentActivity,
-} from '@features/dashboard/data/dashboardData';
+} from '@features/dashboard/data/mockData';
 
 export const dashboardService = {
   getKpis() {

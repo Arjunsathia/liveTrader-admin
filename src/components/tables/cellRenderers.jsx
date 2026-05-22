@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
-import { CatChip, PriorityChip, RiskChip, StatusChip } from '../ui/StatusChip';
+import { CatChip, PriorityChip, RiskChip, StatusChip } from '../ui/Badge';
 import { SEVERITY_COLORS } from '@config/constants/status.constants';
 
 const EMPTY = <span className="text-text-muted/30">-</span>;

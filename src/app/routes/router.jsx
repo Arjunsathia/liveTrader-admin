@@ -7,56 +7,56 @@ import { PermissionGuard } from '@app/guards/PermissionGuard';
 import { adminRedirectRoutes, adminRouteModules } from '@config/routes/admin-routes.config';
 
 // ── Feature pages — imported directly (no src/pages wrapper needed) ──
-import { DashboardScreen } from '@features/dashboard/pages/DashboardScreen';
-import { UsersListScreen } from '@features/users/pages/UsersListScreen';
-import { KycQueueScreen } from '@features/kyc/pages/KycQueueScreen';
-import { Mt5QueueScreen } from '@features/users/pages/Mt5QueueScreen';
-import { UserDetailScreen } from '@features/users/pages/UserDetailScreen';
-import { FinanceScreen } from '@features/finance/pages/FinanceScreen';
-import { TradingAccountsScreen } from '@features/trading/pages/TradingAccountsScreen';
-import { OrdersScreen } from '@features/trading/pages/OrdersScreen';
-import { PositionsScreen } from '@features/trading/pages/PositionsScreen';
-import { TradeHistoryScreen } from '@features/trading/pages/TradeHistoryScreen';
-import { ExecutionLogsScreen } from '@features/trading/pages/ExecutionLogsScreen';
-import { CopyTradingScreen } from '@features/copy-trading/pages/CopyTradingScreen';
-import { CopyTradingDetailScreen } from '@features/copy-trading/pages/CopyTradingDetailScreen';
-import { IBSystemScreen } from '@features/ib-system/pages/IBSystemScreen';
-import { PropTradingScreen } from '@features/prop-trading/pages/PropTradingScreen';
-import { ReportsScreen } from '@features/reports/pages/ReportsScreen';
-import { SupportScreen } from '@features/support/pages/SupportScreen';
-import { TicketDetailScreen } from '@features/support/pages/TicketDetailScreen';
-import { SettingsScreen } from '@features/settings/pages/SettingsScreen';
-import { RolesPermissionsScreen } from '@features/roles-permissions/pages/RolesPermissionsScreen';
+import { DashboardPage } from '@features/dashboard/pages/DashboardPage';
+import { UsersPage } from '@features/users/pages/UsersPage';
+import { KYCQueuePage } from '@features/kyc/pages/KYCQueuePage';
+import { MT5QueuePage } from '@features/users/pages/MT5QueuePage';
+import { UserDetailPage } from '@features/users/pages/UserDetailPage';
+import { FinancePage } from '@features/finance/pages/FinancePage';
+import { TradingAccountsPage } from '@features/trading/pages/TradingAccountsPage';
+import { OrdersPage } from '@features/trading/pages/OrdersPage';
+import { PositionsPage } from '@features/trading/pages/PositionsPage';
+import { TradeHistoryPage } from '@features/trading/pages/TradeHistoryPage';
+import { ExecutionLogsPage } from '@features/trading/pages/ExecutionLogsPage';
+import { CopyTradingPage } from '@features/copy-trading/pages/CopyTradingPage';
+import { CopyTradingDetailPage } from '@features/copy-trading/pages/CopyTradingDetailPage';
+import { IBSystemPage } from '@features/ib-system/pages/IBSystemPage';
+import { PropTradingPage } from '@features/prop-trading/pages/PropTradingPage';
+import { ReportsPage } from '@features/reports/pages/ReportsPage';
+import { SupportPage } from '@features/support/pages/SupportPage';
+import { TicketDetailPage } from '@features/support/pages/TicketDetailPage';
+import { SettingsPage } from '@features/settings/pages/SettingsPage';
+import { RolesPermissionsPage } from '@features/roles-permissions/pages/RolesPermissionsPage';
 
-import { NotFoundScreen } from '@features/not-found/NotFoundScreen';
+import { NotFoundPage } from '@app/pages/NotFoundPage';
 
 const pageRegistry = {
-  'dashboard/dashboard': DashboardScreen,
-  'users/users-list': UsersListScreen,
-  'users/kyc-queue': KycQueueScreen,
-  'users/mt5-queue': Mt5QueueScreen,
-  'users/user-detail': UserDetailScreen,
-  'finance/finance-workspace': FinanceScreen,
-  'trading/trading-accounts': TradingAccountsScreen,
-  'trading/orders': OrdersScreen,
-  'trading/positions': PositionsScreen,
-  'trading/trade-history': TradeHistoryScreen,
-  'trading/execution-logs': ExecutionLogsScreen,
-  'copy-trading/strategies':    CopyTradingScreen,
-  'copy-trading/providers':     CopyTradingScreen,
-  'copy-trading/followers':     CopyTradingScreen,
-  'copy-trading/subscriptions': CopyTradingScreen,
-  'copy-trading/performance':   CopyTradingScreen,
-  'copy-trading/logs':          CopyTradingScreen,
-  'copy-trading/copy-trading-detail': CopyTradingDetailScreen,
-  'ib-system/ib-system-workspace': IBSystemScreen,
-  'prop-trading/prop-trading-workspace': PropTradingScreen,
-  'reports/reports-workspace': ReportsScreen,
-  'support/support-workspace': SupportScreen,
-  'support/ticket-detail': TicketDetailScreen,
-  'settings/settings-workspace': SettingsScreen,
-  'admin-mgmt/roles-permissions-workspace': RolesPermissionsScreen,
-  'admin-mgmt/audit-logs-workspace': RolesPermissionsScreen, // access-logs + activity-logs are sub-tabs inside RolesPermissionsScreen
+  'dashboard/dashboard': DashboardPage,
+  'users/users-list': UsersPage,
+  'users/kyc-queue': KYCQueuePage,
+  'users/mt5-queue': MT5QueuePage,
+  'users/user-detail': UserDetailPage,
+  'finance/finance-workspace': FinancePage,
+  'trading/trading-accounts': TradingAccountsPage,
+  'trading/orders': OrdersPage,
+  'trading/positions': PositionsPage,
+  'trading/trade-history': TradeHistoryPage,
+  'trading/execution-logs': ExecutionLogsPage,
+  'copy-trading/strategies':    CopyTradingPage,
+  'copy-trading/providers':     CopyTradingPage,
+  'copy-trading/followers':     CopyTradingPage,
+  'copy-trading/subscriptions': CopyTradingPage,
+  'copy-trading/performance':   CopyTradingPage,
+  'copy-trading/logs':          CopyTradingPage,
+  'copy-trading/copy-trading-detail': CopyTradingDetailPage,
+  'ib-system/ib-system-workspace': IBSystemPage,
+  'prop-trading/prop-trading-workspace': PropTradingPage,
+  'reports/reports-workspace': ReportsPage,
+  'support/support-workspace': SupportPage,
+  'support/ticket-detail': TicketDetailPage,
+  'settings/settings-workspace': SettingsPage,
+  'admin-mgmt/roles-permissions-workspace': RolesPermissionsPage,
+
 };
 
 function withPermission(permission, PageComponent) {
@@ -110,7 +110,7 @@ export const adminRouter = createHashRouter([
         element: <Navigate to={route.to} replace />,
       })),
       ...buildModuleRoutes(),
-      { path: '*', element: <NotFoundScreen /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ]);
