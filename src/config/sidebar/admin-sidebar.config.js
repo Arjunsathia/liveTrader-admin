@@ -5,6 +5,7 @@ import { adminRouteModules } from '@/config/routes/admin-routes.config';
  * 
  * Defines the high-level groupings for the sidebar navigation menu.
  */
+
 export const adminNavigationSections = [
   { id: 'main', label: 'Main' },
   { id: 'management', label: 'Management' },

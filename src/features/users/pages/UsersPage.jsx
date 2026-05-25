@@ -13,7 +13,7 @@ import {
 } from '@/config/constants/USER_FORM';
 import { applyDraftToUser, buildUserDraft, createDefaultUserDraft } from '@/utils/userDraftUtils';
 import { AddUserDrawer } from '../components/AddUserDrawer';
-import { UsersKPIGrid } from '../components/UsersKPIGrid';
+import { UsersKPIGrid } from '../components/UsersKpiGrid';
 import { UsersListTable } from '../components/UsersTable';
 import { Mt5AccountDrawer, QuickUserDrawer } from '../components/UserDrawers';
 import { TableToolbar } from '../../../components/common/table';
