@@ -1,34 +1,25 @@
 import React, { createElement } from 'react';
 import { createHashRouter, Navigate } from 'react-router-dom';
-import { ErrorBoundary } from '@components/ui/ErrorBoundary';
-import { MainLayout } from '@app/layout/MainLayout';
-import { AdminAuthGuard } from '@app/guards/AdminAuthGuard';
-import { PermissionGuard } from '@app/guards/PermissionGuard';
-import { adminRedirectRoutes, adminRouteModules } from '@config/routes/admin-routes.config';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { MainLayout } from '@/app/layout/MainLayout';
+import { AdminAuthGuard } from '@/app/guards/AdminAuthGuard';
+import { PermissionGuard } from '@/app/guards/PermissionGuard';
+import { adminRedirectRoutes, adminRouteModules } from '@/config/routes/admin-routes.config';
 
 // ── Feature pages — imported directly (no src/pages wrapper needed) ──
-import { DashboardPage } from '@features/dashboard/pages/DashboardPage';
-import { UsersPage } from '@features/users/pages/UsersPage';
-import { KYCQueuePage } from '@features/kyc/pages/KYCQueuePage';
-import { MT5QueuePage } from '@features/users/pages/MT5QueuePage';
-import { UserDetailPage } from '@features/users/pages/UserDetailPage';
-import { FinancePage } from '@features/finance/pages/FinancePage';
-import { TradingAccountsPage } from '@features/trading/pages/TradingAccountsPage';
-import { OrdersPage } from '@features/trading/pages/OrdersPage';
-import { PositionsPage } from '@features/trading/pages/PositionsPage';
-import { TradeHistoryPage } from '@features/trading/pages/TradeHistoryPage';
-import { ExecutionLogsPage } from '@features/trading/pages/ExecutionLogsPage';
-import { CopyTradingPage } from '@features/copy-trading/pages/CopyTradingPage';
-import { CopyTradingDetailPage } from '@features/copy-trading/pages/CopyTradingDetailPage';
-import { IBSystemPage } from '@features/ib-system/pages/IBSystemPage';
-import { PropTradingPage } from '@features/prop-trading/pages/PropTradingPage';
-import { ReportsPage } from '@features/reports/pages/ReportsPage';
-import { SupportPage } from '@features/support/pages/SupportPage';
-import { TicketDetailPage } from '@features/support/pages/TicketDetailPage';
-import { SettingsPage } from '@features/settings/pages/SettingsPage';
-import { RolesPermissionsPage } from '@features/roles-permissions/pages/RolesPermissionsPage';
+import { DashboardPage } from '@/features/dashboard';
+import { UsersPage, MT5QueuePage, UserDetailPage, KYCQueuePage } from '@/features/users';
+import { FinancePage } from '@/features/finance';
+import { TradingAccountsPage, OrdersPage, PositionsPage, TradeHistoryPage, ExecutionLogsPage } from '@/features/trading';
+import { CopyTradingPage, CopyTradingDetailPage } from '@/features/copy-trading';
+import { IBSystemPage } from '@/features/ib-system';
+import { PropTradingPage } from '@/features/prop-trading';
+import { ReportsPage } from '@/features/reports';
+import { SupportPage, TicketDetailPage } from '@/features/support';
+import { SettingsPage } from '@/features/settings';
+import { RolesPermissionsPage } from '@/features/roles-permissions';
 
-import { NotFoundPage } from '@app/pages/NotFoundPage';
+import { NotFoundPage } from '@/app/pages/NotFoundPage';
 
 const pageRegistry = {
   'dashboard/dashboard': DashboardPage,

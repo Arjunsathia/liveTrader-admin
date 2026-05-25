@@ -72,10 +72,10 @@ export function TradingAccountsConsole({ onTriggerControl }) {
   const levelTabs = ['ALL', 'INFO', 'ERROR', 'TRACE'];
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+    <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 mb-2">
 
       {/* ── Left: System Interaction Logs ── */}
-      <div className="xl:col-span-8 bg-surface-elevated rounded-[12px] flex flex-col h-[440px] border border-border/20 shadow-card-subtle overflow-hidden">
+      <div className="xl:col-span-8 bg-surface-elevated rounded-[12px] flex flex-col h-[440px] border border-border/20 shadow-card-subtle overflow-hidden transition-all duration-300 hover:border-brand/15">
 
         {/* Header */}
         <div className="px-5 py-3.5 border-b border-border/12 flex items-center justify-between bg-surface-elevated flex-shrink-0">
@@ -116,7 +116,7 @@ export function TradingAccountsConsole({ onTriggerControl }) {
               key={tab}
               type="button"
               onClick={() => setLevelFilter(tab)}
-              className={`px-3 py-2 text-[9.5px] font-black uppercase tracking-[0.12em] border-b-2 transition-all cursor-pointer ${
+              className={`px-3 py-2 text-[9.5px] font-black uppercase tracking-[0.12em] border-b-2 transition-all duration-200 cursor-pointer ${
                 levelFilter === tab
                   ? 'text-brand border-b-brand'
                   : 'text-text-muted/50 border-b-transparent hover:text-text-muted/80'
@@ -176,7 +176,7 @@ export function TradingAccountsConsole({ onTriggerControl }) {
       <div className="xl:col-span-4 flex flex-col gap-5">
 
         {/* Advanced Global Controls */}
-        <div className="rounded-[12px] border border-border/20 bg-surface-elevated p-5 flex flex-col gap-3.5 shadow-card-subtle">
+        <div className="rounded-[12px] border border-border/20 bg-surface-elevated p-5 flex flex-col gap-3.5 shadow-card-subtle transition-all duration-300 hover:scale-[1.01] hover:border-brand/15 group">
           <div className="flex items-center gap-2.5 pb-1 border-b border-border/10">
             <div className="w-1 h-5 rounded-full bg-brand" />
             <h4 className="text-[12px] font-black uppercase tracking-widest text-text/80 flex items-center gap-1.5">
@@ -193,10 +193,10 @@ export function TradingAccountsConsole({ onTriggerControl }) {
                 onTriggerControl?.('Mass Leverage Reset');
                 addLog('INFO', 'Executed global leverage check and mass reset protocol.');
               }}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-[8px] border border-border/20 bg-bg text-text-muted hover:text-brand hover:border-brand/30 text-[11px] font-bold transition-all duration-200 cursor-pointer group"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-[8px] border border-border/20 bg-bg text-text-muted hover:text-brand hover:border-brand/30 hover:scale-[1.01] text-[11px] font-bold transition-all duration-200 cursor-pointer group/btn"
             >
               <span>Mass Leverage Reset</span>
-              <Sliders size={12} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+              <Sliders size={12} className="opacity-50 group-hover/btn:opacity-100 transition-opacity" />
             </button>
 
             {/* Force Server Reconnect */}
@@ -206,44 +206,44 @@ export function TradingAccountsConsole({ onTriggerControl }) {
                 onTriggerControl?.('Force Server Reconnect');
                 addLog('INFO', 'Initiated hard reconnect sequence on MT5 Cluster.');
               }}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-[8px] border border-border/20 bg-bg text-text-muted hover:text-warning hover:border-warning/30 text-[11px] font-bold transition-all duration-200 cursor-pointer group"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-[8px] border border-border/20 bg-bg text-text-muted hover:text-warning hover:border-warning/30 hover:scale-[1.01] text-[11px] font-bold transition-all duration-200 cursor-pointer group/btn"
             >
               <span>Force Server Reconnect</span>
-              <Globe size={12} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+              <Globe size={12} className="opacity-50 group-hover/btn:opacity-100 transition-opacity" />
             </button>
 
             {/* EMERGENCY HALT — 2-click confirm */}
             <button
               type="button"
               onClick={handleHalt}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-[8px] border font-bold text-[11px] transition-all cursor-pointer group ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-[8px] border font-bold text-[11px] transition-all duration-300 cursor-pointer group/btn ${
                 haltArmed
-                  ? 'bg-negative/10 text-negative border-negative/40 animate-pulse'
-                  : 'border-negative/20 bg-bg text-text-muted hover:text-negative hover:border-negative/30'
+                  ? 'bg-negative/10 text-negative border-negative/50 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.25)]'
+                  : 'border-negative/20 bg-bg text-text-muted hover:text-negative hover:border-negative/30 hover:scale-[1.01]'
               }`}
             >
               <span>{haltArmed ? '⚠ Click Again to CONFIRM HALT' : 'EMERGENCY: Halt Trading'}</span>
-              <AlertTriangle size={12} className={haltArmed ? 'text-negative' : 'opacity-50 group-hover:opacity-100 transition-opacity'} />
+              <AlertTriangle size={12} className={haltArmed ? 'text-negative' : 'opacity-50 group-hover/btn:opacity-100 transition-opacity'} />
             </button>
           </div>
         </div>
 
         {/* Synchronization Health Matrix */}
-        <div className="bg-surface-elevated rounded-[12px] border border-border/20 p-5 flex flex-col gap-4 shadow-card-subtle">
+        <div className="bg-surface-elevated rounded-[12px] border border-border/20 p-5 flex flex-col gap-4 shadow-card-subtle transition-all duration-300 hover:scale-[1.01] hover:border-positive/15 group">
           <div className="flex items-center justify-between pb-1 border-b border-border/10">
             <div className="flex items-center gap-2.5">
               <div className="w-1 h-5 rounded-full bg-positive" />
               <h4 className="text-[12px] font-black uppercase tracking-widest text-text/80 flex items-center gap-1.5">
-                <Wifi size={10} className="text-positive opacity-80" />
+                <Wifi size={10} className="text-positive opacity-80 animate-pulse" />
                 Sync Health
               </h4>
             </div>
             {/* Heartbeat SVG */}
-            <svg viewBox="0 0 60 20" className="w-12 h-4 opacity-40" fill="none">
+            <svg viewBox="0 0 60 20" className="w-12 h-4 opacity-40 group-hover:opacity-75 transition-opacity" fill="none">
               <polyline
                 points="0,10 8,10 12,3 16,17 20,10 28,10 32,5 36,15 40,10 60,10"
                 stroke="var(--positive)"
-                strokeWidth="1.5"
+                strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
@@ -267,6 +267,7 @@ export function TradingAccountsConsole({ onTriggerControl }) {
                     style={{
                       width: `${value}%`,
                       background: color,
+                      boxShadow: `0 0 8px ${color}`,
                     }}
                   />
                 </div>

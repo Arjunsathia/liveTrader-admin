@@ -1,8 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import { Fingerprint, Search } from 'lucide-react';
-import { rolesData } from '../data/workspaces/admin-mgmt.workspace';
-import { SEV_CLR } from '@config/constants/status.constants';
+import { rolesData } from '@/config/constants/roles-permissions/workspaces/admin-mgmt.workspace';
+import { SEV_CLR } from '@/config/constants/status.constants';
 export { SEV_CLR };
 
 export const STATUS_CLR = {

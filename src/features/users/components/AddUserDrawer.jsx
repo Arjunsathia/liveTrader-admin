@@ -1,8 +1,8 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerGrid, TextField, SelectField, TextareaField, ToggleField } from '../../../components/overlays';
-import { Button } from '../../../components/ui/Button';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerSection, DrawerFormGrid as DrawerFormGrid, TextField, SelectField, TextareaField, ToggleField } from '../../../components/common/drawer';
+import { ActionBtn } from '../../../components/ui';
 import {
   FUNDING_OPTIONS,
   KYC_OPTIONS,
@@ -11,8 +11,8 @@ import {
   SEGMENT_OPTIONS,
   SERVER_OPTIONS,
   TIER_OPTIONS,
-} from '../forms/user-form.constants';
-import { isUserDraftValid } from '../forms/user-form.validation';
+} from '@/config/constants/USER_FORM';
+import { isUserDraftValid } from '@/utils/validators';
 
 export function AddUserDrawer({
   open,
@@ -22,7 +22,7 @@ export function AddUserDrawer({
   onSubmit,
   onClose,
 }) {
-  if (!open || !draft) return null;
+  if (!draft) return null;
 
   const isValid = isUserDraftValid(draft);
   const title = mode === 'edit' ? 'Edit User' : 'Create User';
@@ -38,65 +38,37 @@ export function AddUserDrawer({
   };
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
-      title={title}
-      subtitle={subtitle}
-      eyebrow="User Form"
       width="max-w-[720px]"
       onClose={onClose}
-      footer={(
-        <div className="space-y-3">
-          {!isValid && (
-            <div className="flex items-center gap-2 rounded-[10px] border border-warning/30 bg-warning/8 px-3 py-2 text-warning">
-              <AlertTriangle size={14} />
-              <span className="text-[12px]">Full name, email, and country are required before saving.</span>
-            </div>
-          )}
-          <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={onSubmit}
-              disabled={!isValid}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              {mode === 'edit' ? 'Save Changes' : 'Create User'}
-            </button>
-          </div>
-        </div>
-      )}
     >
-      <div className="space-y-5">
+      <DrawerHeader title={title} subtitle={subtitle} eyebrow="User Form" onClose={onClose} />
+      <DrawerBody>
+        <div className="space-y-5">
         <DrawerSection title="Identity">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <TextField label="Full Name" value={draft.name} onChange={setField('name')} placeholder="Jane Doe" />
             <TextField label="Email" value={draft.email} onChange={setField('email')} placeholder="jane@example.com" type="email" />
             <TextField label="Phone" value={draft.phone} onChange={setField('phone')} placeholder="+1 555 120 4567" />
             <TextField label="Country" value={draft.country} onChange={setField('country')} placeholder="US" mono />
             <TextField label="Nationality" value={draft.nationality} onChange={setField('nationality')} placeholder="US" mono />
             <TextField label="Referral / IB Code" value={draft.ibCode} onChange={setField('ibCode')} placeholder="IB-1024" mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
           <div className="mt-4">
             <TextareaField label="Address" value={draft.address} onChange={setField('address')} placeholder="Street, city, state, postal code" />
           </div>
         </DrawerSection>
 
         <DrawerSection title="Account Setup">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <SelectField label="Tier" value={draft.tier} onChange={setField('tier')} options={TIER_OPTIONS} />
             <SelectField label="Segment" value={draft.segment} onChange={setField('segment')} options={SEGMENT_OPTIONS} />
             <SelectField label="KYC Status" value={draft.kycStatus} onChange={setField('kycStatus')} options={KYC_OPTIONS} />
             <SelectField label="Risk Level" value={draft.riskLevel} onChange={setField('riskLevel')} options={RISK_OPTIONS} />
             <SelectField label="Funding State" value={draft.fundingState} onChange={setField('fundingState')} options={FUNDING_OPTIONS} />
             <TextField label="Initial Balance" value={draft.initialBalance} onChange={setField('initialBalance')} placeholder="1000" mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
           <div className="mt-4">
             <ToggleField
               label="Auto-create wallet"
@@ -115,19 +87,43 @@ export function AddUserDrawer({
             description="Create a placeholder MT5 account setup for the dealing desk."
           />
           {draft.createMt5 && (
-            <DrawerGrid className="mt-4">
+            <DrawerFormGrid className="mt-4">
               <SelectField label="Server" value={draft.mt5Server} onChange={setField('mt5Server')} options={SERVER_OPTIONS} placeholder="Select server" />
               <SelectField label="Leverage" value={draft.mt5Leverage} onChange={setField('mt5Leverage')} options={LEVERAGE_OPTIONS} placeholder="Select leverage" />
               <TextField label="Group" value={draft.mt5Group} onChange={setField('mt5Group')} placeholder="retail_usd_std" mono />
               <TextField label="Initial Deposit" value={draft.mt5Deposit} onChange={setField('mt5Deposit')} placeholder="1000" mono />
-            </DrawerGrid>
+            </DrawerFormGrid>
           )}
         </DrawerSection>
 
         <DrawerSection title="Internal Notes" collapsible>
           <TextareaField label="Operator Summary" value={draft.note} onChange={setField('note')} placeholder="Add onboarding notes, exceptions, or next actions." rows={5} />
         </DrawerSection>
-      </div>
-    </AdminDrawer>
+        </div>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          {!isValid && (
+            <div className="flex items-center gap-2 rounded-[10px] border border-warning/30 bg-warning/8 px-3 py-2 text-warning">
+              <AlertTriangle size={14} />
+              <span className="text-[12px]">Full name, email, and country are required before saving.</span>
+            </div>
+          )}
+          <div className="flex items-center justify-end gap-2">
+            <ActionBtn
+              label="Cancel"
+              variant="default"
+              onClick={onClose}
+            />
+            <ActionBtn
+              label={mode === 'edit' ? 'Save Changes' : 'Create User'}
+              variant="brand"
+              disabled={!isValid}
+              onClick={onSubmit}
+            />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

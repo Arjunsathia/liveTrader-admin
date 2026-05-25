@@ -4,9 +4,9 @@ import {
   Edit2, Flag, GitBranch, Link, Lock, PauseCircle,
   RefreshCw, User, UserCheck, Users, Wallet, XCircle, Copy, Send
 } from 'lucide-react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays';
-import { STATUS_CLR, TIER_CLR } from '../data/workspaces/shared.workspace';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerSection, DrawerField, DrawerFormGrid as DrawerFormGrid, TextareaField } from '../../../components/common/drawer';
+import { STATUS_CLR, TIER_CLR } from '@/config/constants/ib-system/workspaces/shared.workspace';
 import { ActionBtn as IconBtn, StatusChip } from '../../../components/ui';
 import { Button } from '../../../components/ui/Button';
 
@@ -17,28 +17,16 @@ export function ReferralDrawer({ row, open, onClose, onAction }) {
   if (!row) return null;
   const conv = row.active && row.referred ? ((row.active / row.referred) * 100).toFixed(1) : '—';
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.id}
-      subtitle={`${row.name} · ${row.region}`}
-      eyebrow="IB Partner"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <StatusChip value={row.status} colorMap={STATUS_CLR} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary">View Profile</Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.id} subtitle={`${row.name} · ${row.region}`} eyebrow="IB Partner" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <DrawerSection title="Partner Identity">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Partner Name" value={row.name} className="sm:col-span-2" />
             <DrawerField label="Partner ID" value={row.id} mono />
             <DrawerField label="Referral Code" value={row.code} mono />
@@ -47,16 +35,16 @@ export function ReferralDrawer({ row, open, onClose, onAction }) {
             <DrawerField label="Revenue Share" value={row.share} mono accent="var(--brand)" />
             <DrawerField label="Last Activity" value={row.lastActivity} mono />
             <DrawerField label="Status" value={row.status} accent={STATUS_CLR[row.status]} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Referral Stats">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Total Referred" value={row.referred?.toLocaleString()} mono />
             <DrawerField label="Active Users" value={row.active?.toLocaleString()} mono accent="var(--positive)" />
             <DrawerField label="Conversion Rate" value={`${conv}%`} mono accent="var(--cyan)" />
             <DrawerField label="Inactive" value={(row.referred - row.active)?.toLocaleString()} mono accent="var(--negative)" />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Referral Link">
@@ -85,7 +73,19 @@ export function ReferralDrawer({ row, open, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <StatusChip value={row.status} colorMap={STATUS_CLR} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <IconBtn variant="default" onClick={onClose} label="Close" />
+            <IconBtn variant="brand" label="View Profile" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
@@ -95,28 +95,16 @@ export function CommissionDrawer({ row, open, onClose, onAction }) {
 
   if (!row) return null;
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.id}
-      subtitle={`${row.partner} · ${row.source}`}
-      eyebrow="Commission Record"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <StatusChip value={row.approval} colorMap={STATUS_CLR} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary">View Source</Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.id} subtitle={`${row.partner} · ${row.source}`} eyebrow="Commission Record" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <DrawerSection title="Commission Details">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Commission ID" value={row.id} mono />
             <DrawerField label="Partner" value={row.partner} />
             <DrawerField label="Referred User" value={row.user} />
@@ -126,7 +114,7 @@ export function CommissionDrawer({ row, open, onClose, onAction }) {
             <DrawerField label="Created" value={row.date} mono />
             <DrawerField label="Payout State" value={row.payout} accent={STATUS_CLR[row.payout]} />
             <DrawerField label="Approval" value={row.approval} accent={STATUS_CLR[row.approval]} className="sm:col-span-2" />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Internal Notes" collapsible>
@@ -150,7 +138,19 @@ export function CommissionDrawer({ row, open, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <StatusChip value={row.approval} colorMap={STATUS_CLR} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <IconBtn variant="default" onClick={onClose} label="Close" />
+            <IconBtn variant="brand" label="View Source" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
@@ -162,28 +162,16 @@ export function PayoutDrawer({ row, open, onClose, onAction }) {
   const riskColor = row.risk === 'HIGH' ? 'var(--negative)' : row.risk === 'MEDIUM' ? 'var(--warning)' : 'var(--positive)';
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.id}
-      subtitle={`${row.partner} · ${row.amount}`}
-      eyebrow="IB Payout Request"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <StatusChip value={row.risk} colorMap={{ HIGH: 'var(--negative)', MEDIUM: 'var(--warning)', LOW: 'var(--positive)' }} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary">Verify Payout</Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.id} subtitle={`${row.partner} · ${row.amount}`} eyebrow="IB Payout Request" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <DrawerSection title="Payout Details">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Payout ID" value={row.id} mono />
             <DrawerField label="Partner" value={row.partner} />
             <DrawerField label="Amount" value={row.amount} mono accent="var(--brand)" />
@@ -192,7 +180,7 @@ export function PayoutDrawer({ row, open, onClose, onAction }) {
             <DrawerField label="Risk Check" value={row.risk} accent={riskColor} />
             <DrawerField label="Requested" value={row.requestedAt} mono className="sm:col-span-2" />
             <DrawerField label="Processed By" value={row.processedBy} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         {row.risk === 'HIGH' && (
@@ -229,6 +217,18 @@ export function PayoutDrawer({ row, open, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <StatusChip value={row.risk} colorMap={{ HIGH: 'var(--negative)', MEDIUM: 'var(--warning)', LOW: 'var(--positive)' }} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <IconBtn variant="default" onClick={onClose} label="Close" />
+            <IconBtn variant="brand" label="Verify Payout" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

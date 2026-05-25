@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useMemo } from 'react';
-import { ROLE_PRESETS } from '@config/permissions/permissions';
+import { ROLE_PRESETS } from '@/config/permissions/permissions';
 
 const AdminSessionContext = createContext(null);
 

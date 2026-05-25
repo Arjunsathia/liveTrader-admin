@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Shield, Check, CheckCircle2, XCircle, X } from 'lucide-react';
 import { IconBtn, ROLE_CLR } from '../components/RolesComponents';
-import { rolesData, PERM_MODULES, PERM_ACTIONS, buildInitialMatrix } from '../data/workspaces/admin-mgmt.workspace';
+import { rolesData, PERM_MODULES, PERM_ACTIONS, buildInitialMatrix } from '@/config/constants/roles-permissions/workspaces/admin-mgmt.workspace';
 import { Card } from '../../../components/ui/Card';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable } from '../../../components/common/table';
 
-export function PermissionsPage() {
+function PermissionsPage() {
   const [matrix, setMatrix] = useState(buildInitialMatrix);
   const [activeRole, setActiveRole] = useState(rolesData[0].name);
   const [toast, setToast] = useState(null);
@@ -64,7 +64,6 @@ export function PermissionsPage() {
     {
       key: 'label',
       label: 'Module',
-      width: '240px',
       render: (_, mod) => {
         const IconComp = mod.Icon;
         return (
@@ -124,7 +123,7 @@ export function PermissionsPage() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-up">
       {/* Role selector */}
       <div className="flex items-center gap-3 flex-wrap">
         <span className="text-[11px] font-black uppercase tracking-[0.15em] text-text-muted/35 font-heading flex-shrink-0">Editing Role:</span>
@@ -158,7 +157,7 @@ export function PermissionsPage() {
       )}
 
       {/* Active role summary */}
-      <Card padding={false} className="border-cyan/20" style={{ background: `color-mix(in srgb, ${roleColor} 3%, transparent)` }}>
+      <Card padding={false} className="border-cyan/20 overflow-hidden" style={{ background: `color-mix(in srgb, ${roleColor} 3%, transparent)` }}>
         <div className="flex items-center gap-4 px-5 py-4">
           <Shield size={18} className="flex-shrink-0" style={{ color: roleColor }} />
           <div className="flex-1 min-w-0">
@@ -172,7 +171,7 @@ export function PermissionsPage() {
         </div>
 
         <div className="border-t border-border/15">
-          <FeatureTable columns={permColumns} data={PERM_MODULES} rowKey="id" />
+          <MainTable columns={permColumns} data={PERM_MODULES} />
         </div>
       </Card>
 
@@ -198,3 +197,5 @@ export function PermissionsPage() {
     </div>
   );
 }
+
+export default PermissionsPage;

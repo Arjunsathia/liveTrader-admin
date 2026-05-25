@@ -6,7 +6,7 @@ import { PageShell } from '../../../components/layout/PageShell';
 import { useDrawerState } from '../../../hooks/useDrawerState';
 import { useTableState } from '../../../hooks/useTableState';
 import { exportRows } from '../../../utils/exporters';
-import { usersService } from '../services/users.service';
+import { usersService } from '../services/userService';
 import { UsersMt5Table } from '../components/UsersTable';
 import { Mt5AccountDrawer } from '../components/UserDrawers';
 
@@ -31,7 +31,7 @@ function filterBySearch(items, search, fields) {
   ));
 }
 
-export function MT5QueuePage() {
+function MT5QueuePage() {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
@@ -122,7 +122,9 @@ export function MT5QueuePage() {
 
       </div>
 
+      {/* Review Drawer */}
       <Mt5AccountDrawer
+        open={mt5Drawer.isOpen}
         entry={mt5Drawer.value}
         onClose={mt5Drawer.close}
       />

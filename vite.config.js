@@ -11,15 +11,7 @@ export default defineConfig({
   plugins: [react(), tailwind()],
   resolve: {
     alias: {
-      '@app': path.resolve(__dirname, 'src/app'),
-      '@features': path.resolve(__dirname, 'src/features'),
-      '@components': path.resolve(__dirname, 'src/components'),
-      '@api': path.resolve(__dirname, 'src/api'),
-      '@config': path.resolve(__dirname, 'src/config'),
-      '@hooks': path.resolve(__dirname, 'src/hooks'),
-      '@utils': path.resolve(__dirname, 'src/utils'),
-      '@styles': path.resolve(__dirname, 'src/styles'),
-      '@assets': path.resolve(__dirname, 'src/assets'),
+      '@': path.resolve(__dirname, 'src'),
     },
   },
   base: '/liveTrader-admin/',

@@ -8,15 +8,15 @@ import {
   RefreshCw, Send, ShieldAlert, Timer, User,
   UserPlus, XCircle, CalendarDays,
 } from 'lucide-react';
-import { PageShell } from '@components/layout/PageShell';
-import { Card } from '@components/ui/Card';
-import { Button } from '@components/ui/Button';
-import { ticketsData, ticketConversation, relatedTickets } from '@features/support/data/mockData';
+import { PageShell } from '@/components/layout/PageShell';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { ticketsData, ticketConversation, relatedTickets } from '@/config/constants/support/mockData';
 import {
   KYC_CLR, WALL_CLR, TRADE_CLR,
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
   UserAvatar, SupportSectionHead, SupportIconBtn, SupportToast, SlaCheckRow,
-} from '@features/support/components/SupportComponents';
+} from '@/features/support/components/SupportComponents';
 
 /* ── Message style map ──────────────────────────────────── */
 const MSG_STYLES = {

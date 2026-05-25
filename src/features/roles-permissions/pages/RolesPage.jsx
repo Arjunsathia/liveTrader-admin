@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { Shield, ShieldCheck, Users, Sliders, Plus, Download, CheckCircle2, ChevronRight, Edit2, Copy, ClipboardList } from 'lucide-react';
 import { SectionHead, IconBtn, ROLE_CLR, Badge } from '../components/RolesComponents';
 import { RoleDrawer } from '../components/RoleDrawers';
-import { rolesData } from '../data/workspaces/admin-mgmt.workspace';
+import { rolesData } from '@/config/constants/roles-permissions/workspaces/admin-mgmt.workspace';
 
 import { KpiCard } from '../../../components/cards';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 import { Card } from '../../../components/ui/Card';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
-export function RolesPage() {
-  const [drawer, setDrawer] = useState(null);
+function RolesPage() {
+  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
   const act = (msg, id) => { setToast(`${msg}: ${id}`); setTimeout(() => setToast(null), 3000); };
 
@@ -38,17 +39,17 @@ export function RolesPage() {
     { key: 'userCount', label: 'Admins', render: v => <span className="font-mono font-bold text-brand">{v}</span> },
     { key: 'scope', label: 'Scope', render: v => <span className="text-[10px] font-heading border border-white/[0.06] px-1.5 py-0.5 rounded-[4px] text-text-muted/50">{v}</span> },
     {
-      key: 'actions', label: 'Actions', render: v => (
+      key: 'perms', label: 'Permissions', render: (_, r) => (
         <div className="flex gap-1 flex-wrap max-w-[200px]">
-          {v.map(a => <span key={a} className="text-[9px] font-mono px-1 py-0.5 rounded-[3px] bg-primary/[0.06] border border-primary/[0.12] text-primary">{a}</span>)}
+          {r.actions.map(a => <span key={a} className="text-[9px] font-mono px-1 py-0.5 rounded-[3px] bg-primary/[0.06] border border-primary/[0.12] text-primary">{a}</span>)}
         </div>
       )
     },
     { key: 'status', label: 'Status', render: v => <Badge value={v} /> },
     { key: 'updated', label: 'Updated', render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
     {
-      key: '_act', label: '', render: (_, r) => (
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end" onClick={(e) => e.stopPropagation()}>
           <button onClick={e => { e.stopPropagation(); act('Edit', r.id); }} className="w-6 h-6 rounded-[5px] border border-white/[0.08] flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer"><Edit2 size={10} /></button>
           <button onClick={e => { e.stopPropagation(); act('Duplicated', r.id); }} className="w-6 h-6 rounded-[5px] border border-cyan/[0.15] flex items-center justify-center text-cyan/60 hover:text-cyan cursor-pointer"><Copy size={10} /></button>
         </div>
@@ -57,7 +58,7 @@ export function RolesPage() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-up">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
@@ -81,7 +82,7 @@ export function RolesPage() {
         {rolesData.map(role => {
           const color = ROLE_CLR[role.name] || 'rgba(255,255,255,0.3)';
           return (
-            <Card key={role.id} onClick={() => setDrawer(role)} padding={false}
+            <Card key={role.id} onClick={() => drawerState.open(role)} padding={false}
               className="text-left group cursor-pointer hover:border-white/[0.1] hover:bg-white/[0.03] p-4 transition-all duration-200">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2.5">
@@ -115,13 +116,19 @@ export function RolesPage() {
       </div>
 
       {/* Also show as table */}
-      <Card padding={false}>
-        <div className="px-5 py-4 border-b border-border/15">
-          <SectionHead title="Role Table View" Icon={ClipboardList} />
-        </div>
-        <FeatureTable cols={cols} rows={rolesData} onRow={r => setDrawer(r)} />
-      </Card>
-      <RoleDrawer row={drawer} open={!!drawer} onClose={() => setDrawer(null)} onAction={act} />
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+        <TableToolbar title="Role Table View" count={rolesData.length} accentColor="var(--primary)" />
+        <MainTable 
+          columns={cols} 
+          data={rolesData} 
+          onRowClick={r => drawerState.open(r)}
+          rowClassName={(r) => `hover:bg-primary/5 hover:border-l-primary cursor-pointer`}
+        />
+      </section>
+      
+      <RoleDrawer row={drawerState.value} open={drawerState.isOpen} onClose={() => drawerState.close()} onAction={act} />
     </div>
   );
 }
+
+export default RolesPage;

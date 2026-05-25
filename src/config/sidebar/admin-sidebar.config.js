@@ -1,4 +1,4 @@
-import { adminRouteModules } from '@config/routes/admin-routes.config';
+import { adminRouteModules } from '@/config/routes/admin-routes.config';
 
 /**
  * Sidebar Navigation Sections
@@ -11,13 +11,6 @@ export const adminNavigationSections = [
   { id: 'system', label: 'System' },
 ];
 
-/**
- * Main Sidebar Navigation Configuration
- * 
- * Automatically built from the `adminRouteModules` configuration so that
- * routes and sidebar links remain perfectly synchronized.
- * Filters out any routes that do not have a `navLabel`.
- */
 export const adminNavigation = adminRouteModules.map((module) => ({
   id: module.id,
   label: module.label,

@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { AlertCircle, ArrowUpRight, Check, CheckCircle2, Download, Globe, MessageSquare, PackageX, RefreshCw, ShieldX, User, XCircle, Search } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
-import { failedPaymentsData, STATUS_CLR, SEV_CLR } from '../data/mockData';
+import { failedPaymentsData, STATUS_CLR, SEV_CLR } from '@/config/constants/finance/mockData';
 import { KpiCard, StatusBadge, MethodBadge, Toast } from '../components/FinanceComponents';
 import { UserCell, FinanceDrawer, DrawerSection, DF, DGrid, DrawerAuditTrail, DrawerNoteEditor, IconBtn, Pagination } from '../components/FinanceDrawer';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
 const PAGE = {
   accent: 'var(--warning)',
@@ -12,13 +13,13 @@ const PAGE = {
   description: 'Gateway and provider failures — retry queues, system errors, and manual resolutions.',
 };
 
-export function FailedPaymentsPage() {
+function FailedPaymentsPage() {
   const [search, setSearch] = useState('');
   const [providerF, setProviderF] = useState('ALL');
   const [sevF, setSevF] = useState('ALL');
   const [statusF, setStatusF] = useState('ALL');
   const [page, setPage] = useState(1);
-  const [drawer, setDrawer] = useState(null);
+  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
   
   const PER = 7;
@@ -234,7 +235,7 @@ export function FailedPaymentsPage() {
                     return (
                       <tr
                         key={row.id}
-                        onClick={() => setDrawer(row)}
+                        onClick={() => drawerState.open(row)}
                         className={`group cursor-pointer transition-colors border-l-2 border-transparent ${
                           isCritical
                             ? 'hover:bg-negative/5 hover:border-l-negative'
@@ -320,56 +321,56 @@ export function FailedPaymentsPage() {
       </div>
 
       {/* Failed Payment Drawer */}
-      <FinanceDrawer open={!!drawer} onClose={() => setDrawer(null)} title={`Failed Payment — ${drawer?.id}`} subtitle="Review failure context, gateway logs, and error resolution options." footer={
-        drawer ? (
+      <FinanceDrawer open={drawerState.isOpen} onClose={() => drawerState.close()} title={`Failed Payment — ${drawerState.value?.id}`} subtitle="Review failure context, gateway logs, and error resolution options." footer={
+        drawerState.value ? (
           <div className="grid grid-cols-2 gap-2 w-full">
-            {drawer.status !== 'RESOLVED' && <>
-              <IconBtn label="Retry Now" Icon={RefreshCw} variant="warning" onClick={() => { act('Retried', drawer.id); setDrawer(null); }} />
-              <IconBtn label="Mark Resolved" Icon={CheckCircle2} variant="success" onClick={() => { act('Resolved', drawer.id); setDrawer(null); }} />
+            {drawerState.value.status !== 'RESOLVED' && <>
+              <IconBtn label="Retry Now" Icon={RefreshCw} variant="warning" onClick={() => { act('Retried', drawerState.value.id); drawerState.close(); }} />
+              <IconBtn label="Mark Resolved" Icon={CheckCircle2} variant="success" onClick={() => { act('Resolved', drawerState.value.id); drawerState.close(); }} />
             </>}
-            <IconBtn label="Escalate" Icon={ArrowUpRight} variant="orange" onClick={() => act('Escalated', drawer.id)} />
-            <IconBtn label="Export Report" Icon={Download} variant="default" onClick={() => act('Exported', drawer.id)} />
+            <IconBtn label="Escalate" Icon={ArrowUpRight} variant="orange" onClick={() => act('Escalated', drawerState.value.id)} />
+            <IconBtn label="Export Report" Icon={Download} variant="default" onClick={() => act('Exported', drawerState.value.id)} />
           </div>
         ) : null
       }>
-        {drawer && (
+        {drawerState.value && (
           <>
             <div className="rounded-[12px] border border-negative/20 bg-negative/[0.05] p-4">
               <div className="flex items-center gap-2 mb-2">
                 <ShieldX size={14} className="text-negative" />
                 <span className="text-[13px] font-bold font-heading text-negative">Payment Failure Report</span>
               </div>
-              <div className="text-[11.5px] text-negative/70 font-heading">Provider: <strong>{drawer.provider}</strong> · Code: <strong>{drawer.code}</strong></div>
-              <div className="text-[11.5px] text-negative/70 font-heading mt-1">Reason: {drawer.reason.replace(/_/g, ' ')}</div>
+              <div className="text-[11.5px] text-negative/70 font-heading">Provider: <strong>{drawerState.value.provider}</strong> · Code: <strong>{drawerState.value.code}</strong></div>
+              <div className="text-[11.5px] text-negative/70 font-heading mt-1">Reason: {drawerState.value.reason.replace(/_/g, ' ')}</div>
             </div>
             <DrawerSection title="Record Details">
               <DGrid>
-                <DF label="Record ID" value={drawer.id} mono copyable />
-                <DF label="Provider" value={drawer.provider} mono />
-                <DF label="Method" value={drawer.method} />
-                <DF label="Error Code" value={drawer.code} mono copyable />
-                <DF label="Severity" value={drawer.severity} accent={SEV_COLORS_MAP[drawer.severity]} />
-                <DF label="Status" value={drawer.status} accent={STATUS_CLR[drawer.status]} />
-                <DF label="Retries" value={drawer.retries} mono />
-                <DF label="Created" value={drawer.created} mono />
+                <DF label="Record ID" value={drawerState.value.id} mono copyable />
+                <DF label="Provider" value={drawerState.value.provider} mono />
+                <DF label="Method" value={drawerState.value.method} />
+                <DF label="Error Code" value={drawerState.value.code} mono copyable />
+                <DF label="Severity" value={drawerState.value.severity} accent={SEV_COLORS_MAP[drawerState.value.severity]} />
+                <DF label="Status" value={drawerState.value.status} accent={STATUS_CLR[drawerState.value.status]} />
+                <DF label="Retries" value={drawerState.value.retries} mono />
+                <DF label="Created" value={drawerState.value.created} mono />
               </DGrid>
             </DrawerSection>
             <DrawerSection title="User Context">
               <DGrid>
-                <DF label="User" value={drawer.user.name} copyable />
-                <DF label="UID" value={drawer.user.uid} mono copyable />
+                <DF label="User" value={drawerState.value.user.name} copyable />
+                <DF label="UID" value={drawerState.value.user.uid} mono copyable />
               </DGrid>
             </DrawerSection>
             <DrawerSection title="Retry History" collapsible>
-              <DrawerAuditTrail entries={Array.from({ length: drawer.retries || 0 }, (_, i) => ({
+              <DrawerAuditTrail entries={Array.from({ length: drawerState.value.retries || 0 }, (_, i) => ({
                 action: `Retry attempt ${i + 1}`,
                 by: 'PaymentEngine',
-                ts: drawer.created,
-                note: `Result: FAILED — ${drawer.reason.replace(/_/g, ' ')}`,
-              })).concat([{ action: 'Initial failure recorded', by: 'PaymentGateway', ts: drawer.created, note: `Code: ${drawer.code}` }]).reverse()} />
+                ts: drawerState.value.created,
+                note: `Result: FAILED — ${drawerState.value.reason.replace(/_/g, ' ')}`,
+              })).concat([{ action: 'Initial failure recorded', by: 'PaymentGateway', ts: drawerState.value.created, note: `Code: ${drawerState.value.code}` }]).reverse()} />
             </DrawerSection>
             <DrawerSection title="Notes" collapsible>
-              <DrawerNoteEditor onSave={() => act('Note saved', drawer.id)} />
+              <DrawerNoteEditor onSave={() => act('Note saved', drawerState.value.id)} />
             </DrawerSection>
           </>
         )}

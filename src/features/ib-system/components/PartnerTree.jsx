@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, GitBranch, Network, Users, X, CircleDollarSign, Edit2, Lock } from 'lucide-react';
 import { IBCard, IBTierBadge, IBBadge, SectionHead, IBIconBtn } from './IBComponents';
-import { TIER_CLR, STATUS_CLR } from '../data/workspaces/shared.workspace';
+import { TIER_CLR, STATUS_CLR } from '@/config/constants/ib-system/workspaces/shared.workspace';
 
 export function TreeNode({ node, depth = 0, selectedId, onSelect }) {
   const [expanded, setExpanded] = useState(depth === 0);

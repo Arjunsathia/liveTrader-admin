@@ -2,7 +2,7 @@
 import React from 'react';
 import { FileText, FileSpreadsheet, Table as TableIcon, FileJson } from 'lucide-react';
 import { Badge } from '../../../components/ui/Badge';
-import { SEV_CLR } from '@config/constants/status.constants';
+import { SEV_CLR } from '@/config/constants/status.constants';
 
 export { SEV_CLR };
 

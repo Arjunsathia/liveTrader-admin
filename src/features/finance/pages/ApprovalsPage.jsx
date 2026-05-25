@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowUpRight, Check, CheckCircle2, Clock, Copy, Download, Eye, FileText, Lock, MessageSquare, ShieldAlert, Timer, User, X, XCircle, Zap, Search } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
-import { approvalsData, RISK_CLR } from '../data/mockData';
+import { approvalsData, RISK_CLR } from '@/config/constants/finance/mockData';
 import { KpiCard, StatusBadge, RiskBadge, PriorityBadge, Toast, IconBtn } from '../components/FinanceComponents';
 import { UserCell, FinanceDrawer, DrawerSection, DF, DGrid, DrawerNoteEditor, RiskPanel, Pagination } from '../components/FinanceDrawer';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
 const PAGE = {
   accent: 'var(--warning)',
@@ -12,14 +13,14 @@ const PAGE = {
   description: 'AML thresholds, high-risk flags, and daily limit compliance audits requiring reviewer sign-off.',
 };
 
-export function ApprovalsPage() {
+function ApprovalsPage() {
   const [search, setSearch] = useState('');
   const [typeF, setTypeF] = useState('ALL');
   const [riskF, setRiskF] = useState('ALL');
   const [priorityF, setPriorityF] = useState('ALL');
   const [statusF, setStatusF] = useState('ALL');
   const [page, setPage] = useState(1);
-  const [drawer, setDrawer] = useState(null);
+  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
   
   const PER = 7;
@@ -264,7 +265,7 @@ export function ApprovalsPage() {
                     return (
                       <tr
                         key={row.id}
-                        onClick={() => setDrawer(row)}
+                        onClick={() => drawerState.open(row)}
                         className={`group cursor-pointer transition-colors border-l-2 border-transparent ${
                           isCritical
                             ? 'hover:bg-negative/5 hover:border-l-negative'
@@ -354,76 +355,76 @@ export function ApprovalsPage() {
       </div>
 
       {/* Approvals Drawer */}
-      <FinanceDrawer open={!!drawer} onClose={() => setDrawer(null)} title={`Approval — ${drawer?.id}`} subtitle="Review rule triggers, SLA status, and approve or reject the request." footer={
-        drawer ? (
+      <FinanceDrawer open={drawerState.isOpen} onClose={() => drawerState.close()} title={`Approval — ${drawerState.value?.id}`} subtitle="Review rule triggers, SLA status, and approve or reject the request." footer={
+        drawerState.value ? (
           <div className="flex flex-col gap-2 w-full">
-            {drawer.status === 'PENDING' && (
+            {drawerState.value.status === 'PENDING' && (
               <div className="grid grid-cols-2 gap-2">
-                <IconBtn label="Approve" Icon={CheckCircle2} variant="success" onClick={() => { act('Approved', drawer.id); setDrawer(null); }} />
-                <IconBtn label="Reject" Icon={XCircle} variant="danger" onClick={() => { act('Rejected', drawer.id); setDrawer(null); }} />
-                <IconBtn label="Request Info" Icon={MessageSquare} variant="cyan" onClick={() => act('Info requested', drawer.id)} />
-                <IconBtn label="Escalate" Icon={ArrowUpRight} variant="orange" onClick={() => { act('Escalated', drawer.id); setDrawer(null); }} />
-                <IconBtn label="Lock Record" Icon={Lock} variant="danger" onClick={() => act('Locked', drawer.id)} />
-                <IconBtn label="Export" Icon={Download} variant="default" onClick={() => act('Exported', drawer.id)} />
+                <IconBtn label="Approve" Icon={CheckCircle2} variant="success" onClick={() => { act('Approved', drawerState.value.id); drawerState.close(); }} />
+                <IconBtn label="Reject" Icon={XCircle} variant="danger" onClick={() => { act('Rejected', drawerState.value.id); drawerState.close(); }} />
+                <IconBtn label="Request Info" Icon={MessageSquare} variant="cyan" onClick={() => act('Info requested', drawerState.value.id)} />
+                <IconBtn label="Escalate" Icon={ArrowUpRight} variant="orange" onClick={() => { act('Escalated', drawerState.value.id); drawerState.close(); }} />
+                <IconBtn label="Lock Record" Icon={Lock} variant="danger" onClick={() => act('Locked', drawerState.value.id)} />
+                <IconBtn label="Export" Icon={Download} variant="default" onClick={() => act('Exported', drawerState.value.id)} />
               </div>
             )}
-            {drawer.status !== 'PENDING' && (
+            {drawerState.value.status !== 'PENDING' && (
               <div className="grid grid-cols-2 gap-2">
-                <IconBtn label="Copy ID" Icon={Copy} variant="default" onClick={() => { navigator.clipboard.writeText(drawer.id); act('Copied', drawer.id); }} />
-                <IconBtn label="Export" Icon={Download} variant="default" onClick={() => act('Exported', drawer.id)} />
+                <IconBtn label="Copy ID" Icon={Copy} variant="default" onClick={() => { navigator.clipboard.writeText(drawerState.value.id); act('Copied', drawerState.value.id); }} />
+                <IconBtn label="Export" Icon={Download} variant="default" onClick={() => act('Exported', drawerState.value.id)} />
               </div>
             )}
           </div>
         ) : null
       }>
-        {drawer && (
+        {drawerState.value && (
           <>
             {/* Header Banner inside drawer */}
             <div className="rounded-[12px] border border-white/[0.07] overflow-hidden">
               <div className="px-4 py-3.5 flex items-center justify-between"
-                style={{ background: `color-mix(in srgb, ${RISK_CLR[drawer.risk] || 'rgba(255,255,255,0.1)'} 6%, transparent)`, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                style={{ background: `color-mix(in srgb, ${RISK_CLR[drawerState.value.risk] || 'rgba(255,255,255,0.1)'} 6%, transparent)`, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <div>
-                  <div className="text-[17px] font-black font-heading text-text">{drawer.amount}</div>
-                  <div className="text-[10px] font-mono text-text-muted/40 mt-0.5">{drawer.type} · {drawer.id}</div>
+                  <div className="text-[17px] font-black font-heading text-text">{drawerState.value.amount}</div>
+                  <div className="text-[10px] font-mono text-text-muted/40 mt-0.5">{drawerState.value.type} · {drawerState.value.id}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <PriorityBadge value={drawer.priority} />
-                  <RiskBadge value={drawer.risk} />
-                  <StatusBadge value={drawer.status} />
+                  <PriorityBadge value={drawerState.value.priority} />
+                  <RiskBadge value={drawerState.value.risk} />
+                  <StatusBadge value={drawerState.value.status} />
                 </div>
               </div>
             </div>
 
             <DrawerSection title="Approval Details">
               <DGrid>
-                <DF label="Record ID" value={drawer.id} mono copyable />
-                <DF label="Type" value={drawer.type} accent={drawer.type === 'DEPOSIT' ? 'var(--positive)' : 'var(--negative)'} />
-                <DF label="Amount" value={drawer.amount} mono accent="var(--brand)" />
-                <DF label="Reviewer" value={drawer.reviewer} accent={drawer.reviewer === 'Unassigned' ? 'var(--negative)' : undefined} />
-                <DF label="Rule" value={drawer.rule.replace(/_/g, ' ')} wide />
-                <DF label="Created" value={drawer.created} mono />
-                <DF label="SLA" value={`${drawer.sla}% remaining`} mono />
+                <DF label="Record ID" value={drawerState.value.id} mono copyable />
+                <DF label="Type" value={drawerState.value.type} accent={drawerState.value.type === 'DEPOSIT' ? 'var(--positive)' : 'var(--negative)'} />
+                <DF label="Amount" value={drawerState.value.amount} mono accent="var(--brand)" />
+                <DF label="Reviewer" value={drawerState.value.reviewer} accent={drawerState.value.reviewer === 'Unassigned' ? 'var(--negative)' : undefined} />
+                <DF label="Rule" value={drawerState.value.rule.replace(/_/g, ' ')} wide />
+                <DF label="Created" value={drawerState.value.created} mono />
+                <DF label="SLA" value={`${drawerState.value.sla}% remaining`} mono />
               </DGrid>
             </DrawerSection>
 
             <DrawerSection title="User Context">
               <DGrid>
-                <DF label="User" value={drawer.user.name} copyable />
-                <DF label="UID" value={drawer.user.uid} mono copyable />
-                <DF label="Email" value={drawer.user.email} mono wide />
+                <DF label="User" value={drawerState.value.user.name} copyable />
+                <DF label="UID" value={drawerState.value.user.uid} mono copyable />
+                <DF label="Email" value={drawerState.value.user.email} mono wide />
               </DGrid>
             </DrawerSection>
 
             <DrawerSection title="Risk Analysis">
-              <RiskPanel risk={drawer.risk} />
+              <RiskPanel risk={drawerState.value.risk} />
               <div className="mt-2 rounded-[9px] border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
                 <div className="text-[9.5px] font-black uppercase tracking-[0.15em] text-text-muted/35 mb-1.5 font-heading">Rule Triggered</div>
-                <div className="text-[12px] font-mono text-text/70">{drawer.rule.replace(/_/g, ' ')}</div>
+                <div className="text-[12px] font-mono text-text/70">{drawerState.value.rule.replace(/_/g, ' ')}</div>
               </div>
             </DrawerSection>
 
             <DrawerSection title="Notes" collapsible>
-              <DrawerNoteEditor onSave={() => act('Note saved', drawer.id)} />
+              <DrawerNoteEditor onSave={() => act('Note saved', drawerState.value.id)} />
             </DrawerSection>
           </>
         )}

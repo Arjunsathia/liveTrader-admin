@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { CheckCircle2, X } from 'lucide-react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { OperatorNoteSection } from '../../../components/overlays';
-import { Button } from '../../../components/ui/Button';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { OperatorNoteSection } from '../../../components/common/drawer';
+import { ActionBtn } from '../../../components/ui';
 
 export function TradingDrawer({
   open,
@@ -16,14 +16,27 @@ export function TradingDrawer({
   const [note, setNote] = useState('');
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={title}
-      subtitle={subtitle}
-      eyebrow="Trading Operations"
       width={width}
-      footer={(
+    >
+      <DrawerHeader title={title} subtitle={subtitle} eyebrow="Trading Operations" onClose={onClose} />
+      <DrawerBody>
+        <div className="space-y-6">
+          {children}
+
+          {/* Operator note section — collapsible */}
+          <OperatorNoteSection
+            value={note}
+            onChange={setNote}
+            placeholder="Add an internal audit note…"
+            onSave={() => {  setNote(''); }}
+            defaultOpen={false}
+          />
+        </div>
+      </DrawerBody>
+      <DrawerFooter>
         <div className="space-y-3">
           {/* Action confirmation banner */}
           {actionDone && (
@@ -37,26 +50,11 @@ export function TradingDrawer({
             <span className="text-[10px] text-text-muted/45 leading-snug max-w-[280px]">
               All actions are logged in the audit trail.
             </span>
-            <Button variant="secondary" onClick={onClose}>
-              <X size={12} className="mr-1" /> Close
-            </Button>
+            <ActionBtn variant="default" label="Close" onClick={onClose} />
           </div>
         </div>
-      )}
-    >
-      <div className="space-y-6">
-        {children}
-
-        {/* Operator note section — collapsible */}
-        <OperatorNoteSection
-          value={note}
-          onChange={setNote}
-          placeholder="Add an internal audit note…"
-          onSave={() => { console.log('Note saved:', note); setNote(''); }}
-          defaultOpen={false}
-        />
-      </div>
-    </AdminDrawer>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 

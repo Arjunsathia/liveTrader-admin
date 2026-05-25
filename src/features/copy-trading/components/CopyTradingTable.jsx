@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, Star, TrendingDown, TrendingUp } from 'lucide-react';
-import { FeatureTable } from '../../../components/tables';
-import { COPY_LOG_COLORS } from '@config/constants/status.constants';
+import { MainTable } from '../../../components/common/table';
+import { COPY_LOG_COLORS } from '@/config/constants/status.constants';
 
 function logTypeCell(value) {
   const color = COPY_LOG_COLORS[value] || 'var(--text-muted)';
@@ -60,7 +60,7 @@ const customRenderers = {
   sharpe: sharpeCell,
 };
 
-export function CopyTradingTable({ columns: configCols, items, onRowClick, slug }) {
+export function CopyTradingTable({ columns: configCols, items, onRowClick, slug, pagination }) {
   const actionLabel = slug === 'subscriptions' ? 'Manage' : slug === 'logs' ? 'Inspect' : 'Open';
   const columns = [
     ...configCols.map((column) => {
@@ -79,7 +79,7 @@ export function CopyTradingTable({ columns: configCols, items, onRowClick, slug 
         <button
           type="button"
           onClick={(event) => { event.stopPropagation(); onRowClick?.(row); }}
-          className="h-7 rounded-[6px] border border-border/25 bg-bg px-2.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/60 hover:text-text"
+          className="h-7 rounded-[6px] border border-border/25 bg-bg px-2.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/60 hover:text-text cursor-pointer"
         >
           {actionLabel}
         </button>
@@ -88,11 +88,13 @@ export function CopyTradingTable({ columns: configCols, items, onRowClick, slug 
   ];
 
   return (
-    <FeatureTable
+    <MainTable
       columns={columns}
       data={items}
       onRowClick={onRowClick}
-      emptyMsg="No records found"
+      emptyTitle="No records found"
+      pagination={pagination}
+      rowClassName={() => "hover:bg-cyan/5 hover:border-l-cyan cursor-pointer"}
     />
   );
 }

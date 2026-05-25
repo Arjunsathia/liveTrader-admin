@@ -10,9 +10,9 @@ import {
 import { KpiCard } from '../../../components/cards';
 import {
   overviewKpis, referralGrowth, commissionTrend, topPartners, payoutAlerts,
-} from '../data/workspaces/overview.workspace';
+} from '@/config/constants/ib-system/workspaces/overview.workspace';
 import { IBCard, IBRiskBadge, IBTierBadge, SectionHead, IBChartTip, TraderAvatar, IBToast, IBIconBtn } from '../components/IBComponents';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 
 // Column definitions for Top IB Partners
 const partnerCols = [
@@ -41,7 +41,7 @@ const partnerCols = [
   { key: 'trend',    label: 'Growth',    render: (v) => <span className={`font-mono font-bold text-[11px] ${v?.startsWith('+') ? 'text-positive' : 'text-negative'}`}>{v}</span> },
 ];
 
-export function IBOverviewPage() {
+function IBOverviewPage() {
   const [toast, setToast] = useState(null);
   const act = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -62,7 +62,7 @@ export function IBOverviewPage() {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-up">
       <IBToast msg={toast} />
 
       {/* KPI row */}
@@ -131,13 +131,17 @@ export function IBOverviewPage() {
 
       {/* Top IB Partners + Payout Alerts */}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-4">
-        <IBCard pad={false}>
-          <div className="px-5 py-4 border-b border-border/30 flex items-center justify-between">
-            <SectionHead title="Top IB Partners" Icon={Trophy} />
-            <button className="text-[10px] text-primary font-bold hover:underline cursor-pointer font-heading">View all →</button>
-          </div>
-          <FeatureTable cols={rankedCols} rows={rankedPartners} rowKey="id" />
-        </IBCard>
+        <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+          <TableToolbar 
+            title="Top IB Partners" 
+            actions={<button className="text-[10px] text-primary font-bold hover:underline cursor-pointer font-heading">View all →</button>}
+          />
+          <MainTable 
+            columns={rankedCols} 
+            data={rankedPartners} 
+            rowClassName={() => "hover:bg-brand/5 hover:border-l-brand"}
+          />
+        </section>
 
         <IBCard>
           <SectionHead title="Payout Alerts" Icon={AlertOctagon}
@@ -184,3 +188,5 @@ export function IBOverviewPage() {
     </div>
   );
 }
+
+export default IBOverviewPage;

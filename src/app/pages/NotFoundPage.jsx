@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '@components/ui/Card';
-import { Button } from '@components/ui/Button';
-import { PageShell } from '@components/layout/PageShell';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { PageShell } from '@/components/layout/PageShell';
 
 export function NotFoundPage() {
   const navigate = useNavigate();

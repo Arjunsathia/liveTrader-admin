@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { ChevronRight, PlusCircle, RefreshCw } from 'lucide-react';
+import { ChevronRight, PlusCircle, RefreshCw, Download } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
 import { TradingAccountsGrid } from '../components/TradingAccountsGrid';
 import { TradingAccountsTable } from '../components/TradingAccountsTable';
 import { TradingAccountsConsole } from '../components/TradingAccountsConsole';
 import { TradingAccountsDrawer } from '../components/TradingAccountsDrawer';
+import { useDrawerState } from '@/hooks/useDrawerState';
+import { exportRows } from '../../../utils/exporters';
+
+const PAGE = {
+  eyebrow: 'Trading Operations',
+  title: 'Trading Accounts',
+  description: 'Monitor MT5 account synchronization, equity distribution, connection health, and issue cluster commands.',
+};
 
 const MOCK_ACCOUNTS = [
   {
@@ -54,7 +62,7 @@ const MOCK_ACCOUNTS = [
   },
 ];
 
-export function TradingAccountsPage() {
+function TradingAccountsPage() {
   const [accounts, setAccounts] = useState(MOCK_ACCOUNTS);
   const [stats, setStats] = useState({
     equity: '$284,102.45',
@@ -68,7 +76,7 @@ export function TradingAccountsPage() {
   });
   const [filter, setFilter] = useState('ALL');
   const [sort, setSort] = useState('EQUITY');
-  const [activeDrawerAccount, setActiveDrawerAccount] = useState(null);
+  const activeDrawerAccountState = useDrawerState(null);
   const [toastMessage, setToastMessage] = useState('');
 
   const triggerToast = (msg) => {
@@ -153,73 +161,81 @@ export function TradingAccountsPage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-5">
-        <div>
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-[10px] text-text-muted/40 uppercase font-black tracking-[0.12em]">
-            <span>Users</span>
-            <ChevronRight size={9} />
-            <span>User Detail</span>
-            <ChevronRight size={9} />
-            <span className="text-brand">MT5 Management</span>
-          </nav>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text mt-1.5">
-            User Accounts <span className="text-text-muted/35 font-light">/</span>{' '}
-            <span className="text-text-muted/60">#499201</span>
-          </h2>
-        </div>
-
-        {/* Command Strip */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Cluster Status Pill */}
-          <div className="flex items-center gap-2 px-3 h-8 rounded-[8px] border border-positive/20 bg-positive/[0.04] text-[10px] font-bold text-positive">
-            <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
-            {stats.node} · {stats.latency} · HEALTHY
+      <div className="space-y-5 animate-fade-up">
+        {/* Page Header */}
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+              {PAGE.eyebrow}
+            </p>
+            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+              {PAGE.title}
+            </h2>
+            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+              {PAGE.description}
+            </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleAddNewAccount}
-            className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-          >
-            <PlusCircle size={13} /> New MT5 Account
-          </button>
-          <button
-            type="button"
-            onClick={handleGlobalSync}
-            className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-          >
-            <RefreshCw size={13} className="animate-spin-slow" /> Global Sync
-          </button>
-        </div>
-      </header>
+          {/* Command Strip */}
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {/* Cluster Status Pill */}
+            <div className="flex items-center gap-2 px-3 h-8 rounded-[8px] border border-positive/20 bg-positive/[0.04] text-[10px] font-bold text-positive">
+              <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
+              {stats.node} · {stats.latency} · HEALTHY
+            </div>
 
-      {/* KPI Bento Strip */}
-      <TradingAccountsGrid stats={stats} />
+            <button
+              type="button"
+              onClick={() => exportRows(accounts, 'trading-accounts.csv')}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+            >
+              <Download size={12} /> Export
+            </button>
 
-      {/* MT5 Inventory Table */}
-      <TradingAccountsTable
-        items={sortedAccounts}
-        onRowClick={setActiveDrawerAccount}
-        onSync={handleSyncSingleAccount}
-        onResetPassword={handleResetPassword}
-        activeFilter={filter}
-        activeSort={sort}
-        onChangeFilter={setFilter}
-        onChangeSort={setSort}
-      />
+            <button
+              type="button"
+              onClick={handleAddNewAccount}
+              className="flex items-center justify-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+            >
+              <PlusCircle size={12} /> New MT5 Account
+            </button>
 
-      {/* Operations Terminal */}
-      <TradingAccountsConsole
-        onTriggerControl={(action) => triggerToast(`Global Command Issued: ${action}`)}
-      />
+            <button
+              type="button"
+              onClick={handleGlobalSync}
+              className="flex items-center justify-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-semibold transition-all cursor-pointer"
+            >
+              <RefreshCw size={12} className="animate-spin-slow" /> Global Sync
+            </button>
+          </div>
+        </header>
+
+        {/* KPI Bento Strip */}
+        <TradingAccountsGrid stats={stats} />
+
+        {/* MT5 Inventory Table */}
+        <TradingAccountsTable
+          items={sortedAccounts}
+          onRowClick={(row) => activeDrawerAccountState.open(row)}
+          onSync={handleSyncSingleAccount}
+          onResetPassword={handleResetPassword}
+          activeFilter={filter}
+          activeSort={sort}
+          onChangeFilter={setFilter}
+          onChangeSort={setSort}
+        />
+
+        {/* Operations Terminal */}
+        <TradingAccountsConsole
+          onTriggerControl={(action) => triggerToast(`Global Command Issued: ${action}`)}
+        />
+      </div>
 
       {/* Details Side-Drawer */}
       <TradingAccountsDrawer
-        open={!!activeDrawerAccount}
-        row={activeDrawerAccount}
-        onClose={() => setActiveDrawerAccount(null)}
+        open={activeDrawerAccountState.isOpen}
+        row={activeDrawerAccountState.value}
+        onClose={() => activeDrawerAccountState.close()}
         onSave={handleSaveChangesFromDrawer}
         onSync={handleSyncSingleAccount}
         onResetPassword={handleResetPassword}

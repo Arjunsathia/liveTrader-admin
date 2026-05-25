@@ -4,7 +4,7 @@ import {
   Bell, CheckCircle2, CreditCard, Eye, EyeOff,
   LineChart, Settings2, ShieldCheck, Zap,
 } from 'lucide-react';
-import { PageShell } from '@components/layout/PageShell';
+import { PageShell } from '@/components/layout/PageShell';
 
 /* ── Sub-nav ─────────────────────────────────────────────── */
 const NAV_ITEMS = [
@@ -424,7 +424,7 @@ function SettingsContent({ ws }) {
 /* ═══════════════════════════════════════════════════════════
    MAIN SCREEN
 ═══════════════════════════════════════════════════════════ */
-export function SettingsPage() {
+function SettingsPage() {
   const location = useLocation();
   const navigate = useNavigate();
 

@@ -14,13 +14,13 @@ import {
   Check,
   History,
 } from 'lucide-react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection, SelectField } from '../../../components/overlays';
-import { Button } from '../../../components/ui/Button';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection, SelectField } from '../../../components/common/drawer';
+import { ActionBtn } from '../../../components/ui';
 import { InlineAlert } from '../../../components/feedback/InlineAlert';
 import { StatusBadge } from '../../../components/ui';
 import { StatusChip } from '../../../components/ui';
-import { userDetailTabs } from '../data/user-tabs';
+import { userDetailTabs } from '@/config/constants/USER_TABS';
 import { UserDetailContent } from './UserDetailContent';
 
 const tabIcons = {
@@ -45,6 +45,7 @@ function getAvatarStyle(name = '?') {
 }
 
 export function UserDetailDrawer({
+  open,
   user,
   activeTab,
   onChangeTab,
@@ -52,37 +53,13 @@ export function UserDetailDrawer({
   onEditUser,
 }) {
   return (
-    <AdminDrawer
-      open={Boolean(user)}
-      title={user?.name ?? 'User Detail'}
-      subtitle={user ? `UID ${user.uid} | ${user.segment} | ${user.tier}` : ''}
-      eyebrow="User Record"
+    <MainDrawer
+      open={open}
       width="max-w-[760px]"
       onClose={onClose}
-      footer={(
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-[11px] text-text-muted">Changes stay inside the users workspace while you review this record.</div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              Close
-            </button>
-            {user && (
-              <button
-                type="button"
-                onClick={() => onEditUser(user)}
-                className="flex items-center justify-center h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-              >
-                Edit User
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={user?.name ?? 'User Detail'} subtitle={user ? `UID ${user.uid} | ${user.segment} | ${user.tier}` : ''} eyebrow="User Record" onClose={onClose} />
+      <DrawerBody>
       {user && (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-border/25 bg-bg/55 p-4 shadow-card-subtle">
@@ -125,47 +102,38 @@ export function UserDetailDrawer({
           <UserDetailContent user={user} activeTab={activeTab} />
         </div>
       )}
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-[11px] text-text-muted">Changes stay inside the users workspace while you review this record.</div>
+          <div className="flex items-center gap-2">
+            <ActionBtn label="Close" variant="default" onClick={onClose} />
+            {user && (
+              <ActionBtn label="Edit User" variant="brand" onClick={() => onEditUser(user)} />
+            )}
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
-export function QuickUserDrawer({ user, onClose, onExpand }) {
+export function QuickUserDrawer({ open, user, onClose, onExpand }) {
   return (
-    <AdminDrawer
-      open={Boolean(user)}
-      title={user?.name ?? 'Quick View'}
-      subtitle={user ? `UID ${user.uid} | ${user.segment}` : ''}
-      eyebrow="Quick View"
+    <MainDrawer
+      open={open}
       width="max-w-[720px]"
       onClose={onClose}
-      footer={(
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center justify-center h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-          >
-            Close
-          </button>
-          {user && (
-            <button
-              type="button"
-              onClick={() => onExpand(user.id)}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              Open User
-            </button>
-          )}
-        </div>
-      )}
     >
+      <DrawerHeader title={user?.name ?? 'Quick View'} subtitle={user ? `UID ${user.uid} | ${user.segment}` : ''} eyebrow="Quick View" onClose={onClose} />
+      <DrawerBody>
       {user && (
         <div className="space-y-5">
           <InlineAlert tone="info" title="Operator Summary">
             {user.notesSummary}
           </InlineAlert>
           <DrawerSection title="User Snapshot">
-            <DrawerGrid>
+            <DrawerFormGrid>
               {[
                 ['Email', user.email],
                 ['Phone', user.phone],
@@ -176,15 +144,24 @@ export function QuickUserDrawer({ user, onClose, onExpand }) {
               ].map(([label, value]) => (
                 <DrawerField key={label} label={label} value={value} />
               ))}
-            </DrawerGrid>
+            </DrawerFormGrid>
           </DrawerSection>
         </div>
       )}
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="flex justify-end gap-2">
+          <ActionBtn label="Close" variant="default" onClick={onClose} />
+          {user && (
+            <ActionBtn label="Open User" variant="brand" onClick={() => onExpand(user.id)} />
+          )}
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
-export function Mt5AccountDrawer({ entry, onClose, onSave, onSync, onResetPassword }) {
+export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onResetPassword }) {
   const [leverage, setLeverage] = useState('');
   const [status, setStatus] = useState('');
   const [showStatusSuccess, setShowStatusSuccess] = useState(false);
@@ -199,13 +176,11 @@ export function Mt5AccountDrawer({ entry, onClose, onSave, onSync, onResetPasswo
     }
   }
 
-  if (!entry) return null;
-
-  const isExistingAccount = Boolean(entry.login);
+  const isExistingAccount = Boolean(entry?.login);
   const isBlocked = status === 'DISCONNECTED' || status === 'BLOCKED' || status === 'SUSPENDED';
   const statusAccent = isBlocked ? 'var(--negative)' : 'var(--positive)';
-  const balanceVal = entry.balance ? parseFloat(String(entry.balance).replace(/[$,]/g, '')) : 0;
-  const equityVal = entry.equity ? parseFloat(String(entry.equity).replace(/[$,]/g, '')) : balanceVal;
+  const balanceVal = entry?.balance ? parseFloat(String(entry.balance).replace(/[$,]/g, '')) : 0;
+  const equityVal = entry?.equity ? parseFloat(String(entry.equity).replace(/[$,]/g, '')) : balanceVal;
   const delta = equityVal - balanceVal;
 
   const handleSave = () => {
@@ -218,42 +193,13 @@ export function Mt5AccountDrawer({ entry, onClose, onSave, onSync, onResetPasswo
   };
 
   return (
-    <AdminDrawer
-      open={Boolean(entry)}
-      title={entry ? `MT5 Account — #${entry.login ?? 'NEW'}` : 'MT5 Account'}
-      subtitle="Inspect credentials, balance metrics, and adjust operational settings."
-      eyebrow="MT5 Account Review"
+    <MainDrawer
+      open={open}
       width="max-w-[720px]"
       onClose={onClose}
-      footer={(
-        <div className="flex items-center justify-between gap-4 w-full">
-          <div className="text-[10px] text-text-muted/55 max-w-[280px] leading-snug">
-            Leverage adjustments push directly to the MT5 dealing gateway cluster.
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={showStatusSuccess}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              {showStatusSuccess ? (
-                <span className="flex items-center gap-1.5">
-                  <Check size={12} /> Pushed to MT5
-                </span>
-              ) : isExistingAccount ? 'Keep Monitoring' : 'Save Setup'}
-            </button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={entry ? `MT5 Account — #${entry.login ?? 'NEW'}` : 'MT5 Account'} subtitle="Inspect credentials, balance metrics, and adjust operational settings." eyebrow="MT5 Account Review" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-6">
         {isExistingAccount ? (
           <>
@@ -305,19 +251,19 @@ export function Mt5AccountDrawer({ entry, onClose, onSave, onSync, onResetPasswo
 
             {/* Account Snapshot */}
             <DrawerSection title="Account Snapshot">
-              <DrawerGrid>
+              <DrawerFormGrid>
                 <DrawerField label="Login" value={entry.login} mono copyable />
                 <DrawerField label="Server" value={entry.server} mono />
                 <DrawerField label="Group" value={entry.group || 'retail_usd_std'} mono copyable />
                 <DrawerField label="Account Type" value={entry.type || 'Live'} />
                 <DrawerField label="Currency" value={entry.currency || 'USD'} />
                 <DrawerField label="Last Synced" value={entry.lastSync} mono />
-              </DrawerGrid>
+              </DrawerFormGrid>
             </DrawerSection>
 
             {/* Capital Metrics */}
             <DrawerSection title="Balance & Capital Metrics">
-              <DrawerGrid>
+              <DrawerFormGrid>
                 <DrawerField label="Balance" value={entry.balance} mono accent="var(--cyan)" />
                 <DrawerField label="Equity" value={entry.equity ?? entry.balance} mono accent="var(--brand)" />
                 <DrawerField label="Margin Used" value={entry.margin || '$0'} mono accent="var(--warning)" />
@@ -332,7 +278,7 @@ export function Mt5AccountDrawer({ entry, onClose, onSave, onSync, onResetPasswo
                       : 'var(--text)'
                   }
                 />
-              </DrawerGrid>
+              </DrawerFormGrid>
             </DrawerSection>
 
             {/* Dealing Desk Controls */}
@@ -391,16 +337,34 @@ export function Mt5AccountDrawer({ entry, onClose, onSave, onSync, onResetPasswo
               A placeholder account will be prepared for the dealing desk using the settings defined in the user form.
             </InlineAlert>
             <DrawerSection title="Setup Snapshot">
-              <DrawerGrid>
-                <DrawerField label="User" value={entry.name} />
-                <DrawerField label="Segment" value={entry.segment} />
-                <DrawerField label="Tier" value={entry.tier} />
-                <DrawerField label="Wallet" value={entry.walletBalance} mono />
-              </DrawerGrid>
+              <DrawerFormGrid>
+                <DrawerField label="User" value={entry?.name} />
+                <DrawerField label="Segment" value={entry?.segment} />
+                <DrawerField label="Tier" value={entry?.tier} />
+                <DrawerField label="Wallet" value={entry?.walletBalance} mono />
+              </DrawerFormGrid>
             </DrawerSection>
           </div>
         )}
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="flex items-center justify-between gap-4 w-full">
+          <div className="text-[10px] text-text-muted/55 max-w-[280px] leading-snug">
+            Leverage adjustments push directly to the MT5 dealing gateway cluster.
+          </div>
+          <div className="flex items-center gap-2">
+            <ActionBtn label="Close" variant="default" onClick={onClose} />
+            <ActionBtn 
+              label={showStatusSuccess ? "Pushed to MT5" : (isExistingAccount ? 'Keep Monitoring' : 'Save Setup')} 
+              Icon={showStatusSuccess ? Check : undefined}
+              variant="brand" 
+              disabled={showStatusSuccess} 
+              onClick={handleSave} 
+            />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

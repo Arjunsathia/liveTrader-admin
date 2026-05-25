@@ -1,17 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { Users, UserCheck, Lock, Clock, Fingerprint, ShieldOff, UserPlus, Download, Edit2, ShieldCheck, CheckCircle2, Zap } from 'lucide-react';
-import { Toolbar, Badge, TwoFABadge, RolePill, AdminAvatar } from '../components/RolesComponents';
+import { Badge, TwoFABadge, RolePill, AdminAvatar } from '../components/RolesComponents';
 import { AdminUserDrawer } from '../components/RoleDrawers';
-import { adminUsers } from '../data/workspaces/admin-mgmt.workspace';
+import { adminUsers } from '@/config/constants/roles-permissions/workspaces/admin-mgmt.workspace';
 
 import { KpiCard } from '../../../components/cards';
-import { FeatureTable } from '../../../components/tables';
-import { Card } from '../../../components/ui/Card';
+import { MainTable, TableToolbar } from '../../../components/common/table';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
-export function AdminUsersPage() {
+function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('ALL');
-  const [drawer, setDrawer] = useState(null);
+  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
   const act = (msg, id) => { setToast(`${msg}: ${id}`); setTimeout(() => setToast(null), 3000); };
 
@@ -57,8 +57,8 @@ export function AdminUsersPage() {
     { key: 'lastLogin', label: 'Last Login', render: v => <span className="font-mono text-text-muted/50 text-[10.5px]">{v}</span> },
     { key: 'created', label: 'Created', render: v => <span className="font-mono text-text-muted/35 text-[10.5px]">{v}</span> },
     {
-      key: '_act', label: '', render: (_, r) => (
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end pr-2">
+      key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end pr-2" onClick={(e) => e.stopPropagation()}>
           <button onClick={e => { e.stopPropagation(); act('Edit', r.id); }} className="w-6 h-6 rounded-[5px] border border-white/[0.08] flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer"><Edit2 size={10} /></button>
           {r.locked
             ? <button onClick={e => { e.stopPropagation(); act('Unlocked', r.id); }} className="w-6 h-6 rounded-[5px] border border-positive/20 flex items-center justify-center text-positive/60 hover:text-positive cursor-pointer"><ShieldCheck size={10} /></button>
@@ -70,7 +70,22 @@ export function AdminUsersPage() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-up">
+
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            Access Management
+          </p>
+          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            Admin Users
+          </h2>
+          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            Manage admin accounts, their roles, and system access.
+          </p>
+        </div>
+      </header>
+
       {/* 2FA alert */}
       {adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length > 0 && (
         <div className="flex items-start gap-3 rounded-[10px] border border-warning/20 bg-warning/[0.05] px-4 py-3">
@@ -95,22 +110,55 @@ export function AdminUsersPage() {
         </div>
       )}
 
-      <Card padding={false}>
-        <div className="px-5 py-4 border-b border-border/15">
-          <Toolbar
-            search={search} setSearch={setSearch}
-            filters={['ALL', 'ACTIVE', 'INACTIVE', 'LOCKED', 'PENDING', '2FA', 'NO_2FA']}
-            activeFilter={filter} setFilter={setFilter}
-            actions={[
-              { label: 'Add Admin', Icon: UserPlus, primary: true, onClick: () => act('New admin form', 'opened') },
-              { label: 'Export', Icon: Download, onClick: () => act('Exported', 'admin list') },
-            ]}
-          />
-        </div>
-        <FeatureTable cols={cols} rows={filtered} onRow={r => setDrawer(r)} />
-      </Card>
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+        <TableToolbar
+          title="Admin Directory"
+          count={filtered.length}
+          accentColor="var(--cyan)"
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search admins…"
+          filters={
+            <div className="flex items-center gap-1">
+              <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Filter:</span>
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                style={{ minWidth: '70px' }}
+              >
+                {['ALL', 'ACTIVE', 'INACTIVE', 'LOCKED', 'PENDING', '2FA', 'NO_2FA'].map(opt => (
+                  <option key={opt} value={opt}>{opt.replace('_', ' ')}</option>
+                ))}
+              </select>
+            </div>
+          }
+          actions={
+            <div className="flex gap-2">
+              <button onClick={() => act('Exported', 'admin list')} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer">
+                <Download size={12} /> Export
+              </button>
+              <button onClick={() => act('New admin form', 'opened')} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all cursor-pointer hover:scale-[1.03] active:scale-[0.97]">
+                <UserPlus size={12} /> Add Admin
+              </button>
+            </div>
+          }
+        />
+        <MainTable 
+          columns={cols} 
+          data={filtered} 
+          onRowClick={r => drawerState.open(r)}
+          rowClassName={(r) => {
+            if (r.locked) return 'hover:bg-negative/5 hover:border-l-negative cursor-pointer';
+            if (r.status === 'PENDING') return 'hover:bg-warning/5 hover:border-l-warning cursor-pointer';
+            return 'hover:bg-cyan/5 hover:border-l-cyan cursor-pointer';
+          }}
+        />
+      </section>
 
-      <AdminUserDrawer row={drawer} open={!!drawer} onClose={() => setDrawer(null)} onAction={act} />
+      <AdminUserDrawer row={drawerState.value} open={drawerState.isOpen} onClose={() => drawerState.close()} onAction={act} />
     </div>
   );
 }
+
+export default AdminUsersPage;

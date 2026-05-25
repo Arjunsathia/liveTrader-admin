@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
 import { Download, Users, BarChart2, BarChart3 } from 'lucide-react';
-import { statsKpis, appTrend, challengeStats } from '../data/workspaces/statistics.workspace';
-import { completionTrend } from '../data/workspaces/overview.workspace';
-import { SectionHead, Card, IconBtn, CustomTooltip } from '../components/PropComponents';
+import { statsKpis, appTrend, challengeStats } from '@/config/constants/prop-trading/workspaces/statistics.workspace';
+import { completionTrend } from '@/config/constants/prop-trading/workspaces/overview.workspace';
+import { SectionHead, Card, CustomTooltip } from '../components/PropComponents';
 import { PropStatsCards } from '../components/PropStatsCards';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 
 const perfCols = [
   { key: 'name',    label: 'Challenge',    render: (v) => <span className="font-heading font-semibold text-text/75">{v}</span> },
@@ -24,7 +24,7 @@ const perfCols = [
   { key: 'avgDays', label: 'Avg. Days',    render: (_, r, i) => <span className="font-mono text-text-muted/50">~{12 + (i ?? 0) * 1}d</span> },
 ];
 
-export function StatisticsPage() {
+function StatisticsPage() {
   const [period, setPeriod] = useState('3M');
 
   // Inject index for avgDays fake metric calculation map over rows
@@ -37,19 +37,34 @@ export function StatisticsPage() {
   );
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1">
-          {['1M', '3M', '6M', '1Y', 'ALL'].map(p => (
-            <button key={p} onClick={() => setPeriod(p)}
-              className={`px-3 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all duration-150 border
-                ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-border/10 text-text-muted/40 hover:text-text-muted bg-transparent'}`}>
-              {p}
-            </button>
-          ))}
+    <div className="space-y-5 animate-fade-up">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            Prop Trading
+          </p>
+          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            Statistics & Performance
+          </h2>
+          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            Analytics on challenge pass rates, application trends, and revenue.
+          </p>
         </div>
-        <IconBtn label="Export Report" Icon={Download} variant="default" />
-      </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex gap-1 mr-2">
+            {['1M', '3M', '6M', '1Y', 'ALL'].map(p => (
+              <button key={p} onClick={() => setPeriod(p)}
+                className={`px-3 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all duration-150 border
+                  ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-border/10 text-text-muted/40 hover:text-text-muted bg-transparent'}`}>
+                {p}
+              </button>
+            ))}
+          </div>
+          <button className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer">
+            <Download size={12} /> Export Report
+          </button>
+        </div>
+      </header>
 
       <PropStatsCards kpis={statsKpis} />
 
@@ -104,12 +119,12 @@ export function StatisticsPage() {
         </Card>
       </div>
 
-      <Card pad={false}>
-        <div className="px-5 py-4 border-b border-border/25">
-          <SectionHead title="Challenge Performance Breakdown" Icon={BarChart3} />
-        </div>
-        <FeatureTable cols={cols} rows={rankedStats} rowKey="name" />
-      </Card>
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+        <TableToolbar title="Challenge Performance Breakdown" />
+        <MainTable cols={cols} data={rankedStats} rowClassName={() => "hover:bg-brand/5 hover:border-l-brand"} />
+      </section>
     </div>
   );
 }
+
+export default StatisticsPage;

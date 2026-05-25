@@ -3,8 +3,8 @@ import { CircleDollarSign, Download, UserPlus } from 'lucide-react';
 import { PageToolbar } from '../../../components/layout/PageToolbar';
 import { IBCard, SectionHead } from '../components/IBComponents';
 import { TreeNode, TreeDetailPanel } from '../components/PartnerTree';
-import { partnerTree } from '../data/workspaces/tree.workspace';
-import { TIER_CLR } from '../data/workspaces/shared.workspace';
+import { partnerTree } from '@/config/constants/ib-system/workspaces/tree.workspace';
+import { TIER_CLR } from '@/config/constants/ib-system/workspaces/shared.workspace';
 
 const filterTree = (nodes, q) => {
   if (!q) return nodes;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Download, CheckCircle2, Edit2, Zap, Check, Trash2, ChevronRight, Layers, FileText } from 'lucide-react';
-import { challengeRows } from '../data/workspaces/challenge.workspace';
+import { challengeRows } from '@/config/constants/prop-trading/workspaces/challenge.workspace';
 import { Card, SectionHead, IconBtn, Badge, FormField, TextInput, SelectInput } from '../components/PropComponents';
 import { ActionToast } from '../../../components/ui';
 import { PropToolbar } from '../components/PropToolbar';

@@ -11,7 +11,7 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
-import { PERMISSIONS } from '@config/permissions/permissions';
+import { PERMISSIONS } from '@/config/permissions/permissions';
 
 /**
  * Admin Route Modules Configuration

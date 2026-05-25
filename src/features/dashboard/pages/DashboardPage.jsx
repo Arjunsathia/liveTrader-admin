@@ -4,7 +4,7 @@ import { DashboardKpis } from '../components/DashboardKpis';
 import { DashboardChart } from '../components/DashboardChart';
 import { DashboardAlerts } from '../components/DashboardAlerts';
 import { DashboardQuickActions } from '../components/DashboardQuickActions';
-import { DashboardStream } from '../components/DashboardStream';
+import DashboardStream from '../components/DashboardStream';
 import { DashboardMarket } from '../components/DashboardMarket';
 import { DashboardHealth } from '../components/DashboardHealth';
 

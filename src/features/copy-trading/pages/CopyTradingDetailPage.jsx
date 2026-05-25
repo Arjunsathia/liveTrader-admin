@@ -14,12 +14,12 @@ import {
 } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { DrawerSection, DrawerField, DrawerGrid } from '../../../components/overlays';
-import { strategiesConfig } from '../data/workspaces/strategies.workspace';
-import { providersConfig } from '../data/workspaces/providers.workspace';
-import { followersConfig } from '../data/workspaces/followers.workspace';
-import { subscriptionsConfig } from '../data/workspaces/subscriptions.workspace';
-import { performanceConfig } from '../data/workspaces/performance.workspace';
+import { DrawerSection, DrawerField, DrawerFormGrid } from '../../../components/common/drawer';
+import { strategiesConfig } from '@/config/constants/copy-trading/workspaces/strategies.workspace';
+import { providersConfig } from '@/config/constants/copy-trading/workspaces/providers.workspace';
+import { followersConfig } from '@/config/constants/copy-trading/workspaces/followers.workspace';
+import { subscriptionsConfig } from '@/config/constants/copy-trading/workspaces/subscriptions.workspace';
+import { performanceConfig } from '@/config/constants/copy-trading/workspaces/performance.workspace';
 
 const WORKSPACE_MAP = {
   strategies: strategiesConfig,
@@ -80,7 +80,7 @@ export function CopyTradingDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Card title="Detailed Overview">
-            <DrawerGrid>
+            <DrawerFormGrid>
               {Object.entries(row).map(([key, value]) => {
                 if (typeof value === 'object' || key === 'id' || key === 'name') return null;
                 return (
@@ -92,7 +92,7 @@ export function CopyTradingDetailPage() {
                   />
                 );
               })}
-            </DrawerGrid>
+            </DrawerFormGrid>
           </Card>
 
           <Card title="Performance Analytics">
@@ -127,11 +127,11 @@ export function CopyTradingDetailPage() {
            <Card title="System Context">
               <div className="space-y-4">
                  <DrawerSection title="Record Metadata" />
-                 <DrawerGrid cols={1}>
+                 <DrawerFormGrid cols={1}>
                     <DrawerField label="Registry ID" value={row.id} mono />
                     <DrawerField label="Slug Reference" value={slug} mono />
                     <DrawerField label="Data Integrity" value="VERIFIED" accent="var(--positive)" />
-                 </DrawerGrid>
+                 </DrawerFormGrid>
               </div>
            </Card>
         </div>

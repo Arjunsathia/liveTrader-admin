@@ -1,12 +1,10 @@
 import React from 'react';
 import { CircleDollarSign, ShieldAlert, Download, AlertTriangle, Lock } from 'lucide-react';
-import { fundedRows } from '../data/workspaces/funded.workspace';
+import { fundedRows } from '@/config/constants/prop-trading/workspaces/funded.workspace';
 import { StatusChip as Badge, RiskChip as RiskBadge, ActionToast } from '../../../components/ui';
-import { PropToolbar } from '../components/PropToolbar';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 import { FundedDrawer } from '../components/PropDrawer';
 import { MetricGrid } from '../../../components/cards/MetricGrid';
-import { Card } from '../../../components/ui/Card';
 import { usePropWorkspace } from '../hooks/usePropWorkspace';
 import { exportRows } from '../../../utils/exporters';
 
@@ -19,7 +17,7 @@ const metrics = [
   { label: 'Risk Flags', value: `${fundedRows.filter((r) => r.risk === 'HIGH').length} HIGH`, accent: 'var(--negative)' },
 ];
 
-export function FundedAccountsPage() {
+function FundedAccountsPage() {
   const ws = usePropWorkspace({
     rows: fundedRows,
     statusKey: 'status',
@@ -74,8 +72,8 @@ export function FundedAccountsPage() {
     { key: 'risk', label: 'Risk', render: (v) => <RiskBadge value={v} /> },
     { key: 'status', label: 'Status', render: (v) => <Badge value={v} /> },
     {
-      key: '_actions', label: '', render: (_, r) => (
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end" onClick={(e) => e.stopPropagation()}>
           {r.payoutReady && (
             <button onClick={(e) => { e.stopPropagation(); ws.onAction('Payout approved', r.id); }} className="w-6 h-6 rounded-[5px] border border-positive/20 bg-positive/[0.07] text-positive flex items-center justify-center cursor-pointer hover:brightness-110">
               <CircleDollarSign size={10} />
@@ -89,28 +87,76 @@ export function FundedAccountsPage() {
   ];
 
   return (
-    <div className="space-y-5">
-      <PropToolbar
-        search={ws.search} setSearch={ws.setSearch}
-        filters={['ALL', 'ACTIVE', 'WARNED', 'BREACHED', 'PAYOUT']}
-        activeFilter={ws.filter} setFilter={ws.setFilter}
-        actions={[
-          { label: 'Batch Payout', Icon: CircleDollarSign, primary: true, onClick: () => ws.onAction('Batch payout initiated', '') },
-          { label: 'Risk Export', Icon: ShieldAlert, onClick: () => exportRows(ws.filtered, 'funded-risk.csv') },
-          { label: 'Export', Icon: Download, onClick: () => exportRows(ws.filtered, 'funded-accounts.csv') },
-        ]}
-      />
+    <div className="space-y-5 animate-fade-up">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            Prop Trading
+          </p>
+          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            Funded Accounts
+          </h2>
+          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            Manage live funded traders, their risk, and payout eligibility.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button onClick={() => exportRows(ws.filtered, 'funded-risk.csv')} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-warning/20 bg-warning/[0.05] text-warning hover:bg-warning/[0.1] text-[11px] font-bold transition-all cursor-pointer">
+            <ShieldAlert size={12} /> Risk Export
+          </button>
+          <button onClick={() => exportRows(ws.filtered, 'funded-accounts.csv')} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer">
+            <Download size={12} /> Export CSV
+          </button>
+          <button onClick={() => ws.onAction('Batch payout initiated', '')} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all cursor-pointer hover:scale-[1.03] active:scale-[0.97]">
+            <CircleDollarSign size={12} /> Batch Payout
+          </button>
+        </div>
+      </header>
 
       <ActionToast msg={ws.toast} />
 
-      {/* Summary metrics strip — replaces inline grid */}
       <MetricGrid metrics={metrics} />
 
-      <Card title="Funded Accounts" subtitle={`${ws.filtered.length} record${ws.filtered.length !== 1 ? 's' : ''} matched · click row to open`} padding={false}>
-        <FeatureTable cols={cols} rows={ws.filtered} onRow={ws.openDrawer} />
-      </Card>
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+        <TableToolbar
+          title="Funded Accounts"
+          count={ws.filtered.length}
+          accentColor="var(--brand)"
+          search={ws.search}
+          onSearchChange={ws.setSearch}
+          searchPlaceholder="Search trader, account ID…"
+          filters={
+            <div className="flex items-center gap-1">
+              <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Filter:</span>
+              <select
+                value={ws.filter}
+                onChange={(e) => ws.setFilter(e.target.value)}
+                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                style={{ minWidth: '70px' }}
+              >
+                {['ALL', 'ACTIVE', 'WARNED', 'BREACHED', 'PAYOUT'].map(f => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+          }
+        />
+        <MainTable 
+          columns={cols} 
+          data={ws.filtered} 
+          onRowClick={ws.openDrawer}
+          rowClassName={(r) => {
+            if (r.payoutReady) return 'hover:bg-brand/5 hover:border-l-brand cursor-pointer';
+            if (r.status === 'BREACHED' || r.risk === 'HIGH') return 'hover:bg-negative/5 hover:border-l-negative cursor-pointer';
+            if (r.status === 'WARNED') return 'hover:bg-warning/5 hover:border-l-warning cursor-pointer';
+            return 'hover:bg-brand/5 hover:border-l-brand cursor-pointer';
+          }}
+        />
+      </section>
 
-      <FundedDrawer row={ws.drawer} open={!!ws.drawer} onClose={ws.closeDrawer} onAction={ws.onAction} />
+      <FundedDrawer row={ws.drawer} open={ws.isDrawerOpen} onClose={ws.closeDrawer} onAction={ws.onAction} />
     </div>
   );
 }
+
+export default FundedAccountsPage;

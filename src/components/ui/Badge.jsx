@@ -1,5 +1,5 @@
 import React from 'react';
-import { STATUS_COLORS, RISK_COLORS, PRIORITY_COLORS, CATEGORY_COLORS } from '@config/constants/status.constants';
+import { STATUS_COLORS, RISK_COLORS, PRIORITY_COLORS, CATEGORY_COLORS } from '@/config/constants/status.constants';
 
 /**
  * Badge — THE single status/badge component for the entire app.

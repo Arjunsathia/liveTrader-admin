@@ -28,11 +28,11 @@ import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { StatusBadge } from '../../../components/ui';
 import { UserDetailContent } from '../components/UserDetailContent';
-import { usersService } from '../services/users.service';
-import { kycService } from '../../kyc/services/kyc.service';
-import { userDetailTabs } from '../data/user-tabs';
+import { usersService } from '../services/userService';
+import { kycService } from "../services/kycService";
+import { userDetailTabs } from '@/config/constants/USER_TABS';
 import { AddUserDrawer } from '../components/AddUserDrawer';
-import { buildUserDraft, applyDraftToUser } from '../data/user-draft.utils';
+import { buildUserDraft, applyDraftToUser } from '@/utils/userDraftUtils';
 
 const tabIcons = {
   overview: BarChart2,

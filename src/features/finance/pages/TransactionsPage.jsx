@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Activity, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, BarChart2, CircleDollarSign, Copy, Download, Eye, FileText, Flag, RefreshCw, RotateCcw, Settings, Star, User, Search } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
-import { transactionsData, TXN_TYPE_CLR, STATUS_CLR } from '../data/mockData';
+import { transactionsData, TXN_TYPE_CLR, STATUS_CLR } from '@/config/constants/finance/mockData';
 import { KpiCard, StatusBadge, MethodBadge, AmountCell, Toast } from '../components/FinanceComponents';
-import { UserCell, FinanceRecordDrawer, Pagination } from '../components/FinanceDrawer';
+import { UserCell, FinanceRecordDrawer } from '../components/FinanceDrawer';
+import { MainTable, TableToolbar } from '../../../components/common/table';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
 const PAGE = {
   accent: 'var(--brand)',
@@ -12,13 +14,13 @@ const PAGE = {
   description: 'Unified financial ledger movement across user wallets, internal systems, and external gateways.',
 };
 
-export function TransactionsPage() {
+function TransactionsPage() {
   const [search, setSearch] = useState('');
   const [typeF, setTypeF] = useState('ALL');
   const [statusF, setStatusF] = useState('ALL');
   const [methodF, setMethodF] = useState('ALL');
   const [page, setPage] = useState(1);
-  const [drawer, setDrawer] = useState(null);
+  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
   
   const PER = 8;
@@ -64,6 +66,61 @@ export function TransactionsPage() {
     ADJUSTMENT: Settings 
   };
 
+  const columns = [
+    { key: 'id', label: 'TXN ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
+    { key: 'user', label: 'User', render: (_, row) => <UserCell u={row.user} /> },
+    {
+      key: 'type',
+      label: 'Type',
+      render: (val) => {
+        const Ic = TXN_ICONS[val] || ArrowLeftRight;
+        const c = TXN_TYPE_CLR[val] || 'var(--text-muted)';
+        return (
+          <span className="inline-flex items-center gap-1.5 text-[10.5px] font-black uppercase tracking-[0.05em] font-heading" style={{ color: c }}>
+            <Ic size={11} className="flex-shrink-0" />
+            {val}
+          </span>
+        );
+      },
+    },
+    { key: 'amount', label: 'Amount', render: (_, row) => <AmountCell value={row.amount} type={row.type} /> },
+    { key: 'method', label: 'Method', render: (val) => <MethodBadge value={val} /> },
+    { key: 'reference', label: 'Reference', render: (val) => <span className="font-mono text-[11px] text-cyan hover:underline">{val}</span> },
+    { key: 'status', label: 'Status', render: (val) => <StatusBadge value={val} /> },
+    { key: 'ts', label: 'Timestamp', render: (val) => <span className="font-mono text-[11px] text-text-muted/50">{val}</span> },
+    {
+      key: 'actions',
+      label: 'Actions',
+      align: 'right',
+      render: (_, row) => (
+        <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={(e) => { e.stopPropagation(); act('Exported', row.id); }}
+            className="w-6 h-6 rounded-[5px] border border-border/20 bg-bg text-text-muted/60 hover:text-text cursor-pointer flex items-center justify-center transition-colors"
+          >
+            <Download size={10} />
+          </button>
+          {row.status === 'FLAGGED' && (
+            <button
+              onClick={(e) => { e.stopPropagation(); act('Reviewed', row.id); }}
+              className="w-6 h-6 rounded-[5px] border border-warning/20 bg-warning/[0.07] text-warning cursor-pointer flex items-center justify-center transition-colors"
+            >
+              <Eye size={10} />
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  const tableState = {
+    page,
+    pageSize: PER,
+    setPage,
+    setPageSize: () => {},
+    totalPages: Math.ceil(filtered.length / PER)
+  };
+
   return (
     <PageShell>
       <div className="space-y-5 animate-fade-up">
@@ -103,186 +160,81 @@ export function TransactionsPage() {
 
         {/* ── Table Card ── */}
         <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+          <TableToolbar
+            title="Ledger Log"
+            count={filtered.length}
+            accentColor={PAGE.accent}
+            search={search}
+            onSearchChange={(v) => { setSearch(v); setPage(1); }}
+            searchPlaceholder="Search ledger…"
+            filters={
+              <>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Type:</span>
+                  <select
+                    value={typeF}
+                    onChange={(e) => { setTypeF(e.target.value); setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '70px' }}
+                  >
+                    {['ALL', 'DEPOSIT', 'WITHDRAWAL', 'FEE', 'REVERSAL', 'COMMISSION', 'ADJUSTMENT'].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* Table Header */}
-          <div className="px-5 py-3.5 border-b border-border/12 flex items-center justify-between gap-3 bg-surface-elevated flex-wrap">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-1 h-5 rounded-full"
-                style={{ background: PAGE.accent }}
-              />
-              <h3 className="font-black text-[12px] tracking-widest uppercase text-text/80">
-                Ledger Log
-              </h3>
-              <span
-                className="px-1.5 py-0.5 rounded-[5px] text-[10px] font-black border font-mono"
-                style={{ color: PAGE.accent, background: `color-mix(in srgb, ${PAGE.accent} 10%, transparent)`, borderColor: `color-mix(in srgb, ${PAGE.accent} 22%, transparent)` }}
-              >
-                {filtered.length}
-              </span>
-            </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                  <select
+                    value={statusF}
+                    onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '70px' }}
+                  >
+                    {['ALL', 'SETTLED', 'PENDING', 'FLAGGED', 'FROZEN'].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="relative">
-                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                  placeholder="Search ledger…"
-                  className="h-7 pl-7 pr-3 w-36 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text placeholder:text-text-muted/35 outline-none focus:border-brand/40 focus:w-48 transition-all"
-                />
-              </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Method:</span>
+                  <select
+                    value={methodF}
+                    onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '70px' }}
+                  >
+                    {['ALL', 'Bank Wire', 'Card', 'Crypto', 'E-Wallet', 'Internal'].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            }
+          />
 
-              {/* Type Select */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Type:</span>
-                <select
-                  value={typeF}
-                  onChange={(e) => { setTypeF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
-                  style={{ minWidth: '70px' }}
-                >
-                  {['ALL', 'DEPOSIT', 'WITHDRAWAL', 'FEE', 'REVERSAL', 'COMMISSION', 'ADJUSTMENT'].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Status Select */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
-                <select
-                  value={statusF}
-                  onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
-                  style={{ minWidth: '70px' }}
-                >
-                  {['ALL', 'SETTLED', 'PENDING', 'FLAGGED', 'FROZEN'].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Method Select */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Method:</span>
-                <select
-                  value={methodF}
-                  onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
-                  style={{ minWidth: '70px' }}
-                >
-                  {['ALL', 'Bank Wire', 'Card', 'Crypto', 'E-Wallet', 'Internal'].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
-                  <th className="px-4 py-3">TXN ID</th>
-                  <th className="px-4 py-3">User</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Amount</th>
-                  <th className="px-4 py-3">Method</th>
-                  <th className="px-4 py-3">Reference</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Timestamp</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/8">
-                {paged.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
-                      No transactions found matching filters.
-                    </td>
-                  </tr>
-                ) : (
-                  paged.map((row) => {
-                    const isGreen = row.type === 'DEPOSIT' || row.type === 'COMMISSION';
-                    const isRed = row.type === 'WITHDRAWAL' || row.type === 'FEE';
-
-                    return (
-                      <tr
-                        key={row.id}
-                        onClick={() => setDrawer(row)}
-                        className={`group cursor-pointer transition-colors border-l-2 border-transparent ${
-                          isGreen
-                            ? 'hover:bg-positive/5 hover:border-l-positive'
-                            : isRed
-                            ? 'hover:bg-negative/5 hover:border-l-negative'
-                            : 'hover:bg-warning/5 hover:border-l-warning'
-                        }`}
-                      >
-                        <td className="px-4 py-3.5 font-mono text-[11px] font-bold text-brand">{row.id}</td>
-                        <td className="px-4 py-3.5"><UserCell u={row.user} /></td>
-                        <td className="px-4 py-3.5">
-                          {(() => {
-                            const Ic = TXN_ICONS[row.type] || ArrowLeftRight;
-                            const c = TXN_TYPE_CLR[row.type] || 'var(--text-muted)';
-                            return (
-                              <span className="inline-flex items-center gap-1.5 text-[10.5px] font-black uppercase tracking-[0.05em] font-heading" style={{ color: c }}>
-                                <Ic size={11} className="flex-shrink-0" />
-                                {row.type}
-                              </span>
-                            );
-                          })()}
-                        </td>
-                        <td className="px-4 py-3.5"><AmountCell value={row.amount} type={row.type} /></td>
-                        <td className="px-4 py-3.5"><MethodBadge value={row.method} /></td>
-                        <td className="px-4 py-3.5 font-mono text-[11px] text-cyan hover:underline">{row.reference}</td>
-                        <td className="px-4 py-3.5"><StatusBadge value={row.status} /></td>
-                        <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.ts}</td>
-                        <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); act('Exported', row.id); }}
-                              className="w-6 h-6 rounded-[5px] border border-border/20 bg-bg text-text-muted/60 hover:text-text cursor-pointer flex items-center justify-center transition-colors"
-                            >
-                              <Download size={10} />
-                            </button>
-                            {row.status === 'FLAGGED' && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); act('Reviewed', row.id); }}
-                                className="w-6 h-6 rounded-[5px] border border-warning/20 bg-warning/[0.07] text-warning cursor-pointer flex items-center justify-center transition-colors"
-                              >
-                                <Eye size={10} />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="border-t border-border/10">
-            <Pagination
-              total={filtered.length}
-              page={page}
-              perPage={PER}
-              setPage={setPage}
-            />
-          </div>
+          <MainTable
+            columns={columns}
+            data={paged}
+            onRowClick={(row) => drawerState.open(row)}
+            emptyTitle="No transactions found matching filters."
+            pagination={tableState}
+            rowClassName={(row) => {
+              const isGreen = row.type === 'DEPOSIT' || row.type === 'COMMISSION';
+              const isRed = row.type === 'WITHDRAWAL' || row.type === 'FEE';
+              if (isGreen) return 'hover:bg-positive/5 hover:border-l-positive';
+              if (isRed) return 'hover:bg-negative/5 hover:border-l-negative';
+              return 'hover:bg-warning/5 hover:border-l-warning';
+            }}
+          />
         </section>
       </div>
 
-      {/* Transactions Drawer */}
       <FinanceRecordDrawer
-        row={drawer}
-        open={!!drawer}
-        onClose={() => setDrawer(null)}
+        row={drawerState.value}
+        open={drawerState.isOpen}
+        onClose={() => drawerState.close()}
         type="Transaction"
         onAction={act}
       />

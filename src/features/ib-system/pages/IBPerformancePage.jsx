@@ -5,9 +5,9 @@ import {
   PieChart as RePie, Pie, Cell,
 } from 'recharts';
 import { KpiCard } from '../../../components/cards';
-import { perfKpis, perfTrend, tierDistrib, topPerformers, lowPerformers } from '../data/workspaces/overview.workspace';
+import { perfKpis, perfTrend, tierDistrib, topPerformers, lowPerformers } from '@/config/constants/ib-system/workspaces/overview.workspace';
 import { IBCard, IBTierBadge, SectionHead, IBChartTip, TraderAvatar, IBIconBtn } from '../components/IBComponents';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 
 const perfCols = [
   { key: 'rank', label: 'Rank', render: (_, r, i) => (
@@ -34,12 +34,12 @@ const perfCols = [
 
 const lowPerfCols = perfCols.filter(c => c.key !== 'rank');
 
-export function IBPerformancePage() {
+function IBPerformancePage() {
   const [period, setPeriod] = useState('3M');
   const DONUT_TOTAL = tierDistrib.reduce((s, t) => s + t.value, 0);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-up">
       {/* Period selector */}
       <div className="flex items-center justify-between">
         <div className="flex gap-1">
@@ -127,16 +127,24 @@ export function IBPerformancePage() {
 
       {/* Tables */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <IBCard pad={false}>
-          <div className="px-5 py-4 border-b border-border/30"><SectionHead title="Top Performers" Icon={Trophy} /></div>
-          <FeatureTable cols={perfCols} rows={topPerformers} rowKey="name" />
-        </IBCard>
+        <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+          <TableToolbar title="Top Performers" />
+          <MainTable 
+            columns={perfCols} 
+            data={topPerformers} 
+            rowClassName={() => "hover:bg-brand/5 hover:border-l-brand"}
+          />
+        </section>
 
         <div className="space-y-4">
-          <IBCard pad={false}>
-            <div className="px-5 py-4 border-b border-border/30"><SectionHead title="Underperforming Partners" Icon={TrendingDown} /></div>
-            <FeatureTable cols={lowPerfCols} rows={lowPerformers} rowKey="name" />
-          </IBCard>
+          <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+            <TableToolbar title="Underperforming Partners" />
+            <MainTable 
+              columns={lowPerfCols} 
+              data={lowPerformers} 
+              rowClassName={() => "hover:bg-warning/5 hover:border-l-warning"}
+            />
+          </section>
 
           <IBCard>
             <SectionHead title="Referral Conversion Funnel" Icon={Filter} />
@@ -167,3 +175,5 @@ export function IBPerformancePage() {
     </div>
   );
 }
+
+export default IBPerformancePage;

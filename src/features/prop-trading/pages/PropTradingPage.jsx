@@ -1,13 +1,13 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { PieChart, Layers, Clipboard, Trophy, BarChart2, Tag, Shield } from 'lucide-react';
-import { PageShell } from '@components/layout/PageShell';
+import { PageShell } from '@/components/layout/PageShell';
 import { PropOverviewPage }            from './PropOverviewPage';
 import { ChallengeConfigPage } from './ChallengeConfigPage';
-import { EvaluationRequestsPage }      from './EvaluationRequestsPage';
-import { FundedAccountsPage }          from './FundedAccountsPage';
-import { StatisticsPage }              from './StatisticsPage';
-import { FeesCouponsPage }             from './FeesCouponsPage';
+import EvaluationRequestsPage from './EvaluationRequestsPage';
+import FundedAccountsPage from './FundedAccountsPage';
+import StatisticsPage from './StatisticsPage';
+import FeesCouponsPage from './FeesCouponsPage';
 import { RiskRulesPanel }               from '../components/RiskRulesPanel';
 
 const NAV_ITEMS = [
@@ -30,7 +30,7 @@ const PAGE_MAP = {
   rules:       RiskRulesPanel,
 };
 
-export function PropTradingPage() {
+function PropTradingPage() {
   const location = useLocation();
 
   const found = NAV_ITEMS.find((n) => n.path === location.pathname);

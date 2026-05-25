@@ -12,16 +12,16 @@ import {
   CheckCircle2, PackageX,
 } from 'lucide-react';
 
-import { DepositsPage }       from './DepositsPage';
-import { WithdrawalsPage }    from './WithdrawalsPage';
-import { TransactionsPage }   from './TransactionsPage';
-import { FailedPaymentsPage } from './FailedPaymentsPage';
-import { ApprovalsPage }      from './ApprovalsPage';
+import DepositsPage from './DepositsPage';
+import WithdrawalsPage from './WithdrawalsPage';
+import TransactionsPage from './TransactionsPage';
+import FailedPaymentsPage from './FailedPaymentsPage';
+import ApprovalsPage from './ApprovalsPage';
 
 import {
   depositsData, withdrawalsData,
   failedPaymentsData, approvalsData,
-} from '../data/mockData';
+} from '@/config/constants/finance/mockData';
 
 /* ── URL slug ↔ internal page key map ──────────────────────────────────── */
 const SLUG_MAP = {
@@ -54,7 +54,7 @@ const FINANCE_NAV_ITEMS = [
 ];
 
 /* ── Module Shell ───────────────────────────────────────────────────────── */
-export function FinancePage() {
+function FinancePage() {
   const location = useLocation();
 
   const urlSlug = location.pathname.split('/')[2] || 'deposits';

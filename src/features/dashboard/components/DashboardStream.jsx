@@ -1,7 +1,6 @@
 import React from 'react';
 import { Activity, ArrowDownRight, ArrowUpRight, FileCheck, ShieldAlert, Zap } from 'lucide-react';
-import { Card } from '../../../components/ui/Card';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable } from '../../../components/common/table';
 
 const UNIFIED_STREAM = [
   { id: 'T-88421', type: 'trade', user: 'k.mueller', icon: Activity, detail: 'EUR/USD Buy 2.00 Lots', value: '+$342', status: 'open', time: 'Just now', color: 'var(--cyan)' },
@@ -68,24 +67,30 @@ const streamColumns = [
   { key: 'time', label: 'Time', align: 'right', render: (value) => <span className="font-mono text-[12px] font-medium tracking-wide text-text-muted/40">{value}</span> },
 ];
 
-export function DashboardStream() {
+function DashboardStream() {
   return (
-    <Card className="h-full p-0">
+    <section className="h-full rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border/15 flex items-center justify-between">
-        <div className="text-[14px] font-semibold text-text flex items-center gap-2">
+      <div className="px-5 py-4 border-b border-border/15 flex items-center justify-between bg-surface-elevated">
+        <div className="text-[14px] font-semibold text-text flex items-center gap-2 font-heading tracking-tight">
           <Zap size={14} className="text-cyan fill-cyan/20" style={{ color: 'var(--cyan)' }} />
           Global Activity Ledger
         </div>
-        <span className="flex items-center gap-1.5 px-2 py-1 rounded-[6px] bg-bg/50 text-[11px] font-bold uppercase tracking-[0.1em] text-text-muted/70 border border-border/20">
+        <span className="flex items-center gap-1.5 px-2 py-1 rounded-[6px] bg-bg/50 text-[10px] font-bold uppercase tracking-[0.1em] text-text-muted/70 border border-border/20 font-heading">
           <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
           Live Stream
         </span>
       </div>
 
-      <div className="pb-2 p-1">
-        <FeatureTable columns={streamColumns} data={UNIFIED_STREAM} rowKey="id" />
+      <div className="flex-1 min-h-0 bg-surface">
+        <MainTable 
+          columns={streamColumns} 
+          data={UNIFIED_STREAM} 
+          rowClassName={() => "hover:bg-cyan/5 hover:border-l-cyan"} 
+        />
       </div>
-    </Card>
+    </section>
   );
 }
+
+export default DashboardStream;

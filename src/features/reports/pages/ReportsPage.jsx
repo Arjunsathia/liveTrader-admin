@@ -1,12 +1,12 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, DollarSign, TrendingUp, Users, Cpu, Send } from 'lucide-react';
-import { PageShell } from '@components/layout/PageShell';
+import { PageShell } from '@/components/layout/PageShell';
 import { ReportsOverviewPage } from './ReportsOverviewPage';
-import { FinanceReportsPage } from './FinanceReportsPage';
-import { TradingReportsPage } from './TradingReportsPage';
-import { UserReportsPage } from './UserReportsPage';
-import { SystemReportsPage } from './SystemReportsPage';
+import FinanceReportsPage from './FinanceReportsPage';
+import TradingReportsPage from './TradingReportsPage';
+import UserReportsPage from './UserReportsPage';
+import SystemReportsPage from './SystemReportsPage';
 import { ExportCenterPage } from './ExportCenterPage';
 
 const NAV_ITEMS = [
@@ -27,7 +27,7 @@ const PAGE_MAP = {
   exports:  ExportCenterPage,
 };
 
-export function ReportsPage() {
+function ReportsPage() {
   const location = useLocation();
   const navigate = useNavigate();
 

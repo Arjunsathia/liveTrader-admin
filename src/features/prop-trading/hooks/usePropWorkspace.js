@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
 /**
  * usePropWorkspace — shared local state for Prop Trading list pages.
@@ -30,7 +31,7 @@ export function usePropWorkspace({
 }) {
   const [search, setSearch]   = useState('');
   const [filter, setFilter]   = useState('ALL');
-  const [drawer, setDrawer]   = useState(null);
+  const drawerState = useDrawerState(null);
   const [toast,  setToast]    = useState(null);
 
   const onAction = useCallback((msg, id) => {
@@ -39,8 +40,8 @@ export function usePropWorkspace({
     return () => clearTimeout(t);
   }, []);
 
-  const openDrawer  = useCallback((row) => setDrawer(row), []);
-  const closeDrawer = useCallback(() => setDrawer(null), []);
+  const openDrawer  = drawerState.open;
+  const closeDrawer = drawerState.close;
 
   const filtered = useMemo(() => {
     let result = rows;
@@ -68,7 +69,9 @@ export function usePropWorkspace({
     search, setSearch,
     filter, setFilter,
     filtered,
-    drawer, openDrawer, closeDrawer,
+    drawer: drawerState.value,
+    isDrawerOpen: drawerState.isOpen,
+    openDrawer, closeDrawer,
     toast,  onAction,
   };
 }

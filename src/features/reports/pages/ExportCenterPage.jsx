@@ -3,41 +3,33 @@ import { PageToolbar } from '../../../components/layout/PageToolbar';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { CheckCircle2, Plus, Pause, Play, PlayCircle, Trash2, Layers, AlertOctagon, AlarmClock, Mail, Clock, FileText, Check, X, Zap, RefreshCw } from 'lucide-react';
-import { exportTemplates, exportFailureLog } from '../data/mockData';
+import { exportTemplates, exportFailureLog } from '@/config/constants/reports/mockData';
 import { FormatBadge, TYPE_CLR, FORMAT_ICONS, FORMAT_CLR, TypePill, IconBtn, STATUS_CLR, StatusBadge } from '../components/ReportsComponents';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerGrid, DrawerField } from '../../../components/overlays';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerSection, DrawerFormGrid as DrawerFormGrid, DrawerField } from '../../../components/common/drawer';
 import { Button } from '../../../components/ui/Button';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
 function TemplateDetailDrawer({ open, tpl, onClose, onAction }) {
   if (!tpl) return null;
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
-      title={tpl.name}
-      subtitle={tpl.id}
-      eyebrow="Export Template"
       width="max-w-[500px]"
       onClose={onClose}
-      footer={(
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-             <StatusBadge value={tpl.status} />
-          </div>
-          <Button variant="secondary" onClick={onClose}>Close</Button>
-        </div>
-      )}
     >
+      <DrawerHeader title={tpl.name} subtitle={tpl.id} eyebrow="Export Template" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-6">
         <DrawerSection title="Configuration">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Type" value={tpl.type} accent={TYPE_CLR[tpl.type]} />
             <DrawerField label="Format" value={tpl.format} accent={FORMAT_CLR[tpl.format]} />
             <DrawerField label="Frequency" value={tpl.freq} />
             <DrawerField label="Last Run" value={tpl.lastRun} mono />
             <DrawerField label="Next Run" value={tpl.nextRun !== '—' ? tpl.nextRun : 'Paused'} mono wide />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
         
         <DrawerSection title="Recipients">
@@ -59,14 +51,23 @@ function TemplateDetailDrawer({ open, tpl, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex gap-2">
+             <StatusBadge value={tpl.status} />
+          </div>
+          <Button variant="secondary" onClick={onClose}>Close</Button>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
 export function ExportCenterPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
-  const [drawerTpl, setDrawerTpl] = useState(null);
+  const exportDrawer = useDrawerState(null);
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [toast, setToast] = useState(null);
   const [formState, setFormState] = useState({ name: '', type: 'Finance', format: 'PDF', freq: 'Daily', recipients: '' });
@@ -129,7 +130,7 @@ export function ExportCenterPage() {
               const isPaused = tpl.status === 'PAUSED';
 
               return (
-                <div key={tpl.id} onClick={() => setDrawerTpl(tpl)}
+                <div key={tpl.id} onClick={() => exportDrawer.open(tpl)}
                   className={`group rounded-[12px] border p-4 cursor-pointer transition-all duration-200 hover:border-primary/20 hover:bg-bg/60
                     ${isPaused ? 'border-border/10 bg-bg/20 opacity-70' : 'border-border/20 bg-bg/30'}`}>
                   <div className="flex items-start justify-between gap-3 mb-3">
@@ -257,21 +258,20 @@ export function ExportCenterPage() {
           </Card>
         </div>
       </div>
-      <TemplateDetailDrawer open={!!drawerTpl} tpl={drawerTpl} onClose={() => setDrawerTpl(null)} onAction={act} />
+      <TemplateDetailDrawer 
+        open={exportDrawer.isOpen}
+        tpl={exportDrawer.value}
+        onClose={exportDrawer.close}
+        onAction={act}
+      />
       
-      <AdminDrawer
+      <MainDrawer
         open={showAddDrawer}
         onClose={() => setShowAddDrawer(false)}
-        title="Create Export Template"
-        eyebrow="New Automation"
         width="max-w-[480px]"
-        footer={
-          <div className="flex gap-2 justify-end">
-            <Button variant="secondary" onClick={() => setShowAddDrawer(false)}>Cancel</Button>
-            <Button variant="primary" onClick={() => { setShowAddDrawer(false); act(`Template "${formState.name || 'New'}" created`); }}>Create Template</Button>
-          </div>
-        }
       >
+        <DrawerHeader title="Create Export Template" eyebrow="New Automation" onClose={() => setShowAddDrawer(false)} />
+        <DrawerBody>
         <div className="space-y-6">
           <DrawerSection title="General Details">
             <div className="space-y-4">
@@ -281,7 +281,7 @@ export function ExportCenterPage() {
                   className="w-full h-11 px-4 rounded-[12px] border border-border/30 bg-bg/40 text-[14px] text-text outline-none placeholder:text-text-muted/30 focus:border-primary/40 focus:bg-bg/60 transition-all font-heading" />
               </div>
               
-              <DrawerGrid>
+              <DrawerFormGrid>
                 {[
                   { label: 'Report Type', key: 'type', opts: ['Finance', 'Trading', 'User', 'System'] },
                   { label: 'Export Format', key: 'format', opts: ['PDF', 'XLSX', 'CSV', 'JSON'] },
@@ -300,7 +300,7 @@ export function ExportCenterPage() {
                     </div>
                   </div>
                 ))}
-              </DrawerGrid>
+              </DrawerFormGrid>
             </div>
           </DrawerSection>
 
@@ -323,7 +323,14 @@ export function ExportCenterPage() {
             </div>
           </DrawerSection>
         </div>
-      </AdminDrawer>
+        </DrawerBody>
+        <DrawerFooter>
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="secondary" onClick={() => setShowAddDrawer(false)}>Cancel</Button>
+            <Button variant="primary" onClick={() => { setShowAddDrawer(false); act(`Template "${formState.name || 'New'}" created`); }}>Create Template</Button>
+          </div>
+        </DrawerFooter>
+      </MainDrawer>
     </div>
   );
 }

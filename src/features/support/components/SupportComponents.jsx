@@ -9,7 +9,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { useEffect } from 'react';
 import { Check, CheckCircle2, X } from 'lucide-react';
-import { PRIORITY_COLORS, CATEGORY_COLORS, STATUS_COLORS } from '@config/constants/status.constants';
+import { PRIORITY_COLORS, CATEGORY_COLORS, STATUS_COLORS } from '@/config/constants/status.constants';
 
 /* ── Color maps (re-exported for backward compat) ────────────── */
 

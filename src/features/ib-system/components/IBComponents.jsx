@@ -1,12 +1,12 @@
 /**
  * IBComponents — re-exports canonical shared UI from components/ui/FeatureUI.
- * IB-specific components (IBTierBadge, TraderAvatar, IBChartTip, IBDrawerGrid)
+ * IB-specific components (IBTierBadge, TraderAvatar, IBChartTip, IBDrawerFormGrid)
  * remain here since they are only used in the IB System feature.
  */
 import React from 'react';
 import { Star } from 'lucide-react';
-import { IB_TIER_COLORS } from '@config/constants/status.constants';
-import { STATUS_CLR, TIER_CLR } from '../data/workspaces/shared.workspace';
+import { IB_TIER_COLORS } from '@/config/constants/status.constants';
+import { STATUS_CLR, TIER_CLR } from '@/config/constants/ib-system/workspaces/shared.workspace';
 
 // ── Re-export canonical shared primitives ──────────────────────
 export { StatusChip as IBBadge, RiskChip as IBRiskBadge, SectionHead, ActionBtn as IBIconBtn, ActionToast as IBToast, TableActionBtn } from '../../../components/ui';
@@ -53,8 +53,8 @@ export function TraderAvatar({ name }) {
   );
 }
 
-// ── IBDrawerGrid (IB-specific grid wrapper) ───────────────────
-export function IBDrawerGrid({ children }) {
+// ── IBDrawerFormGrid (IB-specific grid wrapper) ───────────────────
+export function IBDrawerFormGrid({ children }) {
   return <div className="grid grid-cols-2 gap-2">{children}</div>;
 }
 

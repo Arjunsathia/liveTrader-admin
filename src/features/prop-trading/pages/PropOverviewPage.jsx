@@ -1,7 +1,7 @@
 import React from 'react';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts';
 import { CircleDollarSign, Filter, CheckCircle2, Zap, Plus, Download, AlertOctagon, Settings, Target, Users } from 'lucide-react';
-import { overviewKpis, payoutTrend, completionTrend, funnelData, recentApprovals } from '../data/workspaces/overview.workspace';
+import { overviewKpis, payoutTrend, completionTrend, funnelData, recentApprovals } from '@/config/constants/prop-trading/workspaces/overview.workspace';
 import { Card, SectionHead, IconBtn, RiskBadge, CustomTooltip } from '../components/PropComponents';
 import { PropStatsCards } from '../components/PropStatsCards';
 import { PropQuickActions } from '../components/PropQuickActions';

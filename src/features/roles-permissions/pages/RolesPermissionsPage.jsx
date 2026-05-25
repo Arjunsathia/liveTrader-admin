@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Users, Shield, Key } from 'lucide-react';
-import { AdminUsersPage } from './AdminUsersPage';
-import { RolesPage } from './RolesPage';
-import { PermissionsPage } from './PermissionsPage';
+import AdminUsersPage from './AdminUsersPage';
+import RolesPage from './RolesPage';
+import PermissionsPage from './PermissionsPage';
 
 const NAV_ITEMS = [
   { id: 'users', label: 'Admin Users', Icon: Users, path: '/admin-mgmt/users' },

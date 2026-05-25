@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { CircleDollarSign, Edit2, Tag, Plus, CheckCircle2, PauseCircle, PlayCircle, Trash2, X, Check } from 'lucide-react';
-import { feesRows, couponsRows } from '../data/workspaces/fees.workspace';
-import { Card, SectionHead, IconBtn, Badge, FormField, TextInput, SelectInput } from '../components/PropComponents';
-import { ActionToast } from '../../../components/ui';
+import { Edit2, Tag, Plus, Trash2, X, Check } from 'lucide-react';
+import { feesRows, couponsRows } from '@/config/constants/prop-trading/workspaces/fees.workspace';
+import { Card, SectionHead, IconBtn, FormField, TextInput, SelectInput } from '../components/PropComponents';
+import { StatusChip as Badge, ActionToast } from '../../../components/ui';
 import { FeesTable } from '../components/FeesTable';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 
-export function FeesCouponsPage() {
+function FeesCouponsPage() {
   const [toast, setToast] = useState(null);
   const [couponForm, setCouponForm] = useState(null);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -29,8 +29,8 @@ export function FeesCouponsPage() {
     { key: 'expires',  label: 'Expires',  render: (v) => <span className="font-mono text-text-muted/40">{v ?? '∞'}</span> },
     { key: 'campaign', label: 'Campaign', render: (v) => <span className="text-text-muted/55 font-heading">{v}</span> },
     { key: 'status',   label: 'Status',   render: (v) => <Badge value={v} /> },
-    { key: '_actions', label: '',         render: (_, r) => (
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    { key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
+      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
         <button onClick={() => showToast(`Editing ${r.code}`)} className="w-6 h-6 rounded-[5px] border border-border/25 flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer"><Edit2 size={10} /></button>
         <button onClick={() => showToast(`Deleted ${r.code}`)} className="w-6 h-6 rounded-[5px] border border-negative/20 bg-negative/5 flex items-center justify-center text-negative/50 hover:text-negative cursor-pointer"><Trash2 size={10} /></button>
       </div>
@@ -38,19 +38,37 @@ export function FeesCouponsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 animate-fade-up">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            Prop Trading
+          </p>
+          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            Fees & Coupons
+          </h2>
+          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            Manage challenge entry fees and discount campaigns.
+          </p>
+        </div>
+      </header>
+
       <ActionToast msg={toast} />
 
       <FeesTable rows={feesRows} showToast={showToast} />
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-5 items-start">
-        <Card pad={false}>
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border/25">
-            <SectionHead title="Coupon Codes" Icon={Tag} />
-            <IconBtn label="New Coupon" Icon={Plus} variant="brand" small onClick={() => setCouponForm(true)} />
-          </div>
-          <FeatureTable cols={couponsCols} rows={couponsRows} />
-        </Card>
+        <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+          <TableToolbar 
+            title="Coupon Codes" 
+            actions={<button onClick={() => setCouponForm(true)} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all cursor-pointer hover:scale-[1.03] active:scale-[0.97]"><Plus size={12} /> New Coupon</button>}
+          />
+          <MainTable 
+            columns={couponsCols} 
+            data={couponsRows} 
+            rowClassName={() => "hover:bg-brand/5 hover:border-l-brand"} 
+          />
+        </section>
 
         <Card>
           <SectionHead title={couponForm ? 'New Coupon' : 'Coupon Summary'} Icon={Tag} />
@@ -101,3 +119,5 @@ export function FeesCouponsPage() {
     </div>
   );
 }
+
+export default FeesCouponsPage;

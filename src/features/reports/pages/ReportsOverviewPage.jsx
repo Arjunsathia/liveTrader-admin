@@ -7,7 +7,7 @@ import { IconBtn, FORMAT_ICONS, FORMAT_CLR, TYPE_CLR, StatusBadge } from '../com
 import { ActivityBarChart, DeliveryAreaChart, TypePieChart } from '../components/ReportsCharts';
 import {
   overviewKpis, reportActivity, reportTypeSplit, deliveryTrend, recentReports
-} from '../data/mockData';
+} from '@/config/constants/reports/mockData';
 import {
   CheckCircle2, Plus, AlarmClock, Download, RefreshCw, Layers, Send, Clock, BarChart2, PieChart, Zap, FileText
 } from 'lucide-react';

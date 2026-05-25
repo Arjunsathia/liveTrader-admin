@@ -1,40 +1,36 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AlertCircle, AlertOctagon, Check, CreditCard, Download, Eye,
-  Flag, ShieldAlert, Timer, UserPlus,
+  AlertCircle, AlertOctagon, Check, Download, Eye, UserPlus,
 } from 'lucide-react';
-import { Card } from '@components/ui/Card';
-import { FeatureTable } from '@components/tables';
-import { Pagination } from '@components/tables/Pagination';
-import { escalatedData } from '@features/support/data/mockData';
+import { MainTable, TableToolbar } from '../../../components/common/table';
+import { escalatedData } from '@/config/constants/support/mockData';
 import {
-  PRIORITY_CLR,
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
   UserAvatar, SupportStatCard, SupportIconBtn, SupportToast,
-} from '@features/support/components/SupportComponents';
+} from '@/features/support/components/SupportComponents';
 
 const PER_PAGE = 10;
 
-export function EscalatedPage() {
-  const navigate      = useNavigate();
-  const [search]  = useState('');
+function EscalatedPage() {
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
   const [priorityF, setPriority] = useState('all');
-  const [catF,    setCatF]    = useState('all');
-  const [page,    setPage]    = useState(1);
-  const [toast,   setToast]   = useState(null);
+  const [catF, setCatF] = useState('all');
+  const [page, setPage] = useState(1);
+  const [toast, setToast] = useState(null);
 
   const act = (msg) => { setToast(msg); };
 
   const filtered = useMemo(() => {
     let rows = [...escalatedData];
     if (priorityF !== 'all') rows = rows.filter((r) => r.priority === priorityF);
-    if (catF      !== 'all') rows = rows.filter((r) => r.category === catF);
+    if (catF !== 'all') rows = rows.filter((r) => r.category === catF);
     if (search) {
       const q = search.toLowerCase();
       rows = rows.filter((r) =>
         r.subject.toLowerCase().includes(q) ||
-        r.user.toLowerCase().includes(q)    ||
+        r.user.toLowerCase().includes(q) ||
         r.id.includes(q)
       );
     }
@@ -42,15 +38,15 @@ export function EscalatedPage() {
   }, [search, priorityF, catF]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const stats = [
-    { label: 'Total Escalated',   val: escalatedData.length,                                                      color: 'var(--negative)', urgent: true },
-    { label: 'Critical Priority', val: escalatedData.filter((t) => t.priority === 'CRITICAL').length,             color: 'var(--negative)', urgent: true },
-    { label: 'SLA Breached',      val: escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length,    color: 'var(--negative)', urgent: true },
-    { label: 'Compliance',        val: escalatedData.filter((t) => t.category === 'Compliance').length,           color: 'var(--warning)' },
-    { label: 'Financial',         val: escalatedData.filter((t) => ['Finance', 'Prop'].includes(t.category)).length, color: 'var(--warning)' },
-    { label: 'Unassigned',        val: escalatedData.filter((t) => t.owner === 'Unassigned').length,              color: 'var(--negative)', urgent: true },
+    { label: 'Total Escalated', val: escalatedData.length, color: 'var(--negative)', urgent: true },
+    { label: 'Critical Priority', val: escalatedData.filter((t) => t.priority === 'CRITICAL').length, color: 'var(--negative)', urgent: true },
+    { label: 'SLA Breached', val: escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length, color: 'var(--negative)', urgent: true },
+    { label: 'Compliance', val: escalatedData.filter((t) => t.category === 'Compliance').length, color: 'var(--warning)' },
+    { label: 'Financial', val: escalatedData.filter((t) => ['Finance', 'Prop'].includes(t.category)).length, color: 'var(--warning)' },
+    { label: 'Unassigned', val: escalatedData.filter((t) => t.owner === 'Unassigned').length, color: 'var(--negative)', urgent: true },
   ];
 
   const columns = [
@@ -102,11 +98,11 @@ export function EscalatedPage() {
     { key: 'sla', label: 'SLA Time Left', render: (_, row) => <SlaBar pct={row.sla} slaMins={row.slaMins} /> },
     { key: 'status', label: 'Status', render: (value) => <SupportStatusBadge value={value} /> },
     {
-      key: '_actions',
-      label: '',
+      key: 'actions',
+      label: 'Actions',
       align: 'right',
       render: (_, row) => (
-        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
           <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/support/tickets/${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-border/25 text-text-muted/40 hover:text-text"><Eye size={10} /></button>
           <button type="button" onClick={(e) => { e.stopPropagation(); act(`Assigned: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-cyan/20 text-cyan/50 hover:text-cyan"><UserPlus size={10} /></button>
           <button type="button" onClick={(e) => { e.stopPropagation(); act(`Resolved: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-positive/20 text-positive/50 hover:text-positive"><Check size={10} /></button>
@@ -115,14 +111,32 @@ export function EscalatedPage() {
     },
   ];
 
+  const tableState = {
+    page,
+    pageSize: PER_PAGE,
+    setPage,
+    setPageSize: () => {},
+    totalPages: totalPages
+  };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-up">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            Support Operations
+          </p>
+          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            Escalations
+          </h2>
+          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            High-priority issues requiring senior support review.
+          </p>
+        </div>
+      </header>
 
       {/* ── Critical alert banner ── */}
-      <div
-        className="flex items-start gap-3 rounded-[12px] border border-negative/25 bg-negative/[0.06] px-5 py-4"
-        style={{ boxShadow: '0 0 24px rgba(239,68,68,0.07)' }}
-      >
+      <div className="flex items-start gap-3 rounded-[12px] border border-negative/25 bg-negative/[0.06] px-5 py-4" style={{ boxShadow: '0 0 24px rgba(239,68,68,0.07)' }}>
         <AlertOctagon size={16} className="text-negative flex-shrink-0 mt-0.5 animate-pulse" />
         <div className="flex-1">
           <div className="text-[13px] font-bold text-negative font-heading tracking-[-0.01em]">
@@ -135,8 +149,8 @@ export function EscalatedPage() {
           </div>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          <SupportIconBtn label="Bulk Assign"        Icon={UserPlus}  variant="warning" small onClick={() => act('Bulk assign modal opened')} />
-          <SupportIconBtn label="Escalation Report"  Icon={Download}  variant="default" small onClick={() => act('Report exported')} />
+          <SupportIconBtn label="Bulk Assign" Icon={UserPlus} variant="warning" small onClick={() => act('Bulk assign modal opened')} />
+          <SupportIconBtn label="Escalation Report" Icon={Download} variant="default" small onClick={() => act('Report exported')} />
         </div>
       </div>
 
@@ -147,69 +161,66 @@ export function EscalatedPage() {
         ))}
       </div>
 
-      {/* ── Filters ── */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {/* Priority */}
-        <div className="flex gap-1">
-          {['all', 'CRITICAL', 'HIGH'].map((f) => {
-            const c      = PRIORITY_CLR[f] || 'var(--primary)';
-            const active = priorityF === f;
-            return (
-              <button
-                key={f}
-                onClick={() => { setPriority(f); setPage(1); }}
-                className="px-2.5 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all border"
-                style={active
-                  ? { color: f === 'all' ? 'var(--primary)' : c, background: `color-mix(in srgb, ${f === 'all' ? 'var(--primary)' : c} 14%, transparent)`, borderColor: `color-mix(in srgb, ${f === 'all' ? 'var(--primary)' : c} 28%, transparent)` }
-                  : { color: 'var(--text-muted)', opacity: 0.45, background: 'transparent', borderColor: 'var(--border)' }}
-              >
-                {f === 'all' ? 'All' : f}
-              </button>
-            );
-          })}
-        </div>
-        {/* Category */}
-        <div className="flex gap-1 flex-wrap">
-          {['all', 'Finance', 'Compliance', 'Account', 'Prop'].map((f) => (
-            <button
-              key={f}
-              onClick={() => { setCatF(f); setPage(1); }}
-              className={[
-                'px-2.5 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all border',
-                catF === f
-                  ? 'bg-primary/[0.1] text-primary border-primary/20'
-                  : 'border-border/25 text-text-muted/40 hover:text-text-muted bg-transparent',
-              ].join(' ')}
-            >
-              {f === 'all' ? 'All' : f}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2 ml-auto">
-          <SupportIconBtn label="Export" Icon={Download} variant="default" small onClick={() => act('Escalated report exported')} />
-        </div>
-      </div>
-
       <SupportToast msg={toast} onDone={() => setToast(null)} />
 
       {/* Escalated table */}
-      <Card padding={false}>
-        <FeatureTable
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+        <TableToolbar
+          title="Escalated Queue"
+          count={filtered.length}
+          accentColor="var(--negative)"
+          search={search}
+          onSearchChange={(v) => { setSearch(v); setPage(1); }}
+          searchPlaceholder="Search escalated tickets…"
+          filters={
+            <>
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Priority:</span>
+                <select
+                  value={priorityF}
+                  onChange={(e) => { setPriority(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  <option value="all">ALL</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                  <option value="HIGH">HIGH</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Cat:</span>
+                <select
+                  value={catF}
+                  onChange={(e) => { setCatF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  <option value="all">ALL</option>
+                  <option value="Finance">FINANCE</option>
+                  <option value="Compliance">COMPLIANCE</option>
+                  <option value="Account">ACCOUNT</option>
+                  <option value="Prop">PROP</option>
+                </select>
+              </div>
+            </>
+          }
+          actions={
+            <SupportIconBtn label="Export" Icon={Download} variant="default" small onClick={() => act('Escalated report exported')} />
+          }
+        />
+
+        <MainTable
           columns={columns}
           data={paginated}
           onRowClick={(row) => navigate(`/support/tickets/${row.id}`)}
-          emptyMsg="No escalated tickets match filters"
-          footer={totalPages > 1 ? (
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-              pageSize={PER_PAGE}
-              onPageSizeChange={() => {}}
-            />
-          ) : null}
+          emptyTitle="No escalated tickets match filters"
+          pagination={tableState}
+          rowClassName={() => 'hover:bg-negative/5 hover:border-l-negative'}
         />
-      </Card>
+      </section>
     </div>
   );
 }
+
+export default EscalatedPage;

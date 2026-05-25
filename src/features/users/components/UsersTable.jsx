@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Ban, Edit2, Eye, Monitor, MoreHorizontal } from 'lucide-react';
-import { DataTable } from '../../../components/tables/DataTable';
-import { Pagination } from '../../../components/tables/Pagination';
+import { MainTable } from '../../../components/common/table';
 import { StatusBadge } from '../../../components/ui';
 import { useClickOutside } from '../../../hooks/useClickOutside';
 
@@ -77,297 +76,264 @@ export function UsersListTable({
   onSuspendUser,
   onOpenMt5,
 }) {
-  const paged = tableState.items;
-
-  return (
-    <>
-      <div className="overflow-x-auto custom-scrollbar">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
-              <th className="px-4 py-3">User Profile</th>
-              <th className="px-4 py-3">Segment / Tier</th>
-              <th className="px-4 py-3">KYC Status</th>
-              <th className="px-4 py-3">Collateral Wallet</th>
-              <th className="px-4 py-3">MT5 terminals</th>
-              <th className="px-4 py-3">Risk Assessment</th>
-              <th className="px-4 py-3">Last Active</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/8">
-            {paged.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
-                  No users matched the current filter criteria.
-                </td>
-              </tr>
-            ) : (
-              paged.map((row) => {
-                const isSuspended = row.suspended;
-                const isFlagged = ['FLAGGED', 'ELEVATED'].includes(row.riskStatus) || row.kycStatus === 'REJECTED';
-                const isPending = row.kycStatus === 'PENDING' || row.riskStatus === 'WATCHLIST';
-
-                return (
-                  <tr
-                    key={row.id}
-                    onClick={() => onOpenUser(row.id)}
-                    className={`group cursor-pointer transition-colors border-l-2 border-transparent ${isSuspended || isFlagged
-                      ? 'hover:bg-negative/5 hover:border-l-negative'
-                      : isPending
-                        ? 'hover:bg-warning/5 hover:border-l-warning'
-                        : 'hover:bg-positive/5 hover:border-l-positive'
-                      }`}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <UserAvatar name={row.name} />
-                        <div className="min-w-0">
-                          <div className="text-[13px] font-black text-text group-hover:text-brand transition-colors">{row.name}</div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[10px] font-mono font-bold text-text-muted/50 tracking-wider">UID {row.uid}</span>
-                            {isSuspended && (
-                              <span className="px-1 rounded-[3px] text-[8.5px] font-bold border border-negative/20 bg-negative/5 text-negative uppercase tracking-wide">
-                                Suspended
-                              </span>
-                            )}
-                          </div>
-                          <div className="truncate text-[10.5px] text-text-muted/50 font-medium font-mono">{row.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div>
-                        <div className="text-[12px] font-bold text-text">{row.segment}</div>
-                        <div className="text-[10.5px] text-text-muted/55 font-bold text-brand">{row.tier}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={row.kycStatus} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div>
-                        <div className="font-mono text-[12px] font-bold text-text">{row.walletBalance}</div>
-                        <div className="text-[10px] font-mono text-text-muted/50">EQ {row.equity}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div>
-                        <div className="text-[12.5px] font-bold text-text">{row.mt5Accounts} terminals</div>
-                        <div className="text-[10.5px] text-text-muted/50 font-medium">{row.openPositions} open trades</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={row.riskStatus} dot={false} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div>
-                        <div className="font-mono text-[11.5px] text-text font-semibold">{row.lastSeen}</div>
-                        <div className="text-[10px] text-text-muted/55 font-semibold">{row.source}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onOpenUser(row.id)}
-                          className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer animate-fade-in"
-                        >
-                          Open
-                        </button>
-                        <RowActionsMenu
-                          user={row}
-                          onOpenUser={onOpenUser}
-                          onQuickView={onQuickView}
-                          onEditUser={onEditUser}
-                          onSuspendUser={onSuspendUser}
-                          onOpenMt5={onOpenMt5}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="border-t border-border/10">
-        <Pagination
-          page={tableState.page}
-          totalPages={tableState.totalPages}
-          onPageChange={tableState.setPage}
-          pageSize={tableState.pageSize}
-          onPageSizeChange={tableState.setPageSize}
-        />
-      </div>
-    </>
-  );
-}
-
-export function UsersKYCTable({ tableState, onReviewUser }) {
   const columns = [
-    { key: 'id', label: 'Case ID', render: (item) => <span className="font-mono text-[11px] text-text-muted/75">{item.id}</span> },
     {
-      key: 'user',
-      label: 'User',
-      render: (item) => (
-        <div>
-          <div className="text-[12px] font-medium text-text">{item.user}</div>
-          <div className="text-[11px] text-text-muted/60">{item.country}</div>
+      key: 'profile',
+      label: 'User Profile',
+      render: (_, row) => (
+        <div className="flex items-center gap-3">
+          <UserAvatar name={row.name} />
+          <div className="min-w-0">
+            <div className="text-[13px] font-black text-text group-hover:text-brand transition-colors">{row.name}</div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[10px] font-mono font-bold text-text-muted/50 tracking-wider">UID {row.uid}</span>
+              {row.suspended && (
+                <span className="px-1 rounded-[3px] text-[8.5px] font-bold border border-negative/20 bg-negative/5 text-negative uppercase tracking-wide">
+                  Suspended
+                </span>
+              )}
+            </div>
+            <div className="truncate text-[10.5px] text-text-muted/50 font-medium font-mono">{row.email}</div>
+          </div>
         </div>
       ),
     },
-    { key: 'tier', label: 'Tier', render: (item) => <span className="text-[12px] text-text">{item.tier}</span> },
-    { key: 'docs', label: 'Docs', render: (item) => <span className="text-[12px] text-text-muted">{item.docs}</span> },
-    { key: 'status', label: 'Status', render: (item) => <StatusBadge status={item.status} /> },
-    { key: 'risk', label: 'Risk', render: (item) => <StatusBadge status={item.risk} dot={false} /> },
-    { key: 'eta', label: 'ETA', render: (item) => <span className="font-mono text-[11px] text-text-muted/75">{item.eta}</span> },
     {
-      key: 'action',
-      label: '',
-      render: (item) => (
-        <div className="text-right">
+      key: 'segment',
+      label: 'Segment / Tier',
+      render: (_, row) => (
+        <div>
+          <div className="text-[12px] font-bold text-text">{row.segment}</div>
+          <div className="text-[10.5px] text-text-muted/55 font-bold text-brand">{row.tier}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'kyc',
+      label: 'KYC Status',
+      render: (_, row) => <StatusBadge status={row.kycStatus} />,
+    },
+    {
+      key: 'wallet',
+      label: 'Collateral Wallet',
+      render: (_, row) => (
+        <div>
+          <div className="font-mono text-[12px] font-bold text-text">{row.walletBalance}</div>
+          <div className="text-[10px] font-mono text-text-muted/50">EQ {row.equity}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'mt5',
+      label: 'MT5 terminals',
+      render: (_, row) => (
+        <div>
+          <div className="text-[12.5px] font-bold text-text">{row.mt5Accounts} terminals</div>
+          <div className="text-[10.5px] text-text-muted/50 font-medium">{row.openPositions} open trades</div>
+        </div>
+      ),
+    },
+    {
+      key: 'risk',
+      label: 'Risk Assessment',
+      render: (_, row) => <StatusBadge status={row.riskStatus} dot={false} />,
+    },
+    {
+      key: 'lastSeen',
+      label: 'Last Active',
+      render: (_, row) => (
+        <div>
+          <div className="font-mono text-[11.5px] text-text font-semibold">{row.lastSeen}</div>
+          <div className="text-[10px] text-text-muted/55 font-semibold">{row.source}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      align: 'right',
+      render: (_, row) => (
+        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            onClick={() => onReviewUser(item.userId)}
-            className="rounded-[8px] border border-border/25 px-3 py-1.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
+            onClick={() => onOpenUser(row.id)}
+            className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer animate-fade-in"
           >
-            Review
+            Open
           </button>
+          <RowActionsMenu
+            user={row}
+            onOpenUser={onOpenUser}
+            onQuickView={onQuickView}
+            onEditUser={onEditUser}
+            onSuspendUser={onSuspendUser}
+            onOpenMt5={onOpenMt5}
+          />
         </div>
       ),
     },
   ];
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={tableState.items}
-        rowKey="id"
-        emptyTitle="No KYC cases matched the current search"
-        rowClassName={(item) => {
-          const isFlagged = ['REJECTED', 'FAILED', 'FLAGGED'].includes(item.status);
-          const isPending = ['PENDING', 'NONE'].includes(item.status);
+    <MainTable
+      columns={columns}
+      data={tableState.items}
+      onRowClick={(row) => onOpenUser(row.id)}
+      emptyTitle="No users matched the current filter criteria."
+      pagination={tableState}
+      rowClassName={(row) => {
+        const isSuspended = row.suspended;
+        const isFlagged = ['FLAGGED', 'ELEVATED'].includes(row.riskStatus) || row.kycStatus === 'REJECTED';
+        const isPending = row.kycStatus === 'PENDING' || row.riskStatus === 'WATCHLIST';
+        
+        if (isSuspended || isFlagged) return 'hover:bg-negative/5 hover:border-l-negative';
+        if (isPending) return 'hover:bg-warning/5 hover:border-l-warning';
+        return 'hover:bg-positive/5 hover:border-l-positive';
+      }}
+    />
+  );
+}
 
-          if (isFlagged) {
-            return 'hover:bg-negative/5 [&>td:first-child]:border-l-2 [&>td:first-child]:border-l-transparent hover:[&>td:first-child]:border-l-negative [&>td:first-child]:transition-colors [&>td:first-child]:duration-200';
-          }
-          if (isPending) {
-            return 'hover:bg-warning/5 [&>td:first-child]:border-l-2 [&>td:first-child]:border-l-transparent hover:[&>td:first-child]:border-l-warning [&>td:first-child]:transition-colors [&>td:first-child]:duration-200';
-          }
-          return 'hover:bg-positive/5 [&>td:first-child]:border-l-2 [&>td:first-child]:border-l-transparent hover:[&>td:first-child]:border-l-positive [&>td:first-child]:transition-colors [&>td:first-child]:duration-200';
-        }}
-      />
-      <Pagination
-        page={tableState.page}
-        totalPages={tableState.totalPages}
-        onPageChange={tableState.setPage}
-        pageSize={tableState.pageSize}
-        onPageSizeChange={tableState.setPageSize}
-      />
-    </>
+export function UsersKYCTable({ tableState, onReviewUser }) {
+  const columns = [
+    { key: 'id', label: 'Case ID', render: (val) => <span className="font-mono text-[11px] text-text-muted/75">{val}</span> },
+    {
+      key: 'user',
+      label: 'User',
+      render: (val, row) => (
+        <div>
+          <div className="text-[12px] font-medium text-text">{val}</div>
+          <div className="text-[11px] text-text-muted/60">{row.country}</div>
+        </div>
+      ),
+    },
+    { key: 'tier', label: 'Tier', render: (val) => <span className="text-[12px] text-text">{val}</span> },
+    { key: 'docs', label: 'Docs', render: (val) => <span className="text-[12px] text-text-muted">{val}</span> },
+    { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
+    { key: 'risk', label: 'Risk', render: (val) => <StatusBadge status={val} dot={false} /> },
+    { key: 'eta', label: 'ETA', render: (val) => <span className="font-mono text-[11px] text-text-muted/75">{val}</span> },
+    {
+      key: 'action',
+      label: '',
+      align: 'right',
+      render: (_, row) => (
+        <button
+          type="button"
+          onClick={() => onReviewUser(row.userId)}
+          className="rounded-[8px] border border-border/25 px-3 py-1.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
+        >
+          Review
+        </button>
+      ),
+    },
+  ];
+
+  return (
+    <MainTable
+      columns={columns}
+      data={tableState.items}
+      rowKey="id"
+      emptyTitle="No KYC cases matched the current search"
+      pagination={tableState}
+      rowClassName={(item) => {
+        const isFlagged = ['REJECTED', 'FAILED', 'FLAGGED'].includes(item.status);
+        const isPending = ['PENDING', 'NONE'].includes(item.status);
+
+        if (isFlagged) return 'hover:bg-negative/5 hover:border-l-negative';
+        if (isPending) return 'hover:bg-warning/5 hover:border-l-warning';
+        return 'hover:bg-positive/5 hover:border-l-positive';
+      }}
+    />
   );
 }
 
 export function UsersMt5Table({ tableState, onOpenUser, onOpenMt5 }) {
-  const paged = tableState.items;
+  const columns = [
+    {
+      key: 'login',
+      label: 'Login',
+      render: (_, row) => (
+        <div>
+          <div className="font-mono text-[12px] font-semibold text-text">{row.login}</div>
+          <div className="text-[10px] text-text-muted/55 font-medium">{row.leverage}</div>
+        </div>
+      )
+    },
+    {
+      key: 'user',
+      label: 'User',
+      render: (_, row) => (
+        <div>
+          <div className="text-[12px] font-semibold text-text">{row.user}</div>
+          <button
+            type="button"
+            className="text-[10.5px] font-bold text-brand hover:underline cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenUser(row.userId, 'mt5-accounts');
+            }}
+          >
+            Open user
+          </button>
+        </div>
+      )
+    },
+    {
+      key: 'server',
+      label: 'Server',
+      render: (_, row) => <span className="font-mono text-[11px] text-text-muted/80">{row.server}</span>
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (_, row) => <StatusBadge status={row.status} />
+    },
+    {
+      key: 'group',
+      label: 'Group',
+      render: (_, row) => <span className="font-mono text-[11px] text-text-muted/80">{row.group}</span>
+    },
+    {
+      key: 'balance',
+      label: 'Balance',
+      render: (_, row) => <span className="font-mono text-[12px] font-bold text-text">{row.balance}</span>
+    },
+    {
+      key: 'lastSync',
+      label: 'Last Sync',
+      render: (_, row) => <span className="font-mono text-[11px] text-text-muted/50">{row.lastSync}</span>
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      align: 'right',
+      render: (_, row) => (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onOpenMt5(row); }}
+          className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer"
+        >
+          Details
+        </button>
+      )
+    }
+  ];
 
   return (
-    <>
-      <div className="overflow-x-auto custom-scrollbar">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
-              <th className="px-4 py-3">Login</th>
-              <th className="px-4 py-3">User</th>
-              <th className="px-4 py-3">Server</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Group</th>
-              <th className="px-4 py-3">Balance</th>
-              <th className="px-4 py-3">Last Sync</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/8">
-            {paged.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
-                  No MT5 accounts matched the current search.
-                </td>
-              </tr>
-            ) : (
-              paged.map((row) => {
-                const isFailed = row.status === 'DISCONNECTED';
-                const isWarning = row.status === 'SYNC_DELAY';
+    <MainTable
+      columns={columns}
+      data={tableState.items}
+      onRowClick={(row) => onOpenMt5(row)}
+      emptyTitle="No MT5 accounts matched the current search."
+      pagination={tableState}
+      rowClassName={(row) => {
+        const isFailed = row.status === 'DISCONNECTED';
+        const isWarning = row.status === 'SYNC_DELAY';
 
-                return (
-                  <tr
-                    key={row.id}
-                    onClick={() => onOpenMt5(row)}
-                    className={`group cursor-pointer transition-colors border-l-2 border-transparent ${isFailed
-                      ? 'hover:bg-negative/5 hover:border-l-negative'
-                      : isWarning
-                        ? 'hover:bg-warning/5 hover:border-l-warning'
-                        : 'hover:bg-positive/5 hover:border-l-positive'
-                      }`}
-                  >
-                    <td className="px-4 py-3.5">
-                      <div>
-                        <div className="font-mono text-[12px] font-semibold text-text">{row.login}</div>
-                        <div className="text-[10px] text-text-muted/55 font-medium">{row.leverage}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <div>
-                        <div className="text-[12px] font-semibold text-text">{row.user}</div>
-                        <button
-                          type="button"
-                          className="text-[10.5px] font-bold text-brand hover:underline cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenUser(row.userId, 'mt5-accounts');
-                          }}
-                        >
-                          Open user
-                        </button>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/80">{row.server}</td>
-                    <td className="px-4 py-3.5">
-                      <StatusBadge status={row.status} />
-                    </td>
-                    <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/80">{row.group}</td>
-                    <td className="px-4 py-3.5 font-mono text-[12px] font-bold text-text">{row.balance}</td>
-                    <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.lastSync}</td>
-                    <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        onClick={() => onOpenMt5(row)}
-                        className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer"
-                      >
-                        Details
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="border-t border-border/10">
-        <Pagination
-          page={tableState.page}
-          totalPages={tableState.totalPages}
-          onPageChange={tableState.setPage}
-          pageSize={tableState.pageSize}
-          onPageSizeChange={tableState.setPageSize}
-        />
-      </div>
-    </>
+        if (isFailed) return 'hover:bg-negative/5 hover:border-l-negative';
+        if (isWarning) return 'hover:bg-warning/5 hover:border-l-warning';
+        return 'hover:bg-positive/5 hover:border-l-positive';
+      }}
+    />
   );
 }

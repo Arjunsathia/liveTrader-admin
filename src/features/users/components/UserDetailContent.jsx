@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { InlineAlert } from '../../../components/feedback/InlineAlert';
 import { StatusBadge } from '../../../components/ui';
-import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays';
+import { DrawerField, DrawerFormGrid, DrawerSection } from '../../../components/common/drawer';
 
 export function UserDetailContent({ user, activeTab, onUpdateUser }) {
   
@@ -80,14 +80,14 @@ export function UserDetailContent({ user, activeTab, onUpdateUser }) {
         </DrawerSection>
 
         <DrawerSection title="Account Setup & Terminal Inventory">
-          <DrawerGrid cols={2} className="mt-2">
+          <DrawerFormGrid cols={2} className="mt-2">
             <DrawerField label="KYC Status Level" value={user.kycStatus} />
             <DrawerField label="Assigned Risk Status" value={user.riskStatus} />
             <DrawerField label="Segment Classification" value={user.segment} />
             <DrawerField label="Pricing Tier Level" value={user.tier} />
             <DrawerField label="Active MT5 Terminals" value={`${user.mt5Accounts} accounts`} />
             <DrawerField label="Open Position Count" value={`${user.openPositions} active trades`} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         {user.notesSummary && (
@@ -199,12 +199,12 @@ export function UserDetailContent({ user, activeTab, onUpdateUser }) {
         )}
 
         <DrawerSection title="KYC Audit Details">
-          <DrawerGrid cols={2} className="mt-2">
+          <DrawerFormGrid cols={2} className="mt-2">
             <DrawerField label="Compliance Level" value={user.kyc?.level || 'Level 1'} />
             <DrawerField label="Submission Date" value={user.kyc?.submittedAt || '—'} mono />
             <DrawerField label="Reviewed By" value={user.kyc?.reviewer || 'Compliance Queue'} />
             <DrawerField label="Verification Status" value={user.kyc?.status || 'PENDING'} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Submitted Identity Credentials">
@@ -310,12 +310,12 @@ export function UserDetailContent({ user, activeTab, onUpdateUser }) {
 
                     {/* Content quick parameters */}
                     <div className="p-4">
-                      <DrawerGrid cols={4}>
+                      <DrawerFormGrid cols={4}>
                         <DrawerField label="Leverage" value={terminal.leverage} />
                         <DrawerField label="Terminal Group" value={terminal.group} mono />
                         <DrawerField label="Net Equity" value={terminal.equity} mono accent="var(--brand)" />
                         <DrawerField label="Margin Level" value={terminal.marginLevel} mono />
-                      </DrawerGrid>
+                      </DrawerFormGrid>
                     </div>
 
                     {/* Timeline synchronization indicator */}
@@ -473,12 +473,12 @@ export function UserDetailContent({ user, activeTab, onUpdateUser }) {
         </div>
 
         <DrawerSection title="Calculated Risk Parameters">
-          <DrawerGrid cols={2} className="mt-2">
+          <DrawerFormGrid cols={2} className="mt-2">
             <DrawerField label="Assigned Risk Score" value={user.risk?.score || '15 / 100'} />
             <DrawerField label="Active Exposure Value" value={user.risk?.exposure || '$0.00'} mono />
             <DrawerField label="Margin Drawdown" value={user.risk?.drawdown || '0%'} mono />
             <DrawerField label="Concentration Rate" value={user.risk?.concentration || '0%'} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Active Compliance Alerts">

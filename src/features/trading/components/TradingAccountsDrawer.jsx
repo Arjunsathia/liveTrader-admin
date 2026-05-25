@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { KeyRound, RefreshCw, Check, History } from 'lucide-react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection, SelectField } from '../../../components/overlays';
-import { Button } from '../../../components/ui/Button';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection, SelectField } from '../../../components/common/drawer';
+import { ActionBtn } from '../../../components/ui';
 import { InlineAlert } from '../../../components/feedback/InlineAlert';
 import { StatusChip } from '../../../components/ui';
 
@@ -39,42 +39,13 @@ export function TradingAccountsDrawer({ open, row, onClose, onSave, onSync, onRe
   const delta = equity - balance;
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
-      title={`MT5 Account — #${row.login}`}
-      subtitle="Inspect credentials, balance metrics, and adjust operational settings."
-      eyebrow="MT5 Account Review"
       width="max-w-[720px]"
       onClose={onClose}
-      footer={(
-        <div className="flex items-center justify-between gap-4 w-full">
-          <div className="text-[10px] text-text-muted/55 max-w-[280px] leading-snug">
-            Leverage adjustments push directly to the MT5 dealing gateway cluster.
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={showStatusSuccess}
-              className="flex items-center justify-center h-9 px-4 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            >
-              {showStatusSuccess ? (
-                <span className="flex items-center gap-1.5">
-                  <Check size={12} /> Pushed to MT5
-                </span>
-              ) : 'Push Changes'}
-            </button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={`MT5 Account — #${row.login}`} subtitle="Inspect credentials, balance metrics, and adjust operational settings." eyebrow="MT5 Account Review" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-6">
 
         {/* Connection Status Card */}
@@ -125,19 +96,19 @@ export function TradingAccountsDrawer({ open, row, onClose, onSave, onSync, onRe
 
         {/* Account Snapshot */}
         <DrawerSection title="Account Snapshot">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Login" value={row.login} mono copyable />
             <DrawerField label="Server" value={row.server} mono />
             <DrawerField label="Group" value={row.group || 'retail_usd_std'} mono copyable />
             <DrawerField label="Account Type" value={row.type || 'Live'} />
             <DrawerField label="Currency" value={row.currency || 'USD'} />
             <DrawerField label="Last Synced" value={row.lastSync} mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         {/* Balance Metrics */}
         <DrawerSection title="Balance & Capital Metrics">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Balance" value={row.balance} mono accent="var(--cyan)" />
             <DrawerField label="Equity" value={row.equity} mono accent="var(--brand)" />
             <DrawerField label="Margin Used" value={row.margin || '$0'} mono accent="var(--warning)" />
@@ -152,7 +123,7 @@ export function TradingAccountsDrawer({ open, row, onClose, onSave, onSync, onRe
                   : 'var(--text)'
               }
             />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         {/* Dealing Desk Controls */}
@@ -205,6 +176,24 @@ export function TradingAccountsDrawer({ open, row, onClose, onSave, onSync, onRe
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="flex items-center justify-between gap-4 w-full">
+          <div className="text-[10px] text-text-muted/55 max-w-[280px] leading-snug">
+            Leverage adjustments push directly to the MT5 dealing gateway cluster.
+          </div>
+          <div className="flex items-center gap-2">
+            <ActionBtn label="Close" variant="default" onClick={onClose} />
+            <ActionBtn 
+              label={showStatusSuccess ? "Pushed to MT5" : 'Push Changes'} 
+              Icon={showStatusSuccess ? Check : undefined}
+              variant="brand" 
+              disabled={showStatusSuccess} 
+              onClick={handleSave} 
+            />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

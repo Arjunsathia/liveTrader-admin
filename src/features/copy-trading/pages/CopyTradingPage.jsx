@@ -4,32 +4,24 @@
  * Dynamic workspace shell — a single component replaces the 6 previously
  * identical screen files (StrategiesScreen, ProvidersScreen, FollowersScreen,
  * SubscriptionsScreen, PerformanceScreen, LogsScreen).
- *
- * How it works:
- *  1. Reads the URL slug (the third path segment, e.g. "strategies" from
- *     /copy-trading/strategies) via useLocation().
- *  2. Looks up the matching workspace config from WORKSPACE_MAP.
- *  3. Renders CopyTradingContent with key={slug} so React unmounts and fully
- *     resets search / filter state whenever the user switches workspaces.
  */
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Card }                      from '../../../components/ui/Card';
-import { Pagination }                from '../../../components/tables/Pagination';
+import { Download, Eye }             from 'lucide-react';
 import { CopyTradingLayout }         from '../components/CopyTradingLayout';
 import { CopyTradingStatsCards }     from '../components/CopyTradingStatsCards';
-import { CopyTradingToolbar }        from '../components/CopyTradingToolbar';
 import { CopyTradingTable }          from '../components/CopyTradingTable';
-import { useWorkspace }              from '@hooks/useWorkspace';
+import { useWorkspace }              from '@/hooks/useWorkspace';
 import { exportRows }                from '../../../utils/exporters';
+import { TableToolbar }              from '../../../components/common/table';
 
-import { strategiesConfig }    from '../data/workspaces/strategies.workspace';
-import { providersConfig }     from '../data/workspaces/providers.workspace';
-import { followersConfig }     from '../data/workspaces/followers.workspace';
-import { subscriptionsConfig } from '../data/workspaces/subscriptions.workspace';
-import { performanceConfig }   from '../data/workspaces/performance.workspace';
-import { logsConfig }          from '../data/workspaces/logs.workspace';
+import { strategiesConfig }    from '@/config/constants/copy-trading/workspaces/strategies.workspace';
+import { providersConfig }     from '@/config/constants/copy-trading/workspaces/providers.workspace';
+import { followersConfig }     from '@/config/constants/copy-trading/workspaces/followers.workspace';
+import { subscriptionsConfig } from '@/config/constants/copy-trading/workspaces/subscriptions.workspace';
+import { performanceConfig }   from '@/config/constants/copy-trading/workspaces/performance.workspace';
+import { logsConfig }          from '@/config/constants/copy-trading/workspaces/logs.workspace';
 
 /* ── Per-workspace metadata that differs between the old screen files ── */
 const WORKSPACE_MAP = {
@@ -80,34 +72,66 @@ function CopyTradingContent({ slug, config, placeholder, csvFile, subtitle }) {
     <CopyTradingLayout>
       <CopyTradingStatsCards kpis={config.kpis} />
 
-      <CopyTradingToolbar
-        search={ws.search}
-        onSearchChange={ws.setSearch}
-        filterSets={ws.filterSets}
-        placeholder={placeholder}
-        onExport={() => exportRows(ws.filtered, csvFile)}
-        slug={slug}
-      />
+      <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-1.5 rounded-full border border-cyan/20 bg-cyan/8 px-3 py-1.5">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-cyan">Live Signal</span>
+        </div>
+      </div>
 
-      <Card
-        title={config.tableTitle}
-        subtitle={subtitle(ws.filtered.length)}
-        padding={false}
-      >
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+        <TableToolbar
+          title={config.tableTitle}
+          count={ws.filtered.length}
+          accentColor="var(--cyan)"
+          search={ws.search}
+          onSearchChange={ws.setSearch}
+          searchPlaceholder={placeholder}
+          filters={
+            <div className="flex items-center gap-3">
+               {ws.filterSets?.map(fs => (
+                  <div key={fs.label} className="flex items-center gap-1">
+                     <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">{fs.label}:</span>
+                     <select
+                        value={fs.get}
+                        onChange={(e) => fs.set(e.target.value)}
+                        className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-cyan/40 transition-all cursor-pointer appearance-none"
+                     >
+                        {fs.opts.map(opt => (
+                           <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                     </select>
+                  </div>
+               ))}
+            </div>
+          }
+          actions={
+            <div className="flex gap-2">
+               {slug !== 'logs' && (
+                 <button onClick={() => {}} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer">
+                   <Eye size={12}/> Performance Lens
+                 </button>
+               )}
+               <button onClick={() => exportRows(ws.filtered, csvFile)} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer">
+                 <Download size={12}/> Export
+               </button>
+            </div>
+          }
+        />
         <CopyTradingTable
           columns={config.columns}
           items={ws.table.items}
           onRowClick={(row) => navigate(`/copy-trading/${slug}/${row.id}`)}
           slug={slug}
+          pagination={{
+            page: ws.table.page,
+            totalPages: ws.table.totalPages,
+            setPage: ws.table.setPage,
+            pageSize: ws.table.pageSize,
+            setPageSize: ws.table.setPageSize,
+          }}
         />
-        <Pagination
-          page={ws.table.page}
-          totalPages={ws.table.totalPages}
-          onPageChange={ws.table.setPage}
-          pageSize={ws.table.pageSize}
-          onPageSizeChange={ws.table.setPageSize}
-        />
-      </Card>
+      </section>
     </CopyTradingLayout>
   );
 }

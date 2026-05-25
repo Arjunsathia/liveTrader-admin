@@ -4,19 +4,17 @@ import {
   AlertOctagon, ArrowUp, Check, CheckCircle2, Download, Eye, MessageCircle, Plus,
   Search, Timer, UserPlus,
 } from 'lucide-react';
-import { Card } from '@components/ui/Card';
-import { FeatureTable } from '@components/tables';
-import { Pagination } from '@components/tables/Pagination';
-import { ticketsData } from '@features/support/data/mockData';
+import { MainTable, TableToolbar } from '../../../components/common/table';
+import { ticketsData } from '@/config/constants/support/mockData';
 import {
   PRIORITY_CLR, PRIORITY_ORDER,
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
   UserAvatar, SupportStatCard, SupportToast,
-} from '@features/support/components/SupportComponents';
+} from '@/features/support/components/SupportComponents';
 
 const PER_PAGE = 8;
 
-export function TicketsPage() {
+function TicketsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [statusF, setStatusF] = useState('all');
@@ -63,7 +61,7 @@ export function TicketsPage() {
   ];
 
   const columns = [
-    { key: 'id', label: 'Ticket ID', type: 'mono' },
+    { key: 'id', label: 'Ticket ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
     {
       key: 'user',
       label: 'User',
@@ -85,7 +83,7 @@ export function TicketsPage() {
           <div className="truncate text-[12px] font-medium text-text/75">{value}</div>
           <div className="mt-0.5 flex flex-wrap gap-1">
             {row.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="rounded-[3px] border border-border/20 px-1 py-px font-mono text-[8.5px] text-text-muted/35">#{tag}</span>
+               <span key={tag} className="rounded-[3px] border border-border/20 px-1 py-px font-mono text-[8.5px] text-text-muted/35">#{tag}</span>
             ))}
             {row.replies > 0 && <span className="flex items-center gap-0.5 text-[8.5px] text-text-muted/30"><MessageCircle size={8} />{row.replies}</span>}
           </div>
@@ -99,11 +97,11 @@ export function TicketsPage() {
     { key: 'updated', label: 'Updated', render: (value) => <span className="font-mono text-[10.5px] text-text-muted/40">{value}</span> },
     { key: 'sla', label: 'SLA', render: (_, row) => <SlaBar pct={row.sla} slaMins={row.slaMins} /> },
     {
-      key: '_actions',
-      label: '',
+      key: 'actions',
+      label: 'Actions',
       align: 'right',
       render: (_, row) => (
-        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
           <button type="button" onClick={(event) => { event.stopPropagation(); navigate(`/support/tickets/${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-border/30 text-text-muted/40 transition-colors hover:text-text" title="Open"><Eye size={10} /></button>
           <button type="button" onClick={(event) => { event.stopPropagation(); act(`Reassigned: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-cyan/20 text-cyan/50 transition-colors hover:text-cyan" title="Reassign"><UserPlus size={10} /></button>
           <button type="button" onClick={(event) => { event.stopPropagation(); act(`Escalated: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-orange-500/20 text-orange-400/60 transition-colors hover:text-orange-400" title="Escalate"><ArrowUp size={10} /></button>
@@ -113,8 +111,47 @@ export function TicketsPage() {
     },
   ];
 
+  const tableState = {
+    page,
+    pageSize: PER_PAGE,
+    setPage,
+    setPageSize: () => {},
+    totalPages: totalPages
+  };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-up">
+
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            Support Operations
+          </p>
+          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            Helpdesk Tickets
+          </h2>
+          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            Manage user inquiries, technical support requests, and service issues.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => act('Exported tickets')}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+          >
+            <Download size={12} /> Export
+          </button>
+          <button
+            type="button"
+            onClick={() => act('New ticket form opened')}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+          >
+            <Plus size={12} /> New Ticket
+          </button>
+        </div>
+      </header>
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat) => <SupportStatCard key={stat.label} {...stat} />)}
       </div>
@@ -123,8 +160,12 @@ export function TicketsPage() {
         <div className="flex items-start gap-3 rounded-[10px] border border-negative/20 bg-negative/[0.05] px-4 py-3">
           <AlertOctagon size={14} className="mt-0.5 flex-shrink-0 text-negative" />
           <div className="flex-1">
-            <div className="text-[12px] font-bold text-negative">{breachedCount} Tickets Breached SLA</div>
-            <div className="mt-0.5 text-[11px] text-negative/70">Immediate attention required. These tickets are past their committed response time.</div>
+            <div className="text-[12px] font-bold text-negative">
+              {breachedCount} Tickets Breached SLA
+            </div>
+            <div className="mt-0.5 text-[11px] text-negative/70">
+              Immediate attention required. These tickets are past their committed response time.
+            </div>
           </div>
           <button type="button" onClick={() => { setSortBy('sla'); setStatusF('all'); setPage(1); }} className="flex h-7 flex-shrink-0 items-center gap-1.5 rounded-[7px] border border-negative/25 bg-negative/[0.08] px-3 text-[10.5px] font-bold text-negative">
             <Timer size={10} />View Breached
@@ -132,69 +173,97 @@ export function TicketsPage() {
         </div>
       )}
 
-      <div className="space-y-2.5">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[220px] flex-1 max-w-[340px]">
-            <Search size={12} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted/30" />
-            <input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Search by ID, user, subject..." className="h-8 w-full rounded-[8px] border border-border/30 bg-bg/40 pl-8 pr-3 text-[12px] text-text outline-none placeholder:text-text-muted/25 focus:border-primary/30" />
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {['all', 'OPEN', 'PENDING', 'ESCALATED', 'RESOLVED'].map((filter) => (
-              <button key={filter} type="button" onClick={() => { setStatusF(filter); setPage(1); }} className={`h-8 rounded-[7px] border px-2.5 text-[11px] font-bold uppercase tracking-wide transition-all ${statusF === filter ? 'border-primary/20 bg-primary/[0.12] text-primary' : 'border-border/30 bg-transparent text-text-muted/40 hover:text-text-muted'}`}>
-                {filter === 'all' ? 'All' : filter}
-              </button>
-            ))}
-          </div>
-          <div className="ml-auto flex gap-2">
-            <button type="button" onClick={() => act('Exported tickets')} className="flex h-8 items-center gap-1.5 rounded-[8px] border border-border/30 bg-bg/40 px-3 text-[11px] font-semibold text-text-muted/70"><Download size={12} />Export</button>
-            <button type="button" onClick={() => act('New ticket form opened')} className="flex h-8 items-center gap-1.5 rounded-[8px] border border-brand/30 bg-brand/[0.1] px-3 text-[11px] font-semibold text-brand"><Plus size={12} />New Ticket</button>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-[9.5px] font-black uppercase tracking-[0.15em] text-text-muted/30">Priority:</span>
-          {['all', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((filter) => (
-            <button key={filter} type="button" onClick={() => { setPriorityF(filter); setPage(1); }} className={`h-7 rounded-[6px] border px-2 text-[10.5px] font-bold ${priorityF === filter ? 'border-primary/25 bg-primary/[0.1] text-primary' : 'border-border/20 bg-transparent text-text-muted/45'}`}>
-              {filter === 'all' ? 'All' : filter}
-            </button>
-          ))}
-          <span className="text-[9.5px] font-black uppercase tracking-[0.15em] text-text-muted/30">Cat:</span>
-          {cats.map((filter) => (
-            <button key={filter} type="button" onClick={() => { setCatF(filter); setPage(1); }} className={`h-7 rounded-[6px] border px-2 text-[10.5px] font-bold ${catF === filter ? 'border-primary/20 bg-primary/[0.1] text-primary' : 'border-border/20 bg-transparent text-text-muted/35'}`}>
-              {filter === 'all' ? 'All' : filter}
-            </button>
-          ))}
-          <span className="text-[9.5px] font-black uppercase tracking-[0.15em] text-text-muted/30">Sort:</span>
-          {[
-            ['priority', 'Priority'],
-            ['sla', 'SLA'],
-            ['updated', 'Updated'],
-          ].map(([key, label]) => (
-            <button key={key} type="button" onClick={() => setSortBy(key)} className={`h-7 rounded-[6px] border px-2 text-[10.5px] font-bold ${sortBy === key ? 'border-cyan/20 bg-cyan/[0.1] text-cyan' : 'border-border/20 bg-transparent text-text-muted/35'}`}>{label}</button>
-          ))}
-          <span className="ml-auto text-[10.5px] text-text-muted/35">{filtered.length} tickets</span>
-        </div>
-      </div>
-
       <SupportToast msg={toast} onDone={() => setToast(null)} />
 
-      <Card padding={false}>
-        <FeatureTable
+      <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+        <TableToolbar
+          title="Ticket Queue"
+          count={filtered.length}
+          accentColor="var(--brand)"
+          search={search}
+          onSearchChange={(v) => { setSearch(v); setPage(1); }}
+          searchPlaceholder="Search by ID, user, subject…"
+          filters={
+            <>
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                <select
+                  value={statusF}
+                  onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  <option value="all">ALL</option>
+                  <option value="OPEN">OPEN</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="ESCALATED">ESCALATED</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Priority:</span>
+                <select
+                  value={priorityF}
+                  onChange={(e) => { setPriorityF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  <option value="all">ALL</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="LOW">LOW</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Cat:</span>
+                <select
+                  value={catF}
+                  onChange={(e) => { setCatF(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  {cats.map((c) => (
+                    <option key={c} value={c}>{c.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  style={{ minWidth: '70px' }}
+                >
+                  <option value="priority">Priority</option>
+                  <option value="sla">SLA</option>
+                  <option value="updated">Updated</option>
+                </select>
+              </div>
+            </>
+          }
+        />
+
+        <MainTable
           columns={columns}
           data={paginated}
           onRowClick={(row) => navigate(`/support/tickets/${row.id}`)}
-          emptyMsg="No tickets match your filters"
-          footer={(
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-              pageSize={PER_PAGE}
-              onPageSizeChange={() => {}}
-            />
-          )}
+          emptyTitle="No tickets match your filters"
+          pagination={tableState}
+          rowClassName={(row) => {
+            const isBreached = row.slaMins != null && row.slaMins < 0;
+            if (isBreached) return 'hover:bg-negative/5 hover:border-l-negative';
+            if (row.priority === 'CRITICAL' || row.priority === 'HIGH') return 'hover:bg-warning/5 hover:border-l-warning';
+            return 'hover:bg-brand/5 hover:border-l-brand';
+          }}
         />
-      </Card>
+      </section>
     </div>
   );
 }
+
+export default TicketsPage;

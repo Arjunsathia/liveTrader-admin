@@ -1,8 +1,7 @@
 import React from 'react';
-import { Edit2, PauseCircle, PlayCircle, CircleDollarSign } from 'lucide-react';
-import { Card, SectionHead, IconBtn } from './PropComponents';
+import { Edit2, PauseCircle, PlayCircle } from 'lucide-react';
 import { StatusChip as Badge } from '../../../components/ui';
-import { FeatureTable } from '../../../components/tables';
+import { MainTable, TableToolbar } from '../../../components/common/table';
 
 const feesCols = [
   { key: 'challenge',  label: 'Challenge',   render: (v) => <span className="font-heading font-semibold text-text/75">{v}</span> },
@@ -21,8 +20,8 @@ export function FeesTable({ rows, showToast }) {
   const cols = [
     ...feesCols,
     {
-      key: '_actions', label: '', render: (_, r) => (
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
           <button onClick={() => showToast(`Editing ${r.challenge}`)} className="w-6 h-6 rounded-[5px] border border-border/25 flex items-center justify-center text-text-muted/40 hover:text-text cursor-pointer">
             <Edit2 size={10} />
           </button>
@@ -35,12 +34,16 @@ export function FeesTable({ rows, showToast }) {
   ];
 
   return (
-    <Card pad={false}>
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border/25">
-        <SectionHead title="Challenge Entry Fees" Icon={CircleDollarSign} />
-        <IconBtn label="Edit Fees" Icon={Edit2} variant="default" small onClick={() => showToast('Fee edit mode')} />
-      </div>
-      <FeatureTable cols={cols} rows={rows} />
-    </Card>
+    <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+      <TableToolbar 
+        title="Challenge Entry Fees" 
+        actions={<button onClick={() => showToast('Fee edit mode')} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"><Edit2 size={12}/> Edit Fees</button>} 
+      />
+      <MainTable 
+        columns={cols} 
+        data={rows} 
+        rowClassName={() => "hover:bg-brand/5 hover:border-l-brand"} 
+      />
+    </section>
   );
 }

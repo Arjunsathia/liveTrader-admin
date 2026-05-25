@@ -19,9 +19,9 @@ import {
   User,
   X,
 } from 'lucide-react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection, TextareaField } from '../../../components/overlays';
-import { ActionBtn, Button } from '../../../components/ui';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection, TextareaField } from '../../../components/common/drawer';
+import { ActionBtn } from '../../../components/ui';
 import {
   AdminAvatar,
   Badge,
@@ -31,7 +31,7 @@ import {
   STATUS_CLR,
   TwoFABadge,
 } from './RolesComponents';
-import { adminNotes, PERM_ACTIONS, rolesData } from '../data/workspaces/admin-mgmt.workspace';
+import { adminNotes, PERM_ACTIONS, rolesData } from '@/config/constants/roles-permissions/workspaces/admin-mgmt.workspace';
 
 function InlinePill({ children, active = true, color = 'var(--text-muted)', icon: Icon }) {
   return (
@@ -63,29 +63,13 @@ export function AdminUserDrawer({ row, open, onClose, onAction }) {
   const roleColor = ROLE_CLR[row.role] || 'rgba(255,255,255,0.35)';
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.name}
-      subtitle={row.email}
-      eyebrow="Admin Profile"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge value={row.status} />
-            <RolePill value={row.role} />
-            <TwoFABadge enabled={row.twoFA} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary" icon={Edit2} onClick={() => { onAction?.('Edit opened', row.id); onClose(); }}>
-              Edit Profile
-            </Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.name} subtitle={row.email} eyebrow="Admin Profile" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <div className="rounded-[10px] border border-border/20 bg-bg/50 p-4 shadow-card-subtle">
           <div className="flex flex-wrap items-center gap-3.5">
@@ -106,14 +90,14 @@ export function AdminUserDrawer({ row, open, onClose, onAction }) {
         </div>
 
         <DrawerSection title="Account Details">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Admin ID" value={row.id} mono copyable />
             <DrawerField label="Region" value={row.region} />
             <DrawerField label="Created" value={row.created} mono />
             <DrawerField label="Last Login" value={row.lastLogin} />
             <DrawerField label="Total Logins" value={row.logins?.toLocaleString()} mono />
             <DrawerField label="Total Actions" value={row.actions?.toLocaleString()} mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Role & Permission Scope">
@@ -140,7 +124,7 @@ export function AdminUserDrawer({ row, open, onClose, onAction }) {
         </DrawerSection>
 
         <DrawerSection title="Security Status">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField
               label="2FA Authentication"
               value={row.twoFA ? 'Enabled' : 'Not enabled'}
@@ -157,7 +141,7 @@ export function AdminUserDrawer({ row, open, onClose, onAction }) {
               accent={row.status === 'ACTIVE' && row.lastLogin !== 'Never' ? 'var(--positive)' : 'var(--negative)'}
               className="sm:col-span-2"
             />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Internal Note" collapsible>
@@ -193,7 +177,21 @@ export function AdminUserDrawer({ row, open, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge value={row.status} />
+            <RolePill value={row.role} />
+            <TwoFABadge enabled={row.twoFA} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <ActionBtn variant="default" onClick={onClose} label="Close" />
+            <ActionBtn variant="brand" Icon={Edit2} onClick={() => { onAction?.('Edit opened', row.id); onClose(); }} label="Edit Profile" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
@@ -202,28 +200,13 @@ export function RoleDrawer({ row, open, onClose, onAction }) {
   const color = ROLE_CLR[row.name] || 'rgba(255,255,255,0.35)';
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.label}
-      subtitle={row.desc}
-      eyebrow="Role Info"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <RolePill value={row.name} />
-            <Badge value={row.status} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary" icon={Edit2} onClick={() => { onAction?.('Edit opened', row.id); onClose(); }}>
-              Edit Role
-            </Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.label} subtitle={row.desc} eyebrow="Role Info" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <div
           className="rounded-[10px] border p-4 shadow-card-subtle"
@@ -250,13 +233,13 @@ export function RoleDrawer({ row, open, onClose, onAction }) {
         </div>
 
         <DrawerSection title="Role Info">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Role ID" value={row.id} mono copyable />
             <DrawerField label="User Count" value={row.userCount} mono accent="var(--brand)" />
             <DrawerField label="Scope" value={row.scope} />
             <DrawerField label="Status" value={row.status} accent={STATUS_CLR[row.status]} />
             <DrawerField label="Last Updated" value={row.updated} mono className="sm:col-span-2" />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Allowed Modules">
@@ -288,7 +271,20 @@ export function RoleDrawer({ row, open, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <RolePill value={row.name} />
+            <Badge value={row.status} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <ActionBtn variant="default" onClick={onClose} label="Close" />
+            <ActionBtn variant="brand" Icon={Edit2} onClick={() => { onAction?.('Edit opened', row.id); onClose(); }} label="Edit Role" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
@@ -298,26 +294,13 @@ export function AccessLogDrawer({ row, open, onClose }) {
   const isCritical = row.severity === 'CRITICAL' || row.severity === 'ERROR';
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.id}
-      subtitle={row.action.replace(/_/g, ' ')}
-      eyebrow="Event"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge value={row.status} />
-            <InlinePill color={sevColor}>{row.severity}</InlinePill>
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary" icon={User} onClick={onClose}>View Admin</Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.id} subtitle={row.action.replace(/_/g, ' ')} eyebrow="Event" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         {isCritical && (
           <div className="flex items-start gap-2.5 rounded-[10px] border border-negative/20 bg-negative/[0.06] px-3.5 py-3">
@@ -330,7 +313,7 @@ export function AccessLogDrawer({ row, open, onClose }) {
         )}
 
         <DrawerSection title="Event Details">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Event ID" value={row.id} mono copyable />
             <DrawerField label="Admin" value={row.admin} />
             <DrawerField label="Action" value={row.action.replace(/_/g, ' ')} />
@@ -338,16 +321,16 @@ export function AccessLogDrawer({ row, open, onClose }) {
             <DrawerField label="Status" value={row.status} accent={STATUS_CLR[row.status]} />
             <DrawerField label="Severity" value={row.severity} accent={sevColor} />
             <DrawerField label="Timestamp" value={row.ts} mono className="sm:col-span-2" />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Device & Location">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="IP Address" value={row.ip} mono copyable />
             <DrawerField label="Device" value={row.device} />
             <DrawerField label="Browser" value={row.browser} />
             <DrawerField label="Location" value={row.location} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Risk Assessment">
@@ -382,6 +365,19 @@ export function AccessLogDrawer({ row, open, onClose }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge value={row.status} />
+            <InlinePill color={sevColor}>{row.severity}</InlinePill>
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <ActionBtn variant="default" onClick={onClose} label="Close" />
+            <ActionBtn variant="brand" Icon={User} onClick={onClose} label="View Admin" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

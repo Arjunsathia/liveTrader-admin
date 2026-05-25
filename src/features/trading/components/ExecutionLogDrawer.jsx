@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RefreshCw, Check, AlertTriangle, Terminal } from 'lucide-react';
 import { TradingDrawer, TradingQuickActions } from './TradingDrawer';
-import { DrawerSection, DrawerField, DrawerGrid } from '../../../components/overlays';
+import { DrawerSection, DrawerField, DrawerFormGrid } from '../../../components/common/drawer';
 
 const SEVERITY_META = {
   INFO:     { color: 'var(--positive)', bg: 'bg-positive/8 border-positive/20',   label: 'ℹ INFO' },
@@ -62,7 +62,7 @@ export function ExecutionLogDrawer({ open, row, onClose }) {
         </div>
 
         <DrawerSection title="Event Context">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Event ID"    value={row.eventId}   mono />
             <DrawerField label="Type"        value={row.type}      />
             <DrawerField label="Bridge"      value={row.bridge}    mono />
@@ -82,7 +82,7 @@ export function ExecutionLogDrawer({ open, row, onClose }) {
             <DrawerField label="Status Code" value={row.code}      mono />
             <DrawerField label="Severity"    value={row.severity}  />
             <DrawerField label="Timestamp"   value={row.timestamp} mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Deep Detail">

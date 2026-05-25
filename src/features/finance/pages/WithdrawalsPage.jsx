@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { AlertOctagon, ArrowUpRight, CheckCircle2, Clock, Download, Lock, Play, ShieldAlert, TrendingDown, XCircle, Search, Plus } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
-import { withdrawalsData } from '../data/mockData';
+import { withdrawalsData } from '@/config/constants/finance/mockData';
 import { KpiCard, StatusBadge, RiskBadge, MethodBadge, AmountCell, Toast } from '../components/FinanceComponents';
-import { UserCell, QuickActions, FinanceRecordDrawer, Pagination } from '../components/FinanceDrawer';
+import { UserCell, QuickActions, FinanceRecordDrawer } from '../components/FinanceDrawer';
+import { MainTable, TableToolbar } from '../../../components/common/table';
+import { useDrawerState } from '@/hooks/useDrawerState';
 
 const PAGE = {
   accent: 'var(--negative)',
@@ -12,13 +14,13 @@ const PAGE = {
   description: 'Process client payouts — compliance checks, auto-risk limits, and gateway execution.',
 };
 
-export function WithdrawalsPage() {
+function WithdrawalsPage() {
   const [search, setSearch] = useState('');
   const [statusF, setStatusF] = useState('ALL');
   const [methodF, setMethodF] = useState('ALL');
   const [riskF, setRiskF] = useState('ALL');
   const [page, setPage] = useState(1);
-  const [drawer, setDrawer] = useState(null);
+  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
   
   const PER = 7;
@@ -51,6 +53,68 @@ export function WithdrawalsPage() {
     { label: 'Flagged', value: withdrawalsData.filter(d => d.status === 'FLAGGED').length, Icon: ShieldAlert, accent: 'var(--negative)', sub: 'AML / sanctions hold', urgent: true },
     { label: '24h Volume', value: `$${(vol24 / 1000).toFixed(1)}K`, Icon: TrendingDown, accent: 'var(--brand)', sub: 'Gross payout volume' },
   ];
+
+  const columns = [
+    { key: 'id', label: 'WDR ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
+    { key: 'user', label: 'User', render: (_, row) => <UserCell u={row.user} /> },
+    { key: 'amount', label: 'Amount', render: (_, row) => <AmountCell value={`-${row.amount}`} type="WITHDRAWAL" /> },
+    { key: 'destination', label: 'Destination', render: (val) => <span className="font-mono text-text-muted/55 text-[11px] max-w-[160px] block truncate" title={val}>{val}</span> },
+    { key: 'method', label: 'Method', render: (val) => <MethodBadge value={val} /> },
+    { key: 'status', label: 'Status', render: (val) => <StatusBadge value={val} /> },
+    { key: 'risk', label: 'Risk', render: (val) => <RiskBadge value={val} /> },
+    {
+      key: 'compliance',
+      label: 'Compliance',
+      render: (val) => (
+        <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
+          style={{ 
+            color: val === 'PASS' ? 'var(--positive)' : 'var(--negative)', 
+            background: `color-mix(in srgb, ${val === 'PASS' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
+          }}
+        >
+          {val}
+        </span>
+      ),
+    },
+    {
+      key: 'aml',
+      label: 'AML',
+      render: (val) => (
+        <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
+          style={{ 
+            color: val === 'CLEAR' ? 'var(--positive)' : 'var(--negative)', 
+            background: `color-mix(in srgb, ${val === 'CLEAR' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
+          }}
+        >
+          {val}
+        </span>
+      ),
+    },
+    { key: 'created', label: 'Created', render: (val) => <span className="font-mono text-[11px] text-text-muted/50">{val}</span> },
+    {
+      key: 'actions',
+      label: 'Actions',
+      align: 'right',
+      render: (_, row) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          <QuickActions
+            row={row}
+            onApprove={() => act('Approved', row.id)}
+            onReject={() => act('Rejected', row.id)}
+            onFlag={() => act('Flagged', row.id)}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  const tableState = {
+    page,
+    pageSize: PER,
+    setPage,
+    setPageSize: () => {},
+    totalPages: Math.ceil(filtered.length / PER)
+  };
 
   return (
     <PageShell>
@@ -116,190 +180,81 @@ export function WithdrawalsPage() {
 
         {/* ── Table Card ── */}
         <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
+          <TableToolbar
+            title="Withdrawal Registry"
+            count={filtered.length}
+            accentColor={PAGE.accent}
+            search={search}
+            onSearchChange={(v) => { setSearch(v); setPage(1); }}
+            searchPlaceholder="Search payouts…"
+            filters={
+              <>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                  <select
+                    value={statusF}
+                    onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '70px' }}
+                  >
+                    {['ALL', 'PENDING', 'PROCESSING', 'PAID', 'FROZEN', 'FLAGGED', 'REJECTED'].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* Table Header */}
-          <div className="px-5 py-3.5 border-b border-border/12 flex items-center justify-between gap-3 bg-surface-elevated flex-wrap">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-1 h-5 rounded-full"
-                style={{ background: PAGE.accent }}
-              />
-              <h3 className="font-black text-[12px] tracking-widest uppercase text-text/80">
-                Withdrawal Registry
-              </h3>
-              <span
-                className="px-1.5 py-0.5 rounded-[5px] text-[10px] font-black border font-mono"
-                style={{ color: PAGE.accent, background: `color-mix(in srgb, ${PAGE.accent} 10%, transparent)`, borderColor: `color-mix(in srgb, ${PAGE.accent} 22%, transparent)` }}
-              >
-                {filtered.length}
-              </span>
-            </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Method:</span>
+                  <select
+                    value={methodF}
+                    onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '70px' }}
+                  >
+                    {['ALL', 'Bank Wire', 'Crypto', 'E-Wallet'].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="relative">
-                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                  placeholder="Search payouts…"
-                  className="h-7 pl-7 pr-3 w-36 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text placeholder:text-text-muted/35 outline-none focus:border-brand/40 focus:w-48 transition-all"
-                />
-              </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Risk:</span>
+                  <select
+                    value={riskF}
+                    onChange={(e) => { setRiskF(e.target.value); setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '70px' }}
+                  >
+                    {['ALL', 'LOW', 'MEDIUM', 'HIGH'].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            }
+          />
 
-              {/* Status Selector */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
-                <select
-                  value={statusF}
-                  onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
-                  style={{ minWidth: '70px' }}
-                >
-                  {['ALL', 'PENDING', 'PROCESSING', 'PAID', 'FROZEN', 'FLAGGED', 'REJECTED'].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Method Selector */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Method:</span>
-                <select
-                  value={methodF}
-                  onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
-                  style={{ minWidth: '70px' }}
-                >
-                  {['ALL', 'Bank Wire', 'Crypto', 'E-Wallet'].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Risk Selector */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Risk:</span>
-                <select
-                  value={riskF}
-                  onChange={(e) => { setRiskF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
-                  style={{ minWidth: '70px' }}
-                >
-                  {['ALL', 'LOW', 'MEDIUM', 'HIGH'].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
-                  <th className="px-4 py-3">WDR ID</th>
-                  <th className="px-4 py-3">User</th>
-                  <th className="px-4 py-3">Amount</th>
-                  <th className="px-4 py-3">Destination</th>
-                  <th className="px-4 py-3">Method</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Risk</th>
-                  <th className="px-4 py-3">Compliance</th>
-                  <th className="px-4 py-3">AML</th>
-                  <th className="px-4 py-3">Created</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/8">
-                {paged.length === 0 ? (
-                  <tr>
-                    <td colSpan={11} className="px-5 py-10 text-center text-[12px] text-text-muted/40 italic">
-                      No withdrawals found matching filters.
-                    </td>
-                  </tr>
-                ) : (
-                  paged.map((row) => {
-                    const isCritical = row.status === 'FROZEN' || row.status === 'REJECTED' || row.status === 'FLAGGED';
-                    const isPending = row.status === 'PENDING' || row.status === 'PROCESSING';
-
-                    return (
-                      <tr
-                        key={row.id}
-                        onClick={() => setDrawer(row)}
-                        className={`group cursor-pointer transition-colors border-l-2 border-transparent ${
-                          isCritical
-                            ? 'hover:bg-negative/5 hover:border-l-negative'
-                            : isPending
-                            ? 'hover:bg-warning/5 hover:border-l-warning'
-                            : 'hover:bg-positive/5 hover:border-l-positive'
-                        }`}
-                      >
-                        <td className="px-4 py-3.5 font-mono text-[11px] font-bold text-brand">{row.id}</td>
-                        <td className="px-4 py-3.5"><UserCell u={row.user} /></td>
-                        <td className="px-4 py-3.5"><AmountCell value={`-${row.amount}`} type="WITHDRAWAL" /></td>
-                        <td className="px-4 py-3.5">
-                          <span className="font-mono text-text-muted/55 text-[11px] max-w-[160px] block truncate" title={row.destination}>
-                            {row.destination}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5"><MethodBadge value={row.method} /></td>
-                        <td className="px-4 py-3.5"><StatusBadge value={row.status} /></td>
-                        <td className="px-4 py-3.5"><RiskBadge value={row.risk} /></td>
-                        <td className="px-4 py-3.5">
-                          <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
-                            style={{ 
-                              color: row.compliance === 'PASS' ? 'var(--positive)' : 'var(--negative)', 
-                              background: `color-mix(in srgb, ${row.compliance === 'PASS' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
-                            }}
-                          >
-                            {row.compliance}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
-                            style={{ 
-                              color: row.aml === 'CLEAR' ? 'var(--positive)' : 'var(--negative)', 
-                              background: `color-mix(in srgb, ${row.aml === 'CLEAR' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
-                            }}
-                          >
-                            {row.aml}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.created}</td>
-                        <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                          <QuickActions
-                            row={row}
-                            onApprove={() => act('Approved', row.id)}
-                            onReject={() => act('Rejected', row.id)}
-                            onFlag={() => act('Flagged', row.id)}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="border-t border-border/10">
-            <Pagination
-              total={filtered.length}
-              page={page}
-              perPage={PER}
-              setPage={setPage}
-            />
-          </div>
+          <MainTable
+            columns={columns}
+            data={paged}
+            onRowClick={(row) => drawerState.open(row)}
+            emptyTitle="No withdrawals found matching filters."
+            pagination={tableState}
+            rowClassName={(row) => {
+              const isCritical = row.status === 'FROZEN' || row.status === 'REJECTED' || row.status === 'FLAGGED';
+              const isPending = row.status === 'PENDING' || row.status === 'PROCESSING';
+              if (isCritical) return 'hover:bg-negative/5 hover:border-l-negative';
+              if (isPending) return 'hover:bg-warning/5 hover:border-l-warning';
+              return 'hover:bg-positive/5 hover:border-l-positive';
+            }}
+          />
         </section>
       </div>
 
       <FinanceRecordDrawer
-        row={drawer}
-        open={!!drawer}
-        onClose={() => setDrawer(null)}
+        row={drawerState.value}
+        open={drawerState.isOpen}
+        onClose={() => drawerState.close()}
         type="Withdrawal"
         onAction={act}
       />

@@ -13,9 +13,9 @@ import {
   MessageSquare, Play, RefreshCw, Search, Send, ShieldAlert,
   User, X, XCircle,
 } from 'lucide-react';
-import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR } from '../data/mockData';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerField, DrawerGrid, DrawerSection } from '../../../components/overlays';
+import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR } from '@/config/constants/finance/mockData';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection } from '../../../components/common/drawer';
 import { ActionBtn as IconBtn } from '../../../components/ui';
 import { StatusChip, RiskChip, PriorityChip } from '../../../components/ui';
 
@@ -23,7 +23,7 @@ import { StatusChip, RiskChip, PriorityChip } from '../../../components/ui';
 export { IconBtn };
 export { DrawerSection };
 export { DrawerField as DF };
-export { DrawerGrid as DGrid };
+export { DrawerFormGrid as DGrid };
 export { StatusChip as StatusBadge };
 export { RiskChip as RiskBadge };
 // SectionHead for any page that imports it via FinanceDrawer
@@ -31,16 +31,20 @@ export { SectionHead } from '../../../components/ui/SectionHead';
 
 
 /* ── Pagination re-export (Finance pages import from here) ───── */
-export { Pagination } from '../../../components/tables/Pagination';
+export { Pagination } from '../../../components/common/table';
 
 /* ── Base drawer shell ───────────────────────────────────────── */
 function FinanceDrawer({ open, onClose, title, subtitle, children, footer }) {
   return (
-    <AdminDrawer open={open} onClose={onClose} title={title} subtitle={subtitle} eyebrow="Record Review" width="max-w-[720px]" footer={footer}>
-      <div className="space-y-6">
-        {children}
-      </div>
-    </AdminDrawer>
+    <MainDrawer open={open} onClose={onClose} width="max-w-[720px]">
+      <DrawerHeader title={title} subtitle={subtitle} eyebrow="Record Review" onClose={onClose} />
+      <DrawerBody>
+        <div className="space-y-6">
+          {children}
+        </div>
+      </DrawerBody>
+      {footer && <DrawerFooter>{footer}</DrawerFooter>}
+    </MainDrawer>
   );
 }
 
@@ -201,7 +205,7 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
 
       {/* Transaction Summary */}
       <DrawerSection title="Transaction Summary">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Record ID"     value={row.id}      mono copyable />
           <DrawerField label="Status"        value={row.status}  accent={STATUS_CLR[row.status]} />
           <DrawerField label="Amount"        value={row.amount}  mono accent={row.amtRaw > 0 ? 'var(--positive)' : 'var(--negative)'} />
@@ -215,7 +219,7 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
           {row.aml         && <DrawerField label="AML Status"       value={row.aml}         accent={row.aml === 'CLEAR' ? 'var(--positive)' : row.aml === 'REVIEW' ? 'var(--warning)' : 'var(--negative)'} />}
           <DrawerField label="Timestamp"       value={rowTs} mono />
           {row.reviewedBy && <DrawerField label="Reviewed By"   value={row.reviewedBy || 'Unassigned'} />}
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       {/* User Context */}

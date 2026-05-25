@@ -1,7 +1,6 @@
 import React from 'react';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerGrid, DrawerField } from '../../../components/overlays';
-import { Button } from '../../../components/ui/Button';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerSection, DrawerFormGrid as DrawerFormGrid, DrawerField } from '../../../components/common/drawer';
 import { ActionBtn } from '../../../components/ui';
 import { Download, RefreshCw, PlayCircle, Copy, MessageSquare, Trash2, FileText, Activity, Send, Archive, Hash, Clock } from 'lucide-react';
 import { Badge } from '../../../components/ui/Badge';
@@ -44,23 +43,13 @@ export function ReportDetailDrawer({ open, row, onClose, onAction }) {
   ];
 
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
-      title={row.name || row.title || row.id}
-      subtitle={row.id}
-      eyebrow="Report Details"
       width="max-w-[500px]"
       onClose={onClose}
-      footer={(
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-             <StatusBadge value={row.status} />
-             <FormatBadge value={row.format} />
-          </div>
-          <Button variant="secondary" onClick={onClose}>Close</Button>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.name || row.title || row.id} subtitle={row.id} eyebrow="Report Details" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-6">
         
         {/* Quick Stats Header */}
@@ -71,7 +60,7 @@ export function ReportDetailDrawer({ open, row, onClose, onAction }) {
         </div>
 
         <DrawerSection title="Core Information">
-          <DrawerGrid>
+          <DrawerFormGrid>
             {row.period && <DrawerField label="Period" value={row.period} />}
             {row.owner && <DrawerField label="Owner" value={row.owner} />}
             {row.source && <DrawerField label="Source" value={row.source} />}
@@ -87,11 +76,11 @@ export function ReportDetailDrawer({ open, row, onClose, onAction }) {
             {row.retries !== undefined && <DrawerField label="Retries" value={row.retries} mono accent={row.retries > 0 ? 'var(--warning)' : 'var(--positive)'} />}
             <DrawerField label="Format" value={row.format} accent={fmtColor} />
             <DrawerField label="Generated" value={row.generated || '—'} mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Delivery Info">
-          <DrawerGrid cols={1}>
+          <DrawerFormGrid cols={1}>
             <div className="rounded-[10px] border border-border/20 bg-bg/30 px-4 py-3 space-y-2">
               {[
                 { label: 'Delivery Channel', val: 'Email + Export Queue' },
@@ -105,7 +94,7 @@ export function ReportDetailDrawer({ open, row, onClose, onAction }) {
                 </div>
               ))}
             </div>
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Audit Trail">
@@ -123,6 +112,16 @@ export function ReportDetailDrawer({ open, row, onClose, onAction }) {
           </div>
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex gap-2">
+             <StatusBadge value={row.status} />
+             <FormatBadge value={row.format} />
+          </div>
+          <ActionBtn variant="default" onClick={onClose} label="Close" />
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

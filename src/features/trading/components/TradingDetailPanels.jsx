@@ -4,7 +4,7 @@ import {
   X, XCircle, Shield, Flag, Check, Eye,
   TrendingUp, TrendingDown,
 } from 'lucide-react';
-import { DrawerSection, DrawerField, DrawerGrid } from '../../../components/overlays';
+import { DrawerSection, DrawerField, DrawerFormGrid } from '../../../components/common/drawer';
 import { TradingQuickActions } from './TradingDrawer';
 
 /**
@@ -21,30 +21,30 @@ export function AccountDetailsDrawer({ row, onAction }) {
   return (
     <div className="space-y-6">
       <DrawerSection title="Account Summary">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Group"    value={row.group}    mono />
           <DrawerField label="Currency" value={row.currency} />
           <DrawerField label="Leverage" value={row.leverage} />
           <DrawerField label="Status"   value={row.status}   />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="Financials">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Balance"     value={row.balance}    mono accent="var(--brand)" />
           <DrawerField label="Equity"      value={row.equity}     mono accent="var(--positive)" />
           <DrawerField label="Margin"      value={row.margin}     mono accent="var(--warning)" />
           <DrawerField label="Free Margin" value={row.freeMargin} mono accent="var(--cyan)" />
           <DrawerField label="Margin Level" value={row.marginLvl} mono />
           <DrawerField label="Last Sync"   value={row.lastSync}  mono />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="User Association">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Full Name"   value={row.user} />
           <DrawerField label="Account UID" value={row.uid}  mono />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="Actions">
@@ -111,7 +111,7 @@ export function OrderDetailsDrawer({ row, onAction }) {
       </div>
 
       <DrawerSection title="Order Details">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Ticket"      value={row.ticket}    mono />
           <DrawerField label="Symbol"      value={row.symbol}    mono />
           <DrawerField label="Side"        value={row.side}      accent={row.side === 'BUY' ? 'var(--positive)' : 'var(--negative)'} />
@@ -120,17 +120,17 @@ export function OrderDetailsDrawer({ row, onAction }) {
           <DrawerField label="Price"       value={row.price}     mono />
           <DrawerField label="Stop Loss"   value={row.sl}        mono accent="var(--negative)" />
           <DrawerField label="Take Profit" value={row.tp}        mono accent="var(--positive)" />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="Execution">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Status" value={row.status} />
           <DrawerField label="Source" value={row.source} />
           <DrawerField label="Time"   value={row.time}   mono />
           <DrawerField label="User"   value={row.user}   />
           <DrawerField label="UID"    value={row.uid}    mono />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       {row.status === 'REJECTED' && (
@@ -188,7 +188,7 @@ export function PositionDetailsDrawer({ row, onAction }) {
       </div>
 
       <DrawerSection title="Position Summary">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Ticket"        value={row.ticket}    mono />
           <DrawerField label="Symbol"        value={row.symbol}    mono />
           <DrawerField label="Side"          value={row.side}      accent={row.side === 'BUY' ? 'var(--positive)' : 'var(--negative)'} />
@@ -198,14 +198,14 @@ export function PositionDetailsDrawer({ row, onAction }) {
           <DrawerField label="Swap"          value={row.swap}      mono />
           <DrawerField label="Margin"        value={row.margin}    mono accent="var(--warning)" />
           <DrawerField label="Duration"      value={row.duration}  />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="Account Link">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="User" value={row.user} />
           <DrawerField label="UID"  value={row.uid}  mono />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="Actions">
@@ -258,7 +258,7 @@ export function HistoryDetailsDrawer({ row }) {
       </div>
 
       <DrawerSection title="Trade Execution Result">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Ticket"      value={row.ticket}     mono />
           <DrawerField label="Symbol"      value={row.symbol}     mono />
           <DrawerField label="Side"        value={row.side}       accent={row.side === 'BUY' ? 'var(--positive)' : 'var(--negative)'} />
@@ -266,16 +266,16 @@ export function HistoryDetailsDrawer({ row }) {
           <DrawerField label="Open Price"  value={row.openPrice}  mono />
           <DrawerField label="Close Price" value={row.closePrice} mono />
           <DrawerField label="Net P&L"     value={row.pnl}        mono accent={String(row.pnl).startsWith('+') ? 'var(--positive)' : 'var(--negative)'} wide />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
 
       <DrawerSection title="Chronology">
-        <DrawerGrid>
+        <DrawerFormGrid>
           <DrawerField label="Opened"  value={row.openTime}  mono />
           <DrawerField label="Closed"  value={row.closeTime} mono />
           <DrawerField label="Account" value={row.account}   mono />
           <DrawerField label="User"    value={row.user}      />
-        </DrawerGrid>
+        </DrawerFormGrid>
       </DrawerSection>
     </div>
   );

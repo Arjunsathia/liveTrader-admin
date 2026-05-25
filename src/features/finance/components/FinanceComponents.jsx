@@ -7,13 +7,13 @@
  */
 import React, { useEffect } from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { PRIORITY_CLR, METHOD_ICONS } from '../data/mockData';
+import { PRIORITY_CLR, METHOD_ICONS } from '@/config/constants/finance/mockData';
 
 // Re-export canonical components
 export { StatusChip as StatusBadge, RiskChip as RiskBadge, PriorityChip, SectionHead, Card, ActionBtn as IconBtn } from '../../../components/ui';
 export { KpiCard } from '../../../components/cards';
 // Pagination is now canonical — Finance pages can import from here or from FinanceDrawer
-export { Pagination } from '../../../components/tables/Pagination';
+export { Pagination } from '../../../components/common/table';
 
 /* ── Finance-specific: PriorityBadge ────────────────────────── */
 function PriorityBadge({ value }) {

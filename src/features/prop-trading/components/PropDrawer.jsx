@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { StatusChip } from '../../../components/ui';
-import { AdminDrawer } from '../../../components/overlays/AdminDrawer';
-import { DrawerSection, DrawerField, DrawerGrid, TextareaField } from '../../../components/overlays';
-import { Button } from '../../../components/ui/Button';
+import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
+import { DrawerSection, DrawerField, DrawerFormGrid as DrawerFormGrid, TextareaField } from '../../../components/common/drawer';
+import { ActionBtn } from '../../../components/ui';
 import { STATUS_COLOR } from './PropComponents';
 
 /* ─── Evaluation Drawer ──────────────────────────────────────── */
@@ -12,84 +12,40 @@ export function EvaluationDrawer({ row, open, onClose, onAction }) {
 
   if (!row) return null;
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.id}
-      subtitle={`${row.trader} · ${row.challenge}`}
-      eyebrow="Evaluation Request"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="success"
-              onClick={() => { onAction('Approved', row.id); onClose(); }}
-              className="flex-1"
-            >
-              Approve
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => { onAction('Rejected', row.id); onClose(); }}
-              className="flex-1"
-            >
-              Reject
-            </Button>
-            <Button
-              variant="warning"
-              onClick={() => { onAction('Flagged', row.id); onClose(); }}
-              className="flex-1"
-            >
-              Flag Review
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => { onAction('KYC Sent', row.id); onClose(); }}
-              className="flex-1"
-            >
-              Request KYC
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <StatusChip value={row.status} colorMap={STATUS_COLOR} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary" onClick={() => { onAction('Review Complete', row.id); onClose(); }}>
-              Finish Review
-            </Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.id} subtitle={`${row.trader} · ${row.challenge}`} eyebrow="Evaluation Request" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <DrawerSection title="Applicant">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Trader" value={row.trader} />
             <DrawerField label="UID" value={row.uid} mono />
             <DrawerField label="Challenge" value={row.challenge} />
             <DrawerField label="Phase" value={row.phase} />
             <DrawerField label="Applied" value={row.ts} mono />
             <DrawerField label="Days Active" value={`${row.days} days`} mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Performance">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Profit" value={row.profit} mono accent={row.profit?.startsWith('+') ? 'var(--positive)' : 'var(--negative)'} />
             <DrawerField label="Drawdown" value={row.drawdown} mono accent="var(--negative)" />
             <DrawerField label="Daily Loss" value={row.dailyLoss} accent={row.dailyLoss === 'OK' ? 'var(--positive)' : 'var(--negative)'} />
             <DrawerField label="Risk" value={row.risk} accent={STATUS_COLOR[row.risk] ?? 'var(--text-muted)'} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Compliance">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="KYC Status" value={row.kyc} accent={STATUS_COLOR[row.kyc]} />
             <DrawerField label="Reviewed By" value={row.reviewedBy} />
             <DrawerField label="Current Status" value={row.status} accent={STATUS_COLOR[row.status]} className="sm:col-span-2" />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="PnL Trend (Simulated)" collapsible>
@@ -118,7 +74,41 @@ export function EvaluationDrawer({ row, open, onClose, onAction }) {
           />
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2 w-full">
+            <ActionBtn
+              variant="success"
+              onClick={() => { onAction('Approved', row.id); onClose(); }}
+              label="Approve"
+            />
+            <ActionBtn
+              variant="danger"
+              onClick={() => { onAction('Rejected', row.id); onClose(); }}
+              label="Reject"
+            />
+            <ActionBtn
+              variant="warning"
+              onClick={() => { onAction('Flagged', row.id); onClose(); }}
+              label="Flag Review"
+            />
+            <ActionBtn
+              variant="default"
+              onClick={() => { onAction('KYC Sent', row.id); onClose(); }}
+              label="Request KYC"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusChip value={row.status} colorMap={STATUS_COLOR} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <ActionBtn variant="default" onClick={onClose} label="Close" />
+            <ActionBtn variant="brand" onClick={() => { onAction('Review Complete', row.id); onClose(); }} label="Finish Review" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }
 
@@ -129,76 +119,39 @@ export function FundedDrawer({ row, open, onClose, onAction }) {
   if (!row) return null;
   const pnlPos = row.pnl?.startsWith('+');
   return (
-    <AdminDrawer
+    <MainDrawer
       open={open}
       onClose={onClose}
-      title={row.id}
-      subtitle={`${row.trader} · ${row.uid}`}
-      eyebrow="Funded Account"
       width="max-w-[720px]"
-      footer={(
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            {row.payoutReady && (
-              <Button
-                variant="success"
-                onClick={() => { onAction('Payout Approved', row.id); onClose(); }}
-                className="flex-1"
-              >
-                Approve Payout
-              </Button>
-            )}
-            <Button
-              variant="warning"
-              onClick={() => { onAction('Warning Sent', row.id); onClose(); }}
-              className="flex-1"
-            >
-              Warn Trader
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => { onAction('Account Suspended', row.id); onClose(); }}
-              className="flex-1"
-            >
-              Suspend Account
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <StatusChip value={row.risk} colorMap={STATUS_COLOR} />
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Close</Button>
-            <Button variant="primary">Access Platform</Button>
-          </div>
-        </div>
-      )}
     >
+      <DrawerHeader title={row.id} subtitle={`${row.trader} · ${row.uid}`} eyebrow="Funded Account" onClose={onClose} />
+      <DrawerBody>
       <div className="space-y-5">
         <DrawerSection title="Account Identity">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Account ID" value={row.id} mono />
             <DrawerField label="Trader" value={row.trader} />
             <DrawerField label="UID" value={row.uid} mono />
             <DrawerField label="Funded Since" value={row.since} mono />
             <DrawerField label="Funded Amount" value={row.funded} mono accent="var(--brand)" />
             <DrawerField label="Max DD Limit" value={row.maxDD} mono />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Performance">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Current PnL" value={row.pnl} mono accent={pnlPos ? 'var(--positive)' : 'var(--negative)'} />
             <DrawerField label="PnL %" value={row.pnlPct} mono accent={pnlPos ? 'var(--positive)' : 'var(--negative)'} />
             <DrawerField label="Drawdown" value={row.drawdown} mono accent="var(--negative)" />
             <DrawerField label="Risk Level" value={row.risk} accent={STATUS_COLOR[row.risk] ?? 'var(--text-muted)'} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Payout">
-          <DrawerGrid>
+          <DrawerFormGrid>
             <DrawerField label="Payout Amount" value={row.payout ?? 'N/A'} mono accent="var(--brand)" />
             <DrawerField label="Payout Eligible" value={row.payoutReady ? 'YES' : 'NO'} accent={row.payoutReady ? 'var(--positive)' : 'var(--negative)'} />
-          </DrawerGrid>
+          </DrawerFormGrid>
         </DrawerSection>
 
         <DrawerSection title="Internal Notes" collapsible>
@@ -211,6 +164,37 @@ export function FundedDrawer({ row, open, onClose, onAction }) {
           />
         </DrawerSection>
       </div>
-    </AdminDrawer>
+      </DrawerBody>
+      <DrawerFooter>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2 w-full">
+            {row.payoutReady && (
+              <ActionBtn
+                variant="success"
+                onClick={() => { onAction('Payout Approved', row.id); onClose(); }}
+                label="Approve Payout"
+              />
+            )}
+            <ActionBtn
+              variant="warning"
+              onClick={() => { onAction('Warning Sent', row.id); onClose(); }}
+              label="Warn Trader"
+            />
+            <ActionBtn
+              variant="danger"
+              onClick={() => { onAction('Account Suspended', row.id); onClose(); }}
+              label="Suspend Account"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusChip value={row.risk} colorMap={STATUS_COLOR} />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <ActionBtn variant="default" onClick={onClose} label="Close" />
+            <ActionBtn variant="brand" label="Access Platform" />
+          </div>
+        </div>
+      </DrawerFooter>
+    </MainDrawer>
   );
 }

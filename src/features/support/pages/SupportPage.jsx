@@ -1,10 +1,10 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertOctagon, Inbox } from 'lucide-react';
-import { PageShell } from '@components/layout/PageShell';
-import { TicketsPage }    from '@features/support/pages/TicketsPage';
-import { EscalatedPage }  from '@features/support/pages/EscalatedPage';
-import { ticketsData }    from '@features/support/data/mockData';
+import { PageShell } from '@/components/layout/PageShell';
+import TicketsPage from '@/features/support/pages/TicketsPage';
+import EscalatedPage from '@/features/support/pages/EscalatedPage';
+import { ticketsData }    from '@/config/constants/support/mockData';
 
 /* ── Sub-navigation definition ─────────────────────────── */
 const NAV_ITEMS = [
@@ -31,7 +31,7 @@ const PAGE_MAP = {
 };
 
 /* ── Main dispatcher ────────────────────────────────────── */
-export function SupportPage() {
+function SupportPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
