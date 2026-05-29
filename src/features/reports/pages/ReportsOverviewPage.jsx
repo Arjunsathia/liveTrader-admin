@@ -30,12 +30,13 @@ function Panel({ children, className = '' }) {
 }
 
 /** Panel header strip — icon · title · optional right slot */
-function PanelHead({ icon: Icon, title, sub, right }) {
+function PanelHead({ icon, title, sub, right }) {
+  const IconComponent = icon;
   return (
     <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/12">
       <div className="flex items-center gap-2.5">
         <span className="w-5 h-5 rounded-[6px] bg-brand/10 flex items-center justify-center shrink-0">
-          <Icon size={10} className="text-brand" />
+          <IconComponent size={10} className="text-brand" />
         </span>
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 leading-none">

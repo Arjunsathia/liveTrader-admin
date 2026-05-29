@@ -9,7 +9,7 @@ import { TableToolbar } from '../../../components/common/table';
 import { KYCTable } from '../components/KYCTable';
 import { kycService } from '../services/kycService';
 import { KYC_OPTIONS, RISK_OPTIONS } from "@/config/constants/USER_FORM";
-import { UsersKPIGrid } from '../components/UsersKPIGrid';
+import { UsersKPIGrid } from '../components/UsersKpiGrid';
 
 const USER_NAV_TABS = [
   { id: 'list', label: 'User Directory', path: '/users', Icon: Users },

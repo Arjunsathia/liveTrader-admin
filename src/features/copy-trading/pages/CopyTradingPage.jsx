@@ -9,9 +9,30 @@ import { SubscriptionsPage } from './SubscriptionsPage';
 import { PerformancePage } from './PerformancePage';
 import { LogsPage } from './LogsPage';
 
-import { providersData } from '../configs/providers.config';
-import { subsData } from '../configs/subscriptions.config';
-import { logsData } from '../configs/logs.config';
+import { PROVIDER_ROWS, SUBSCRIPTION_ROWS, LOG_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const providersData = PROVIDER_ROWS.map(p => ({
+  ...p,
+  name: p.provider,
+  email: p.email || `${p.provider}@firm.com`,
+  joined: p.joined || '2023-06-15',
+  kyc: p.kyc || 'APPROVED',
+  verified: p.verified ?? true,
+  risk: p.risk || 'LOW',
+}));
+
+const subsData = SUBSCRIPTION_ROWS.map(s => ({
+  ...s,
+  alloc: s.allocation || s.alloc,
+  fee: s.fee || '20%',
+}));
+
+const logsData = LOG_ROWS.map(l => ({
+  ...l,
+  id: l.eventId || l.id,
+  sev: l.severity || l.sev,
+  ts: l.timestamp || l.ts,
+}));
 
 const PAGE_TITLES = {
   strategies: 'Strategies',

@@ -114,7 +114,8 @@ function DFooter({ children }) {
 }
 
 /* ── Collapsible Section Card ── */
-function DSection({ icon: Icon, title, children, collapsible = false, accent = 'var(--brand)' }) {
+function DSection({ icon, title, children, collapsible = false, accent = 'var(--brand)' }) {
+  const IconComponent = icon;
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -132,7 +133,7 @@ function DSection({ icon: Icon, title, children, collapsible = false, accent = '
             border: `1px solid color-mix(in srgb, ${accent} 20%, transparent)`,
           }}
         >
-          <Icon size={12} style={{ color: accent }} />
+          <IconComponent size={12} style={{ color: accent }} />
         </div>
         <span className="flex-1 text-[10.5px] font-black uppercase tracking-[0.16em] text-text-muted/65">
           {title}

@@ -6,7 +6,15 @@ import { MainTable, TableToolbar } from '@/components/common/table';
 import { Badge, RiskBadge, IBtn, ToastBar } from '../components/CopyTradingActions';
 import { KpiCard } from '../components/CopyTradingStatsCards';
 import { StatPills } from '../components/CopyTradingFilters';
-import { followersData } from '../configs/followers.config';
+import { FOLLOWER_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const followersData = FOLLOWER_ROWS.map(f => ({
+  ...f,
+  alloc: f.allocation || f.alloc,
+  ratio: f.copyRatio || f.ratio,
+  pnl: f.pnlImpact || f.pnl,
+  pnlN: parseFloat((f.pnlImpact || f.pnl || '0').replace(/[+$$,]/g, '')) || 0,
+}));
 import { FollowerDetailPage } from '../detail/FollowerDetailPage';
 
 const PAGE = {

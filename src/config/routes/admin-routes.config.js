@@ -364,10 +364,10 @@ export const adminRouteModules = [
         id: 'prop-configs',
         path: '/prop-trading/challenge-configurations',
         pageKey: 'prop-trading/prop-trading-workspace',
-        navLabel: 'Challenge Configurations',
+        navLabel: 'Challenges',
         permission: PERMISSIONS.propTrading.manage,
         meta: [
-          { pattern: '/prop-trading/challenge-configurations', title: 'Challenge Configurations', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
+          { pattern: '/prop-trading/challenge-configurations', title: 'Challenges', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
         ],
       },
       {

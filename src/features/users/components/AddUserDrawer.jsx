@@ -157,7 +157,8 @@ function PDivider({ label }) {
 /* ══════════════════════════════════════════════════════════
    COLLAPSIBLE SECTION CARD
 ══════════════════════════════════════════════════════════ */
-function Section({ step, icon: Icon, title, children, collapsible = false }) {
+function Section({ step, icon, title, children, collapsible = false }) {
+  const IconComponent = icon;
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -176,7 +177,7 @@ function Section({ step, icon: Icon, title, children, collapsible = false }) {
         </div>
 
         {/* Icon */}
-        <Icon size={13} className="text-text-muted/50 flex-shrink-0" />
+        <IconComponent size={13} className="text-text-muted/50 flex-shrink-0" />
 
         {/* Title */}
         <span className="flex-1 text-[10.5px] font-black uppercase tracking-[0.16em] text-text-muted/65">

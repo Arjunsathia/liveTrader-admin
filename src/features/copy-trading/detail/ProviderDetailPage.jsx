@@ -8,7 +8,19 @@ import {
   Badge, RiskBadge, StarRating, IBtn, Card, DetailHeader, RC
 } from '../components/CopyTradingActions';
 import { SH, KpiCard } from '../components/CopyTradingStatsCards';
-import { strategiesData } from '../configs/strategies.config';
+import { STRATEGY_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const strategiesData = STRATEGY_ROWS.map(s => ({
+  ...s,
+  copiedVol: s.copiedVolume || s.copiedVol,
+  aum: s.copiedVolume || s.aum,
+  winRateN: parseFloat((s.winRate || '0').replace(/%/g, '')) || 0,
+  ddN: parseFloat((s.drawdown || '0').replace(/[-%]/g, '')) || 0,
+  roiN: parseFloat((s.roi || '0').replace(/[+%]/g, '')) || 0,
+  rating: s.rating || 4.5,
+  tags: s.tags || ['forex', 'scalping'],
+  phase: s.phase || 'Phase-2',
+}));
 
 export function ProviderDetailPage({ row, onBack, act }) {
   const strategies = strategiesData.filter(s => s.provider === row.name);

@@ -40,3 +40,17 @@ export const strategiesConfig = {
     { key: 'lastUpdated',  label: 'Updated',     type: 'mono'   },
   ],
 };
+
+export const strPerf = [
+  { m:'Jan', roi:4.2, dd:-1.1 },{ m:'Feb', roi:6.8, dd:-2.4 },{ m:'Mar', roi:3.1, dd:-3.8 },
+  { m:'Apr', roi:8.2, dd:-1.8 },{ m:'May', roi:5.4, dd:-2.2 },{ m:'Jun', roi:7.1, dd:-1.4 },
+  { m:'Jul', roi:9.4, dd:-3.1 },{ m:'Aug', roi:6.2, dd:-2.0 },
+];
+
+export const strActivityLog = [
+  { ts:'2024-08-01 14:22', event:'STATUS_CHANGE',  detail:'Strategy status PAUSED → ACTIVE',        by:'admin@sys' },
+  { ts:'2024-08-01 10:12', event:'FEE_UPDATE',     detail:'Performance fee updated 18% → 20%',      by:'admin@sys' },
+  { ts:'2024-07-31 18:00', event:'FOLLOWER_JOIN',  detail:'New follower UID-8821 subscribed',        by:'system'    },
+  { ts:'2024-07-30 09:00', event:'RISK_REVIEW',    detail:'Risk profile reviewed — LOW maintained',  by:'Keiran L.' },
+  { ts:'2024-07-28 14:44', event:'PUBLISH',        detail:'Strategy published to marketplace',       by:'admin@sys' },
+];

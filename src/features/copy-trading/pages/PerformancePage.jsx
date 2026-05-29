@@ -8,7 +8,21 @@ import { PageShell } from '@/components/layout/PageShell';
 import { Card, IBtn, TrendBadge } from '../components/CopyTradingActions';
 import { SH, KpiCard } from '../components/CopyTradingStatsCards';
 import { CTip } from '../components/CopyTradingCharts';
-import { perfData } from '../configs/performance.config';
+import { PERFORMANCE_ROWS, growth, dd } from '@/config/constants/copy-trading/workspaces';
+
+const perfData = {
+  growth,
+  dd,
+  ranking: PERFORMANCE_ROWS.map(r => ({
+    strategy: r.strategy,
+    provider: r.provider,
+    roi: parseFloat(r.monthlyGrowth.replace(/[+%]/g, '')) || 0,
+    winRate: parseFloat(r.winRate.replace(/%/g, '')) || 0,
+    dd: parseFloat(r.drawdown.replace(/%/g, '')) || 0,
+    followers: r.followers,
+    trend: r.trend,
+  })),
+};
 
 const PAGE = {
   eyebrow: 'Copy Trading',

@@ -161,7 +161,7 @@ function PositionPnLBanner({ pnl, side, size }) {
   );
 }
 
-function HistoryResultBanner({ status, pnl, ticket, symbol, side, size }) {
+function HistoryResultBanner({ status, pnl, ticket, side, size }) {
   const isWin = status === 'WIN';
   const statusColor = isWin ? 'var(--positive)' : 'var(--negative)';
   const StatusIcon = isWin ? TrendingUp : TrendingDown;

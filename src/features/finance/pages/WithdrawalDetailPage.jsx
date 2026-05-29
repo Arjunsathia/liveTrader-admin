@@ -237,12 +237,13 @@ function Field({ label, value, mono = false, accent, copyable = false }) {
 /* ─────────────────────────────────────────────────────────
    SECTION HEADER
    ───────────────────────────────────────────────────────── */
-function SectionHead({ icon: Icon, title, right }) {
+function SectionHead({ icon, title, right }) {
+  const IconComponent = icon;
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2">
         <div className="w-6 h-6 rounded-[6px] bg-brand/8 border border-brand/15 flex items-center justify-center shrink-0">
-          <Icon size={12} className="text-brand" />
+          <IconComponent size={12} className="text-brand" />
         </div>
         <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70">
           {title}

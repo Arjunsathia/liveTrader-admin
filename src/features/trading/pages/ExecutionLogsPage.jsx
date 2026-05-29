@@ -5,7 +5,7 @@ import { KpiCard } from '../../../components/cards';
 import { MainTable, TableToolbar } from '../../../components/common/table';
 import { ExecutionLogDrawer } from '../components/ExecutionLogDrawer';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { logsConfig } from '@/config/constants/copy-trading/workspaces/logs.workspace';
+import { logsConfig } from '@/config/constants/trading/workspaces/logs.workspace';
 import { exportRows } from '../../../utils/exporters';
 import { useDrawerState } from '@/hooks/useDrawerState';
 

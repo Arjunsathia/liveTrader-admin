@@ -6,7 +6,13 @@ import { MainTable, TableToolbar } from '@/components/common/table';
 import { Badge, IBtn, ToastBar } from '../components/CopyTradingActions';
 import { KpiCard } from '../components/CopyTradingStatsCards';
 import { StatPills } from '../components/CopyTradingFilters';
-import { subsData } from '../configs/subscriptions.config';
+import { SUBSCRIPTION_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const subsData = SUBSCRIPTION_ROWS.map(s => ({
+  ...s,
+  alloc: s.allocation || s.alloc,
+  fee: s.fee || '20%',
+}));
 import { SubscriptionDetailPage } from '../detail/SubscriptionDetailPage';
 
 const PAGE = {

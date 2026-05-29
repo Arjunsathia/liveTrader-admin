@@ -3,13 +3,12 @@ import { Download, Layers, Landmark, Clock, Cpu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../components/layout/PageShell';
-import { useDrawerState } from '../../../hooks/useDrawerState';
 import { useTableState } from '../../../hooks/useTableState';
 import { TableToolbar } from '../../../components/common/table';
 import { exportRows } from '../../../utils/exporters';
 import { usersService } from '../services/userService';
 import { UsersMt5Table } from '../components/UsersTable';
-import { UsersKPIGrid } from '../components/UsersKPIGrid';
+import { UsersKPIGrid } from '../components/UsersKpiGrid';
 
 const PAGE = {
   accent: 'var(--brand)',
@@ -32,21 +31,13 @@ function MT5QueuePage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [serverFilter, setServerFilter] = useState('all');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [toastMessage, setToastMessage] = useState('');
-
-  const triggerToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3000);
-  };
 
   // Load unique servers for dynamic triage dropdowns
   const servers = useMemo(() => {
     const list = usersService.listMt5Accounts();
     const unique = [...new Set(list.map((item) => item.server))].filter(Boolean);
     return unique.sort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger]);
+  }, []);
 
   const filteredMt5 = useMemo(
     () => {
@@ -59,8 +50,7 @@ function MT5QueuePage() {
       }
       return rows;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search, statusFilter, serverFilter, refreshTrigger]
+    [search, statusFilter, serverFilter]
   );
 
   // Compute real-time MT5 bridge telemetry for the scoreboard
@@ -79,7 +69,7 @@ function MT5QueuePage() {
       { label: 'Gateway Health', value: '99.8%', subtext: 'cluster latency handshake', trend: 'Stable ping', positive: true, Icon: Clock, accent: 'var(--warning)', pulse: true },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredMt5, refreshTrigger]);
+  }, [filteredMt5]);
 
   const mt5Table = useTableState(filteredMt5, { searchFields: [], initialPageSize: 10 });
 
@@ -171,16 +161,6 @@ function MT5QueuePage() {
 
       </div>
 
-      {/* ── Toast ── */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-[300] flex items-center gap-3 bg-surface-elevated border border-brand/20 px-4 py-3 rounded-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.45)] animate-fade-in">
-          <span className="relative flex h-2 w-2 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-positive opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-positive" />
-          </span>
-          <span className="text-[11px] font-bold text-text">{toastMessage}</span>
-        </div>
-      )}
     </PageShell>
   );
 }

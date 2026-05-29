@@ -6,7 +6,7 @@ import { useTableState } from '../../../hooks/useTableState';
 import { TableToolbar, MainTable } from '../../../components/common/table';
 import { exportRows } from '../../../utils/exporters';
 import { usersService } from '../services/userService';
-import { UsersKPIGrid } from '../components/UsersKPIGrid';
+import { UsersKPIGrid } from '../components/UsersKpiGrid';
 
 const PAGE = {
   accent: 'var(--brand)',

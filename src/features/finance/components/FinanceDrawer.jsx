@@ -9,10 +9,10 @@
 import React, { useState } from 'react';
 import {
   AlertTriangle, ArrowUpRight, Check, CheckCircle2,
-  ChevronDown, Copy, Download, Eye, Flag, Lock,
+  ChevronDown, ChevronUp, Copy, Download, Eye, Flag, Lock,
   MessageSquare, Play, RefreshCw, Search, Send, ShieldAlert,
   User, X, XCircle, Clock, Activity, CreditCard,
-  Building2, Bitcoin, CircleDollarSign, Database,
+  Building2, Bitcoin, CircleDollarSign, Database, FileText,
 } from 'lucide-react';
 import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR, METHOD_ICONS } from '@/config/constants/finance/mockData';
 import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
@@ -34,18 +34,72 @@ export { SectionHead } from '../../../components/ui/SectionHead';
 /* ── Pagination re-export (Finance pages import from here) ───── */
 export { Pagination } from '../../../components/common/table';
 
-/* ── Base drawer shell ───────────────────────────────────────── */
-function FinanceDrawer({ open, onClose, title, subtitle, children, footer, eyebrow = "Record Review" }) {
+/* ── Base drawer shell components (Premium DrawerShell & DHeader) ── */
+function DrawerShell({ open, onClose, maxWidth = 'max-w-[720px]', children }) {
   return (
-    <MainDrawer open={open} onClose={onClose} width="max-w-[720px]">
-      <DrawerHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onClose={onClose} />
-      <DrawerBody>
-        <div className="space-y-6">
-          {children}
-        </div>
-      </DrawerBody>
-      {footer && <DrawerFooter>{footer}</DrawerFooter>}
+    <MainDrawer open={open} onClose={onClose} width={maxWidth}>
+      {children}
     </MainDrawer>
+  );
+}
+
+function DHeader({ eyebrow, title, subtitle, onClose, accentColor = 'var(--brand)' }) {
+  return (
+    <div className="flex-shrink-0 border-b border-border/15">
+      {/* Color accent bar */}
+      <div
+        className="h-[2.5px] w-full"
+        style={{
+          background: `linear-gradient(90deg, ${accentColor}, color-mix(in srgb, ${accentColor} 30%, transparent) 60%, transparent)`,
+        }}
+      />
+      <div className="px-6 py-5 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p
+            className="text-[9.5px] font-black uppercase tracking-[0.22em] mb-2 leading-none"
+            style={{ color: `color-mix(in srgb, ${accentColor} 65%, transparent)` }}
+          >
+            {eyebrow}
+          </p>
+          <h2 className="text-[20px] font-bold tracking-[-0.022em] text-text leading-tight truncate">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="text-[11px] font-mono text-text-muted/50 mt-1.5 truncate">{subtitle}</p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-[8px] border border-border/18 bg-bg/40 text-text-muted hover:text-text hover:border-border/30 transition-all cursor-pointer mt-0.5"
+        >
+          <X size={13} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FinanceDrawer({ open, onClose, title, subtitle, children, footer, eyebrow = "Record Review", accentColor = 'var(--brand)' }) {
+  return (
+    <DrawerShell open={open} onClose={onClose} maxWidth="max-w-[720px]">
+      <DHeader
+        eyebrow={eyebrow}
+        title={title}
+        subtitle={subtitle}
+        onClose={onClose}
+        accentColor={accentColor}
+      />
+      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        {children}
+        <div className="h-2" />
+      </div>
+      {footer && (
+        <div className="flex-shrink-0 border-t border-border/15 bg-surface-elevated px-6 py-4">
+          {footer}
+        </div>
+      )}
+    </DrawerShell>
   );
 }
 
@@ -106,25 +160,58 @@ function DrawerAuditTrail({ entries, statusColor }) {
   );
 }
 
-/* ── Note editor ─────────────────────────────────────────────── */
-function DrawerNoteEditor({ onSave }) {
+/* ── Note editor (Collapsible Premium Operator Note Box) ─────── */
+function DrawerNoteEditor({ onSave, placeholder = "Add internal operator review notes...", defaultOpen = false }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [text, setText] = useState('');
+
   return (
-    <div className="space-y-2.5">
-      <textarea
-        value={text}
-        onChange={e => setText(e.target.value)}
-        rows={3}
-        placeholder="Add internal operator review notes..."
-        className="w-full resize-none rounded-[10px] border border-border/25 bg-bg px-3 py-2.5 text-[12px] text-text outline-none transition-all placeholder:text-text-muted/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
-      />
-      <button
-        onClick={() => { if (text.trim()) { onSave(text); setText(''); } }}
-        disabled={!text.trim()}
-        className="flex items-center gap-1.5 h-8 px-4 rounded-[8px] text-[10.5px] font-bold font-heading border border-primary/20 bg-primary/[0.07] text-primary cursor-pointer hover:brightness-110 transition-all disabled:opacity-30 active:scale-95 duration-200"
+    <div className="rounded-[12px] border border-border/15 bg-bg/20 overflow-hidden">
+      {/* Toggle header */}
+      <div
+        className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-bg/30 transition-colors select-none ${isOpen ? 'border-b border-border/10' : ''
+          }`}
+        onClick={() => setIsOpen((v) => !v)}
       >
-        <Send size={10} /> Save Note
-      </button>
+        <div className="w-6 h-6 rounded-[6px] bg-brand/8 border border-brand/15 flex items-center justify-center flex-shrink-0">
+          <FileText size={12} className="text-brand" />
+        </div>
+        <span className="flex-1 text-[10.5px] font-black uppercase tracking-[0.16em] text-text-muted/65">
+          Operator Note
+        </span>
+        {isOpen
+          ? <ChevronUp size={12} className="text-text-muted/30 flex-shrink-0" />
+          : <ChevronDown size={12} className="text-text-muted/30 flex-shrink-0" />
+        }
+      </div>
+
+      {/* Note body */}
+      {isOpen && (
+        <div className="px-4 py-4 space-y-2.5">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder={placeholder}
+            rows={3}
+            className="w-full resize-none rounded-[8px] border border-border/18 bg-bg/60 px-3 py-2.5 text-[12.5px] text-text outline-none placeholder:text-text-muted/20 focus:border-brand/40 focus:ring-1 focus:ring-brand/10 transition-all leading-relaxed"
+          />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              disabled={!text?.trim()}
+              onClick={() => {
+                if (text.trim()) {
+                  onSave(text);
+                  setText('');
+                }
+              }}
+              className="flex items-center gap-1.5 h-8 px-4 rounded-[7px] text-[10.5px] font-black uppercase tracking-wider border border-brand/22 bg-brand/6 text-brand hover:bg-brand/12 disabled:opacity-25 transition-all cursor-pointer"
+            >
+              <Send size={10} /> Save Note
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -187,7 +274,7 @@ function RiskPanel({ risk, flags = [] }) {
 }
 
 /* ── Status hero banner ───────────────────────────────────────── */
-function StatusHeroBanner({ status, amount, id, created, method, rail, type }) {
+function StatusHeroBanner({ status, amount, id, created, method, rail }) {
   const statusColor = STATUS_CLR[status] || 'var(--text-muted)';
 
   let StatusIcon = Clock;

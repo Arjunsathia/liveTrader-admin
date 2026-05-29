@@ -31,12 +31,13 @@ function Panel({ children, className = '' }) {
   );
 }
 
-function PanelHead({ icon: Icon, title, sub, right }) {
+function PanelHead({ icon, title, sub, right }) {
+  const IconComponent = icon;
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-border/12 bg-bg/5">
       <div className="flex items-center gap-2">
         <span className="w-5 h-5 rounded-[6px] bg-brand/10 flex items-center justify-center shrink-0">
-          <Icon size={10} className="text-brand" />
+          <IconComponent size={10} className="text-brand" />
         </span>
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 leading-none">
@@ -137,13 +138,16 @@ function TemplateDetailDrawer({ open, tpl, onClose, onAction }) {
                 { Icon: AlarmClock, val: tpl.freq, label: 'Frequency', color: freqColor },
                 { Icon: Clock, val: tpl.lastRun || '—', label: 'Last Run', color: 'var(--text-muted)' },
                 { Icon: Zap, val: !isPaused && tpl.nextRun !== '—' ? tpl.nextRun : 'Paused', label: 'Next Run', color: 'var(--text-muted)' },
-              ].map(({ Icon: Ic, val, label, color }) => (
-                <div key={label} className="flex flex-col gap-1 items-center text-center">
-                  <Ic size={12} style={{ color }} />
-                  <div className="font-mono text-[11.5px] font-bold" style={{ color }}>{val}</div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{label}</div>
-                </div>
-              ))}
+              ].map((item) => {
+                const IconComponent = item.Icon;
+                return (
+                  <div key={item.label} className="flex flex-col gap-1 items-center text-center">
+                    <IconComponent size={12} style={{ color: item.color }} />
+                    <div className="font-mono text-[11.5px] font-bold" style={{ color: item.color }}>{item.val}</div>
+                    <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{item.label}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -184,18 +188,21 @@ function TemplateDetailDrawer({ open, tpl, onClose, onAction }) {
                 { label: isPaused ? 'Resume Schedule' : 'Pause Schedule', Icon: isPaused ? Play : Pause, style: { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 8%, transparent)', border: 'color-mix(in srgb, var(--warning) 22%, transparent)' }, cb: () => { onAction(isPaused ? 'Resumed' : 'Paused', tpl.id); onClose(); } },
                 { label: 'Edit Template', Icon: RefreshCw, style: null, cb: () => { onAction('Edit opened', tpl.id); onClose(); } },
                 { label: 'Delete Template', Icon: Trash2, style: { color: 'var(--negative)', bg: 'color-mix(in srgb, var(--negative) 5%, transparent)', border: 'color-mix(in srgb, var(--negative) 15%, transparent)' }, cb: () => { onAction('Deleted', tpl.id); onClose(); } },
-              ].map(({ label, Icon: Ic, style, cb }) => (
-                <button
-                  key={label}
-                  onClick={cb}
-                  className="flex items-center gap-2 h-10 px-4 rounded-[10px] border font-bold font-heading text-[11px] transition-all hover:brightness-110 active:scale-[0.97] cursor-pointer"
-                  style={style
-                    ? { color: style.color, background: style.bg, borderColor: style.border }
-                    : { color: 'var(--text-muted)', background: 'color-mix(in srgb, var(--bg) 30%, transparent)', borderColor: 'var(--border)' }}
-                >
-                  <Ic size={12} /> {label}
-                </button>
-              ))}
+              ].map((item) => {
+                const IconComponent = item.Icon;
+                return (
+                  <button
+                    key={item.label}
+                    onClick={item.cb}
+                    className="flex items-center gap-2 h-10 px-4 rounded-[10px] border font-bold font-heading text-[11px] transition-all hover:brightness-110 active:scale-[0.97] cursor-pointer"
+                    style={item.style
+                      ? { color: item.style.color, background: item.style.bg, borderColor: item.style.border }
+                      : { color: 'var(--text-muted)', background: 'color-mix(in srgb, var(--bg) 30%, transparent)', borderColor: 'var(--border)' }}
+                  >
+                    <IconComponent size={12} /> {item.label}
+                  </button>
+                );
+              })}
             </div>
           </DrawerSection>
         </div>
@@ -290,16 +297,19 @@ function TemplateCard({ tpl, onOpen, onAct }) {
           { Icon: Mail, val: `${tpl.recipients.length} recipients`, color: 'var(--text-muted)' },
           { Icon: Clock, val: `Last: ${tpl.lastRun || '—'}`, color: 'var(--text-muted)' },
           { Icon: Zap, val: isPaused ? 'Paused' : `Next: ${tpl.nextRun !== '—' ? tpl.nextRun : '—'}`, color: isPaused ? 'var(--warning)' : 'var(--text-muted)' },
-        ].map(({ Icon: Ic, val, color }, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-1.5 text-[11px] font-semibold px-3 first:pl-0 border-r border-border/8 last:border-0 py-0 text-text-muted/70"
-            style={{ color, opacity: color === 'var(--text-muted)' ? 0.6 : 1 }}
-          >
-            <Ic size={10} className="shrink-0" />
-            {val}
-          </div>
-        ))}
+        ].map((item, i) => {
+          const IconComponent = item.Icon;
+          return (
+            <div
+              key={i}
+              className="flex items-center gap-1.5 text-[11px] font-semibold px-3 first:pl-0 border-r border-border/8 last:border-0 py-0 text-text-muted/70"
+              style={{ color: item.color, opacity: item.color === 'var(--text-muted)' ? 0.6 : 1 }}
+            >
+              <IconComponent size={10} className="shrink-0" />
+              {item.val}
+            </div>
+          );
+        })}
       </div>
 
       {/* Floating Action Popup on Hover */}

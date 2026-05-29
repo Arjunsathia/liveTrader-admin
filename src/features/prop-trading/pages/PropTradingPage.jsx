@@ -49,4 +49,4 @@ function PropTradingPage() {
   );
 }
 
-export default PropTradingPage;;
+export default PropTradingPage;

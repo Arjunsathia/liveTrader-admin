@@ -6,7 +6,17 @@ import { MainTable, TableToolbar } from '@/components/common/table';
 import { Badge, RiskBadge, StarRating, IBtn, ToastBar } from '../components/CopyTradingActions';
 import { KpiCard } from '../components/CopyTradingStatsCards';
 import { StatPills } from '../components/CopyTradingFilters';
-import { providersData } from '../configs/providers.config';
+import { PROVIDER_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const providersData = PROVIDER_ROWS.map(p => ({
+  ...p,
+  name: p.provider,
+  email: p.email || `${p.provider}@firm.com`,
+  joined: p.joined || '2023-06-15',
+  kyc: p.kyc || 'APPROVED',
+  verified: p.verified ?? true,
+  risk: p.risk || 'LOW',
+}));
 import { ProviderDetailPage } from '../detail/ProviderDetailPage';
 
 const PAGE = {

@@ -6,7 +6,19 @@ import { MainTable, TableToolbar } from '@/components/common/table';
 import { Badge, RiskBadge, IBtn, ToastBar } from '../components/CopyTradingActions';
 import { KpiCard } from '../components/CopyTradingStatsCards';
 import { StatPills } from '../components/CopyTradingFilters';
-import { strategiesData } from '../configs/strategies.config';
+import { STRATEGY_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const strategiesData = STRATEGY_ROWS.map(s => ({
+  ...s,
+  copiedVol: s.copiedVolume || s.copiedVol,
+  aum: s.copiedVolume || s.aum,
+  winRateN: parseFloat((s.winRate || '0').replace(/%/g, '')) || 0,
+  ddN: parseFloat((s.drawdown || '0').replace(/[-%]/g, '')) || 0,
+  roiN: parseFloat((s.roi || '0').replace(/[+%]/g, '')) || 0,
+  rating: s.rating || 4.5,
+  tags: s.tags || ['forex', 'scalping'],
+  phase: s.phase || 'Phase-2',
+}));
 import { StrategyDetailPage } from '../detail/StrategyDetailPage';
 
 const PAGE = {

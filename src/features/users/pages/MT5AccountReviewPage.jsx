@@ -2,7 +2,7 @@
  * users/pages/MT5AccountReviewPage.jsx
  * Standalone review and administration page for a single MT5 account bridge.
  */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   ArrowLeft, ChevronRight, RefreshCw, KeyRound, Check,
@@ -94,13 +94,13 @@ export function MT5AccountReviewPage() {
     { action: 'Gateway clusters latency verification completed', by: 'BridgeManager', ts: originalAccount.lastSync || '2026-05-26 12:00', note: 'Latency stable, LDS4 network' }
   ]);
 
-  useEffect(() => {
-    if (originalAccount) {
-      setAccount(originalAccount);
-      setLeverage(originalAccount.leverage || '1:100');
-      setStatus(originalAccount.status || 'CONNECTED');
-    }
-  }, [originalAccount]);
+  const [prevLogin, setPrevLogin] = useState(login);
+  if (login !== prevLogin) {
+    setPrevLogin(login);
+    setAccount(originalAccount);
+    setLeverage(originalAccount.leverage || '1:100');
+    setStatus(originalAccount.status || 'CONNECTED');
+  }
 
   const triggerToast = (msg) => {
     setToastMsg(msg);

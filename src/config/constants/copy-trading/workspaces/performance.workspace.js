@@ -38,3 +38,17 @@ export const performanceConfig = {
     { key: 'trend',         label: 'Trend',        type: 'trend'  },
   ],
 };
+
+export const growth = [
+  { m:'Jan', apex:4.2, gold:2.1, finedge:1.8 },{ m:'Feb', apex:6.8, gold:3.4, finedge:2.6 },
+  { m:'Mar', apex:3.1, gold:1.8, finedge:3.2 },{ m:'Apr', apex:8.2, gold:4.2, finedge:2.8 },
+  { m:'May', apex:5.4, gold:3.1, finedge:2.2 },{ m:'Jun', apex:7.1, gold:2.8, finedge:3.8 },
+  { m:'Jul', apex:9.4, gold:5.6, finedge:2.4 },{ m:'Aug', apex:6.2, gold:3.2, finedge:1.6 },
+];
+
+export const dd = [
+  { m:'Jan', apex:-1.1, gold:-2.4, finedge:-1.8 },{ m:'Feb', apex:-2.4, gold:-3.1, finedge:-2.2 },
+  { m:'Mar', apex:-3.8, gold:-4.2, finedge:-3.4 },{ m:'Apr', apex:-1.8, gold:-2.8, finedge:-2.0 },
+  { m:'May', apex:-2.2, gold:-3.4, finedge:-2.8 },{ m:'Jun', apex:-1.4, gold:-2.1, finedge:-1.6 },
+  { m:'Jul', apex:-3.1, gold:-3.8, finedge:-2.4 },{ m:'Aug', apex:-2.0, gold:-2.6, finedge:-2.1 },
+];

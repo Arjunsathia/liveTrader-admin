@@ -239,7 +239,10 @@ function ReplyComposer({ noteType, setNoteType, replyText, setReplyText, onSend,
         {[
           ['REPLY',    'Reply to Customer', Send],
           ['INTERNAL', 'Internal Note',     Lock],
-        ].map(([type, label, Icon]) => {
+        ].map((item) => {
+          const IconComponent = item[2];
+          const type = item[0];
+          const label = item[1];
           const active = noteType === type;
           const col = type === 'REPLY' ? 'var(--brand)' : '#a78bfa';
           return (
@@ -251,7 +254,7 @@ function ReplyComposer({ noteType, setNoteType, replyText, setReplyText, onSend,
                 ? { color: col, borderColor: col }
                 : { color: 'var(--text-muted)', opacity: 0.7, borderColor: 'transparent' }}
             >
-              <Icon size={9} />
+              <IconComponent size={9} />
               {label}
             </button>
           );
@@ -557,15 +560,18 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
               { Icon: CalendarDays, val: `Opened ${t.created}` },
               { Icon: Clock,        val: `Updated ${t.updated || '—'}` },
               { Icon: MessageCircle, val: `${msgCount} messages` },
-            ].map(({ Icon, val }, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-1.5 text-[11.5px] text-text-muted/75 font-heading font-semibold px-3.5 first:pl-0 border-r border-border/8 last:border-0"
-              >
-                <Icon size={11} className="shrink-0 text-text-muted/60" />
-                <span>{val}</span>
-              </div>
-            ))}
+            ].map((item, i) => {
+              const IconComponent = item.Icon;
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-1.5 text-[11.5px] text-text-muted/75 font-heading font-semibold px-3.5 first:pl-0 border-r border-border/8 last:border-0"
+                >
+                  <IconComponent size={11} className="shrink-0 text-text-muted/60" />
+                  <span>{item.val}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Panel>

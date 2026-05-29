@@ -6,7 +6,14 @@ import { MainTable, TableToolbar } from '@/components/common/table';
 import { Badge, SevBadge, IBtn, ToastBar } from '../components/CopyTradingActions';
 import { KpiCard } from '../components/CopyTradingStatsCards';
 import { StatPills } from '../components/CopyTradingFilters';
-import { logsData } from '../configs/logs.config';
+import { LOG_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const logsData = LOG_ROWS.map(l => ({
+  ...l,
+  id: l.eventId || l.id,
+  sev: l.severity || l.sev,
+  ts: l.timestamp || l.ts,
+}));
 import { LogDetailPage } from '../detail/LogDetailPage';
 
 const PAGE = {

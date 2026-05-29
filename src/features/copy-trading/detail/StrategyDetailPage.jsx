@@ -12,8 +12,15 @@ import {
 } from '../components/CopyTradingActions';
 import { SH, KpiCard } from '../components/CopyTradingStatsCards';
 import { CTip } from '../components/CopyTradingCharts';
-import { strPerf, strActivityLog } from '../configs/strategies.config';
-import { followersData } from '../configs/followers.config';
+import { strPerf, strActivityLog, FOLLOWER_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const followersData = FOLLOWER_ROWS.map(f => ({
+  ...f,
+  alloc: f.allocation || f.alloc,
+  ratio: f.copyRatio || f.ratio,
+  pnl: f.pnlImpact || f.pnl,
+  pnlN: parseFloat((f.pnlImpact || f.pnl || '0').replace(/[+$$,]/g, '')) || 0,
+}));
 
 export function StrategyDetailPage({ row, onBack, act }) {
   const [tab, setTab] = useState('overview');

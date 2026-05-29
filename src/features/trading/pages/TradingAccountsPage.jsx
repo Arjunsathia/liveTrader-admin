@@ -5,7 +5,7 @@ import {
   Wallet, Monitor, ShieldAlert, Radio, DollarSign,
 } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
-import { KPICard } from '../../../components/cards/KPICard';
+import { KpiCard } from '../../../components/cards';
 import { TradingAccountCards } from '../components/TradingAccountCards';
 import { TradingActivityLog } from '../components/TradingActivityLog';
 import { exportRows } from '../../../utils/exporters';
@@ -243,7 +243,7 @@ function TradingAccountsPage() {
         {/* ── KPI Strip ── */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           {kpis.map((kpi) => (
-            <KPICard key={kpi.label} {...kpi} />
+            <KpiCard key={kpi.label} {...kpi} />
           ))}
         </section>
 

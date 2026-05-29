@@ -7,11 +7,50 @@ import FollowerDetailPage from '../detail/FollowerDetailPage';
 import SubscriptionDetailPage from '../detail/SubscriptionDetailPage';
 import LogDetailPage from '../detail/LogDetailPage';
 
-import { strategiesData } from '../configs/strategies.config';
-import { providersData } from '../configs/providers.config';
-import { followersData } from '../configs/followers.config';
-import { subsData } from '../configs/subscriptions.config';
-import { logsData } from '../configs/logs.config';
+import { STRATEGY_ROWS, PROVIDER_ROWS, FOLLOWER_ROWS, SUBSCRIPTION_ROWS, LOG_ROWS } from '@/config/constants/copy-trading/workspaces';
+
+const strategiesData = STRATEGY_ROWS.map(s => ({
+  ...s,
+  copiedVol: s.copiedVolume || s.copiedVol,
+  aum: s.copiedVolume || s.aum,
+  winRateN: parseFloat((s.winRate || '0').replace(/%/g, '')) || 0,
+  ddN: parseFloat((s.drawdown || '0').replace(/[-%]/g, '')) || 0,
+  roiN: parseFloat((s.roi || '0').replace(/[+%]/g, '')) || 0,
+  rating: s.rating || 4.5,
+  tags: s.tags || ['forex', 'scalping'],
+  phase: s.phase || 'Phase-2',
+}));
+
+const providersData = PROVIDER_ROWS.map(p => ({
+  ...p,
+  name: p.provider,
+  email: p.email || `${p.provider}@firm.com`,
+  joined: p.joined || '2023-06-15',
+  kyc: p.kyc || 'APPROVED',
+  verified: p.verified ?? true,
+  risk: p.risk || 'LOW',
+}));
+
+const followersData = FOLLOWER_ROWS.map(f => ({
+  ...f,
+  alloc: f.allocation || f.alloc,
+  ratio: f.copyRatio || f.ratio,
+  pnl: f.pnlImpact || f.pnl,
+  pnlN: parseFloat((f.pnlImpact || f.pnl || '0').replace(/[+$$,]/g, '')) || 0,
+}));
+
+const subsData = SUBSCRIPTION_ROWS.map(s => ({
+  ...s,
+  alloc: s.allocation || s.alloc,
+  fee: s.fee || '20%',
+}));
+
+const logsData = LOG_ROWS.map(l => ({
+  ...l,
+  id: l.eventId || l.id,
+  sev: l.severity || l.sev,
+  ts: l.timestamp || l.ts,
+}));
 
 export function CopyTradingDetailPage() {
   const { slug, id } = useParams();
