@@ -55,7 +55,7 @@ function RowActionsMenu({ user, onOpenUser, onQuickView, onEditUser, onSuspendUs
               key={action.label}
               type="button"
               onClick={() => { action.onClick(); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-[8px] px-3 py-2 text-left text-[12px] transition-colors hover:bg-surface-elevated"
+              className="flex w-full items-center gap-2 rounded-[8px] px-3 py-2 text-left text-[12.5px] transition-colors hover:bg-surface-elevated"
               style={{ color: action.danger ? 'var(--negative)' : 'var(--text)' }}
             >
               <action.Icon size={13} />
@@ -84,16 +84,16 @@ export function UsersListTable({
         <div className="flex items-center gap-3">
           <UserAvatar name={row.name} />
           <div className="min-w-0">
-            <div className="text-[13px] font-black text-text group-hover:text-brand transition-colors">{row.name}</div>
+            <div className="text-[14px] font-semibold tracking-[-0.01em] text-text group-hover:text-brand transition-colors">{row.name}</div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[10px] font-mono font-bold text-text-muted/50 tracking-wider">UID {row.uid}</span>
+              <span className="font-mono text-[11.5px] font-semibold text-text-muted">UID {row.uid}</span>
               {row.suspended && (
-                <span className="px-1 rounded-[3px] text-[8.5px] font-bold border border-negative/20 bg-negative/5 text-negative uppercase tracking-wide">
+                <span className="px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] font-mono border border-negative/25 text-negative bg-negative/5">
                   Suspended
                 </span>
               )}
             </div>
-            <div className="truncate text-[10.5px] text-text-muted/50 font-medium font-mono">{row.email}</div>
+            <div className="truncate text-[12px] text-text-muted mt-0.5 font-medium">{row.email}</div>
           </div>
         </div>
       ),
@@ -103,8 +103,8 @@ export function UsersListTable({
       label: 'Segment / Tier',
       render: (_, row) => (
         <div>
-          <div className="text-[12px] font-bold text-text">{row.segment}</div>
-          <div className="text-[10.5px] text-text-muted/55 font-bold text-brand">{row.tier}</div>
+          <div className="text-[13.5px] font-medium text-text leading-tight">{row.segment}</div>
+          <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 mt-1">{row.tier}</div>
         </div>
       ),
     },
@@ -117,9 +117,9 @@ export function UsersListTable({
       key: 'wallet',
       label: 'Collateral Wallet',
       render: (_, row) => (
-        <div>
-          <div className="font-mono text-[12px] font-bold text-text">{row.walletBalance}</div>
-          <div className="text-[10px] font-mono text-text-muted/50">EQ {row.equity}</div>
+        <div className="flex flex-col gap-1">
+          <div className="font-mono text-[13.5px] font-semibold text-text leading-none">{row.walletBalance}</div>
+          <div className="text-[11.5px] font-mono font-medium text-text-muted/80 leading-none">EQ {row.equity}</div>
         </div>
       ),
     },
@@ -128,8 +128,8 @@ export function UsersListTable({
       label: 'MT5 terminals',
       render: (_, row) => (
         <div>
-          <div className="text-[12.5px] font-bold text-text">{row.mt5Accounts} terminals</div>
-          <div className="text-[10.5px] text-text-muted/50 font-medium">{row.openPositions} open trades</div>
+          <div className="text-[13.5px] font-semibold font-mono text-text leading-none">{row.mt5Accounts} TERMINALS</div>
+          <div className="text-[12px] text-text-muted font-medium leading-none mt-1.5">{row.openPositions} open trades</div>
         </div>
       ),
     },
@@ -142,9 +142,9 @@ export function UsersListTable({
       key: 'lastSeen',
       label: 'Last Active',
       render: (_, row) => (
-        <div>
-          <div className="font-mono text-[11.5px] text-text font-semibold">{row.lastSeen}</div>
-          <div className="text-[10px] text-text-muted/55 font-semibold">{row.source}</div>
+        <div className="flex flex-col gap-1">
+          <div className="font-mono text-[11.5px] text-text font-medium leading-none">{row.lastSeen}</div>
+          <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 leading-none">{row.source}</div>
         </div>
       ),
     },
@@ -157,7 +157,7 @@ export function UsersListTable({
           <button
             type="button"
             onClick={() => onOpenUser(row.id)}
-            className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer animate-fade-in"
+            className="rounded-[6px] border border-border/25 bg-bg/50 px-3 py-1.5 text-[12.5px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer animate-fade-in"
           >
             Open
           </button>
@@ -196,22 +196,22 @@ export function UsersListTable({
 
 export function UsersKYCTable({ tableState, onReviewUser }) {
   const columns = [
-    { key: 'id', label: 'Case ID', render: (val) => <span className="font-mono text-[11px] text-text-muted/75">{val}</span> },
+    { key: 'id', label: 'Case ID', render: (val) => <span className="font-mono text-[11.5px] font-semibold text-text">{val}</span> },
     {
       key: 'user',
       label: 'User',
       render: (val, row) => (
         <div>
-          <div className="text-[12px] font-medium text-text">{val}</div>
-          <div className="text-[11px] text-text-muted/60">{row.country}</div>
+          <div className="text-[13px] font-medium text-text">{val}</div>
+          <div className="text-[11.5px] text-text-muted/80">{row.country}</div>
         </div>
       ),
     },
-    { key: 'tier', label: 'Tier', render: (val) => <span className="text-[12px] text-text">{val}</span> },
-    { key: 'docs', label: 'Docs', render: (val) => <span className="text-[12px] text-text-muted">{val}</span> },
+    { key: 'tier', label: 'Tier', render: (val) => <span className="text-[13px] font-medium text-text">{val}</span> },
+    { key: 'docs', label: 'Docs', render: (val) => <span className="text-[13px] text-text-muted">{val}</span> },
     { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
     { key: 'risk', label: 'Risk', render: (val) => <StatusBadge status={val} dot={false} /> },
-    { key: 'eta', label: 'ETA', render: (val) => <span className="font-mono text-[11px] text-text-muted/75">{val}</span> },
+    { key: 'eta', label: 'ETA', render: (val) => <span className="font-mono text-[11.5px] font-medium text-text-muted">{val}</span> },
     {
       key: 'action',
       label: '',
@@ -220,7 +220,7 @@ export function UsersKYCTable({ tableState, onReviewUser }) {
         <button
           type="button"
           onClick={() => onReviewUser(row.userId)}
-          className="rounded-[8px] border border-border/25 px-3 py-1.5 text-[11px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
+          className="rounded-[8px] border border-border/25 px-3 py-1.5 text-[11.5px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
         >
           Review
         </button>
@@ -251,57 +251,87 @@ export function UsersMt5Table({ tableState, onOpenUser, onOpenMt5 }) {
   const columns = [
     {
       key: 'login',
-      label: 'Login',
+      label: 'MT5 Login',
       render: (_, row) => (
-        <div>
-          <div className="font-mono text-[12px] font-semibold text-text">{row.login}</div>
-          <div className="text-[10px] text-text-muted/55 font-medium">{row.leverage}</div>
+        <div className="flex items-center gap-2 select-none">
+          <span className="px-2 py-0.5 rounded-[5px] border border-brand/15 bg-brand/[0.04] font-mono text-[11px] font-bold text-brand tracking-wider">
+            {row.login}
+          </span>
+          <span className="px-1.5 py-0.5 rounded-[4px] border border-border/12 bg-bg/50 font-mono text-[10.5px] font-bold text-text-muted tracking-wider">
+            {row.leverage || '1:100'}
+          </span>
         </div>
       )
     },
     {
       key: 'user',
-      label: 'User',
+      label: 'Account Owner',
       render: (_, row) => (
         <div>
-          <div className="text-[12px] font-semibold text-text">{row.user}</div>
+          <div className="text-[13.5px] font-semibold text-text leading-tight">{row.user}</div>
           <button
             type="button"
-            className="text-[10.5px] font-bold text-brand hover:underline cursor-pointer"
+            className="text-[10.5px] font-bold text-brand uppercase tracking-wider hover:text-brand-hover transition-colors cursor-pointer mt-1"
             onClick={(e) => {
               e.stopPropagation();
               onOpenUser(row.userId, 'mt5-accounts');
             }}
           >
-            Open user
+            Open Profile Dossier →
           </button>
         </div>
       )
     },
     {
       key: 'server',
-      label: 'Server',
-      render: (_, row) => <span className="font-mono text-[11px] text-text-muted/80">{row.server}</span>
+      label: 'Bridge Server',
+      render: (_, row) => (
+        <span className="font-mono text-[11.5px] text-text-muted font-medium select-none">
+          {row.server}
+        </span>
+      )
     },
     {
       key: 'status',
-      label: 'Status',
-      render: (_, row) => <StatusBadge status={row.status} />
+      label: 'Bridge Status',
+      render: (_, row) => {
+        const isFailed = row.status === 'DISCONNECTED';
+        const isWarning = row.status === 'SYNC_DELAY';
+        const pulseColor = isFailed ? 'bg-negative shadow-[0_0_8px_var(--negative)]' : isWarning ? 'bg-warning shadow-[0_0_8px_var(--warning)]' : 'bg-positive shadow-[0_0_8px_var(--positive)]';
+        return (
+          <div className="flex items-center gap-2 select-none">
+            <span className={`h-1.5 w-1.5 rounded-full ${pulseColor} animate-pulse shrink-0`} />
+            <StatusBadge status={row.status} />
+          </div>
+        );
+      }
     },
     {
       key: 'group',
-      label: 'Group',
-      render: (_, row) => <span className="font-mono text-[11px] text-text-muted/80">{row.group}</span>
+      label: 'Dealing Group',
+      render: (_, row) => (
+        <span className="font-mono text-[11.5px] text-text-muted font-medium select-none">
+          {row.group}
+        </span>
+      )
     },
     {
       key: 'balance',
-      label: 'Balance',
-      render: (_, row) => <span className="font-mono text-[12px] font-bold text-text">{row.balance}</span>
+      label: 'Margin Balance',
+      render: (_, row) => (
+        <span className="font-mono text-[13.5px] font-semibold text-text select-none">
+          {row.balance}
+        </span>
+      )
     },
     {
       key: 'lastSync',
-      label: 'Last Sync',
-      render: (_, row) => <span className="font-mono text-[11px] text-text-muted/50">{row.lastSync}</span>
+      label: 'Sync Handshake',
+      render: (_, row) => (
+        <span className="font-mono text-[11.5px] text-text-muted font-medium select-none">
+          {row.lastSync}
+        </span>
+      )
     },
     {
       key: 'actions',
@@ -311,7 +341,7 @@ export function UsersMt5Table({ tableState, onOpenUser, onOpenMt5 }) {
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onOpenMt5(row); }}
-          className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer"
+          className="inline-flex items-center justify-center h-7 px-3.5 rounded-[7px] border border-border/15 bg-bg/25 text-text-muted hover:text-text hover:border-brand/40 hover:bg-bg/40 text-[10.5px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.94] shadow-sm select-none"
         >
           Details
         </button>
@@ -330,9 +360,9 @@ export function UsersMt5Table({ tableState, onOpenUser, onOpenMt5 }) {
         const isFailed = row.status === 'DISCONNECTED';
         const isWarning = row.status === 'SYNC_DELAY';
 
-        if (isFailed) return 'hover:bg-negative/5 hover:border-l-negative';
-        if (isWarning) return 'hover:bg-warning/5 hover:border-l-warning';
-        return 'hover:bg-positive/5 hover:border-l-positive';
+        if (isFailed) return 'hover:bg-negative/[0.02] hover:border-l-negative hover:border-l-3 transition-all duration-150';
+        if (isWarning) return 'hover:bg-warning/[0.02] hover:border-l-warning hover:border-l-3 transition-all duration-150';
+        return 'hover:bg-positive/[0.02] hover:border-l-positive hover:border-l-3 transition-all duration-150';
       }}
     />
   );

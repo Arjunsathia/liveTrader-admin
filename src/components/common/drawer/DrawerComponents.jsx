@@ -17,7 +17,7 @@ export function DrawerSection({ title, children, className = '', collapsible = f
         onClick={() => collapsible && setIsOpen(!isOpen)}
         className={`flex w-full items-center gap-3 group/section ${collapsible ? 'cursor-pointer' : 'cursor-default'}`}
       >
-        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary/60 transition-colors group-hover/section:text-primary">
+        <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 transition-colors group-hover/section:text-text-muted/90">
           {title}
         </span>
         <div className="h-[1px] flex-1 bg-border/20 shadow-[0_1px_0_rgba(255,255,255,0.02)]" />
@@ -50,7 +50,7 @@ export function DrawerField({ label, value, mono = false, accent, className = ''
 
   return (
     <div className={`flex min-w-0 flex-col gap-1.5 ${wide ? 'col-span-2' : ''} ${className}`}>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">
         {label}
       </span>
       <div
@@ -86,7 +86,7 @@ export function DrawerFormGrid({ children, className = '' }) {
 export function TextField({ label, value, onChange, placeholder, type = 'text', mono = false, className = '' }) {
   return (
     <label className={`flex flex-col gap-1.5 ${className}`}>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">{label}</span>
       <input
         type={type}
         value={value ?? ''}
@@ -101,7 +101,7 @@ export function TextField({ label, value, onChange, placeholder, type = 'text', 
 export function SelectField({ label, value, onChange, options, placeholder, className = '' }) {
   return (
     <label className={`flex flex-col gap-1.5 ${className}`}>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">{label}</span>
       <div className="relative">
         <select
           value={value ?? ''}
@@ -124,7 +124,7 @@ export function SelectField({ label, value, onChange, options, placeholder, clas
 export function TextareaField({ label, value, onChange, placeholder, rows = 4, className = '' }) {
   return (
     <label className={`flex flex-col gap-1.5 ${className}`}>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">{label}</span>
       <textarea
         rows={rows}
         value={value ?? ''}

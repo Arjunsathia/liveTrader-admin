@@ -25,14 +25,14 @@ function PayoutsPage() {
     .reduce((s, r) => s + parseFloat(r.amount.replace(/[$,]/g, '')), 0);
 
   const cols = [
-    { key: 'id', label: 'Payout ID', render: v => <span className="font-mono text-text-muted/55 text-[10.5px]">{v}</span> },
-    { key: 'partner', label: 'Partner', render: v => <div className="flex items-center gap-2"><TraderAvatar name={v} /><span className={`text-[12px] font-semibold font-heading ${v.startsWith('unknown') ? 'text-negative' : 'text-text/82'}`}>{v}</span></div> },
+    { key: 'id', label: 'Payout ID', render: v => <span className="font-mono text-text-muted/70 text-[11px]">{v}</span> },
+    { key: 'partner', label: 'Partner', render: v => <div className="flex items-center gap-2"><TraderAvatar name={v} /><span className={`text-[12.5px] font-semibold ${v.startsWith('unknown') ? 'text-negative' : 'text-text/90'}`}>{v}</span></div> },
     { key: 'amount', label: 'Amount', render: v => <span className="font-mono font-bold text-brand text-[12.5px]">{v}</span> },
-    { key: 'method', label: 'Method', render: v => <span className="text-[10.5px] font-heading border border-border/30 px-1.5 py-0.5 rounded-[4px] text-text-muted/55">{v}</span> },
+    { key: 'method', label: 'Method', render: v => <span className="text-[11px] font-semibold border border-border/30 px-1.5 py-0.5 rounded-[4px] text-text-muted/70">{v}</span> },
     { key: 'status', label: 'Status', render: v => <IBBadge value={v} /> },
     { key: 'risk', label: 'Risk', render: v => <IBRiskBadge value={v} /> },
-    { key: 'requestedAt', label: 'Requested', render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
-    { key: 'processedBy', label: 'Processed', render: v => <span className="font-heading text-text-muted/50">{v}</span> },
+    { key: 'requestedAt', label: 'Requested', render: v => <span className="font-mono text-text-muted/60 text-[11px]">{v}</span> },
+    { key: 'processedBy', label: 'Processed', render: v => <span className="font-medium text-text-muted/70 text-[12px]">{v}</span> },
     {
       key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end" onClick={(e) => e.stopPropagation()}>
@@ -50,13 +50,13 @@ function PayoutsPage() {
     <div className="space-y-5 animate-fade-up">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
             IB System
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
             Payout Requests
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
             Review and process partner commission withdrawals.
           </p>
         </div>
@@ -79,8 +79,8 @@ function PayoutsPage() {
         <div className="flex items-start gap-3 rounded-[10px] border border-negative/20 bg-negative/[0.05] px-4 py-3">
           <AlertOctagon size={14} className="text-negative flex-shrink-0 mt-0.5" />
           <div>
-            <div className="text-[12px] font-bold text-negative font-heading">High-Risk Payouts Require Manual Review</div>
-            <div className="text-[11px] text-negative/70 font-heading mt-0.5">{payoutsRows.filter(r => r.risk === 'HIGH' && ['PENDING', 'REVIEW', 'FROZEN'].includes(r.status)).length} payout(s) flagged — verify partner identity and fund source before processing.</div>
+            <div className="text-[13px] font-bold text-negative">High-Risk Payouts Require Manual Review</div>
+            <div className="text-[12px] text-negative/85 mt-0.5">{payoutsRows.filter(r => r.risk === 'HIGH' && ['PENDING', 'REVIEW', 'FROZEN'].includes(r.status)).length} payout(s) flagged — verify partner identity and fund source before processing.</div>
           </div>
         </div>
       )}
@@ -93,8 +93,8 @@ function PayoutsPage() {
           { label: 'Paid This Month', val: payoutsRows.filter(r => r.status === 'PAID').length + ' items', color: 'var(--positive)' },
         ].map(s => (
           <div key={s.label} className="rounded-[10px] border border-border/30 bg-surface-elevated shadow-card-subtle px-4 py-3">
-            <div className="text-[9.5px] font-black uppercase tracking-[0.14em] text-text-muted/50 font-heading mb-1.5">{s.label}</div>
-            <div className="text-[18px] font-bold font-heading tracking-[-0.02em]" style={{ color: s.color }}>{s.val}</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 mb-1.5">{s.label}</div>
+            <div className="text-[18px] font-bold tracking-[-0.02em]" style={{ color: s.color }}>{s.val}</div>
           </div>
         ))}
       </div>
@@ -108,12 +108,12 @@ function PayoutsPage() {
           onSearchChange={setSearch}
           searchPlaceholder="Search partner, payout ID…"
           filters={
-            <div className="flex items-center gap-1">
-              <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Filter:</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Filter:</span>
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none font-semibold"
                 style={{ minWidth: '70px' }}
               >
                 <option value="ALL">ALL</option>

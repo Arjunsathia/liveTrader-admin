@@ -2,14 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertOctagon, ArrowUp, Check, CheckCircle2, Download, Eye, MessageCircle, Plus,
-  Search, Timer, UserPlus,
+  Search, Timer, UserPlus, Inbox, ShieldAlert
 } from 'lucide-react';
-import { MainTable, TableToolbar } from '../../../components/common/table';
+import { TableToolbar } from '../../../components/common/table';
+import { KpiCard } from '@/components/cards';
 import { ticketsData } from '@/config/constants/support/mockData';
 import {
   PRIORITY_CLR, PRIORITY_ORDER,
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
-  UserAvatar, SupportStatCard, SupportToast,
+  UserAvatar, SupportToast, TicketCard,
 } from '@/features/support/components/SupportComponents';
 
 const PER_PAGE = 8;
@@ -52,86 +53,27 @@ function TicketsPage() {
   const breachedCount = ticketsData.filter((ticket) => ticket.slaMins != null && ticket.slaMins < 0).length;
 
   const stats = [
-    { label: 'Total', val: ticketsData.length, color: 'var(--text-muted)' },
-    { label: 'Open', val: ticketsData.filter((ticket) => ticket.status === 'OPEN').length, color: 'var(--positive)' },
-    { label: 'Pending', val: ticketsData.filter((ticket) => ticket.status === 'PENDING').length, color: 'var(--warning)' },
-    { label: 'Escalated', val: ticketsData.filter((ticket) => ticket.status === 'ESCALATED').length, color: 'var(--negative)', urgent: true },
-    { label: 'Resolved', val: ticketsData.filter((ticket) => ticket.status === 'RESOLVED').length, color: 'var(--positive)' },
-    { label: 'SLA Breach', val: breachedCount, color: 'var(--negative)', urgent: breachedCount > 0 },
+    { label: 'Total Tickets', value: ticketsData.length, accent: 'var(--brand)', Icon: Inbox, sub: 'All logged tickets' },
+    { label: 'Open Tickets', value: ticketsData.filter((t) => t.status === 'OPEN').length, accent: 'var(--positive)', Icon: MessageCircle, sub: 'Awaiting support agent' },
+    { label: 'Pending Tickets', value: ticketsData.filter((t) => t.status === 'PENDING').length, accent: 'var(--warning)', Icon: Timer, sub: 'Under active review' },
+    { label: 'Escalated Tickets', value: ticketsData.filter((t) => t.status === 'ESCALATED').length, accent: 'var(--negative)', Icon: AlertOctagon, sub: 'Requires manager attention', trend: 'Urgent', trendUp: false },
+    { label: 'Resolved Tickets', value: ticketsData.filter((t) => t.status === 'RESOLVED').length, accent: 'var(--positive)', Icon: CheckCircle2, sub: 'Solved and closed' },
+    { label: 'SLA Breaches', value: breachedCount, accent: 'var(--negative)', Icon: ShieldAlert, sub: 'Past due response time', trend: breachedCount > 0 ? 'Needs action' : 'Stable', trendUp: breachedCount > 0 ? false : undefined }
   ];
-
-  const columns = [
-    { key: 'id', label: 'Ticket ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
-    {
-      key: 'user',
-      label: 'User',
-      render: (_, row) => (
-        <div className="flex items-center gap-2">
-          <UserAvatar name={row.user} />
-          <div>
-            <div className="text-[12px] font-semibold text-text/85">{row.user}</div>
-            <div className="font-mono text-[9.5px] text-text-muted/35">{row.uid}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'subject',
-      label: 'Subject',
-      render: (value, row) => (
-        <div className="max-w-[260px]">
-          <div className="truncate text-[12px] font-medium text-text/75">{value}</div>
-          <div className="mt-0.5 flex flex-wrap gap-1">
-            {row.tags.slice(0, 2).map((tag) => (
-               <span key={tag} className="rounded-[3px] border border-border/20 px-1 py-px font-mono text-[8.5px] text-text-muted/35">#{tag}</span>
-            ))}
-            {row.replies > 0 && <span className="flex items-center gap-0.5 text-[8.5px] text-text-muted/30"><MessageCircle size={8} />{row.replies}</span>}
-          </div>
-        </div>
-      ),
-    },
-    { key: 'priority', label: 'Priority', render: (value) => <PriorityBadge value={value} /> },
-    { key: 'status', label: 'Status', render: (value) => <SupportStatusBadge value={value} /> },
-    { key: 'category', label: 'Category', render: (value) => <CatTag value={value} /> },
-    { key: 'owner', label: 'Owner', render: (value) => <span className={`text-[11px] ${value === 'Unassigned' ? 'font-bold text-negative/70' : 'text-text-muted/55'}`}>{value}</span> },
-    { key: 'updated', label: 'Updated', render: (value) => <span className="font-mono text-[10.5px] text-text-muted/40">{value}</span> },
-    { key: 'sla', label: 'SLA', render: (_, row) => <SlaBar pct={row.sla} slaMins={row.slaMins} /> },
-    {
-      key: 'actions',
-      label: 'Actions',
-      align: 'right',
-      render: (_, row) => (
-        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
-          <button type="button" onClick={(event) => { event.stopPropagation(); navigate(`/support/tickets/${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-border/30 text-text-muted/40 transition-colors hover:text-text" title="Open"><Eye size={10} /></button>
-          <button type="button" onClick={(event) => { event.stopPropagation(); act(`Reassigned: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-cyan/20 text-cyan/50 transition-colors hover:text-cyan" title="Reassign"><UserPlus size={10} /></button>
-          <button type="button" onClick={(event) => { event.stopPropagation(); act(`Escalated: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-orange-500/20 text-orange-400/60 transition-colors hover:text-orange-400" title="Escalate"><ArrowUp size={10} /></button>
-          <button type="button" onClick={(event) => { event.stopPropagation(); act(`Closed: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-positive/20 text-positive/50 transition-colors hover:text-positive" title="Close"><Check size={10} /></button>
-        </div>
-      ),
-    },
-  ];
-
-  const tableState = {
-    page,
-    pageSize: PER_PAGE,
-    setPage,
-    setPageSize: () => {},
-    totalPages: totalPages
-  };
 
   return (
     <div className="space-y-5 animate-fade-up">
 
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
-            Support Operations
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            Support Helpdesk
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
-            Helpdesk Tickets
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
+            All Tickets
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
-            Manage user inquiries, technical support requests, and service issues.
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
+            View, handle, and solve user questions and support requests.
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -152,22 +94,25 @@ function TicketsPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        {stats.map((stat) => <SupportStatCard key={stat.label} {...stat} />)}
-      </div>
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {stats.map((stat) => <KpiCard key={stat.label} {...stat} />)}
+      </section>
 
       {breachedCount > 0 && (
-        <div className="flex items-start gap-3 rounded-[10px] border border-negative/20 bg-negative/[0.05] px-4 py-3">
-          <AlertOctagon size={14} className="mt-0.5 flex-shrink-0 text-negative" />
-          <div className="flex-1">
-            <div className="text-[12px] font-bold text-negative">
-              {breachedCount} Tickets Breached SLA
-            </div>
-            <div className="mt-0.5 text-[11px] text-negative/70">
-              Immediate attention required. These tickets are past their committed response time.
-            </div>
+        <div className="flex items-start gap-3 rounded-[12px] border border-negative/20 bg-negative/[0.04] px-4 py-3 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="relative mt-0.5 shrink-0 flex items-center justify-center">
+            <span className="absolute h-2 w-2 animate-ping rounded-full bg-negative" />
+            <AlertOctagon size={14} className="text-negative relative z-10" />
           </div>
-          <button type="button" onClick={() => { setSortBy('sla'); setStatusF('all'); setPage(1); }} className="flex h-7 flex-shrink-0 items-center gap-1.5 rounded-[7px] border border-negative/25 bg-negative/[0.08] px-3 text-[10.5px] font-bold text-negative">
+          <div className="flex-1">
+            <h4 className="text-[13px] font-bold text-negative font-heading tracking-[-0.01em]">
+              {breachedCount} SLA Breaches Detected
+            </h4>
+            <p className="text-[12px] text-negative/80 font-heading mt-1 leading-relaxed">
+              Immediate attention required. These tickets are past their committed response time.
+            </p>
+          </div>
+          <button type="button" onClick={() => { setSortBy('sla'); setStatusF('all'); setPage(1); }} className="flex h-7 flex-shrink-0 items-center gap-1.5 rounded-[7px] border border-negative/25 bg-negative/[0.08] px-3 text-[11.5px] font-semibold text-negative cursor-pointer">
             <Timer size={10} />View Breached
           </button>
         </div>
@@ -177,7 +122,7 @@ function TicketsPage() {
 
       <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
         <TableToolbar
-          title="Ticket Queue"
+          title="Tickets Registry"
           count={filtered.length}
           accentColor="var(--brand)"
           search={search}
@@ -186,11 +131,11 @@ function TicketsPage() {
           filters={
             <>
               <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Status:</span>
                 <select
                   value={statusF}
                   onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   <option value="all">ALL</option>
@@ -202,11 +147,11 @@ function TicketsPage() {
               </div>
 
               <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Priority:</span>
+                <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Priority:</span>
                 <select
                   value={priorityF}
                   onChange={(e) => { setPriorityF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   <option value="all">ALL</option>
@@ -218,11 +163,11 @@ function TicketsPage() {
               </div>
 
               <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Cat:</span>
+                <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Category:</span>
                 <select
                   value={catF}
                   onChange={(e) => { setCatF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   {cats.map((c) => (
@@ -232,11 +177,11 @@ function TicketsPage() {
               </div>
 
               <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Sort:</span>
+                <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Sort:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   <option value="priority">Priority</option>
@@ -248,19 +193,58 @@ function TicketsPage() {
           }
         />
 
-        <MainTable
-          columns={columns}
-          data={paginated}
-          onRowClick={(row) => navigate(`/support/tickets/${row.id}`)}
-          emptyTitle="No tickets match your filters"
-          pagination={tableState}
-          rowClassName={(row) => {
-            const isBreached = row.slaMins != null && row.slaMins < 0;
-            if (isBreached) return 'hover:bg-negative/5 hover:border-l-negative';
-            if (row.priority === 'CRITICAL' || row.priority === 'HIGH') return 'hover:bg-warning/5 hover:border-l-warning';
-            return 'hover:bg-brand/5 hover:border-l-brand';
-          }}
-        />
+        <div className="p-5 border-t border-border/15">
+          {paginated.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-12 h-12 rounded-[12px] bg-brand/8 border border-brand/15 flex items-center justify-center mb-3">
+                <AlertOctagon size={20} className="text-brand/40" />
+              </div>
+              <p className="text-[13px] font-bold text-text/60 tracking-tight">No tickets found</p>
+              <p className="text-[11.5px] text-text-muted/40 mt-1 max-w-[220px] leading-snug">
+                Try removing the filters or search keywords.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              {paginated.map((ticket) => (
+                <TicketCard
+                  key={ticket.id}
+                  ticket={ticket}
+                  onView={(t) => navigate(`/support/tickets/${t.id}`, { state: { fromEscalated: false } })}
+                  onAssign={(t) => act(`Reassigned: ${t.id}`)}
+                  onEscalate={(t) => act(`Escalated: ${t.id}`)}
+                  onResolve={(t) => act(`Closed: ${t.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-border/10 px-5 py-4 bg-bg/5">
+            <span className="text-[11px] font-mono text-text-muted/45 font-bold">
+              Showing {(page - 1) * PER_PAGE + 1} to {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} tickets
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="flex h-7.5 px-3 items-center justify-center rounded-[6px] border border-border/20 text-[10.5px] font-bold text-text-muted hover:text-text hover:border-border/40 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-all bg-surface"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="flex h-7.5 px-3 items-center justify-center rounded-[6px] border border-border/20 text-[10.5px] font-bold text-text-muted hover:text-text hover:border-border/40 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-all bg-surface"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

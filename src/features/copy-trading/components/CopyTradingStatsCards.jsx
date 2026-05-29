@@ -1,23 +1,17 @@
 import React from 'react';
-import { KpiCard } from '../../../components/cards';
 
-/**
- * CopyTradingStatsCards — mirrors TradingStatsCards.
- * Renders a 6-column KPI grid from the config's kpis array.
- */
-export function CopyTradingStatsCards({ kpis }) {
+// Re-export standard platform KPI Card
+export { KpiCard } from '@/components/cards';
+
+export function SH({ title, Icon: Ic, action }) {
   return (
-    <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-      {kpis.map((k) => (
-        <KpiCard
-          key={k.label}
-          label={k.label}
-          value={k.value}
-          sub={k.sub}
-          Icon={k.Icon}
-          accent={k.accent}
-        />
-      ))}
-    </section>
+    <div className="flex items-center gap-2 mb-3">
+      {Ic && <Ic size={12} className="text-text-muted/65 flex-shrink-0" />}
+      <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 font-heading select-none">
+        {title}
+      </span>
+      <div className="flex-1 h-px bg-white/[0.05]" />
+      {action}
+    </div>
   );
 }

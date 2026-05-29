@@ -34,7 +34,7 @@ export function MainLayout() {
       <div
         className="flex flex-col min-h-screen relative"
         style={{
-          paddingLeft: isMobile ? '0' : (collapsed ? '72px' : '248px'),
+          paddingLeft: isMobile ? '0' : (collapsed ? '68px' : '248px'),
           transition: 'padding-left 0.4s cubic-bezier(0.16,1,0.3,1)',
         }}
       >

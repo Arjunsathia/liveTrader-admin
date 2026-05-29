@@ -1,62 +1,235 @@
-import React from 'react';
 import {
-  Lock, RefreshCw, BarChart2, Activity,
+  Activity,
   X, XCircle, Shield, Flag, Check, Eye,
-  TrendingUp, TrendingDown,
+  TrendingUp, TrendingDown, Clock, CheckCircle2,
 } from 'lucide-react';
 import { DrawerSection, DrawerField, DrawerFormGrid } from '../../../components/common/drawer';
 import { TradingQuickActions } from './TradingDrawer';
 
-/**
- * AccountDetailsDrawer: Specialized body for Account records.
- */
-export function AccountDetailsDrawer({ row, onAction }) {
-  const actions = [
-    { label: 'Block Account',   color: 'var(--negative)', icon: Lock,     onClick: () => onAction('Block Account') },
-    { label: 'Force Sync',      color: 'var(--cyan)',     icon: RefreshCw, onClick: () => onAction('Force Sync') },
-    { label: 'View Positions',  color: 'var(--brand)',    icon: BarChart2, onClick: () => onAction('View Positions') },
-    { label: 'Audit Trail',     color: 'var(--text-muted)', icon: Activity, onClick: () => onAction('Audit Trail') },
-  ];
+/* ── Banners ─────────────────────────────────────────────────── */
+function OrderStatusBanner({ status, side, volume }) {
+  const statusColors = {
+    PENDING: 'var(--warning)',
+    FILLED: 'var(--positive)',
+    CANCELED: 'var(--text-muted)',
+    REJECTED: 'var(--negative)',
+  };
+  const statusColor = statusColors[status] || 'var(--text-muted)';
+
+  let StatusIcon = Activity;
+  let labelText = 'Order Review';
+
+  if (status === 'FILLED') {
+    StatusIcon = CheckCircle2;
+    labelText = 'Filled & Executed';
+  } else if (status === 'CANCELED') {
+    StatusIcon = X;
+    labelText = 'Order Canceled';
+  } else if (status === 'REJECTED') {
+    StatusIcon = XCircle;
+    labelText = 'Order Rejected';
+  } else if (status === 'PENDING') {
+    StatusIcon = Clock;
+    labelText = 'Pending Dispatch';
+  }
 
   return (
-    <div className="space-y-6">
-      <DrawerSection title="Account Summary">
-        <DrawerFormGrid>
-          <DrawerField label="Group"    value={row.group}    mono />
-          <DrawerField label="Currency" value={row.currency} />
-          <DrawerField label="Leverage" value={row.leverage} />
-          <DrawerField label="Status"   value={row.status}   />
-        </DrawerFormGrid>
-      </DrawerSection>
+    <div
+      className="rounded-[14px] border p-5 relative overflow-hidden animate-fade-in duration-300"
+      style={{
+        borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))`,
+        background: `color-mix(in srgb, ${statusColor} 4%, var(--bg))`,
+      }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-[0.06] pointer-events-none"
+        style={{ background: statusColor }}
+      />
 
-      <DrawerSection title="Financials">
-        <DrawerFormGrid>
-          <DrawerField label="Balance"     value={row.balance}    mono accent="var(--brand)" />
-          <DrawerField label="Equity"      value={row.equity}     mono accent="var(--positive)" />
-          <DrawerField label="Margin"      value={row.margin}     mono accent="var(--warning)" />
-          <DrawerField label="Free Margin" value={row.freeMargin} mono accent="var(--cyan)" />
-          <DrawerField label="Margin Level" value={row.marginLvl} mono />
-          <DrawerField label="Last Sync"   value={row.lastSync}  mono />
-        </DrawerFormGrid>
-      </DrawerSection>
+      <div className="flex items-start justify-between gap-4 relative z-[1]">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-11 h-11 rounded-[11px] flex items-center justify-center border flex-shrink-0"
+            style={{
+              background: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+              borderColor: `color-mix(in srgb, ${statusColor} 22%, transparent)`,
+            }}
+          >
+            <StatusIcon size={20} style={{ color: statusColor }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span
+                className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+                style={{ color: statusColor }}
+              >
+                {labelText}
+              </span>
+            </div>
+            <div className="text-[22px] font-semibold tracking-tight text-text font-mono leading-tight mt-1">
+              {status}
+            </div>
+            <div className="text-[12.5px] font-mono text-text-muted/75 mt-1">
+              {side} · {volume} Lots
+            </div>
+          </div>
+        </div>
 
-      <DrawerSection title="User Association">
-        <DrawerFormGrid>
-          <DrawerField label="Full Name"   value={row.user} />
-          <DrawerField label="Account UID" value={row.uid}  mono />
-        </DrawerFormGrid>
-      </DrawerSection>
-
-      <DrawerSection title="Actions">
-        <TradingQuickActions actions={actions} />
-      </DrawerSection>
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <span 
+            className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider border font-heading"
+            style={{
+              color: statusColor,
+              borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))`,
+              background: `color-mix(in srgb, ${statusColor} 8%, transparent)`,
+            }}
+          >
+            {side}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
 
-/**
- * OrderDetailsDrawer: Specialized body for Order records.
- */
+function PositionPnLBanner({ pnl, side, size }) {
+  const pnlPositive = String(pnl).startsWith('+');
+  const accentColor = pnlPositive ? 'var(--positive)' : 'var(--negative)';
+  const PnlIcon = pnlPositive ? TrendingUp : TrendingDown;
+
+  return (
+    <div
+      className="rounded-[14px] border p-5 relative overflow-hidden animate-fade-in duration-300"
+      style={{
+        borderColor: `color-mix(in srgb, ${accentColor} 20%, var(--border))`,
+        background: `color-mix(in srgb, ${accentColor} 4%, var(--bg))`,
+      }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-[0.06] pointer-events-none"
+        style={{ background: accentColor }}
+      />
+
+      <div className="flex items-start justify-between gap-4 relative z-[1]">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-11 h-11 rounded-[11px] flex items-center justify-center border flex-shrink-0"
+            style={{
+              background: `color-mix(in srgb, ${accentColor} 12%, transparent)`,
+              borderColor: `color-mix(in srgb, ${accentColor} 22%, transparent)`,
+            }}
+          >
+            <PnlIcon size={20} style={{ color: accentColor }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span
+                className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+                style={{ color: accentColor }}
+              >
+                Floating P&L
+              </span>
+            </div>
+            <div 
+              className="text-[24px] font-semibold tracking-tight text-text font-mono leading-tight mt-1"
+              style={{ color: accentColor }}
+            >
+              {pnl}
+            </div>
+            <div className="text-[12.5px] font-mono text-text-muted/75 mt-1">
+              Active Trade · {side} ({size} Lots)
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <span 
+            className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider border font-heading"
+            style={{
+              color: side === 'BUY' ? 'var(--positive)' : 'var(--negative)',
+              borderColor: `color-mix(in srgb, ${side === 'BUY' ? 'var(--positive)' : 'var(--negative)'} 20%, var(--border))`,
+              background: `color-mix(in srgb, ${side === 'BUY' ? 'var(--positive)' : 'var(--negative)'} 8%, transparent)`,
+            }}
+          >
+            {side}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HistoryResultBanner({ status, pnl, ticket, symbol, side, size }) {
+  const isWin = status === 'WIN';
+  const statusColor = isWin ? 'var(--positive)' : 'var(--negative)';
+  const StatusIcon = isWin ? TrendingUp : TrendingDown;
+
+  return (
+    <div
+      className="rounded-[14px] border p-5 relative overflow-hidden animate-fade-in duration-300"
+      style={{
+        borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))`,
+        background: `color-mix(in srgb, ${statusColor} 4%, var(--bg))`,
+      }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-[0.06] pointer-events-none"
+        style={{ background: statusColor }}
+      />
+
+      <div className="flex items-start justify-between gap-4 relative z-[1]">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-11 h-11 rounded-[11px] flex items-center justify-center border flex-shrink-0"
+            style={{
+              background: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+              borderColor: `color-mix(in srgb, ${statusColor} 22%, transparent)`,
+            }}
+          >
+            <StatusIcon size={20} style={{ color: statusColor }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span
+                className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+                style={{ color: statusColor }}
+              >
+                Trade Result · {isWin ? 'Win' : 'Loss'}
+              </span>
+            </div>
+            <div 
+              className="text-[24px] font-semibold tracking-tight text-text font-mono leading-tight mt-1"
+              style={{ color: statusColor }}
+            >
+              {pnl}
+            </div>
+            <div className="text-[12.5px] font-mono text-text-muted/75 mt-1">
+              Ticket #{ticket} · {side} ({size} Lots)
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <span 
+            className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider border font-heading"
+            style={{
+              color: statusColor,
+              borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))`,
+              background: `color-mix(in srgb, ${statusColor} 8%, transparent)`,
+            }}
+          >
+            {isWin ? '✓ WIN' : '✗ LOSS'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── OrderDetailsDrawer ───────────────────────────────────────── */
 export function OrderDetailsDrawer({ row, onAction }) {
   const actions = [
     { label: 'Cancel Order', color: 'var(--negative)', icon: X,        onClick: () => onAction('Cancel Order') },
@@ -75,40 +248,12 @@ export function OrderDetailsDrawer({ row, onAction }) {
 
   return (
     <div className="space-y-6">
-      {/* Order Status Banner */}
-      <div
-        className="rounded-[12px] border overflow-hidden"
-        style={{
-          borderColor: `color-mix(in srgb, ${statusColor} 25%, var(--border))`,
-        }}
-      >
-        <div
-          className="flex items-center justify-between px-4 py-3"
-          style={{ background: `color-mix(in srgb, ${statusColor} 10%, transparent)` }}
-        >
-          <div>
-            <div className="text-[9.5px] uppercase tracking-wider text-text-muted/55 mb-0.5">Order Status</div>
-            <div className="flex items-center gap-2">
-              <span
-                className="text-[18px] font-black uppercase tracking-wide"
-                style={{ color: statusColor }}
-              >
-                {row.status}
-              </span>
-              <span className="text-[11px] font-semibold text-text-muted/70">
-                · {row.side} {row.volume} Lots
-              </span>
-            </div>
-          </div>
-          <div
-            className="w-2.5 h-2.5 rounded-full"
-            style={{
-              background: statusColor,
-              boxShadow: `0 0 10px ${statusColor}`,
-            }}
-          />
-        </div>
-      </div>
+      {/* Premium Order Status Banner */}
+      <OrderStatusBanner
+        status={row.status}
+        side={row.side}
+        volume={row.volume}
+      />
 
       <DrawerSection title="Order Details">
         <DrawerFormGrid>
@@ -125,7 +270,7 @@ export function OrderDetailsDrawer({ row, onAction }) {
 
       <DrawerSection title="Execution">
         <DrawerFormGrid>
-          <DrawerField label="Status" value={row.status} />
+          <DrawerField label="Status" value={row.status} accent={statusColor} />
           <DrawerField label="Source" value={row.source} />
           <DrawerField label="Time"   value={row.time}   mono />
           <DrawerField label="User"   value={row.user}   />
@@ -148,9 +293,7 @@ export function OrderDetailsDrawer({ row, onAction }) {
   );
 }
 
-/**
- * PositionDetailsDrawer: Specialized body for Position records.
- */
+/* ── PositionDetailsDrawer ───────────────────────────────────── */
 export function PositionDetailsDrawer({ row, onAction }) {
   const actions = [
     { label: 'Close Position', color: 'var(--negative)', icon: XCircle,  onClick: () => onAction('Close Position') },
@@ -159,33 +302,14 @@ export function PositionDetailsDrawer({ row, onAction }) {
     { label: 'Audit Trail',    color: 'var(--text-muted)', icon: Activity, onClick: () => onAction('Audit Trail') },
   ];
 
-  const pnlPositive = String(row.pnl).startsWith('+');
-  const PnlIcon = pnlPositive ? TrendingUp : TrendingDown;
-
   return (
     <div className="space-y-6">
-      {/* PnL Banner */}
-      <div
-        className="rounded-[12px] border px-4 py-3 flex items-center justify-between"
-        style={{
-          borderColor: `color-mix(in srgb, ${pnlPositive ? 'var(--positive)' : 'var(--negative)'} 22%, var(--border))`,
-          background: `color-mix(in srgb, ${pnlPositive ? 'var(--positive)' : 'var(--negative)'} 5%, transparent)`,
-        }}
-      >
-        <div>
-          <div className="text-[9.5px] uppercase tracking-wider text-text-muted/55 mb-1">Floating P&L</div>
-          <div
-            className="text-[22px] font-black font-mono tracking-[-0.03em]"
-            style={{ color: pnlPositive ? 'var(--positive)' : 'var(--negative)' }}
-          >
-            {row.pnl}
-          </div>
-        </div>
-        <PnlIcon
-          size={32}
-          style={{ color: pnlPositive ? 'var(--positive)' : 'var(--negative)', opacity: 0.3 }}
-        />
-      </div>
+      {/* Floating PnL Banner */}
+      <PositionPnLBanner
+        pnl={row.pnl}
+        side={row.side}
+        size={row.size}
+      />
 
       <DrawerSection title="Position Summary">
         <DrawerFormGrid>
@@ -202,10 +326,31 @@ export function PositionDetailsDrawer({ row, onAction }) {
       </DrawerSection>
 
       <DrawerSection title="Account Link">
-        <DrawerFormGrid>
-          <DrawerField label="User" value={row.user} />
-          <DrawerField label="UID"  value={row.uid}  mono />
-        </DrawerFormGrid>
+        <div 
+          className="rounded-[12px] border bg-bg/20 p-4 space-y-4 animate-in fade-in duration-300"
+          style={{ borderColor: 'color-mix(in srgb, var(--brand) 12%, var(--border))' }}
+        >
+          <div className="flex items-center gap-3.5">
+            <div 
+              className="w-10 h-10 rounded-[11px] border flex items-center justify-center text-[13px] font-bold text-brand font-heading flex-shrink-0"
+              style={{
+                background: 'color-mix(in srgb, var(--brand) 10%, transparent)',
+                borderColor: 'color-mix(in srgb, var(--brand) 20%, transparent)',
+              }}
+            >
+              {row.user?.split(' ').map(n => n[0]).join('') || 'U'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14px] font-semibold font-heading text-text tracking-tight truncate">{row.user}</div>
+              <div className="text-[11.5px] font-mono text-text-muted/75 mt-0.5 truncate">User ID: {row.uid || '—'}</div>
+            </div>
+            <div 
+              className="px-2.5 py-0.5 rounded-[5px] border border-border/20 text-[11px] font-mono font-semibold text-text-muted/75 bg-bg/40 flex-shrink-0"
+            >
+              LIVE
+            </div>
+          </div>
+        </div>
       </DrawerSection>
 
       <DrawerSection title="Actions">
@@ -215,47 +360,22 @@ export function PositionDetailsDrawer({ row, onAction }) {
   );
 }
 
-/**
- * HistoryDetailsDrawer: Specialized body for Historical Trade records.
- */
+/* ── HistoryDetailsDrawer ────────────────────────────────────── */
 export function HistoryDetailsDrawer({ row }) {
   const isWin = row.status === 'WIN';
   const statusColor = isWin ? 'var(--positive)' : 'var(--negative)';
-  const StatusIcon = isWin ? TrendingUp : TrendingDown;
 
   return (
     <div className="space-y-6">
       {/* WIN / LOSS Result Banner */}
-      <div
-        className="rounded-[12px] border overflow-hidden"
-        style={{
-          borderColor: `color-mix(in srgb, ${statusColor} 25%, var(--border))`,
-        }}
-      >
-        <div
-          className="flex items-center justify-between px-4 py-3"
-          style={{ background: `color-mix(in srgb, ${statusColor} 10%, transparent)` }}
-        >
-          <div>
-            <div className="text-[9.5px] uppercase tracking-wider text-text-muted/55 mb-0.5">Trade Result</div>
-            <div className="flex items-center gap-2">
-              <span
-                className="text-[18px] font-black uppercase tracking-wide"
-                style={{ color: statusColor }}
-              >
-                {isWin ? '✓ WIN' : '✗ LOSS'}
-              </span>
-              <span
-                className="font-mono font-black text-[16px]"
-                style={{ color: statusColor }}
-              >
-                {row.pnl}
-              </span>
-            </div>
-          </div>
-          <StatusIcon size={28} style={{ color: statusColor, opacity: 0.3 }} />
-        </div>
-      </div>
+      <HistoryResultBanner
+        status={row.status}
+        pnl={row.pnl}
+        ticket={row.ticket}
+        symbol={row.symbol}
+        side={row.side}
+        size={row.size}
+      />
 
       <DrawerSection title="Trade Execution Result">
         <DrawerFormGrid>
@@ -265,7 +385,7 @@ export function HistoryDetailsDrawer({ row }) {
           <DrawerField label="Size"        value={`${row.size} lots`} mono />
           <DrawerField label="Open Price"  value={row.openPrice}  mono />
           <DrawerField label="Close Price" value={row.closePrice} mono />
-          <DrawerField label="Net P&L"     value={row.pnl}        mono accent={String(row.pnl).startsWith('+') ? 'var(--positive)' : 'var(--negative)'} wide />
+          <DrawerField label="Net P&L"     value={row.pnl}        mono accent={statusColor} wide />
         </DrawerFormGrid>
       </DrawerSection>
 

@@ -14,26 +14,30 @@ const UNIFIED_STREAM = [
 ];
 
 const STATUS_STYLE = {
-  open: { color: 'var(--cyan)', bg: 'color-mix(in srgb, var(--cyan) 10%, transparent)' },
-  resolved: { color: 'var(--cyan)', bg: 'color-mix(in srgb, var(--cyan) 10%, transparent)' },
-  pending: { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 10%, transparent)' },
-  'review req': { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 10%, transparent)' },
-  confirmed: { color: 'var(--positive)', bg: 'color-mix(in srgb, var(--positive) 10%, transparent)' },
-  'action req': { color: 'var(--negative)', bg: 'color-mix(in srgb, var(--negative) 10%, transparent)' },
+  open: { color: 'var(--cyan)', bg: 'color-mix(in srgb, var(--cyan) 8%, transparent)' },
+  resolved: { color: 'var(--cyan)', bg: 'color-mix(in srgb, var(--cyan) 8%, transparent)' },
+  pending: { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 8%, transparent)' },
+  'review req': { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 8%, transparent)' },
+  confirmed: { color: 'var(--positive)', bg: 'color-mix(in srgb, var(--positive) 8%, transparent)' },
+  'action req': { color: 'var(--negative)', bg: 'color-mix(in srgb, var(--negative) 8%, transparent)' },
   closed: { color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.04)' },
 };
 
 function StreamRefCell({ item }) {
   const Icon = item.icon;
   return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex items-center gap-2.5 group/ref">
       <div
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] transition-transform group-hover:scale-110"
-        style={{ background: `color-mix(in srgb, ${item.color} 12%, transparent)`, color: item.color }}
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] transition-transform duration-300 group-hover/ref:scale-110"
+        style={{ 
+          background: `color-mix(in srgb, ${item.color} 10%, transparent)`, 
+          color: item.color,
+          boxShadow: `0 0 4px color-mix(in srgb, ${item.color} 15%, transparent)`
+        }}
       >
         <Icon size={11} strokeWidth={2.5} />
       </div>
-      <span className="font-mono text-[12px] font-medium tracking-wider text-text-muted/60">{item.id}</span>
+      <span className="font-mono text-[11.5px] font-medium tracking-wider text-text-muted">{item.id}</span>
     </div>
   );
 }
@@ -42,7 +46,11 @@ function StreamValueCell({ item }) {
   const isGain = item.value.startsWith('+') || item.status === 'confirmed';
   const isLoss = item.value.startsWith('-') || item.status === 'action req';
   const valColor = isGain ? 'var(--positive)' : isLoss ? 'var(--negative)' : item.color;
-  return <span className="font-mono text-[13px] font-bold" style={{ color: valColor }}>{item.value}</span>;
+  return (
+    <span className="font-mono text-[13.5px] font-semibold" style={{ color: valColor }}>
+      {item.value}
+    </span>
+  );
 }
 
 function StreamStatusCell({ item }) {
@@ -50,8 +58,12 @@ function StreamStatusCell({ item }) {
 
   return (
     <span
-      className="rounded-[4px] px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em]"
-      style={{ color: ss.color, background: ss.bg }}
+      className="rounded-[4px] px-1.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider border"
+      style={{ 
+        color: ss.color, 
+        background: ss.bg,
+        borderColor: `color-mix(in srgb, ${ss.color} 15%, transparent)`
+      }}
     >
       {item.status}
     </span>
@@ -59,34 +71,34 @@ function StreamStatusCell({ item }) {
 }
 
 const streamColumns = [
-  { key: 'id', label: 'Ref', render: (_, row) => <StreamRefCell item={row} /> },
-  { key: 'user', label: 'User', render: (value) => <span className="text-[13px] font-medium text-text">{value}</span> },
-  { key: 'detail', label: 'Detail', render: (value) => <span className="whitespace-nowrap text-[12px] font-medium text-text-muted">{value}</span> },
-  { key: 'value', label: 'Value', align: 'right', render: (_, row) => <StreamValueCell item={row} /> },
-  { key: 'status', label: 'Status', align: 'right', render: (_, row) => <StreamStatusCell item={row} /> },
-  { key: 'time', label: 'Time', align: 'right', render: (value) => <span className="font-mono text-[12px] font-medium tracking-wide text-text-muted/40">{value}</span> },
+  { key: 'id', label: 'Ref ID', render: (_, row) => <StreamRefCell item={row} /> },
+  { key: 'user', label: 'Operator', render: (value) => <span className="text-[13px] font-semibold text-text">{value}</span> },
+  { key: 'detail', label: 'Transaction Details', render: (value) => <span className="whitespace-nowrap text-[13px] font-medium text-text-muted">{value}</span> },
+  { key: 'value', label: 'Amount', align: 'right', render: (_, row) => <StreamValueCell item={row} /> },
+  { key: 'status', label: 'Ledger Status', align: 'right', render: (_, row) => <StreamStatusCell item={row} /> },
+  { key: 'time', label: 'Activity Time', align: 'right', render: (value) => <span className="font-mono text-[11.5px] font-medium text-text-muted">{value}</span> },
 ];
 
 function DashboardStream() {
   return (
-    <section className="h-full rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
+    <section className="h-full rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col transition-all duration-300">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border/15 flex items-center justify-between bg-surface-elevated">
-        <div className="text-[14px] font-semibold text-text flex items-center gap-2 font-heading tracking-tight">
-          <Zap size={14} className="text-cyan fill-cyan/20" style={{ color: 'var(--cyan)' }} />
+      <div className="px-5 py-4 border-b border-border/15 flex items-center justify-between bg-surface-elevated/45">
+        <div className="text-[15px] font-semibold text-text flex items-center gap-2 tracking-tight">
+          <Zap size={14} className="text-cyan fill-cyan/20 animate-pulse" style={{ color: 'var(--cyan)' }} />
           Global Activity Ledger
         </div>
-        <span className="flex items-center gap-1.5 px-2 py-1 rounded-[6px] bg-bg/50 text-[10px] font-bold uppercase tracking-[0.1em] text-text-muted/70 border border-border/20 font-heading">
+        <span className="flex items-center gap-1.5 px-2 py-1 rounded-[6px] bg-bg/50 text-[10.5px] font-bold uppercase tracking-wider text-text-muted border border-border/20">
           <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
           Live Stream
         </span>
       </div>
 
-      <div className="flex-1 min-h-0 bg-surface">
+      <div className="flex-1 min-h-0 bg-surface/5">
         <MainTable 
           columns={streamColumns} 
           data={UNIFIED_STREAM} 
-          rowClassName={() => "hover:bg-cyan/5 hover:border-l-cyan"} 
+          rowClassName="hover:bg-cyan/5" 
         />
       </div>
     </section>

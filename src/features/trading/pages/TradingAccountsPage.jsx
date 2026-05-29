@@ -1,245 +1,291 @@
-import React, { useState } from 'react';
-import { ChevronRight, PlusCircle, RefreshCw, Download } from 'lucide-react';
-import { PageShell } from '../../../components/layout/PageShell';
-import { TradingAccountsGrid } from '../components/TradingAccountsGrid';
-import { TradingAccountsTable } from '../components/TradingAccountsTable';
-import { TradingAccountsConsole } from '../components/TradingAccountsConsole';
-import { TradingAccountsDrawer } from '../components/TradingAccountsDrawer';
-import { useDrawerState } from '@/hooks/useDrawerState';
-import { exportRows } from '../../../utils/exporters';
+import React, { useMemo, useState } from 'react';
 
+import {
+  PlusCircle, RefreshCw, Download,
+  Wallet, Monitor, ShieldAlert, Radio, DollarSign,
+} from 'lucide-react';
+import { PageShell } from '../../../components/layout/PageShell';
+import { KPICard } from '../../../components/cards/KPICard';
+import { TradingAccountCards } from '../components/TradingAccountCards';
+import { TradingActivityLog } from '../components/TradingActivityLog';
+import { exportRows } from '../../../utils/exporters';
+import { useNavigate } from 'react-router-dom';
+
+/* ─── Page metadata ─────────────────────────────────────────── */
 const PAGE = {
-  eyebrow: 'Trading Operations',
-  title: 'Trading Accounts',
-  description: 'Monitor MT5 account synchronization, equity distribution, connection health, and issue cluster commands.',
+  eyebrow:     'Trading Operations',
+  title:       'Trading Accounts',
+  description: 'View and manage all MT5 trading accounts — check balances, sync with the server, and adjust account settings.',
 };
 
+/* ─── Mock data ─────────────────────────────────────────────── */
 const MOCK_ACCOUNTS = [
   {
-    login: '88100249',
-    user: 'Arjun Sathia',
-    uid: 'U-499201',
-    server: 'MT5-PRIME-01 (EU Node)',
-    group: 'REAL_RAW_SPREAD',
-    leverage: '1:500',
-    equity: '$142,005.12',
-    balance: '$141,800.00',
-    margin: '$2,800.00',
+    login:      '88100249',
+    user:       'Arjun Sathia',
+    uid:        'U-499201',
+    server:     'MT5-PRIME-01 (EU Node)',
+    group:      'REAL_RAW_SPREAD',
+    leverage:   '1:500',
+    equity:     '$142,005.12',
+    balance:    '$141,800.00',
+    margin:     '$2,800.00',
     freeMargin: '$139,205.12',
-    marginLvl: '5071%',
-    status: 'LIVE',
-    lastSync: '2 mins ago',
+    marginLvl:  '5071%',
+    status:     'LIVE',
+    lastSync:   '2 mins ago',
   },
   {
-    login: '88100562',
-    user: 'Arjun Sathia',
-    uid: 'U-499201',
-    server: 'MT5-STND-04 (US Node)',
-    group: 'REAL_STANDARD',
-    leverage: '1:100',
-    equity: '$42,099.00',
-    balance: '$42,099.00',
-    margin: '$0.00',
+    login:      '88100562',
+    user:       'Arjun Sathia',
+    uid:        'U-499201',
+    server:     'MT5-STND-04 (US Node)',
+    group:      'REAL_STANDARD',
+    leverage:   '1:100',
+    equity:     '$42,099.00',
+    balance:    '$42,099.00',
+    margin:     '$0.00',
     freeMargin: '$42,099.00',
-    marginLvl: '—',
-    status: 'DISCONNECTED',
-    lastSync: '14 hours ago',
+    marginLvl:  '—',
+    status:     'DISCONNECTED',
+    lastSync:   '14 hours ago',
   },
   {
-    login: '88100918',
-    user: 'Arjun Sathia',
-    uid: 'U-499201',
-    server: 'MT5-PRIME-01 (EU Node)',
-    group: 'REAL_RAW_SPREAD',
-    leverage: '1:500',
-    equity: '$100,000.33',
-    balance: '$100,000.00',
-    margin: '$2,000.00',
+    login:      '88100918',
+    user:       'Arjun Sathia',
+    uid:        'U-499201',
+    server:     'MT5-PRIME-01 (EU Node)',
+    group:      'REAL_RAW_SPREAD',
+    leverage:   '1:500',
+    equity:     '$100,000.33',
+    balance:    '$100,000.00',
+    margin:     '$2,000.00',
     freeMargin: '$98,000.33',
-    marginLvl: '5000%',
-    status: 'LIVE',
-    lastSync: 'Just now',
+    marginLvl:  '5000%',
+    status:     'LIVE',
+    lastSync:   'Just now',
   },
 ];
 
-function TradingAccountsPage() {
-  const [accounts, setAccounts] = useState(MOCK_ACCOUNTS);
-  const [stats, setStats] = useState({
-    equity: '$284,102.45',
-    equityChange: '+4.2%',
-    activeAccounts: '03',
-    allowedAccounts: '5',
-    riskLevel: 'High',
-    marginLevel: '112%',
-    latency: '14ms',
-    node: 'NY4',
-  });
-  const [filter, setFilter] = useState('ALL');
-  const [sort, setSort] = useState('EQUITY');
-  const activeDrawerAccountState = useDrawerState(null);
-  const [toastMessage, setToastMessage] = useState('');
+const FILTER_OPTIONS = [
+  { id: 'ALL',          label: 'All Accounts' },
+  { id: 'LIVE',         label: 'Live Only'    },
+  { id: 'DISCONNECTED', label: 'Disconnected' },
+  { id: 'BLOCKED',      label: 'Blocked'      },
+];
 
-  const triggerToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3000);
+/* ─── Helpers ─────────────────────────────────────────────── */
+function parseMoney(str = '$0') {
+  return parseFloat(String(str).replace(/[$,]/g, '')) || 0;
+}
+
+function formatMoney(num) {
+  return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/* ─── Page Component ─────────────────────────────────────────── */
+function TradingAccountsPage() {
+  const navigate = useNavigate();
+  const [accounts,    setAccounts]    = useState(MOCK_ACCOUNTS);
+  const [filterStatus, setFilter]     = useState('ALL');
+  const [syncing,     setSyncing]     = useState(false);
+  const [toastMsg,    setToastMsg]    = useState('');
+
+
+  /* ── Toast helper ── */
+  const toast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 3000);
   };
 
+  /* ── Aggregate KPI values ── */
+  const kpis = useMemo(() => {
+    const liveCount = accounts.filter((a) => a.status === 'LIVE' || a.status === 'ACTIVE').length;
+    const totalEquity   = accounts.reduce((s, a) => s + parseMoney(a.equity),   0);
+    const totalBalance  = accounts.reduce((s, a) => s + parseMoney(a.balance),  0);
+    const totalMargin   = accounts.reduce((s, a) => s + parseMoney(a.margin),   0);
+
+    return [
+      {
+        label:   'Total Equity',
+        value:   formatMoney(totalEquity),
+        accent:  'var(--brand)',
+        Icon:    Wallet,
+        sub:     'across all accounts',
+        trend:   '+4.2%',
+        trendUp: true,
+      },
+      {
+        label:   'Live Accounts',
+        value:   `${liveCount} of ${accounts.length}`,
+        accent:  'var(--positive)',
+        Icon:    Monitor,
+        sub:     'connected & active',
+        trend:   liveCount > 0 ? 'online' : 'offline',
+        trendUp: liveCount > 0,
+      },
+      {
+        label:   'Total Balance',
+        value:   formatMoney(totalBalance),
+        accent:  'var(--cyan)',
+        Icon:    DollarSign,
+        sub:     'deposited capital',
+      },
+      {
+        label:   'Margin In Use',
+        value:   formatMoney(totalMargin),
+        accent:  'var(--warning)',
+        Icon:    ShieldAlert,
+        sub:     'collateral held',
+      },
+      {
+        label:   'Server Status',
+        value:   'Healthy',
+        accent:  'var(--positive)',
+        Icon:    Radio,
+        sub:     'NY4 · 14ms',
+        trend:   'stable',
+      },
+    ];
+  }, [accounts]);
+
+  /* ── Actions ── */
   const handleAddNewAccount = () => {
-    const nextLogin = String(Math.floor(10000000 + Math.random() * 90000000));
-    const newAcct = {
-      login: nextLogin,
-      user: 'Arjun Sathia',
-      uid: 'U-499201',
-      server: 'MT5-PRIME-01 (EU Node)',
-      group: 'REAL_RAW_SPREAD',
-      leverage: '1:100',
-      equity: '$10,000.00',
-      balance: '$10,000.00',
-      margin: '$0.00',
+    const login = String(Math.floor(10_000_000 + Math.random() * 90_000_000));
+    setAccounts((prev) => [{
+      login,
+      user:       'New Account',
+      uid:        'U-000000',
+      server:     'MT5-PRIME-01 (EU Node)',
+      group:      'REAL_STANDARD',
+      leverage:   '1:100',
+      equity:     '$10,000.00',
+      balance:    '$10,000.00',
+      margin:     '$0.00',
       freeMargin: '$10,000.00',
-      marginLvl: '—',
-      status: 'LIVE',
-      lastSync: 'Just now',
-    };
-    setAccounts((prev) => [newAcct, ...prev]);
-    setStats((prev) => ({
-      ...prev,
-      equity: `$${(parseFloat(prev.equity.replace(/[$,]/g, '')) + 10000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      activeAccounts: String(prev.activeAccounts * 1 + 1).padStart(2, '0'),
-    }));
-    triggerToast(`Added Account #${nextLogin} to inventory`);
+      marginLvl:  '—',
+      status:     'LIVE',
+      lastSync:   'Just now',
+    }, ...prev]);
+    toast(`New account #${login} created`);
   };
 
   const handleGlobalSync = () => {
-    triggerToast('MT5 Dealing Cluster Synchronizing...');
-    setStats((prev) => ({
-      ...prev,
-      latency: `${Math.floor(10 + Math.random() * 8)}ms`,
-      marginLevel: `${110 + Math.floor(Math.random() * 20)}%`,
-    }));
+    setSyncing(true);
+    setTimeout(() => setSyncing(false), 1800);
+    setAccounts((prev) => prev.map((a) => ({ ...a, lastSync: 'Just now', status: a.status === 'DISCONNECTED' ? 'DISCONNECTED' : 'LIVE' })));
+    toast('All accounts synced with MT5 cluster');
   };
 
-  const handleSyncSingleAccount = (row) => {
+  const handleSyncOne = (account) => {
     setAccounts((prev) =>
-      prev.map((item) =>
-        item.login === row.login ? { ...item, lastSync: 'Just now', status: 'LIVE' } : item
-      )
+      prev.map((a) => a.login === account.login ? { ...a, lastSync: 'Just now', status: 'LIVE' } : a)
     );
-    triggerToast(`Cluster handshake refreshed for #${row.login}`);
+    toast(`Account #${account.login} synced`);
   };
 
-  const handleResetPassword = (row) => {
-    triggerToast(`Password reset instruction queued for #${row.login}`);
-  };
 
-  const handleSaveChangesFromDrawer = (updatedAcct) => {
-    setAccounts((prev) =>
-      prev.map((item) => (item.login === updatedAcct.login ? updatedAcct : item))
-    );
-    triggerToast(`Updated MT5 Account #${updatedAcct.login}`);
-  };
-
-  const filteredAccounts = accounts.filter((item) => {
-    if (filter === 'LIVE') return item.status === 'LIVE';
-    return true;
-  });
-
-  const sortedAccounts = [...filteredAccounts].sort((a, b) => {
-    if (sort === 'EQUITY') {
-      return parseFloat(b.equity.replace(/[$,]/g, '')) - parseFloat(a.equity.replace(/[$,]/g, ''));
-    }
-    return b.login.localeCompare(a.login);
-  });
 
   return (
     <PageShell className="relative">
-      {/* Toast Notification */}
-      {toastMessage && (
+
+      {/* ── Toast ── */}
+      {toastMsg && (
         <div className="fixed top-6 right-6 z-[300] bg-surface-elevated border border-brand/20 text-text text-[11px] font-bold px-4 py-3 rounded-[8px] shadow-[0_4px_24px_rgba(0,0,0,0.4)] animate-fade-in flex items-center gap-2.5">
           <span className="w-2 h-2 bg-positive rounded-full animate-ping" />
-          {toastMessage}
+          {toastMsg}
         </div>
       )}
 
-      <div className="space-y-5 animate-fade-up">
-        {/* Page Header */}
+      <div className="space-y-6 animate-fade-up">
+
+        {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
               {PAGE.description}
             </p>
           </div>
 
-          {/* Command Strip */}
+          {/* Action buttons */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            {/* Cluster Status Pill */}
-            <div className="flex items-center gap-2 px-3 h-8 rounded-[8px] border border-positive/20 bg-positive/[0.04] text-[10px] font-bold text-positive">
-              <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
-              {stats.node} · {stats.latency} · HEALTHY
-            </div>
-
             <button
               type="button"
               onClick={() => exportRows(accounts, 'trading-accounts.csv')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
               <Download size={12} /> Export
             </button>
-
             <button
               type="button"
               onClick={handleAddNewAccount}
-              className="flex items-center justify-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
-              <PlusCircle size={12} /> New MT5 Account
+              <PlusCircle size={12} /> New Account
             </button>
-
             <button
               type="button"
               onClick={handleGlobalSync}
-              className="flex items-center justify-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-semibold transition-all cursor-pointer hover:brightness-110 active:scale-[0.97]"
             >
-              <RefreshCw size={12} className="animate-spin-slow" /> Global Sync
+              <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} />
+              {syncing ? 'Syncing…' : 'Sync All'}
             </button>
           </div>
         </header>
 
-        {/* KPI Bento Strip */}
-        <TradingAccountsGrid stats={stats} />
+        {/* ── KPI Strip ── */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
+          {kpis.map((kpi) => (
+            <KPICard key={kpi.label} {...kpi} />
+          ))}
+        </section>
 
-        {/* MT5 Inventory Table */}
-        <TradingAccountsTable
-          items={sortedAccounts}
-          onRowClick={(row) => activeDrawerAccountState.open(row)}
-          onSync={handleSyncSingleAccount}
-          onResetPassword={handleResetPassword}
-          activeFilter={filter}
-          activeSort={sort}
-          onChangeFilter={setFilter}
-          onChangeSort={setSort}
+        {/* ── Filter Bar ── */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5">
+            {FILTER_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setFilter(opt.id)}
+                className={`h-8 px-3.5 rounded-[8px] text-[12px] font-semibold transition-all cursor-pointer border ${
+                  filterStatus === opt.id
+                    ? 'bg-brand text-text-on-accent border-brand/30'
+                    : 'bg-surface-elevated border-border/20 text-text-muted/80 hover:text-text hover:border-border/40'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Account count */}
+          <span className="text-[12px] text-text-muted/75 font-mono font-bold select-none">
+            {filterStatus === 'ALL'
+              ? `${accounts.length} accounts`
+              : `${accounts.filter((a) => a.status === filterStatus).length} of ${accounts.length}`}
+          </span>
+        </div>
+
+        {/* ── Account Cards Grid ── */}
+        <TradingAccountCards
+          accounts={accounts}
+          filterStatus={filterStatus}
+          onViewDetails={(account) => navigate(`/users/mt5/${account.login}`, { state: { fromTrading: true } })}
+          onSync={handleSyncOne}
         />
 
-        {/* Operations Terminal */}
-        <TradingAccountsConsole
-          onTriggerControl={(action) => triggerToast(`Global Command Issued: ${action}`)}
-        />
+        {/* ── Activity Log (collapsible) ── */}
+        <TradingActivityLog />
+
       </div>
-
-      {/* Details Side-Drawer */}
-      <TradingAccountsDrawer
-        open={activeDrawerAccountState.isOpen}
-        row={activeDrawerAccountState.value}
-        onClose={() => activeDrawerAccountState.close()}
-        onSave={handleSaveChangesFromDrawer}
-        onSync={handleSyncSingleAccount}
-        onResetPassword={handleResetPassword}
-      />
     </PageShell>
   );
 }

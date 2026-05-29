@@ -21,7 +21,21 @@ export function PartnerTreePage() {
   const visibleTree = useMemo(() => filterTree(partnerTree, search), [search]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 animate-fade-up">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            IB System
+          </p>
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
+            Partner Network Tree
+          </h2>
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
+            Visualize the Introducing Broker referral hierarchy and multi-level commission flow.
+          </p>
+        </div>
+      </header>
+
       <PageToolbar
         search={search} onSearchChange={setSearch} placeholder="Search partner name or ID…"
         showFilters={false}
@@ -39,7 +53,7 @@ export function PartnerTreePage() {
         ].map(s => (
           <div key={s.label} className="flex items-center gap-2 rounded-[8px] border border-border/30 bg-bg/60 px-3 py-1.5">
             <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: s.color }} />
-            <span className="text-[11px] text-text-muted/50 font-heading">{s.label}</span>
+            <span className="text-[11px] text-text-muted/70 font-semibold">{s.label}</span>
             <span className="text-[11px] font-mono font-bold" style={{ color: s.color }}>{s.val}</span>
           </div>
         ))}

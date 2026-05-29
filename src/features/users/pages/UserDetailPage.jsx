@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  BarChart2, 
-  User, 
-  FileCheck, 
-  Wallet, 
-  Monitor, 
-  TrendingUp, 
-  Activity, 
-  ShieldAlert, 
+import {
+  ArrowLeft,
+  BarChart2,
+  User,
+  FileCheck,
+  Wallet,
+  Monitor,
+  TrendingUp,
+  Activity,
+  ShieldAlert,
   Edit2,
   Copy,
   Check,
@@ -21,7 +21,8 @@ import {
   Globe,
   Calendar,
   Clock,
-  ExternalLink
+  ExternalLink,
+  ChevronRight,
 } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
 import { Card } from '../../../components/ui/Card';
@@ -29,11 +30,14 @@ import { Button } from '../../../components/ui/Button';
 import { StatusBadge } from '../../../components/ui';
 import { UserDetailContent } from '../components/UserDetailContent';
 import { usersService } from '../services/userService';
-import { kycService } from "../services/kycService";
+import { kycService } from '../services/kycService';
 import { userDetailTabs } from '@/config/constants/USER_TABS';
 import { AddUserDrawer } from '../components/AddUserDrawer';
 import { buildUserDraft, applyDraftToUser } from '@/utils/userDraftUtils';
+import { useDrawerState } from '@/hooks/useDrawerState';
+import { Mt5AccountDrawer } from '../components/UserDrawers';
 
+/* ── Tab icon map ── */
 const tabIcons = {
   overview: BarChart2,
   profile: User,
@@ -46,25 +50,77 @@ const tabIcons = {
   notes: Edit2,
 };
 
+/* ── Deterministic avatar gradient from name ── */
 function getAvatarStyle(name = '?') {
   const seed = name.charCodeAt(0) * 37;
   return {
     background: `linear-gradient(135deg, hsl(${seed % 360},45%,28%), hsl(${(seed + 60) % 360},45%,15%))`,
     color: `hsl(${seed % 360},90%,70%)`,
-    boxShadow: `0 0 15px color-mix(in srgb, hsl(${seed % 360},90%,70%) 25%, transparent)`,
-    border: `1px solid color-mix(in srgb, hsl(${seed % 360},90%,70%) 30%, transparent)`,
+    boxShadow: `0 0 20px color-mix(in srgb, hsl(${seed % 360},90%,70%) 20%, transparent)`,
+    border: `1px solid color-mix(in srgb, hsl(${seed % 360},90%,70%) 25%, transparent)`,
   };
 }
 
+/* ── Inline contact row ── */
+// eslint-disable-next-line no-unused-vars
+const ContactRow = ({ icon: Icon, label, children }) => (
+  <div className="flex items-center gap-3 py-2 border-b border-border/8 last:border-0">
+    <div className="flex items-center gap-1.5 w-[88px] shrink-0">
+      <Icon size={10} className="text-text-muted/30 shrink-0" />
+      <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 truncate">{label}</span>
+    </div>
+    <div className="flex-1 min-w-0 flex items-center justify-end">{children}</div>
+  </div>
+);
+
+/* ── Stat pill used in sidebar quick-stats bar ── */
+const QuickStat = ({ label, value, valueClass = 'text-text' }) => (
+  <div className="flex-1 flex flex-col items-center py-3 gap-0.5">
+    <span className={`font-mono font-semibold text-[14.5px] leading-none ${valueClass}`}>{value}</span>
+    <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 mt-0.5">{label}</span>
+  </div>
+);
+
+/* ══════════════════════════════════════════════════════════════
+   MAIN PAGE COMPONENT
+══════════════════════════════════════════════════════════════ */
 export function UserDetailPage() {
   const { userId, tab } = useParams();
   const navigate = useNavigate();
   const activeTab = tab || 'overview';
-  
+
   const [user, setUser] = useState(() => usersService.getById(userId));
   const [formOpen, setFormOpen] = useState(false);
   const [userDraft, setUserDraft] = useState(null);
   const [copied, setCopied] = useState(false);
+  const mt5Drawer = useDrawerState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
+
+  const handleSaveMt5Account = (accountData) => {
+    const target = mt5Drawer.value;
+    if (!target) return;
+    if (accountData.login) {
+      usersService.updateMt5AccountForUser(user.id, accountData.login, accountData);
+      const updatedUser = usersService.getById(userId);
+      setUser({ ...updatedUser });
+      triggerToast(`Successfully updated MT5 Account #${accountData.login}`);
+    } else {
+      const newAcct = usersService.createMt5AccountForUser(user.id, accountData);
+      if (newAcct) {
+        const updatedUser = usersService.getById(userId);
+        setUser({ ...updatedUser });
+        triggerToast(`Successfully created MT5 Account #${newAcct.login} for ${user.name}`);
+      }
+    }
+  };
+
+  const handleSyncMt5Account = (accountData) => triggerToast(`Cluster handshake refreshed for #${accountData.login}`);
+  const handleResetMt5Password = (accountData) => triggerToast(`Password reset instruction queued for #${accountData.login}`);
 
   const handleOpenEdit = () => {
     if (!user) return;
@@ -94,10 +150,7 @@ export function UserDetailPage() {
     const target = usersService.getById(userId);
     if (target) {
       usersService.update(userId, updatedFields);
-      // If we are updating KYC status, synchronize it in the KYC service too
-      if (updatedFields.kycStatus) {
-        kycService.updateStatusByUserId(userId, updatedFields.kycStatus);
-      }
+      if (updatedFields.kycStatus) kycService.updateStatusByUserId(userId, updatedFields.kycStatus);
       setUser({ ...target, ...updatedFields });
     }
   };
@@ -108,193 +161,263 @@ export function UserDetailPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  /* ── Not found ── */
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-        <h2 className="text-xl font-bold text-text">User Not Found</h2>
-        <p className="mt-2 text-text-muted">The user with ID {userId} could not be located.</p>
-        <Button variant="primary" className="mt-4" onClick={() => navigate('/users')}>
-          Back to Users
-        </Button>
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-4">
+        <h2 className="text-xl font-black text-text">User Not Found</h2>
+        <p className="text-[12px] text-text-muted/55">The user with ID {userId} could not be located.</p>
+        <Button variant="primary" onClick={() => navigate('/users')}>Back to Users</Button>
       </div>
     );
   }
 
-  // Filter profile tab out from right-side deck since its details are sticky in the sidebar
   const filteredTabs = userDetailTabs.filter(t => t.id !== 'profile');
+
+  /* ── Derived pnl color ── */
+  const isPnLNegative = String(user.pnl30d ?? '').startsWith('-');
 
   return (
     <PageShell>
-      <div className="space-y-6">
-        
-        {/* Navigation Breadcrumb Strip */}
-        <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => navigate('/users')}
-              className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-border/20 text-text-muted bg-surface-elevated/40 hover:text-text hover:border-border/40 transition-all cursor-pointer"
-            >
-              <ArrowLeft size={14} />
-            </button>
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/40">
-              User Management <span className="mx-1 text-text-muted/20">/</span> Dossier
-            </div>
+
+      {/* ── Toast ── */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-[300] flex items-center gap-3 bg-surface-elevated border border-brand/20 px-4 py-3 rounded-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.45)] animate-fade-in">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-positive opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-positive" />
+          </span>
+          <span className="text-[11px] font-bold text-text">{toastMessage}</span>
+        </div>
+      )}
+
+      <div className="space-y-5">
+
+        {/* ── Breadcrumb bar ── */}
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => navigate('/users')}
+            className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border/18 bg-bg/30 text-text-muted hover:text-text hover:border-border/35 hover:bg-bg/50 transition-all cursor-pointer shrink-0"
+          >
+            <ArrowLeft size={13} />
+          </button>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 select-none">
+            <span className="hover:text-text-muted/60 cursor-pointer transition-colors" onClick={() => navigate('/users')}>
+              User Management
+            </span>
+            <ChevronRight size={10} className="text-text-muted/20" />
+            <span className="text-text-muted/55">Trader Dossier</span>
+            <ChevronRight size={10} className="text-text-muted/20" />
+            <span className="text-brand font-bold">{user.uid}</span>
           </div>
         </div>
 
-        {/* 2-Column Split Dossier Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* ── LEFT COLUMN: Profile Dossier Sidebar (Sticky) ── */}
-          <div className="lg:col-span-4 lg:sticky lg:top-5 space-y-5">
-            <div className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
-              
-              {/* Profile Card Header (Seeded HSL Gradient) */}
-              <div className="p-6 flex flex-col items-center text-center border-b border-border/12 bg-bg/10 relative">
-                
-                {/* Seeded HSL Avatar */}
-                <div 
-                  className="flex h-20 w-20 items-center justify-center rounded-full text-[26px] font-black font-heading select-none transition-transform duration-300 hover:scale-105"
-                  style={getAvatarStyle(user.name)}
-                >
-                  {user.name?.[0] ?? '?'}
+        {/* ── Main 2-column layout ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+          {/* ═══════════════════════════════════════
+              LEFT SIDEBAR — Sticky Profile Dossier
+          ═══════════════════════════════════════ */}
+          <div className="lg:col-span-4 lg:sticky lg:top-5 space-y-3">
+
+            {/* ── Profile Identity Card ── */}
+            <div className="rounded-[10px] border border-border/15 bg-surface-elevated overflow-hidden">
+
+              {/* Avatar + Name header */}
+              <div className="relative px-5 pt-6 pb-0 flex flex-col items-center text-center">
+
+                {/* Subtle top glow strip */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand/30 to-transparent" />
+
+                {/* Suspended warning bar */}
+                {user.suspended && (
+                  <div className="absolute top-[2px] left-0 right-0 flex items-center justify-center gap-1.5 bg-negative/10 border-b border-negative/15 py-1.5">
+                    <Ban size={9} className="text-negative" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-negative">Account Suspended</span>
+                  </div>
+                )}
+
+                {/* Avatar */}
+                <div className={`relative ${user.suspended ? 'mt-6' : 'mt-0'}`}>
+                  <div
+                    className="flex h-[72px] w-[72px] items-center justify-center rounded-full text-[26px] font-semibold select-none transition-transform duration-300 hover:scale-105"
+                    style={getAvatarStyle(user.name)}
+                  >
+                    {user.name?.[0] ?? '?'}
+                  </div>
+                  {/* Online / KYC indicator dot */}
+                  <span className={`absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-surface-elevated
+                    ${user.kycStatus === 'VERIFIED' ? 'bg-positive' : user.kycStatus === 'REJECTED' ? 'bg-negative' : 'bg-warning'}`}
+                  />
                 </div>
 
-                <h1 className="text-[20px] font-black tracking-[-0.04em] text-text mt-4 leading-tight">
+                {/* Name */}
+                <h1 className="text-[18px] font-semibold tracking-[-0.02em] text-text mt-3 leading-tight">
                   {user.name}
                 </h1>
-                
-                <p className="mt-1 text-[11px] font-mono font-bold uppercase tracking-[0.1em] text-brand leading-none">
-                  UID {user.uid}
-                </p>
 
-                {/* Badges deck */}
-                <div className="flex flex-wrap justify-center items-center gap-1.5 mt-3.5">
+                {/* UID */}
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-[11.5px] font-mono font-semibold uppercase tracking-[0.10em] text-brand">UID {user.uid}</span>
+                </div>
+
+                {/* Status badges */}
+                <div className="flex flex-wrap justify-center gap-1.5 mt-3">
                   <StatusBadge status={user.kycStatus} />
                   <StatusBadge status={user.riskStatus} dot={false} />
-                  {user.suspended && (
-                    <span className="px-1.5 py-0.5 rounded-[4px] text-[10px] font-bold border border-negative/25 bg-negative/10 text-negative flex items-center gap-1">
-                      <Ban size={9} /> SUSPENDED
+                  {user.withdrawalsBlocked && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] border border-negative/25 bg-negative/8 text-negative animate-pulse">
+                      <Ban size={8} /> Payout Lock
+                    </span>
+                  )}
+                  {user.readOnlyTerminals && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] border border-warning/25 bg-warning/8 text-warning animate-pulse">
+                      <Ban size={8} /> Read-Only
+                    </span>
+                  )}
+                  {user.apiBlocked && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] border border-negative/25 bg-negative/8 text-negative animate-pulse">
+                      <Ban size={8} /> API Blocked
                     </span>
                   )}
                 </div>
-              </div>
 
-              {/* Identity & Metadata quick registry */}
-              <div className="p-5 space-y-4 text-[12px]">
-                
-                {/* Contact items */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <Mail size={11} className="text-text-muted/30" /> Email
-                    </span>
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-semibold text-text truncate font-mono text-[11px]">{user.email}</span>
-                      <button 
-                        onClick={() => handleCopyEmail(user.email)}
-                        className="p-1 rounded-[5px] border border-border/20 bg-bg text-text-muted/50 hover:text-text transition-all cursor-pointer shrink-0"
+                {/* Dynamic classification tags */}
+                {(user.tags ?? []).length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-1.5 mt-2.5 max-w-[260px]">
+                    {user.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="px-2 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] border select-none cursor-default animate-fade-in"
+                        style={{
+                          borderColor: t === 'HighRisk' ? 'rgba(239,68,68,0.3)' : t === 'VIPPriority' ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.07)',
+                          color: t === 'HighRisk' ? 'var(--negative)' : t === 'VIPPriority' ? 'var(--brand)' : 'var(--text-muted)',
+                          background: t === 'HighRisk' ? 'rgba(239,68,68,0.07)' : t === 'VIPPriority' ? 'rgba(99,102,241,0.07)' : 'rgba(255,255,255,0.02)',
+                        }}
                       >
-                        {copied ? <Check size={10} className="text-positive" /> : <Copy size={10} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <Phone size={11} className="text-text-muted/30" /> Phone
-                    </span>
-                    <span className="font-semibold text-text font-mono text-[11px]">{user.phone || '—'}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <Globe size={11} className="text-text-muted/30" /> Country
-                    </span>
-                    <span className="font-semibold text-text font-mono text-[11px]">{user.country || '—'}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <User size={11} className="text-text-muted/30" /> Classification
-                    </span>
-                    <span className="font-semibold text-text font-heading text-[11px]">{user.segment} · <span className="text-brand font-bold">{user.tier}</span></span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <ExternalLink size={11} className="text-text-muted/30" /> Source
-                    </span>
-                    <span className="font-semibold text-text-muted text-[11px]">{user.source || 'Direct signup'}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <Calendar size={11} className="text-text-muted/30" /> Registered
-                    </span>
-                    <span className="font-semibold text-text-muted/80 font-mono text-[11px]">{user.registered || '—'}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0">
-                      <Clock size={11} className="text-text-muted/30" /> Last Active
-                    </span>
-                    <span className="font-semibold text-text-muted/80 font-mono text-[11px]">{user.lastSeen || '—'}</span>
-                  </div>
-
-                  {user.address && (
-                    <div className="flex items-start justify-between gap-3 py-1 border-t border-border/12 pt-3 mt-1">
-                      <span className="text-text-muted/40 font-bold uppercase text-[9px] tracking-wider flex items-center gap-1.5 shrink-0 mt-0.5">
-                        <MapPin size={11} className="text-text-muted/30" /> Address
+                        {t}
                       </span>
-                      <span className="font-medium text-text-muted/80 text-right leading-snug break-words max-w-[200px]">{user.address}</span>
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                )}
+
+                {/* Quick-stats strip */}
+                <div className="w-full mt-5 flex divide-x divide-border/10 border-t border-border/10">
+                  <QuickStat label="MT5 Accts" value={user.mt5Accounts ?? 0} />
+                  <QuickStat
+                    label="30d P&L"
+                    value={user.pnl30d || '$0'}
+                    valueClass={isPnLNegative ? 'text-negative' : 'text-positive'}
+                  />
+                  <QuickStat label="Open Trades" value={user.openPositions ?? 0} valueClass="text-brand" />
                 </div>
-
-                {/* Quick Action Button deck */}
-                <div className="flex gap-2 border-t border-border/12 pt-4 mt-2">
-                  
-                  <button 
-                    onClick={handleOpenEdit}
-                    className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-                  >
-                    <Edit2 size={11} /> Edit Profile
-                  </button>
-
-                  <button 
-                    onClick={handleToggleSuspension}
-                    className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-[8px] text-[11px] font-bold cursor-pointer border transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97]
-                      ${user.suspended
-                        ? 'border-positive/20 bg-positive/[0.04] text-positive'
-                        : 'border-negative/20 bg-negative/[0.04] text-negative'
-                      }`}
-                  >
-                    {user.suspended ? (
-                      <>
-                        <ShieldCheck size={11} /> Unsuspend
-                      </>
-                    ) : (
-                      <>
-                        <Ban size={11} /> Suspend
-                      </>
-                    )}
-                  </button>
-
-                </div>
-
               </div>
 
+              {/* ── Identity metadata ── */}
+              <div className="px-5 py-4">
+                <ContactRow icon={Mail} label="Email">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="font-mono text-[12.5px] font-medium text-text-muted/80 truncate">{user.email}</span>
+                    <button
+                      onClick={() => handleCopyEmail(user.email)}
+                      className="shrink-0 flex h-5 w-5 items-center justify-center rounded-[4px] border border-border/18 bg-bg/40 text-text-muted/50 hover:text-text transition-all cursor-pointer"
+                    >
+                      {copied ? <Check size={9} className="text-positive" /> : <Copy size={9} />}
+                    </button>
+                  </div>
+                </ContactRow>
+
+                <ContactRow icon={Phone} label="Phone">
+                  <span className="font-mono text-[12.5px] font-medium text-text-muted/80">{user.phone || '—'}</span>
+                </ContactRow>
+
+                <ContactRow icon={Globe} label="Country">
+                  <span className="font-mono text-[12.5px] font-medium text-text-muted/80">{user.country || '—'}</span>
+                </ContactRow>
+
+                <ContactRow icon={User} label="Segment">
+                  <span className="text-[12.5px] font-medium text-text-muted/80">
+                    {user.segment} <span className="text-brand font-semibold">· {user.tier}</span>
+                  </span>
+                </ContactRow>
+
+                <ContactRow icon={ExternalLink} label="Source">
+                  <span className="text-[12.5px] font-medium text-text-muted/80">{user.source || 'Direct signup'}</span>
+                </ContactRow>
+
+                <ContactRow icon={Calendar} label="Registered">
+                  <span className="font-mono text-[12.5px] font-medium text-text-muted/80">{user.registered || '—'}</span>
+                </ContactRow>
+
+                <ContactRow icon={Clock} label="Last Active">
+                  <span className="font-mono text-[12.5px] font-medium text-text-muted/80">{user.lastSeen || '—'}</span>
+                </ContactRow>
+
+                {user.address && (
+                  <ContactRow icon={MapPin} label="Address">
+                    <span className="text-[12.5px] font-medium text-text-muted/80 text-right leading-snug break-words max-w-[180px]">
+                      {user.address}
+                    </span>
+                  </ContactRow>
+                )}
+              </div>
+
+              {/* ── Action buttons ── */}
+              <div className="px-5 pb-5 grid grid-cols-2 gap-2 border-t border-border/8 pt-4">
+                <button
+                  onClick={handleOpenEdit}
+                  className="flex items-center justify-center gap-1.5 h-8.5 rounded-[7px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold uppercase tracking-wider hover:bg-brand-hover transition-all duration-200 transform-gpu hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm shadow-brand/10"
+                >
+                  <Edit2 size={11} /> Edit Profile
+                </button>
+                <button
+                  onClick={handleToggleSuspension}
+                  className={`flex items-center justify-center gap-1.5 h-8.5 rounded-[7px] text-[11px] font-bold uppercase tracking-wider cursor-pointer border transition-all duration-200 transform-gpu hover:scale-[1.02] active:scale-[0.98]
+                    ${user.suspended
+                      ? 'border-positive/20 bg-positive/5 text-positive hover:bg-positive/10'
+                      : 'border-negative/20 bg-negative/5 text-negative hover:bg-negative/10'
+                    }`}
+                >
+                  {user.suspended
+                    ? <><ShieldCheck size={11} /> Unsuspend</>
+                    : <><Ban size={11} /> Suspend</>
+                  }
+                </button>
+              </div>
             </div>
+
+            {/* ── Equity & Balance mini-panel ── */}
+            <div className="rounded-[10px] border border-border/15 bg-surface-elevated overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-border/10 bg-bg/20">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70">Financial Snapshot</span>
+              </div>
+              <div className="divide-y divide-border/8">
+                {[
+                  { label: 'Wallet Balance', value: user.walletBalance, cls: 'text-text font-mono' },
+                  { label: 'Net Equity', value: user.equity, cls: 'text-positive font-mono' },
+                  { label: 'KYC Level', value: user.kycStatus, cls: '' },
+                  { label: 'Risk Status', value: user.riskStatus, cls: '' },
+                ].map(({ label, value, cls }) => (
+                  <div key={label} className="flex items-center justify-between px-4 py-2.5">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{label}</span>
+                    <span className={`text-[12.5px] font-semibold ${cls || 'text-text'}`}>{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
 
-          {/* ── RIGHT COLUMN: Content Tabs & Data Panels ── */}
-          <div className="lg:col-span-8 space-y-5">
-            
-            {/* Modular Tab Navigation Deck */}
-            <div className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle px-4 overflow-hidden">
-              <div className="flex gap-1 overflow-x-auto no-scrollbar pt-1.5 pb-0.5">
-                {filteredTabs.map((t) => {
+          {/* ═══════════════════════════════════════
+              RIGHT COLUMN — Tabs + Content
+          ═══════════════════════════════════════ */}
+          <div className="lg:col-span-8 space-y-4">
+
+            {/* ── Tab Navigation ── */}
+            <div className="rounded-[10px] border border-border/15 bg-surface-elevated overflow-hidden">
+              {/* Scrollable tab strip */}
+              <div className="flex overflow-x-auto no-scrollbar">
+                {filteredTabs.map((t, idx) => {
                   const Icon = tabIcons[t.id] ?? User;
                   const active = t.id === activeTab;
 
@@ -302,38 +425,47 @@ export function UserDetailPage() {
                     <button
                       key={t.id}
                       onClick={() => navigate(`/users/${userId}/${t.id}`)}
-                      className={`group relative flex h-11 items-center gap-2 border-b-2 px-3.5 transition-all duration-200 cursor-pointer whitespace-nowrap
+                      className={`relative group flex items-center gap-2 px-4 h-11 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150 cursor-pointer shrink-0 border-b-2
                         ${active
-                          ? 'border-brand text-brand font-bold'
-                          : 'border-transparent text-text-muted/40 hover:text-text-muted hover:border-white/10'
-                        }`}
+                          ? 'border-b-brand text-brand bg-brand/[0.04]'
+                          : 'border-b-transparent text-text-muted/40 hover:text-text-muted/70 hover:bg-bg/20 hover:border-b-border/20'
+                        }
+                        ${idx > 0 ? 'border-l border-l-border/8' : ''}`}
                     >
-                      <Icon size={13} className={active ? 'text-brand' : 'text-text-muted/30 group-hover:text-text-muted/50'} />
-                      <span className="text-[11px] font-bold uppercase tracking-wider font-heading">{t.label}</span>
+                      <Icon
+                        size={12}
+                        className={`shrink-0 transition-colors ${active ? 'text-brand' : 'text-text-muted/30 group-hover:text-text-muted/55'}`}
+                      />
+                      {t.label}
+                      {/* Active dot indicator */}
+                      {active && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-0.5 rounded-t-full bg-brand" />
+                      )}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Core Dossier Details Display Card */}
-            <div className="animate-in fade-in slide-in-from-bottom-1 duration-300">
-              <Card padding={true}>
-                <UserDetailContent 
-                  user={user} 
-                  activeTab={activeTab} 
-                  onUpdateUser={handleUpdateUser} 
+            {/* ── Content Panel ── */}
+            <div className="rounded-[10px] border border-border/15 bg-surface-elevated overflow-hidden animate-in fade-in slide-in-from-bottom-1 duration-250">
+              <div className="p-5">
+                <UserDetailContent
+                  user={user}
+                  activeTab={activeTab}
+                  onUpdateUser={handleUpdateUser}
+                  onCreateMt5Account={() => mt5Drawer.open(user)}
+                  onOpenMt5Account={(terminal) => mt5Drawer.open(terminal)}
                 />
-              </Card>
+              </div>
             </div>
 
           </div>
 
         </div>
-
       </div>
 
-      {/* Profile Edit Modal Drawer */}
+      {/* ── Drawers ── */}
       <AddUserDrawer
         open={formOpen}
         mode="edit"
@@ -342,6 +474,15 @@ export function UserDetailPage() {
         onSubmit={handleSaveUser}
         onClose={() => setFormOpen(false)}
       />
+      <Mt5AccountDrawer
+        open={mt5Drawer.isOpen}
+        entry={mt5Drawer.value}
+        onClose={mt5Drawer.close}
+        onSave={handleSaveMt5Account}
+        onSync={handleSyncMt5Account}
+        onResetPassword={handleResetMt5Password}
+      />
+
     </PageShell>
   );
 }

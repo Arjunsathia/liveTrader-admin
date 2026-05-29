@@ -1,111 +1,356 @@
-import React from 'react';
-import { 
-  CheckCircle, 
-  AlertCircle, 
-  TrendingUp, 
-  TrendingDown, 
-  ShieldAlert, 
-  Cpu, 
-  Landmark, 
-  Clock, 
-  FileText, 
-  ArrowDownRight, 
-  ArrowUpRight, 
-  Activity, 
-  AlertTriangle 
+import React, { useState } from 'react';
+import {
+  CheckCircle,
+  AlertCircle,
+  TrendingUp,
+  TrendingDown,
+  ShieldAlert,
+  Cpu,
+  Landmark,
+  Clock,
+  FileText,
+  ArrowDownRight,
+  ArrowUpRight,
+  Activity,
+  AlertTriangle,
+  Lock,
+  Sliders,
+  History,
+  ShieldCheck
 } from 'lucide-react';
 import { InlineAlert } from '../../../components/feedback/InlineAlert';
 import { StatusBadge } from '../../../components/ui';
-import { DrawerField, DrawerFormGrid, DrawerSection } from '../../../components/common/drawer';
+import { DrawerField, DrawerFormGrid, DrawerSection, SelectField } from '../../../components/common/drawer';
+import { usersService } from '../services/userService';
 
-export function UserDetailContent({ user, activeTab, onUpdateUser }) {
-  
-  // ── 1. OVERVIEW TAB ──
+/* ─────────────────────────────────────────────────────────────
+   INTERNAL DESIGN PRIMITIVES
+───────────────────────────────────────────────────────────── */
+
+/** Sleek section header with left-rule accent + dot marker */
+const SectionHeader = ({ title, action }) => (
+  <div className="flex items-center justify-between mb-4">
+    <div className="flex items-center gap-3">
+      <span className="block w-[3px] h-3.5 rounded-full bg-brand shrink-0" />
+      <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 select-none">
+        {title}
+      </h3>
+    </div>
+    {action && <div>{action}</div>}
+  </div>
+);
+
+/** Flat metric tile — large value, muted label below */
+const MetricTile = ({ label, value, sub, color = 'text-text', icon: Icon, accentClass = '' }) => (
+  <div className={`relative flex flex-col justify-between p-4 rounded-[8px] border border-border/15 bg-bg/20 overflow-hidden group transition-all duration-200 hover:bg-bg/40 ${accentClass}`}>
+    <div className="flex items-start justify-between mb-3">
+      <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 select-none">{label}</span>
+      {Icon && (
+        <span className="p-1.5 rounded-[5px] bg-bg/60 border border-border/10">
+          <Icon size={11} className="text-text-muted/40" />
+        </span>
+      )}
+    </div>
+    <div>
+      <p className={`text-[22px] font-semibold tracking-[-0.02em] font-mono leading-none ${color}`}>{value}</p>
+      {sub && <p className="text-[12px] text-text-muted/80 mt-1 leading-none">{sub}</p>}
+    </div>
+    {/* Subtle bottom accent line */}
+    <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-border/20 to-transparent" />
+  </div>
+);
+
+/** Horizontal data row — label left, value right */
+const DataRow = ({ label, value, mono = false, valueClass = '' }) => (
+  <div className="flex items-center justify-between py-2.5 border-b border-border/8 last:border-0 gap-4">
+    <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 shrink-0">{label}</span>
+    <span className={`text-[11.5px] font-bold text-text text-right truncate ${mono ? 'font-mono' : ''} ${valueClass}`}>{value}</span>
+  </div>
+);
+
+/** Status chip */
+const Chip = ({ label, variant = 'neutral' }) => {
+  const map = {
+    neutral: 'border-border/25 text-text-muted bg-bg/30',
+    positive: 'border-positive/25 text-positive bg-positive/5',
+    negative: 'border-negative/25 text-negative bg-negative/5',
+    warning: 'border-warning/25 text-warning bg-warning/5',
+    brand: 'border-brand/25 text-brand bg-brand/5',
+  };
+  return (
+    <span className={`px-2 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] border font-mono ${map[variant]}`}>
+      {label}
+    </span>
+  );
+};
+
+/** Pill button */
+const PillBtn = ({ onClick, children, variant = 'ghost', disabled = false, className = '' }) => {
+  const base = 'inline-flex items-center justify-center gap-1.5 px-3.5 h-8 rounded-[6px] text-[11px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97] border';
+  const variants = {
+    ghost: 'border-border/20 bg-bg/25 text-text-muted hover:text-text hover:border-border/40 hover:bg-bg/50',
+    danger: 'border-negative/20 bg-negative/5 text-negative hover:bg-negative/12 hover:border-negative/35',
+    brand: 'border-brand/25 bg-brand text-text-on-accent hover:bg-brand-hover shadow-sm shadow-brand/10',
+    warning: 'border-warning/20 bg-warning/5 text-warning hover:bg-warning/12 hover:border-warning/35',
+  };
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} className={`${base} ${variants[variant]} ${className}`}>
+      {children}
+    </button>
+  );
+};
+
+/** Glassy panel wrapper */
+const Panel = ({ children, className = '' }) => (
+  <div className={`rounded-[10px] border border-border/15 bg-bg/30 overflow-hidden ${className}`}>
+    {children}
+  </div>
+);
+
+/** Panel header strip */
+const PanelHead = ({ title, subtitle, right }) => (
+  <div className="px-4 py-3 border-b border-border/10 bg-bg/20 flex items-center justify-between gap-3 flex-wrap">
+    <div>
+      <h4 className="text-[13px] font-semibold text-text tracking-tight">{title}</h4>
+      {subtitle && <p className="text-[12px] text-text-muted/80 mt-1">{subtitle}</p>}
+    </div>
+    {right && <div>{right}</div>}
+  </div>
+);
+
+/* ─────────────────────────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────────────────────────── */
+export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Account, onOpenMt5Account }) {
+  const [selectedDoc, setSelectedDoc] = useState('passport');
+  const [rotation, setRotation] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [contrastInverted, setContrastInverted] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectionForm, setShowRejectionForm] = useState(false);
+  const [newNoteText, setNewNoteText] = useState('');
+
+  const [pendingAdjustments, setPendingAdjustments] = useState([]);
+  const [makerAmount, setMakerAmount] = useState('');
+  const [makerAsset, setMakerAsset] = useState('USD');
+  const [makerType, setMakerType] = useState('CREDIT');
+  const [makerReason, setMakerReason] = useState('');
+  const [adjustmentSuccessMsg, setAdjustmentSuccessMsg] = useState('');
+
+  const handleCreateAdjustment = (e) => {
+    e.preventDefault();
+    if (!makerAmount || parseFloat(makerAmount) <= 0) return;
+    const newAdjustment = {
+      id: `ADJ-${Date.now()}`,
+      amount: makerAmount,
+      asset: makerAsset,
+      type: makerType,
+      reason: makerReason || 'Manual balance correction',
+      maker: 'Financial Admin',
+      time: new Date().toISOString().replace('T', ' ').substring(0, 16),
+    };
+    setPendingAdjustments(prev => [...prev, newAdjustment]);
+    setMakerAmount('');
+    setMakerReason('');
+    setAdjustmentSuccessMsg('Maker adjustment queued. Awaiting Checker review.');
+    setTimeout(() => setAdjustmentSuccessMsg(''), 4000);
+  };
+
+  const handleApproveAdjustment = (adjId) => {
+    const adj = pendingAdjustments.find(a => a.id === adjId);
+    if (!adj) return;
+    const amountNum = parseFloat(adj.amount) || 0;
+    const updatedUser = usersService.adjustUserBalance(user.id, adj.asset, amountNum, adj.type);
+    if (updatedUser) {
+      usersService.logAdminAction('Financial Auditor', user.name, `Approved manual wire: ${adj.type} $${amountNum} (${adj.asset}) - Reason: ${adj.reason}`);
+      onUpdateUser?.({ walletBalance: updatedUser.walletBalance, equity: updatedUser.equity, walletHistory: updatedUser.walletHistory });
+      setPendingAdjustments(prev => prev.filter(p => p.id !== adjId));
+      setAdjustmentSuccessMsg('Adjustment successfully checker-approved.');
+      setTimeout(() => setAdjustmentSuccessMsg(''), 4000);
+    }
+  };
+
+  const handleDeclineAdjustment = (adjId) => {
+    const adj = pendingAdjustments.find(a => a.id === adjId);
+    if (adj) usersService.logAdminAction('Financial Auditor', user.name, `Declined manual wire: ${adj.type} $${adj.amount} (${adj.asset}) - Reason: ${adj.reason}`);
+    setPendingAdjustments(prev => prev.filter(p => p.id !== adjId));
+  };
+
+  const handleToggleLock = (lockKey) => {
+    const currentLocks = {
+      withdrawalsBlocked: user.withdrawalsBlocked ?? false,
+      readOnlyTerminals: user.readOnlyTerminals ?? false,
+      apiBlocked: user.apiBlocked ?? false,
+    };
+    currentLocks[lockKey] = !currentLocks[lockKey];
+    const updated = usersService.updateUserSecurityRestrictions(user.id, currentLocks);
+    if (updated) {
+      const actionVerb = currentLocks[lockKey] ? 'Enabled' : 'Disabled';
+      const lockLabel = lockKey === 'withdrawalsBlocked' ? 'Payout Lock' : lockKey === 'readOnlyTerminals' ? 'Read-Only Terminals' : 'API Connection Block';
+      usersService.logAdminAction('Compliance Officer', user.name, `${actionVerb} Restriction: ${lockLabel}`);
+      onUpdateUser?.({ withdrawalsBlocked: updated.withdrawalsBlocked, readOnlyTerminals: updated.readOnlyTerminals, apiBlocked: updated.apiBlocked });
+    }
+  };
+
+  const handleForceClose = (ticketId, symbol) => {
+    const result = usersService.forceCloseUserPosition(user.id, ticketId);
+    if (result) {
+      usersService.logAdminAction('Risk Desk', user.name, `Force Closed Position ${symbol} #${ticketId}`);
+      onUpdateUser?.({ livePositions: result.user.livePositions, tradingHistory: result.user.tradingHistory, walletBalance: result.user.walletBalance, equity: result.user.equity });
+    }
+  };
+
+  const handleForceHedge = (ticketId, symbol) => {
+    const result = usersService.forceHedgeUserPosition(user.id, ticketId);
+    if (result) {
+      usersService.logAdminAction('Risk Desk', user.name, `Hedged Position ${symbol} #${ticketId} with counter-trade #${result.hedgePosition.ticket}`);
+      onUpdateUser?.({ livePositions: result.user.livePositions });
+    }
+  };
+
+  const handleRebateRateChange = (nextRate) => {
+    const updated = usersService.updateUserRebateRate(user.id, nextRate);
+    if (updated) {
+      usersService.logAdminAction('Marketing Admin', user.name, `Updated affiliate rebate commission rate to ${nextRate}%`);
+      onUpdateUser?.({ rebateRate: nextRate });
+    }
+  };
+
+  /* ── 1. OVERVIEW ── */
   if (activeTab === 'overview') {
     const isPnLNegative = String(user.pnl30d).startsWith('-');
 
+    const handleTierChange = (nextTier) => onUpdateUser?.({ tier: nextTier });
+    const handleSegmentChange = (nextSegment) => onUpdateUser?.({ segment: nextSegment });
+
     return (
-      <div className="space-y-5 animate-fade-up">
+      <div className="space-y-6 animate-fade-up">
+
+        {/* Suspension banner */}
         {user.suspended && (
-          <div className="flex items-start gap-3 rounded-[10px] border border-negative/20 bg-negative/[0.04] p-3.5">
-            <AlertCircle size={14} className="text-negative mt-0.5 shrink-0" />
+          <div className="flex items-start gap-3 rounded-[8px] border-l-2 border-l-negative border border-negative/15 bg-negative/[0.03] px-4 py-3">
+            <AlertCircle size={13} className="text-negative mt-0.5 shrink-0" />
             <div>
-              <h4 className="text-[12px] font-bold text-negative">Administrative Suspension Active</h4>
-              <p className="text-[11px] text-negative/70 mt-0.5 leading-relaxed">
+              <h4 className="text-[12px] font-semibold text-negative">Administrative Suspension Active</h4>
+              <p className="text-[12px] text-negative/85 mt-1 leading-relaxed">
                 Trading capabilities, API access, and wallet withdrawals are locked until review completion.
               </p>
             </div>
           </div>
         )}
 
-        <DrawerSection title="Financial Ledger Overview">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-            
-            {/* Wallet Balance Card */}
-            <div className="rounded-[10px] border border-border/20 bg-bg/30 p-4 relative overflow-hidden group hover:border-brand/30 transition-all">
-              <div className="absolute top-2 right-2 p-1.5 rounded-[5px] bg-brand/5 text-brand shrink-0">
-                <Landmark size={12} />
-              </div>
-              <p className="text-[10px] font-bold text-text-muted/40 uppercase tracking-wider">Wallet Balance</p>
-              <h3 className="text-[20px] font-black tracking-tight text-text mt-2 font-mono">{user.walletBalance}</h3>
-              <p className="text-[10px] text-text-muted/65 mt-1">Total collateral asset holdings</p>
-            </div>
-
-            {/* Equity Card */}
-            <div className="rounded-[10px] border border-border/20 bg-bg/30 p-4 relative overflow-hidden group hover:border-positive/30 transition-all">
-              <div className="absolute top-2 right-2 p-1.5 rounded-[5px] bg-positive/5 text-positive shrink-0">
-                <TrendingUp size={12} />
-              </div>
-              <p className="text-[10px] font-bold text-text-muted/40 uppercase tracking-wider">Net Equity</p>
-              <h3 className="text-[20px] font-black tracking-tight text-positive mt-2 font-mono">{user.equity}</h3>
-              <p className="text-[10px] text-text-muted/65 mt-1">Real-time valuation across terminals</p>
-            </div>
-
-            {/* 30d PnL Card */}
-            <div className={`rounded-[10px] border border-border/20 bg-bg/30 p-4 relative overflow-hidden group transition-all
-              ${isPnLNegative ? 'hover:border-negative/30' : 'hover:border-positive/30'}`}>
-              <div className={`absolute top-2 right-2 p-1.5 rounded-[5px] shrink-0
-                ${isPnLNegative ? 'bg-negative/5 text-negative' : 'bg-positive/5 text-positive'}`}>
-                {isPnLNegative ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
-              </div>
-              <p className="text-[10px] font-bold text-text-muted/40 uppercase tracking-wider">30d Performance</p>
-              <h3 className={`text-[20px] font-black tracking-tight mt-2 font-mono
-                ${isPnLNegative ? 'text-negative' : 'text-positive'}`}>
-                {user.pnl30d || '$0'}
-              </h3>
-              <p className="text-[10px] text-text-muted/65 mt-1">Accumulated rolling monthly yields</p>
-            </div>
-
+        {/* ── Financial Overview ── */}
+        <div>
+          <SectionHeader title="Account Financial Overview" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <MetricTile
+              label="Wallet Balance"
+              value={user.walletBalance}
+              sub="Total funds deposited in the trader's wallet."
+              icon={Landmark}
+            />
+            <MetricTile
+              label="Net Equity"
+              value={user.equity}
+              sub="Total account value including open trades in real-time."
+              color="text-positive"
+              icon={TrendingUp}
+            />
+            <MetricTile
+              label="30d Performance"
+              value={user.pnl30d || '$0'}
+              sub="Net profit or loss generated over the last 30 days."
+              color={isPnLNegative ? 'text-negative' : 'text-positive'}
+              icon={isPnLNegative ? TrendingDown : TrendingUp}
+            />
           </div>
-        </DrawerSection>
+        </div>
 
-        <DrawerSection title="Account Setup & Terminal Inventory">
-          <DrawerFormGrid cols={2} className="mt-2">
-            <DrawerField label="KYC Status Level" value={user.kycStatus} />
-            <DrawerField label="Assigned Risk Status" value={user.riskStatus} />
-            <DrawerField label="Segment Classification" value={user.segment} />
-            <DrawerField label="Pricing Tier Level" value={user.tier} />
-            <DrawerField label="Active MT5 Terminals" value={`${user.mt5Accounts} accounts`} />
-            <DrawerField label="Open Position Count" value={`${user.openPositions} active trades`} />
-          </DrawerFormGrid>
-        </DrawerSection>
-
-        {user.notesSummary && (
-          <DrawerSection title="Compliance Operator Commentary">
-            <div className="rounded-[10px] border border-brand/12 bg-brand/[0.02] p-4 text-[12px] leading-relaxed text-text-muted/80">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText size={12} className="text-brand shrink-0" />
-                <span className="font-bold text-brand uppercase text-[10px] tracking-wider">Executive Overview</span>
-              </div>
-              {user.notesSummary}
+        {/* ── Classification ── */}
+        <div>
+          <SectionHeader title="Account Classification & MT5 Summary" />
+          <Panel>
+            <div className="divide-y divide-border/8">
+              {[
+                ['KYC Verification Level', user.kycStatus],
+                ['Assigned Risk Status', user.riskStatus],
+                ['Trader Segment', user.segment],
+                ['Pricing Tier', user.tier],
+                ['Connected MT5 Accounts', `${user.mt5Accounts} accounts`],
+                ['Active Trade Count', `${user.openPositions} active trades`],
+              ].map(([label, val], i) => (
+                <div key={i} className="px-4">
+                  <DataRow label={label} value={val} />
+                </div>
+              ))}
             </div>
-          </DrawerSection>
+          </Panel>
+        </div>
+
+        {/* ── Trader Group & Pricing ── */}
+        <div>
+          <SectionHeader title="Trader Group & Pricing Settings" />
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <SelectField
+                label="Pricing Tier"
+                value={user.tier || 'Standard'}
+                onChange={handleTierChange}
+                options={['Standard', 'Prime', 'VIP', 'Institutional', 'Partner']}
+              />
+              <SelectField
+                label="Trader Segment"
+                value={user.segment || 'Retail FX'}
+                onChange={handleSegmentChange}
+                options={['Retail FX', 'Institutional Copy', 'Prop Trader', 'IB Partner', 'MAM Manager']}
+              />
+            </div>
+
+            {/* Dynamic rule strip */}
+            <div className="grid grid-cols-3 divide-x divide-border/10 border border-border/12 rounded-[8px] overflow-hidden bg-bg/15">
+              {[
+                {
+                  label: 'Maximum Allowed Leverage',
+                  value: user.tier === 'VIP' ? '1:500' : user.tier === 'Institutional' ? '1:1000' : user.tier === 'Prime' ? '1:200' : '1:100',
+                  cls: 'text-text',
+                },
+                {
+                  label: 'Trading Commissions Discount',
+                  value: user.tier === 'VIP' ? '50% VIP rate' : user.tier === 'Institutional' ? '75% Custom rate' : user.tier === 'Prime' ? '25% discount' : 'Standard commission',
+                  cls: 'text-positive',
+                },
+                {
+                  label: 'Trading Server Routing Gateway',
+                  value: user.tier === 'Institutional' ? 'Direct LP Bridge (LD4)' : 'Retail Cluster NY4',
+                  cls: 'text-brand',
+                },
+              ].map(({ label, value, cls }, i) => (
+                <div key={i} className="px-4 py-3.5">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">{label}</span>
+                  <span className={`font-mono font-semibold text-[13px] ${cls}`}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Compliance Notes ── */}
+        {user.notesSummary && (
+          <div>
+            <SectionHeader title="Compliance Officer Comments" />
+            <Panel>
+              <div className="px-4 py-3 flex items-start gap-3">
+                <FileText size={12} className="text-brand shrink-0 mt-0.5" />
+                <p className="text-[11.5px] leading-relaxed text-text-muted/75">{user.notesSummary}</p>
+              </div>
+            </Panel>
+          </div>
         )}
       </div>
     );
   }
 
-  // ── 2. KYC SUBSECTION ──
+  /* ── 2. KYC ── */
   if (activeTab === 'kyc') {
     const isVerified = user.kycStatus === 'VERIFIED';
     const isRejected = user.kycStatus === 'REJECTED';
@@ -114,415 +359,943 @@ export function UserDetailContent({ user, activeTab, onUpdateUser }) {
       if (onUpdateUser) {
         onUpdateUser({
           kycStatus: 'VERIFIED',
-          kyc: {
-            ...user.kyc,
-            status: 'VERIFIED',
-            reviewer: 'Compliance Officer',
-            submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16),
-          }
+          kyc: { ...user.kyc, status: 'VERIFIED', reviewer: 'Compliance Officer', submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16) }
         });
       }
     };
 
     const handleReject = () => {
+      if (!rejectionReason.trim()) { setShowRejectionForm(true); return; }
       if (onUpdateUser) {
         onUpdateUser({
           kycStatus: 'REJECTED',
-          kyc: {
-            ...user.kyc,
-            status: 'REJECTED',
-            reviewer: 'Compliance Officer',
-            submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16),
-          }
+          kyc: { ...user.kyc, status: 'REJECTED', reviewer: 'Compliance Officer', submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16), aml: `Failed compliance criteria: ${rejectionReason}` }
         });
+        setShowRejectionForm(false);
       }
     };
 
+    const docSrc = selectedDoc === 'passport' ? '/mock_passport.png' : '/mock_utility_bill.png';
+    const statusConfig = isVerified
+      ? { border: 'border-l-positive border-positive/12 bg-positive/[0.03]', icon: <CheckCircle size={13} className="text-positive" />, titleCls: 'text-positive', text: 'Verification Complete: The identity document and address bill have been reviewed and approved.' }
+      : isRejected
+      ? { border: 'border-l-negative border-negative/12 bg-negative/[0.03]', icon: <ShieldAlert size={13} className="text-negative" />, titleCls: 'text-negative', text: `Verification Rejected: This account did not pass review. Reason: ${user.kyc?.aml || 'Operator rejection'}` }
+      : { border: 'border-l-warning border-warning/12 bg-warning/[0.03]', icon: <Clock size={13} className="text-warning" />, titleCls: 'text-warning', text: 'Pending Review: The submitted documents are waiting for administrator approval.' };
+
     return (
       <div className="space-y-5 animate-fade-up">
-        <div className={`flex items-start gap-3 rounded-[10px] border p-4 shadow-sm
-          ${isVerified 
-            ? 'border-positive/20 bg-positive/[0.04]' 
-            : isRejected 
-            ? 'border-negative/20 bg-negative/[0.04]' 
-            : 'border-warning/20 bg-warning/[0.04]'
-          }`}
-        >
-          <div className="shrink-0 mt-0.5">
-            {isVerified ? (
-              <CheckCircle size={14} className="text-positive" />
-            ) : isRejected ? (
-              <ShieldAlert size={14} className="text-negative" />
-            ) : (
-              <Clock size={14} className="text-warning" />
-            )}
-          </div>
+
+        {/* Status banner */}
+        <div className={`flex items-start gap-3 rounded-[8px] border-l-2 border px-4 py-3 ${statusConfig.border}`}>
+          <div className="shrink-0 mt-0.5">{statusConfig.icon}</div>
           <div>
-            <h4 className={`text-[12px] font-bold
-              ${isVerified ? 'text-positive' : isRejected ? 'text-negative' : 'text-warning'}`}
-            >
-              Verification Registry Status: {user.kycStatus}
-            </h4>
-            <p className="text-[11px] text-text-muted/85 mt-1 leading-relaxed">
-              {isVerified
-                ? 'All mandatory identity documents and AML watchlist screenings have been verified and approved.'
-                : isRejected
-                ? 'This verification case has failed compliance criteria and requires operator review.'
-                : 'Documents have been logged and are currently pending review in the compliance queue.'}
-            </p>
+            <h4 className={`text-[12.5px] font-semibold ${statusConfig.titleCls}`}>Account Verification Status: {user.kycStatus}</h4>
+            <p className="text-[12.5px] text-text-muted/80 mt-1 leading-relaxed">{statusConfig.text}</p>
           </div>
         </div>
 
-        {user.kycStatus === 'PENDING' && (
-          <div className="rounded-[12px] border border-brand/25 bg-brand/[0.02] p-5 shadow-card-subtle flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div>
-              <h4 className="text-[13.5px] font-black text-text tracking-tight">Compliance Action Center</h4>
-              <p className="text-[11px] text-text-muted/65 mt-1 max-w-md leading-relaxed">
-                Review the submitted documents below. As a compliance operator, you can verify and approve the credentials or reject the submission.
-              </p>
-            </div>
-            <div className="flex items-center gap-2.5 shrink-0">
-              <button 
-                onClick={handleReject}
-                className="flex items-center justify-center gap-1.5 px-4 h-9 rounded-[8px] border border-negative/20 bg-negative/5 hover:bg-negative/10 text-negative text-[11px] font-bold transition-all cursor-pointer hover:border-negative/30"
-              >
-                Reject Submission
-              </button>
-              <button 
-                onClick={handleApprove}
-                className="flex items-center justify-center gap-1.5 px-4 h-9 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 hover:bg-brand-hover text-[11px] font-bold transition-all duration-300 transform-gpu hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-sm"
-              >
-                Approve Documents
-              </button>
-            </div>
-          </div>
-        )}
+        {/* KYC workspace */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-        <DrawerSection title="KYC Audit Details">
-          <DrawerFormGrid cols={2} className="mt-2">
-            <DrawerField label="Compliance Level" value={user.kyc?.level || 'Level 1'} />
-            <DrawerField label="Submission Date" value={user.kyc?.submittedAt || '—'} mono />
-            <DrawerField label="Reviewed By" value={user.kyc?.reviewer || 'Compliance Queue'} />
-            <DrawerField label="Verification Status" value={user.kyc?.status || 'PENDING'} />
-          </DrawerFormGrid>
-        </DrawerSection>
-
-        <DrawerSection title="Submitted Identity Credentials">
-          <div className="space-y-2 mt-2">
-            {(user.kyc?.documents ?? []).length > 0 ? (
-              user.kyc.documents.map((docName) => (
-                <div key={docName} className="flex items-center justify-between rounded-[8px] border border-border/20 bg-bg/40 px-3.5 py-2.5 hover:border-white/10 transition-colors">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <FileText size={12} className="text-text-muted/40 shrink-0" />
-                    <span className="text-[12px] font-semibold text-text truncate">{docName}</span>
+          {/* LEFT: Document viewer */}
+          <div className="lg:col-span-7">
+            <Panel>
+              <PanelHead
+                title="Document Viewer"
+                right={
+                  <div className="flex items-center gap-2">
+                    {/* Doc tabs */}
+                    <div className="flex bg-bg/40 rounded-[5px] border border-border/15 overflow-hidden">
+                      {[['passport', 'Passport ID'], ['address', 'Address Bill']].map(([key, label]) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => { setSelectedDoc(key); setRotation(0); setZoom(1); }}
+                          className={`px-3 h-7 text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer
+                            ${selectedDoc === key ? 'bg-brand text-text-on-accent' : 'text-text-muted hover:text-text'}`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Controls */}
+                    <div className="flex items-center gap-1 border border-border/15 rounded-[5px] overflow-hidden bg-bg/40">
+                      {[
+                        { title: 'Rotate 90°', label: '↻', action: () => setRotation(r => (r + 90) % 360) },
+                        { title: 'Zoom In', label: '+', action: () => setZoom(z => Math.min(z + 0.25, 2.5)) },
+                        { title: 'Zoom Out', label: '−', action: () => setZoom(z => Math.max(z - 0.25, 0.75)) },
+                      ].map(({ title, label, action }) => (
+                        <button key={label} type="button" title={title} onClick={action}
+                          className="h-7 w-7 flex items-center justify-center text-[11px] font-bold text-text-muted hover:text-text hover:bg-bg/60 transition-all cursor-pointer border-r border-border/10 last:border-0">
+                          {label}
+                        </button>
+                      ))}
+                      <button type="button" title="Invert Colors" onClick={() => setContrastInverted(v => !v)}
+                        className={`h-7 px-2.5 text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer
+                          ${contrastInverted ? 'bg-warning/20 text-warning' : 'text-text-muted hover:text-text hover:bg-bg/60'}`}>
+                        INV
+                      </button>
+                    </div>
                   </div>
-                  <span className="px-1.5 py-0.5 rounded-[4px] text-[9.5px] font-black border border-positive/20 bg-positive/[0.04] text-positive uppercase tracking-wider">
-                    Received
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-[8px] border border-dashed border-border/25 p-5 text-center text-[12px] text-text-muted/40 italic">
-                No credentials uploaded yet.
+                }
+              />
+              <div className="relative h-[288px] flex items-center justify-center bg-bg overflow-hidden">
+                <img
+                  src={docSrc}
+                  alt="Verification Document"
+                  className="max-h-full max-w-full object-contain transition-all duration-300 transform-gpu"
+                  style={{ transform: `rotate(${rotation}deg) scale(${zoom})`, filter: contrastInverted ? 'invert(1) contrast(1.2)' : 'none' }}
+                />
+                <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-[3px] bg-bg/90 border border-border/12 text-[8.5px] font-mono text-text-muted/50 uppercase tracking-wide">
+                  1024 × 680 · Safe
+                </span>
               </div>
-            )}
+            </Panel>
           </div>
-          {user.kyc?.aml && (
-            <div className="mt-4 p-3 rounded-[8px] border border-border/12 bg-bg/25 flex items-start gap-2.5">
-              <Cpu size={12} className="text-brand shrink-0 mt-0.5" />
-              <div>
-                <h5 className="text-[10px] font-bold uppercase tracking-wider text-brand">AML Watchlist Screening</h5>
-                <p className="text-[11px] text-text-muted/75 mt-0.5 leading-relaxed">{user.kyc.aml}</p>
+
+          {/* RIGHT: Checklist + actions */}
+          <div className="lg:col-span-5 flex flex-col gap-3">
+            {/* Checklist */}
+            <Panel className="flex-1">
+              <PanelHead title="Required Verification Checklist" />
+              <div className="divide-y divide-border/8">
+                {[
+                  ['Identity Document (Passport/ID)', `Verified Level 1 (Submitted Passport ID)`],
+                  ['Global Sanctions & AML Watchlist Check', 'AML screening reports CLEAR - System approved.'],
+                  ['Full Name Match', `Name matches identity document: "${user.name}"`],
+                  ['Address Match', `Address matches utility bill/bank statement: "${user.address || 'Standard Address'}"`],
+                ].map(([label, val], idx) => (
+                  <div key={idx} className="flex items-start gap-3 px-4 py-2.5">
+                    <input type="checkbox" defaultChecked className="mt-0.5 accent-brand cursor-pointer shrink-0" />
+                    <div>
+                      <h5 className="text-[11px] font-bold text-text leading-tight">{label}</h5>
+                      <p className="text-[9.5px] text-text-muted/50 mt-0.5 leading-snug">{val}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </Panel>
+
+            {/* Decision desk */}
+            <Panel>
+              <PanelHead title="Compliance Operations Desk" />
+              <div className="p-4">
+                {showRejectionForm ? (
+                  <div className="space-y-2.5 animate-fade-in">
+                    <textarea
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="Provide a clear rejection reason (e.g., Expired ID, utility bill name mismatch)..."
+                      className="w-full text-[11px] p-2.5 rounded-[6px] border border-negative/30 bg-bg text-text outline-none focus:border-negative transition-all resize-none"
+                      rows={2}
+                    />
+                    <div className="flex gap-2">
+                      <PillBtn onClick={() => setShowRejectionForm(false)} variant="ghost" className="flex-1">Cancel</PillBtn>
+                      <PillBtn onClick={handleReject} variant="danger" className="flex-1">Confirm Reject</PillBtn>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <PillBtn onClick={() => setShowRejectionForm(true)} variant="danger" className="flex-1">Reject KYC</PillBtn>
+                    <PillBtn onClick={handleApprove} variant="brand" className="flex-1">Approve KYC</PillBtn>
+                  </div>
+                )}
+              </div>
+            </Panel>
+          </div>
+
+        </div>
+
+        {/* Metadata */}
+        <div>
+          <SectionHeader title="Verification History & Metadata" />
+          <Panel>
+            <div className="divide-y divide-border/8">
+              {[
+                ['Verification Level', user.kyc?.level || 'Level 1', false],
+                ['Submission Date & Time', user.kyc?.submittedAt || '2026-03-31 10:00', true],
+                ['Assigned Reviewer', user.kyc?.reviewer || 'Compliance Queue', false],
+                ['Uploaded File Names', (user.kyc?.documents ?? []).join(', ') || 'PassportID.jpg, UtilityBill.jpg', false],
+              ].map(([label, val, mono], i) => (
+                <div key={i} className="px-4"><DataRow label={label} value={val} mono={mono} /></div>
+              ))}
             </div>
-          )}
-        </DrawerSection>
+          </Panel>
+        </div>
+
       </div>
     );
   }
 
-  // ── 3. WALLET BALANCES SUBSECTION ──
+  /* ── 3. WALLET ── */
   if (activeTab === 'wallet') {
     return (
       <div className="space-y-5 animate-fade-up">
-        <DrawerSection title="Collateral Assets Summary">
-          <div className="space-y-3 mt-2">
-            {(user.wallet ?? []).length > 0 ? (
-              user.wallet.map((w, idx) => (
-                <div key={idx} className="rounded-[10px] border border-border/20 bg-bg/25 p-4 shadow-card-subtle flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:border-brand/20 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-[8px] border border-brand/20 bg-brand/[0.04] text-brand flex items-center justify-center font-black text-[13px] font-heading shrink-0 select-none">
-                      {w.asset}
-                    </div>
-                    <div>
-                      <h4 className="text-[13px] font-black text-text">{w.asset} Wallet</h4>
-                      <p className="text-[11px] text-text-muted/50 mt-0.5">Primary trading collateral</p>
-                    </div>
+
+        {/* Success toast */}
+        {adjustmentSuccessMsg && (
+          <div className="flex items-center gap-2.5 rounded-[6px] border-l-2 border-l-brand border border-brand/15 bg-brand/[0.04] px-4 py-2.5 text-[11px] font-bold text-brand">
+            <CheckCircle size={12} className="shrink-0" />
+            {adjustmentSuccessMsg}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          {/* LEFT: Assets + History */}
+          <div className="lg:col-span-7 space-y-5">
+
+            {/* Wallet assets */}
+            <div>
+              <SectionHeader title="Wallet Assets Balance" />
+              <div className="space-y-2.5">
+                {(user.wallet ?? []).length > 0 ? (
+                  user.wallet.map((w, idx) => (
+                    <Panel key={idx}>
+                      <div className="flex items-center gap-4 p-4">
+                        {/* Asset badge */}
+                        <div className="h-9 w-9 rounded-[7px] border border-brand/20 bg-brand/[0.06] text-brand flex items-center justify-center font-semibold text-[12px] font-mono shrink-0">
+                          {w.asset}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[13px] font-semibold text-text">{w.asset} Wallet</h4>
+                          <p className="text-[12px] text-text-muted/80 mt-1">Primary trading account currency.</p>
+                        </div>
+                        {/* Metrics */}
+                        <div className="flex items-center divide-x divide-border/15 shrink-0">
+                          {[
+                            { label: 'Balance', val: user.walletBalance, cls: 'text-text' },
+                            { label: 'Available', val: user.walletBalance, cls: 'text-positive' },
+                            { label: 'Hold', val: '$0.00', cls: 'text-text-muted/50' },
+                          ].map(({ label, val, cls }) => (
+                            <div key={label} className="px-4 text-right">
+                              <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{label}</p>
+                              <p className={`font-mono text-[12.5px] font-semibold mt-0.5 ${cls}`}>{val}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Panel>
+                  ))
+                ) : (
+                  <div className="rounded-[8px] border border-dashed border-border/20 p-6 text-center text-[11.5px] text-text-muted/40 italic">
+                    No collateral balances registered.
                   </div>
-                  <div className="grid grid-cols-3 gap-6 sm:gap-12 shrink-0">
-                    <div>
-                      <p className="text-[9.5px] font-bold text-text-muted/45 uppercase tracking-wider">Balance</p>
-                      <p className="text-[13px] font-black font-mono text-text mt-0.5">{w.balance}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Transaction history */}
+            <div>
+              <SectionHeader title="Deposit & Withdrawal Transaction History" />
+              <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1 no-scrollbar">
+                {(user.walletHistory ?? []).length > 0 ? (
+                  user.walletHistory.map((tx) => {
+                    const isDebit = tx.type === 'WITHDRAWAL';
+                    return (
+                      <div key={tx.id}
+                        className={`flex items-center justify-between gap-4 px-4 py-2.5 rounded-[7px] border-l-2 border border-border/10 bg-bg/20 hover:bg-bg/35 transition-all
+                          ${isDebit ? 'border-l-negative' : 'border-l-positive'}`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`p-1.5 rounded-[5px] shrink-0 ${isDebit ? 'bg-negative/8 text-negative' : 'bg-positive/8 text-positive'}`}>
+                            {isDebit ? <ArrowDownRight size={11} /> : <ArrowUpRight size={11} />}
+                          </div>
+                          <div>
+                            <h4 className="text-[11.5px] font-bold text-text leading-tight">{tx.method}</h4>
+                            <p className="text-[9.5px] text-text-muted/45 mt-0.5 font-mono uppercase">
+                              {tx.type} · <span className="text-positive font-bold">{tx.status}</span>
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className={`font-mono text-[12px] font-black block ${isDebit ? 'text-negative' : 'text-positive'}`}>{tx.amount}</span>
+                          <span className="font-mono text-[9px] text-text-muted/35 block mt-0.5">{tx.time}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="rounded-[8px] border border-dashed border-border/20 p-6 text-center text-[11.5px] text-text-muted/40 italic">
+                    No transactions recorded.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT: Maker-Checker */}
+          <div className="lg:col-span-5 space-y-4">
+
+            {/* Maker form */}
+            <Panel>
+              <PanelHead
+                title="Add Balance Adjustment"
+                subtitle="Request a manual balance increase (Credit) or decrease (Debit). This must be approved by another administrator."
+              />
+              <div className="p-4">
+                <form onSubmit={handleCreateAdjustment} className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Select Action', val: makerType, set: setMakerType, opts: [['CREDIT', 'CREDIT (Add)'], ['DEBIT', 'DEBIT (Remove)']] },
+                      { label: 'Currency Asset', val: makerAsset, set: setMakerAsset, opts: [['USD', 'USD'], ['BTC', 'BTC'], ['EUR', 'EUR']] },
+                    ].map(({ label, val, set, opts }) => (
+                      <div key={label}>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">{label}</label>
+                        <select value={val} onChange={e => set(e.target.value)}
+                          className="w-full h-8 text-[12px] px-2.5 rounded-[6px] border border-border/18 bg-bg text-text outline-none focus:border-brand/40 transition-all font-semibold">
+                          {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">Adjustment Amount (USD)</label>
+                    <input type="number" value={makerAmount} onChange={e => setMakerAmount(e.target.value)}
+                      placeholder="e.g. 5000.00" required step="0.01" min="0.01"
+                      className="w-full h-8 text-[12px] px-2.5 rounded-[6px] border border-border/18 bg-bg text-text outline-none focus:border-brand/40 font-mono transition-all font-semibold" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 block mb-1">Detailed Reason for Adjustment</label>
+                    <textarea value={makerReason} onChange={e => setMakerReason(e.target.value)}
+                      placeholder="Write a detailed reason for the wire exception or correction..." required
+                      className="w-full text-[12px] p-2.5 rounded-[6px] border border-border/18 bg-bg text-text outline-none focus:border-brand/40 resize-none transition-all"
+                      rows={2} />
+                  </div>
+                  <button type="submit"
+                    className="w-full h-8 rounded-[6px] bg-brand text-text-on-accent border border-brand/20 hover:bg-brand-hover text-[11px] font-bold uppercase tracking-wider transition-all active:scale-[0.98] cursor-pointer">
+                    Create Adjustment Request
+                  </button>
+                </form>
+              </div>
+            </Panel>
+
+            {/* Checker queue */}
+            <Panel>
+              <PanelHead
+                title="Review Balance Adjustments"
+                subtitle="Review and approve or decline pending balance adjustment requests created by other administrators."
+              />
+              <div className="p-4 space-y-2.5 max-h-[300px] overflow-y-auto no-scrollbar">
+                {pendingAdjustments.length > 0 ? (
+                  pendingAdjustments.map((adj) => (
+                    <div key={adj.id} className="rounded-[8px] border border-border/15 bg-bg/20 overflow-hidden">
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-border/10">
+                        <Chip label={adj.type} variant={adj.type === 'CREDIT' ? 'positive' : 'negative'} />
+                        <span className="font-mono text-text font-semibold text-[12.5px]">${parseFloat(adj.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="px-3 py-2.5">
+                        <p className="text-[12px] text-text-muted/80 leading-relaxed">Reason: "{adj.reason}"</p>
+                        <p className="text-[11px] text-text-muted/70 font-semibold mt-1">Requested by {adj.maker} · {adj.time}</p>
+                      </div>
+                      <div className="flex border-t border-border/8">
+                        <button onClick={() => handleDeclineAdjustment(adj.id)}
+                          className="flex-1 h-7 text-negative text-[11px] font-bold uppercase tracking-wider hover:bg-negative/5 transition-all cursor-pointer border-r border-border/10">
+                          Decline
+                        </button>
+                        <button onClick={() => handleApproveAdjustment(adj.id)}
+                          className="flex-1 h-7 text-brand text-[11px] font-bold uppercase tracking-wider hover:bg-brand/5 transition-all cursor-pointer">
+                          Approve & Apply
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[9.5px] font-bold text-text-muted/45 uppercase tracking-wider">Available</p>
-                      <p className="text-[13px] font-semibold font-mono text-positive mt-0.5">{w.available}</p>
+                  ))
+                ) : (
+                  <div className="rounded-[8px] border border-dashed border-border/18 p-5 text-center text-[11px] text-text-muted/35 italic">
+                    No adjustments are currently waiting for checker approval.
+                  </div>
+                )}
+              </div>
+            </Panel>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── 4. MT5 TERMINALS ── */
+  if (activeTab === 'mt5-accounts') {
+    return (
+      <div className="space-y-5 animate-fade-up">
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-[15px] font-semibold tracking-tight text-text">MT5 Trading Accounts List</h3>
+            <p className="text-[12.5px] text-text-muted/80 mt-1">Create, monitor, and configure settings for active trading accounts.</p>
+          </div>
+          <PillBtn onClick={onCreateMt5Account} variant="brand">Create New MT5 Account</PillBtn>
+        </div>
+
+        <div>
+          <SectionHeader title="Connected MT5 Accounts" />
+          <div className="space-y-3">
+            {(user.mt5 ?? []).length > 0 ? (
+              user.mt5.map((terminal) => (
+                <div
+                  key={terminal.login}
+                  onClick={() => onOpenMt5Account?.(terminal)}
+                  className="rounded-[10px] border border-border/15 bg-bg/20 overflow-hidden hover:border-brand/40 hover:bg-bg/35 transition-all duration-200 transform-gpu hover:scale-[1.005] cursor-pointer"
+                >
+                  {/* Header */}
+                  <div className="px-4 py-2.5 border-b border-border/10 bg-bg/20 flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-mono text-[13.5px] font-semibold text-brand">{terminal.login}</span>
+                      <span className="px-2 py-0.5 rounded-[4px] text-[9px] font-bold border border-border/20 text-text-muted font-mono bg-bg/60">
+                        {terminal.server}
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-[9.5px] font-bold text-text-muted/45 uppercase tracking-wider">Hold</p>
-                      <p className="text-[13px] font-semibold font-mono text-text-muted/65 mt-0.5">{w.hold}</p>
-                    </div>
+                    <StatusBadge status={terminal.status} />
+                  </div>
+
+                  {/* Parameters */}
+                  <div className="grid grid-cols-4 divide-x divide-border/8 px-0">
+                    {[
+                      { label: 'Leverage Ratio', val: terminal.leverage, cls: '' },
+                      { label: 'Account Group', val: terminal.group, cls: 'font-mono' },
+                      { label: 'Net Equity', val: terminal.equity, cls: 'font-mono text-brand' },
+                      { label: 'Margin Level', val: terminal.marginLevel ?? terminal.marginLvl ?? '—', cls: 'font-mono' },
+                    ].map(({ label, val, cls }) => (
+                      <div key={label} className="px-4 py-3">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{label}</p>
+                        <p className={`text-[12.5px] font-semibold text-text mt-0.5 ${cls}`}>{val}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-4 py-2 bg-bg/15 border-t border-border/8 flex justify-between items-center text-[11px] text-text-muted/70 font-mono">
+                    <span className="flex items-center gap-1.5"><Clock size={9} /> MT5 Server Connection Active</span>
+                    <span>Last Synchronized: {terminal.lastSync}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="rounded-[10px] border border-dashed border-border/25 p-6 text-center text-[12px] text-text-muted/40 italic">
-                No collateral balances registered.
+              <div className="rounded-[10px] border border-dashed border-border/20 p-10 text-center flex flex-col items-center">
+                <div className="h-10 w-10 rounded-full border border-brand/15 bg-brand/5 text-brand flex items-center justify-center mb-3">
+                  <Cpu size={17} />
+                </div>
+                <h4 className="text-[13px] font-bold text-text">No Active MT5 Accounts</h4>
+                <p className="text-[10.5px] text-text-muted/45 mt-1 max-w-xs leading-relaxed">
+                  This trader does not have any active MT5 accounts. Create a new account with custom leverage and initial balance settings instantly.
+                </p>
+                <PillBtn onClick={onCreateMt5Account} variant="brand" className="mt-4">Create New MT5 Account</PillBtn>
               </div>
             )}
           </div>
-        </DrawerSection>
+        </div>
       </div>
     );
   }
 
-  // ── 4. MT5 TERMINALS SUBSECTION ──
-  if (activeTab === 'mt5-accounts') {
+  /* ── 5. TRADE LOG ── */
+  if (activeTab === 'trading-history') {
     return (
-      <div className="space-y-5 animate-fade-up">
-        <DrawerSection title="Connected MetaTrader 5 Accounts">
-          <div className="space-y-4 mt-2">
-            {(user.mt5 ?? []).length > 0 ? (
-              user.mt5.map((terminal) => {
+      <div className="space-y-6 animate-fade-up">
+
+        {/* Live positions */}
+        <div>
+          <SectionHeader title="Active Open Positions" />
+          <div className="space-y-2.5">
+            {(user.livePositions ?? []).length > 0 ? (
+              user.livePositions.map((trade) => {
+                const isLoss = String(trade.pnl).startsWith('-');
+                const isBuy = trade.side === 'BUY';
                 return (
-                  <div key={terminal.login} className="rounded-[12px] border border-border/20 bg-bg/20 overflow-hidden shadow-card-subtle hover:border-white/10 transition-colors">
-                    
-                    {/* Header bar */}
-                    <div className="px-4 py-3 border-b border-border/12 bg-bg/10 flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[13px] font-black text-brand">{terminal.login}</span>
-                        <span className="px-1.5 py-0.5 rounded-[4px] text-[9.5px] font-bold border border-border/25 text-text-muted font-mono bg-surface-elevated/40">
-                          {terminal.server}
+                  <Panel key={trade.ticket}>
+                    <div className="flex flex-col md:flex-row md:items-center gap-4 p-4">
+                      {/* Side + Symbol */}
+                      <div className="flex items-center gap-3 min-w-[140px]">
+                        <span className={`h-8 w-12 rounded-[6px] text-[11px] font-bold uppercase tracking-wider flex items-center justify-center border shrink-0
+                          ${isBuy ? 'border-positive/20 bg-positive/8 text-positive' : 'border-negative/20 bg-negative/8 text-negative'}`}>
+                          {trade.side}
                         </span>
+                        <div>
+                          <h4 className="text-[13px] font-semibold text-text">{trade.symbol}</h4>
+                          <p className="font-mono text-[11px] text-text-muted/70 mt-1">#{trade.ticket}</p>
+                        </div>
                       </div>
-                      <StatusBadge status={terminal.status} />
-                    </div>
 
-                    {/* Content quick parameters */}
-                    <div className="p-4">
-                      <DrawerFormGrid cols={4}>
-                        <DrawerField label="Leverage" value={terminal.leverage} />
-                        <DrawerField label="Terminal Group" value={terminal.group} mono />
-                        <DrawerField label="Net Equity" value={terminal.equity} mono accent="var(--brand)" />
-                        <DrawerField label="Margin Level" value={terminal.marginLevel} mono />
-                      </DrawerFormGrid>
-                    </div>
+                      {/* Metrics */}
+                      <div className="flex-1 grid grid-cols-4 gap-4 border-x border-border/10 px-4">
+                        {[
+                          { label: 'Volume (Lots)', val: trade.lots },
+                          { label: 'Entry Price', val: trade.openPrice },
+                          { label: 'Live Price', val: trade.livePrice },
+                          { label: 'Swaps', val: trade.swaps },
+                        ].map(({ label, val }) => (
+                          <div key={label}>
+                            <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{label}</p>
+                            <p className="font-mono text-[12px] font-semibold text-text mt-0.5">{val}</p>
+                          </div>
+                        ))}
+                      </div>
 
-                    {/* Timeline synchronization indicator */}
-                    <div className="px-4 py-2 bg-bg/30 border-t border-border/8 flex justify-between items-center text-[10px] text-text-muted/40">
-                      <span className="flex items-center gap-1">
-                        <Clock size={10} /> MT5 API Bridge Connected
-                      </span>
-                      <span className="font-mono">Last Synchronized: {terminal.lastSync}</span>
+                      {/* PnL + actions */}
+                      <div className="flex items-center gap-4 shrink-0">
+                        <div className="text-right">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">P&L</p>
+                          <p className={`font-mono font-semibold text-[14px] mt-0.5 ${isLoss ? 'text-negative' : 'text-positive'}`}>{trade.pnl}</p>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <PillBtn onClick={() => handleForceHedge(trade.ticket, trade.symbol)} variant="warning">
+                            Emergency Hedge
+                          </PillBtn>
+                          <PillBtn onClick={() => handleForceClose(trade.ticket, trade.symbol)} variant="danger">
+                            Force Close Trade
+                          </PillBtn>
+                        </div>
+                      </div>
                     </div>
-
-                  </div>
+                  </Panel>
                 );
               })
             ) : (
-              <div className="rounded-[10px] border border-dashed border-border/25 p-6 text-center text-[12px] text-text-muted/40 italic">
-                No active MetaTrader 5 accounts mapped.
+              <div className="rounded-[8px] border border-dashed border-border/18 p-7 text-center text-[11.5px] text-text-muted/40 italic">
+                No active open positions on MT5 servers.
               </div>
             )}
           </div>
-        </DrawerSection>
-      </div>
-    );
-  }
+        </div>
 
-  // ── 5. EXECUTED TRADE LOG ──
-  if (activeTab === 'trading-history') {
-    return (
-      <div className="space-y-5 animate-fade-up">
-        <DrawerSection title="Executed Terminals Ledger">
-          <div className="space-y-3.5 mt-2">
+        {/* Closed history */}
+        <div>
+          <SectionHeader title="Closed Trades History Log" />
+          <div className="space-y-1.5">
             {(user.tradingHistory ?? []).length > 0 ? (
               user.tradingHistory.map((trade) => {
                 const isLoss = String(trade.pnl).startsWith('-');
                 const isBuy = trade.side === 'BUY';
-
                 return (
-                  <div key={trade.ticket} className="rounded-[10px] border border-border/20 bg-bg/25 p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-card-subtle hover:border-white/10 transition-colors">
-                    
-                    {/* Instrument Side */}
+                  <div key={trade.ticket}
+                    className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-2.5 rounded-[7px] border-l-2 border border-border/10 bg-bg/18 hover:bg-bg/30 transition-all
+                      ${isBuy ? 'border-l-positive' : 'border-l-negative'}`}>
                     <div className="flex items-center gap-3">
-                      <div className={`h-8 w-12 rounded-[6px] text-[10px] font-black uppercase tracking-wider flex items-center justify-center font-heading shrink-0 select-none
-                        ${isBuy 
-                          ? 'border border-positive/20 bg-positive/10 text-positive' 
-                          : 'border border-negative/20 bg-negative/10 text-negative'
-                        }`}
-                      >
+                      <span className={`h-7 w-10 rounded-[5px] text-[11px] font-bold uppercase flex items-center justify-center border shrink-0
+                        ${isBuy ? 'border-positive/18 bg-positive/6 text-positive' : 'border-negative/18 bg-negative/6 text-negative'}`}>
                         {trade.side}
-                      </div>
+                      </span>
                       <div>
-                        <h4 className="text-[13px] font-black text-text leading-tight">{trade.symbol}</h4>
-                        <p className="font-mono text-[10px] text-text-muted/45 mt-1 leading-none">TICKET #{trade.ticket}</p>
+                        <h4 className="text-[13px] font-semibold text-text">{trade.symbol}</h4>
+                        <p className="font-mono text-[11px] text-text-muted/70 mt-1">#{trade.ticket}</p>
                       </div>
                     </div>
-
-                    {/* Parameters Grid */}
-                    <div className="grid grid-cols-3 gap-6 sm:gap-10 shrink-0 text-[12px]">
-                      <div>
-                        <p className="text-[9.5px] font-bold text-text-muted/45 uppercase tracking-wider">Lot Size</p>
-                        <p className="font-mono text-text font-bold mt-0.5">{trade.lots}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9.5px] font-bold text-text-muted/45 uppercase tracking-wider">Execution (O/C)</p>
-                        <p className="font-mono text-text-muted mt-0.5 leading-tight">{trade.open}<br/>{trade.close}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[9.5px] font-bold text-text-muted/45 uppercase tracking-wider">Net Profits</p>
-                        <p className={`font-mono font-black mt-0.5 text-[13px]
-                          ${isLoss ? 'text-negative' : 'text-positive'}`}
-                        >
-                          {trade.pnl}
-                        </p>
-                      </div>
+                    <div className="grid grid-cols-3 gap-8 shrink-0">
+                      {[
+                        { label: 'Volume (Lots)', val: trade.lots, cls: '' },
+                        { label: 'Entry / Close', val: `${trade.open} → ${trade.close}`, cls: 'font-mono text-text-muted/65' },
+                        { label: 'P&L', val: trade.pnl, cls: `font-mono font-semibold ${isLoss ? 'text-negative' : 'text-positive'}` },
+                      ].map(({ label, val, cls }) => (
+                        <div key={label} className="text-right">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">{label}</p>
+                          <p className={`text-[12px] font-semibold mt-0.5 ${cls}`}>{val}</p>
+                        </div>
+                      ))}
                     </div>
-
                   </div>
                 );
               })
             ) : (
-              <div className="rounded-[10px] border border-dashed border-border/25 p-6 text-center text-[12px] text-text-muted/40 italic">
-                No trading ledger recordings logged.
+              <div className="rounded-[8px] border border-dashed border-border/18 p-6 text-center text-[11.5px] text-text-muted/40 italic">
+                No closed trades recorded in the ledger yet.
               </div>
             )}
           </div>
-        </DrawerSection>
+        </div>
       </div>
     );
   }
 
-  // ── 6. AUDIT STREAM ──
+  /* ── 6. ACTIVITY LOGS ── */
   if (activeTab === 'activity-logs') {
+    const handleRevokeSession = (sessionId) => {
+      const updatedSessions = (user.sessions ?? []).filter((s) => s.id !== sessionId);
+      onUpdateUser?.({ sessions: updatedSessions });
+    };
+
     return (
       <div className="space-y-5 animate-fade-up">
-        <DrawerSection title="Compliance Activity Stream">
-          <div className="space-y-2 mt-2">
-            {(user.activity ?? []).length > 0 ? (
-              user.activity.map((item, index) => (
-                <div key={index} className="rounded-[8px] border border-border/20 bg-bg/25 px-4 py-3 flex items-start sm:items-center justify-between gap-4 shadow-card-subtle">
-                  <div className="flex items-start sm:items-center gap-3">
-                    <div className="p-1.5 rounded-[5px] bg-brand/5 text-brand mt-0.5 sm:mt-0 shrink-0">
-                      <Activity size={12} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          {/* Sessions */}
+          <div className="lg:col-span-6">
+            <SectionHeader title="Active Device Terminal Sessions" />
+            <div className="space-y-2">
+              {(user.sessions ?? []).length > 0 ? (
+                user.sessions.map((sess) => (
+                  <Panel key={sess.id}>
+                    <div className="flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0">
+                        <h4 className="text-[12.5px] font-semibold text-text truncate">{sess.device}</h4>
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          <Chip label={sess.location} variant="brand" />
+                          <span className="font-mono text-[11px] text-text-muted/70">IP: {sess.ip}</span>
+                        </div>
+                        <p className="text-[11px] text-text-muted/70 mt-1">Logged in: {sess.lastActive}</p>
+                      </div>
+                      <PillBtn onClick={() => handleRevokeSession(sess.id)} variant="danger">Revoke</PillBtn>
                     </div>
-                    <div>
-                      <h4 className="text-[12px] font-bold text-text leading-tight">{item.action}</h4>
-                      <p className="text-[10px] text-text-muted/50 mt-0.5 font-medium leading-none">
+                  </Panel>
+                ))
+              ) : (
+                <div className="rounded-[8px] border border-dashed border-border/18 p-6 text-center text-[11.5px] text-text-muted/35 italic">
+                  No active sessions registered.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Activity stream */}
+          <div className="lg:col-span-6">
+            <SectionHeader title="Compliance Activity Stream" />
+            <div className="relative space-y-0 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
+              {/* Timeline vertical line */}
+              <div className="absolute left-[15px] top-0 bottom-0 w-[1px] bg-border/15 pointer-events-none" />
+              {(user.activity ?? []).length > 0 ? (
+                user.activity.map((item, index) => (
+                  <div key={index} className="relative flex items-start gap-4 pl-8 pb-3">
+                    {/* Dot */}
+                    <span className="absolute left-[11px] top-[6px] h-[9px] w-[9px] rounded-full bg-bg border-2 border-brand/40 shrink-0" />
+                    <div className="flex-1 rounded-[7px] border border-border/10 bg-bg/18 hover:bg-bg/30 transition-all px-3.5 py-2.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <h4 className="text-[12px] font-semibold text-text leading-tight">{item.action}</h4>
+                        <span className="font-mono text-[11px] text-text-muted/70 shrink-0">{item.time}</span>
+                      </div>
+                      <p className="text-[11.5px] text-text-muted/70 mt-1">
                         By {item.actor} · via <span className="font-mono uppercase">{item.channel}</span>
                       </p>
                     </div>
                   </div>
-                  <span className="font-mono text-[10px] text-text-muted/40 shrink-0 mt-0.5 sm:mt-0">{item.time}</span>
+                ))
+              ) : (
+                <div className="rounded-[8px] border border-dashed border-border/18 p-6 text-center text-[11.5px] text-text-muted/35 italic ml-8">
+                  No recent workspace events.
                 </div>
-              ))
-            ) : (
-              <div className="rounded-[10px] border border-dashed border-border/25 p-6 text-center text-[12px] text-text-muted/40 italic">
-                No recent workspace events.
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </DrawerSection>
+
+        </div>
       </div>
     );
   }
 
-  // ── 7. RISK ASSESSMENT ──
+  /* ── 7. RISK VIEW ── */
   if (activeTab === 'risk-view') {
     const isWatch = user.riskStatus === 'WATCHLIST';
     const isHigh = ['HIGH', 'ELEVATED'].includes(user.riskStatus);
 
+    const riskConfig = isHigh
+      ? { accentCls: 'border-l-negative border-negative/12 bg-negative/[0.03]', iconCls: 'text-negative', titleCls: 'text-negative', text: 'High volatility / margin triggers active. Monitor open positions closely to prevent liquidations.' }
+      : isWatch
+      ? { accentCls: 'border-l-warning border-warning/12 bg-warning/[0.03]', iconCls: 'text-warning', titleCls: 'text-warning', text: 'Moderate concentration warning. Avoid increasing leverage multipliers.' }
+      : { accentCls: 'border-l-positive border-positive/12 bg-positive/[0.03]', iconCls: 'text-positive', titleCls: 'text-positive', text: 'User risk levels are low. Operational thresholds are active and stable.' };
+
+    const LOCKS = [
+      {
+        key: 'withdrawalsBlocked',
+        active: user.withdrawalsBlocked ?? false,
+        title: 'Block Withdrawals',
+        sub: 'Restrict payout transactions & wires',
+        activeColor: 'negative',
+        activeLabel: 'LOCKED',
+        inactiveLabel: 'ACTIVE',
+      },
+      {
+        key: 'readOnlyTerminals',
+        active: user.readOnlyTerminals ?? false,
+        title: 'Read-Only Terminals',
+        sub: 'Disable order creation & adjustments',
+        activeColor: 'warning',
+        activeLabel: 'READ-ONLY',
+        inactiveLabel: 'ACTIVE',
+      },
+      {
+        key: 'apiBlocked',
+        active: user.apiBlocked ?? false,
+        title: 'Block API Bridges',
+        sub: 'Revoke algorithmic terminal access keys',
+        activeColor: 'negative',
+        activeLabel: 'BLOCKED',
+        inactiveLabel: 'ACTIVE',
+      },
+    ];
+
     return (
       <div className="space-y-5 animate-fade-up">
-        <div className={`flex items-start gap-3 rounded-[10px] border p-4 shadow-sm
-          ${isHigh 
-            ? 'border-negative/20 bg-negative/[0.04]' 
-            : isWatch 
-            ? 'border-warning/20 bg-warning/[0.04]' 
-            : 'border-positive/20 bg-positive/[0.04]'
-          }`}
-        >
-          <div className="shrink-0 mt-0.5">
-            <ShieldAlert size={14} className={isHigh ? 'text-negative' : isWatch ? 'text-warning' : 'text-positive'} />
-          </div>
+
+        {/* Risk banner */}
+        <div className={`flex items-start gap-3 rounded-[8px] border-l-2 border px-4 py-3 ${riskConfig.accentCls}`}>
+          <ShieldAlert size={13} className={`${riskConfig.iconCls} shrink-0 mt-0.5`} />
           <div>
-            <h4 className={`text-[12px] font-bold
-              ${isHigh ? 'text-negative' : isWatch ? 'text-warning' : 'text-positive'}`}
-            >
-              Risk Assessment Rating: {user.riskStatus}
-            </h4>
-            <p className="text-[11px] text-text-muted/85 mt-1 leading-relaxed">
-              {isHigh
-                ? 'High volatility / margin triggers active. Monitor open positions closely to prevent liquidations.'
-                : isWatch
-                ? 'Moderate concentration warning. Avoid increasing leverage multipliers.'
-                : 'User risk levels are low. Operational thresholds are active and stable.'}
-            </p>
+            <h4 className={`text-[12px] font-semibold ${riskConfig.titleCls}`}>Risk Assessment Rating: {user.riskStatus}</h4>
+            <p className="text-[12px] text-text-muted/80 mt-1 leading-relaxed">{riskConfig.text}</p>
           </div>
         </div>
 
-        <DrawerSection title="Calculated Risk Parameters">
-          <DrawerFormGrid cols={2} className="mt-2">
-            <DrawerField label="Assigned Risk Score" value={user.risk?.score || '15 / 100'} />
-            <DrawerField label="Active Exposure Value" value={user.risk?.exposure || '$0.00'} mono />
-            <DrawerField label="Margin Drawdown" value={user.risk?.drawdown || '0%'} mono />
-            <DrawerField label="Concentration Rate" value={user.risk?.concentration || '0%'} />
-          </DrawerFormGrid>
-        </DrawerSection>
+        {/* Security Restrictions */}
+        <div>
+          <SectionHeader title="Trader Security Restrictions Matrix" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {LOCKS.map(({ key, active, title, sub, activeColor, activeLabel, inactiveLabel }) => {
+              const colorMap = { negative: { ring: 'border-negative/30 bg-negative/[0.03]', chip: 'border-negative/20 text-negative bg-negative/6', icon: 'bg-negative/8 text-negative' }, warning: { ring: 'border-warning/30 bg-warning/[0.03]', chip: 'border-warning/20 text-warning bg-warning/6', icon: 'bg-warning/8 text-warning' } };
+              const c = active ? colorMap[activeColor] : null;
+              return (
+                <div
+                  key={key}
+                  onClick={() => handleToggleLock(key)}
+                  className={`relative rounded-[8px] border p-4 cursor-pointer select-none transition-all duration-200 overflow-hidden
+                    ${active ? `${c.ring}` : 'border-border/15 bg-bg/18 hover:bg-bg/30 hover:border-border/30'}`}
+                >
+                  {/* Active glow line top */}
+                  {active && <span className={`absolute top-0 left-0 right-0 h-[2px] ${activeColor === 'negative' ? 'bg-negative/40' : 'bg-warning/40'}`} />}
 
-        <DrawerSection title="Active Compliance Alerts">
-          <div className="space-y-2 mt-2">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className={`p-2 rounded-[6px] ${active ? c.icon : 'bg-bg/50 border border-border/15 text-text-muted/45'}`}>
+                      <Lock size={12} />
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-[4px] text-[11px] font-semibold uppercase tracking-[0.05em] border font-mono
+                      ${active ? c.chip : 'border-border/20 text-text-muted/45 bg-bg/30'}`}>
+                      {active ? activeLabel : inactiveLabel}
+                    </span>
+                  </div>
+                  <h4 className="text-[12.5px] font-semibold text-text">{title}</h4>
+                  <p className="text-[11.5px] text-text-muted/70 mt-1 leading-tight">{sub}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Risk Parameters */}
+        <div>
+          <SectionHeader title="Calculated Risk Parameters" />
+          <Panel>
+            <div className="divide-y divide-border/8">
+              {[
+                ['Assigned Risk Score', user.risk?.score || '15 / 100', false],
+                ['Active Exposure Value', user.risk?.exposure || '$0.00', true],
+                ['Margin Drawdown', user.risk?.drawdown || '0%', true],
+                ['Concentration Rate', user.risk?.concentration || '0%', false],
+              ].map(([label, val, mono], i) => (
+                <div key={i} className="px-4"><DataRow label={label} value={val} mono={mono} /></div>
+              ))}
+            </div>
+          </Panel>
+        </div>
+
+        {/* Compliance Alerts */}
+        <div>
+          <SectionHeader title="Active Compliance Alerts" />
+          <div className="space-y-1.5">
             {(user.risk?.alerts ?? []).length > 0 ? (
               user.risk.alerts.map((al, index) => (
-                <div key={index} className="rounded-[8px] border border-negative/15 bg-negative/[0.03] px-3.5 py-2.5 flex items-start gap-2.5">
-                  <AlertTriangle size={12} className="text-negative shrink-0 mt-0.5" />
-                  <span className="text-[11.5px] text-text-muted font-medium leading-normal">{al}</span>
+                <div key={index}
+                  className="flex items-start gap-3 rounded-[7px] border-l-2 border-l-negative border border-negative/12 bg-negative/[0.02] px-3.5 py-2.5">
+                  <AlertTriangle size={11} className="text-negative shrink-0 mt-0.5" />
+                  <span className="text-[11px] text-text-muted font-medium leading-normal">{al}</span>
                 </div>
               ))
             ) : (
-              <div className="rounded-[10px] border border-dashed border-border/25 p-5 text-center text-[12px] text-text-muted/40 italic">
+              <div className="rounded-[8px] border border-dashed border-border/18 p-5 text-center text-[11.5px] text-text-muted/35 italic">
                 No security warnings logged.
               </div>
             )}
           </div>
-        </DrawerSection>
+        </div>
+
       </div>
     );
   }
 
-  // ── 8. OPERATOR NOTES ──
+  /* ── 9. REFERRALS ── */
+  if (activeTab === 'referrals') {
+    const totalEarnings = (user.referrals ?? []).reduce((acc, curr) => acc + (parseFloat(curr.earnings.replace(/[$,]/g, '')) || 0), 0);
+    const totalVolume = (user.referrals ?? []).reduce((acc, curr) => acc + (parseFloat(curr.volume.replace(/[^0-9.]/g, '')) || 0), 0);
+
+    return (
+      <div className="space-y-5 animate-fade-up">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          {/* LEFT: Commission controls */}
+          <div className="lg:col-span-5">
+            <Panel>
+              <PanelHead
+                title="Affiliate Rebate Commission Settings"
+                subtitle="Set the percentage of trading fees paid back to this partner as a referral commission."
+              />
+              <div className="p-5 space-y-5">
+                {/* Slider */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70">Commission Rate</span>
+                    <span className="font-mono text-brand font-semibold text-[16px]">{user.rebateRate ?? 10}%</span>
+                  </div>
+                  <input
+                    type="range" min="5" max="20" step="1"
+                    value={user.rebateRate ?? 10}
+                    onChange={(e) => handleRebateRateChange(parseInt(e.target.value))}
+                    className="w-full accent-brand cursor-pointer h-1 bg-border/20 rounded-full appearance-none"
+                  />
+                  <div className="flex justify-between text-[11px] font-mono text-text-muted/70 font-bold uppercase">
+                    <span>5% · Standard</span>
+                    <span>12% · Mid</span>
+                    <span>20% · VIP</span>
+                  </div>
+                </div>
+
+                {/* Summary tiles */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border/8">
+                  <MetricTile
+                    label="Total Commissions Earned"
+                    value={`$${totalEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+                    color="text-positive"
+                  />
+                  <MetricTile
+                    label="Total Referred Volume"
+                    value={`${totalVolume.toFixed(1)} Lots`}
+                    color="text-brand"
+                  />
+                </div>
+              </div>
+            </Panel>
+          </div>
+
+          {/* RIGHT: Referral table */}
+          <div className="lg:col-span-7">
+            <Panel>
+              <PanelHead title="List of Referred Accounts" />
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/10">
+                      {['Referred User', 'UID', 'Volume', 'Commission Yield'].map((h, i) => (
+                        <th key={h} className={`px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 ${i === 3 ? 'text-right' : ''}`}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/6">
+                    {(user.referrals ?? []).length > 0 ? (
+                      user.referrals.map((ref) => (
+                        <tr key={ref.id} className="hover:bg-bg/20 transition-colors">
+                          <td className="px-4 py-3 text-[12px] font-semibold text-text">{ref.name}</td>
+                          <td className="px-4 py-3 font-mono text-[11.5px] text-text-muted/70">{ref.uid}</td>
+                          <td className="px-4 py-3 font-mono text-[12px] text-text font-semibold">{ref.volume}</td>
+                          <td className="px-4 py-3 font-mono text-[12px] font-semibold text-positive text-right">{ref.earnings}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-[11.5px] text-text-muted/35 italic">
+                          No referral accounts have been registered under this partner yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  /* ── 8. NOTES & TAGS ── */
+  const allAvailableTags = ['Scalper', 'HedgeTrader', 'Whale', 'VIPPriority', 'HighRisk', 'MAMManager'];
+
+  const handleToggleTag = (tag) => {
+    const currentTags = user.tags ?? [];
+    const nextTags = currentTags.includes(tag) ? currentTags.filter(t => t !== tag) : [...currentTags, tag];
+    onUpdateUser?.({ tags: nextTags });
+  };
+
+  const handleAddNote = () => {
+    if (!newNoteText.trim()) return;
+    const newNote = {
+      id: `NOTE-${Date.now()}`,
+      author: 'Compliance Officer',
+      time: 'Just now',
+      text: newNoteText,
+    };
+    onUpdateUser?.({ notes: [newNote, ...(user.notes ?? [])] });
+    setNewNoteText('');
+  };
+
   return (
     <div className="space-y-5 animate-fade-up">
-      <DrawerSection title="Platform Internal Notes">
-        <div className="space-y-3.5 mt-2">
-          {(user.notes ?? []).length > 0 ? (
-            user.notes.map((n) => (
-              <div key={n.id} className="rounded-[10px] border border-border/20 bg-bg/25 p-4 shadow-card-subtle hover:border-white/5 transition-colors">
-                <div className="flex items-center justify-between gap-3 border-b border-border/12 pb-2.5 mb-2.5 flex-wrap">
-                  <span className="text-[12px] font-black text-text">{n.author}</span>
-                  <span className="font-mono text-[10px] text-text-muted/40">{n.time}</span>
-                </div>
-                <p className="text-[12px] leading-relaxed text-text-muted/75 font-medium">{n.text}</p>
-              </div>
-            ))
-          ) : (
-            <div className="rounded-[10px] border border-dashed border-border/25 p-6 text-center text-[12px] text-text-muted/40 italic">
-              No internal operator logs registered.
-            </div>
-          )}
+
+      {/* Tags */}
+      <div>
+        <SectionHeader title="Admin Classification Tags" />
+        <div className="flex flex-wrap gap-2">
+          {allAvailableTags.map((tag) => {
+            const isActive = (user.tags ?? []).includes(tag);
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleToggleTag(tag)}
+                className={`px-3 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer border
+                  ${isActive
+                    ? 'bg-brand text-text-on-accent border-brand/20 shadow-sm shadow-brand/10'
+                    : 'bg-bg/20 border-border/15 text-text-muted/60 hover:text-text hover:border-border/35'}`}
+              >
+                {tag}
+              </button>
+            );
+          })}
         </div>
-      </DrawerSection>
+        <p className="text-[12px] text-text-muted/80 mt-2 leading-relaxed">
+          Add or remove labels to quickly identify trader behavior across the platform.
+        </p>
+      </div>
+
+      {/* Notes */}
+      <div>
+        <SectionHeader title="Administrator Discussion Notes" />
+        <div className="space-y-4">
+
+          {/* Input */}
+          <Panel>
+            <PanelHead title="Add an Internal Note" />
+            <div className="p-4 space-y-3">
+              <textarea
+                value={newNoteText}
+                onChange={(e) => setNewNoteText(e.target.value)}
+                placeholder="Write a detailed note about compliance issues, phone logs, or VIP requirements..."
+                className="w-full text-[11px] p-2.5 rounded-[6px] border border-border/15 bg-bg text-text outline-none focus:border-brand/40 transition-all leading-relaxed resize-none"
+                rows={3}
+              />
+              <div className="flex justify-end">
+                <PillBtn onClick={handleAddNote} variant="brand" disabled={!newNoteText.trim()}>
+                  Save Note
+                </PillBtn>
+              </div>
+            </div>
+          </Panel>
+
+          {/* Notes feed */}
+          <div className="space-y-2.5">
+            {(user.notes ?? []).length > 0 ? (
+              user.notes.map((n) => (
+                <div key={n.id} className="rounded-[8px] border-l-2 border-l-brand/30 border border-border/10 bg-bg/18 hover:bg-bg/28 transition-all px-4 py-3.5">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <span className="text-[12.5px] font-semibold text-text">{n.author}</span>
+                    <span className="font-mono text-[11px] text-text-muted/70">{n.time}</span>
+                  </div>
+                  <p className="text-[12.5px] leading-relaxed text-text-muted/80">{n.text}</p>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-[8px] border border-dashed border-border/18 p-6 text-center text-[11.5px] text-text-muted/35 italic">
+                No admin notes have been added to this account yet.
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 }

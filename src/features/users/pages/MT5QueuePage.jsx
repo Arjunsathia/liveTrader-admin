@@ -1,20 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { Download, FileCheck, Layers, Search, Users } from 'lucide-react';
+import { Download, Layers, Landmark, Clock, Cpu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../../components/ui/Card';
 import { PageShell } from '../../../components/layout/PageShell';
 import { useDrawerState } from '../../../hooks/useDrawerState';
 import { useTableState } from '../../../hooks/useTableState';
+import { TableToolbar } from '../../../components/common/table';
 import { exportRows } from '../../../utils/exporters';
 import { usersService } from '../services/userService';
 import { UsersMt5Table } from '../components/UsersTable';
-import { Mt5AccountDrawer } from '../components/UserDrawers';
-
-const USER_NAV_TABS = [
-  { id: 'list', label: 'User Directory', path: '/users', Icon: Users },
-  { id: 'kyc', label: 'KYC Requests', path: '/users/kyc', Icon: FileCheck },
-  { id: 'mt5', label: 'MT5 Accounts', path: '/users/mt5', Icon: Layers },
-];
+import { UsersKPIGrid } from '../components/UsersKPIGrid';
 
 const PAGE = {
   accent: 'var(--brand)',
@@ -35,12 +30,56 @@ function MT5QueuePage() {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
-  const mt5Drawer = useDrawerState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [serverFilter, setServerFilter] = useState('all');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
+
+  // Load unique servers for dynamic triage dropdowns
+  const servers = useMemo(() => {
+    const list = usersService.listMt5Accounts();
+    const unique = [...new Set(list.map((item) => item.server))].filter(Boolean);
+    return unique.sort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
 
   const filteredMt5 = useMemo(
-    () => filterBySearch(usersService.listMt5Accounts(), search, ['login', 'user', 'server', 'group', 'status']),
-    [search],
+    () => {
+      let rows = filterBySearch(usersService.listMt5Accounts(), search, ['login', 'user', 'server', 'group', 'status']);
+      if (statusFilter !== 'all') {
+        rows = rows.filter((r) => r.status === statusFilter);
+      }
+      if (serverFilter !== 'all') {
+        rows = rows.filter((r) => r.server === serverFilter);
+      }
+      return rows;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [search, statusFilter, serverFilter, refreshTrigger]
   );
+
+  // Compute real-time MT5 bridge telemetry for the scoreboard
+  const kpis = useMemo(() => {
+    const list = usersService.listMt5Accounts();
+    const totalBalance = list.reduce((acc, curr) => {
+      const val = parseFloat(String(curr.balance || '0').replace(/[$,]/g, '')) || 0;
+      return acc + val;
+    }, 0);
+    const uniqueServers = [...new Set(list.map((t) => t.server))].filter(Boolean);
+    
+    return [
+      { label: 'Total MT5 Terminals', value: list.length, subtext: 'provisioned instances', trend: 'Active Bridge', positive: true, Icon: Layers, accent: 'var(--brand)' },
+      { label: 'Liquidation Pool', value: `$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, subtext: 'cumulative margin balances', trend: 'Direct Custody', positive: true, Icon: Landmark, accent: 'var(--positive)' },
+      { label: 'Bridge Servers', value: uniqueServers.length, subtext: 'active gateway server nodes', trend: 'LD4/NY4 Route', positive: true, Icon: Cpu, accent: 'var(--cyan)' },
+      { label: 'Gateway Health', value: '99.8%', subtext: 'cluster latency handshake', trend: 'Stable ping', positive: true, Icon: Clock, accent: 'var(--warning)', pulse: true },
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredMt5, refreshTrigger]);
 
   const mt5Table = useTableState(filteredMt5, { searchFields: [], initialPageSize: 10 });
 
@@ -51,13 +90,13 @@ function MT5QueuePage() {
         {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
               {PAGE.description}
             </p>
           </div>
@@ -72,62 +111,76 @@ function MT5QueuePage() {
           </div>
         </header>
 
-
+        {/* ── MT5 KPI Telemetry scorecard Grid ── */}
+        <UsersKPIGrid items={kpis} />
 
         {/* ── Table registry panel ── */}
         <Card padding={false}>
-          {/* Custom Premium Table Header Panel */}
-          <div className="px-5 py-3.5 border-b border-border/12 flex items-center justify-between gap-3 bg-surface-elevated flex-wrap">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-1 h-5 rounded-full"
-                style={{ background: PAGE.accent }}
-              />
-              <h3 className="font-black text-[12px] tracking-widest uppercase text-text/80">
-                MT5 Accounts Inventory
-              </h3>
-              <span
-                className="px-1.5 py-0.5 rounded-[5px] text-[10px] font-black border font-mono animate-fade-in"
-                style={{
-                  color: PAGE.accent,
-                  background: `color-mix(in srgb, ${PAGE.accent} 10%, transparent)`,
-                  borderColor: `color-mix(in srgb, ${PAGE.accent} 22%, transparent)`,
-                }}
-              >
-                {filteredMt5.length}
-              </span>
-            </div>
+          <TableToolbar
+            title="MT5 Accounts Inventory"
+            count={filteredMt5.length}
+            accentColor={PAGE.accent}
+            search={search}
+            onSearchChange={(val) => { setSearch(val); mt5Table.setPage(1); }}
+            searchPlaceholder="Search terminals..."
+            filters={
+              <>
+                {/* 1. Status Filter */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0 select-none">Status:</span>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => { setStatusFilter(e.target.value); mt5Table.setPage(1); }}
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    style={{ minWidth: '76px' }}
+                  >
+                    <option value="all">ALL</option>
+                    {['CONNECTED', 'DISCONNECTED', 'SYNC_DELAY', 'BLOCKED', 'READONLY'].map((status) => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className="flex items-center gap-3.5 flex-wrap">
-              {/* Search */}
-              <div className="relative">
-                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); mt5Table.setPage(1); }}
-                  placeholder="Search accounts..."
-                  className="h-7 pl-7 pr-3 w-40 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text placeholder:text-text-muted/35 outline-none focus:border-brand/40 focus:w-48 transition-all"
-                />
-              </div>
-            </div>
-          </div>
+                {/* 2. Server Node Filter */}
+                {servers.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0 select-none">Server:</span>
+                    <select
+                      value={serverFilter}
+                      onChange={(e) => { setServerFilter(e.target.value); mt5Table.setPage(1); }}
+                      className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                      style={{ minWidth: '76px' }}
+                    >
+                      <option value="all">ALL</option>
+                      {servers.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </>
+            }
+          />
 
           <UsersMt5Table
             tableState={mt5Table}
             onOpenUser={(nextUserId, nextTab) => navigate(`/users/${nextUserId}${nextTab ? `/${nextTab}` : ''}`)}
-            onOpenMt5={(entry) => mt5Drawer.open(entry)}
+            onOpenMt5={(entry) => navigate(`/users/mt5/${entry.login}`)}
           />
         </Card>
 
       </div>
 
-      {/* Review Drawer */}
-      <Mt5AccountDrawer
-        open={mt5Drawer.isOpen}
-        entry={mt5Drawer.value}
-        onClose={mt5Drawer.close}
-      />
+      {/* ── Toast ── */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-[300] flex items-center gap-3 bg-surface-elevated border border-brand/20 px-4 py-3 rounded-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.45)] animate-fade-in">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-positive opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-positive" />
+          </span>
+          <span className="text-[11px] font-bold text-text">{toastMessage}</span>
+        </div>
+      )}
     </PageShell>
   );
 }

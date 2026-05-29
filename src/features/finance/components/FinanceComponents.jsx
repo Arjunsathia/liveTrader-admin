@@ -19,7 +19,7 @@ export { Pagination } from '../../../components/common/table';
 function PriorityBadge({ value }) {
   const color = PRIORITY_CLR[value] || 'var(--text-muted)';
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-[5px] px-2 py-[3px] text-[9.5px] font-black uppercase tracking-[0.09em] whitespace-nowrap font-heading"
+    <span className="inline-flex items-center gap-1.5 rounded-[5px] px-2 py-[3px] text-[10px] font-bold uppercase tracking-[0.14em] whitespace-nowrap font-heading"
       style={{ color, background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 22%, transparent)` }}>
       <span className={`w-1 h-1 rounded-full flex-shrink-0 ${value === 'CRITICAL' ? 'animate-pulse' : ''}`} style={{ background: color }} />
       {value}
@@ -31,8 +31,8 @@ function PriorityBadge({ value }) {
 function MethodBadge({ value }) {
   const Icon = METHOD_ICONS[value];
   return (
-    <span className="inline-flex items-center gap-1.5 text-[10.5px] font-heading font-semibold text-text-muted/55">
-      {Icon ? <Icon size={11} className="flex-shrink-0 text-text-muted/35" /> : null}
+    <span className="inline-flex items-center gap-1.5 text-[11.5px] font-heading font-semibold text-text-muted/80">
+      {Icon ? <Icon size={12} className="flex-shrink-0 text-text-muted/55" /> : null}
       {value}
     </span>
   );
@@ -43,7 +43,7 @@ function AmountCell({ value, type }) {
   const isCredit = value?.startsWith('+') || type === 'DEPOSIT' || type === 'COMMISSION' || type === 'REVERSAL' || type === 'ADJUSTMENT';
   const isDebit  = value?.startsWith('-') || type === 'WITHDRAWAL' || type === 'FEE';
   const color    = isCredit ? 'var(--positive)' : isDebit ? 'var(--negative)' : 'var(--text)';
-  return <span className="font-mono font-bold text-[12.5px]" style={{ color }}>{value}</span>;
+  return <span className="font-mono font-bold text-[13px] leading-none" style={{ color }}>{value}</span>;
 }
 
 /* ── Finance-specific: Toast ─────────────────────────────────── */
@@ -64,8 +64,8 @@ function SummaryPills({ items }) {
       {items.map(p => (
         <div key={p.label} className="flex items-center gap-2 rounded-[8px] border border-border/20 bg-surface-bright/10 px-3 py-1.5">
           <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
-          <span className="text-[11px] text-text-muted/60 font-heading">{p.label}</span>
-          <span className="text-[11px] font-mono font-bold" style={{ color: p.color }}>{p.val}</span>
+          <span className="text-[11.5px] text-text-muted/80 font-heading">{p.label}</span>
+          <span className="text-[12px] font-mono font-bold leading-none" style={{ color: p.color }}>{p.val}</span>
         </div>
       ))}
     </div>

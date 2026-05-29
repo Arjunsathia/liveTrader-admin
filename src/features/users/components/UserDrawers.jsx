@@ -15,7 +15,7 @@ import {
   History,
 } from 'lucide-react';
 import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
-import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection, SelectField } from '../../../components/common/drawer';
+import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection, SelectField, TextField } from '../../../components/common/drawer';
 import { ActionBtn } from '../../../components/ui';
 import { InlineAlert } from '../../../components/feedback/InlineAlert';
 import { StatusBadge } from '../../../components/ui';
@@ -60,48 +60,48 @@ export function UserDetailDrawer({
     >
       <DrawerHeader title={user?.name ?? 'User Detail'} subtitle={user ? `UID ${user.uid} | ${user.segment} | ${user.tier}` : ''} eyebrow="User Record" onClose={onClose} />
       <DrawerBody>
-      {user && (
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-border/25 bg-bg/55 p-4 shadow-card-subtle">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-semibold" style={getAvatarStyle(user.name)}>
-              {user.name?.[0] ?? '?'}
+        {user && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-border/25 bg-bg/55 p-4 shadow-card-subtle">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-semibold" style={getAvatarStyle(user.name)}>
+                {user.name?.[0] ?? '?'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold text-text">{user.name}</div>
+                <div className="truncate text-[12px] text-text-muted">{user.email}</div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <StatusBadge status={user.kycStatus} />
+                <StatusBadge status={user.riskStatus} dot={false} />
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[14px] font-semibold text-text">{user.name}</div>
-              <div className="truncate text-[12px] text-text-muted">{user.email}</div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <StatusBadge status={user.kycStatus} />
-              <StatusBadge status={user.riskStatus} dot={false} />
-            </div>
-          </div>
 
-          <div className="flex gap-1 border-b border-white/[0.06] overflow-x-auto no-scrollbar pb-px mb-2">
-            {userDetailTabs.map((tab) => {
-              const Icon = tabIcons[tab.id] ?? User;
-              const active = tab.id === activeTab;
+            <div className="flex gap-1 border-b border-white/[0.06] overflow-x-auto no-scrollbar pb-px mb-2">
+              {userDetailTabs.map((tab) => {
+                const Icon = tabIcons[tab.id] ?? User;
+                const active = tab.id === activeTab;
 
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => onChangeTab(tab.id)}
-                  className={`group relative flex h-11 items-center gap-2.5 border-b-2 px-4 transition-all duration-200 cursor-pointer whitespace-nowrap
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => onChangeTab(tab.id)}
+                    className={`group relative flex h-11 items-center gap-2.5 border-b-2 px-4 transition-all duration-200 cursor-pointer whitespace-nowrap
                     ${active
-                      ? 'border-brand text-brand font-bold'
-                      : 'border-transparent text-text-muted/40 hover:text-text-muted hover:border-white/10'
-                    }`}
-                >
-                  <Icon size={14} className={active ? 'text-brand' : 'text-text-muted/30 group-hover:text-text-muted/50'} />
-                  <span className="text-[12px] font-bold uppercase tracking-wider font-heading">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+                        ? 'border-brand text-brand font-bold'
+                        : 'border-transparent text-text-muted/40 hover:text-text-muted hover:border-white/10'
+                      }`}
+                  >
+                    <Icon size={14} className={active ? 'text-brand' : 'text-text-muted/30 group-hover:text-text-muted/50'} />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 font-heading">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-          <UserDetailContent user={user} activeTab={activeTab} />
-        </div>
-      )}
+            <UserDetailContent user={user} activeTab={activeTab} />
+          </div>
+        )}
       </DrawerBody>
       <DrawerFooter>
         <div className="flex items-center justify-between gap-2">
@@ -127,27 +127,27 @@ export function QuickUserDrawer({ open, user, onClose, onExpand }) {
     >
       <DrawerHeader title={user?.name ?? 'Quick View'} subtitle={user ? `UID ${user.uid} | ${user.segment}` : ''} eyebrow="Quick View" onClose={onClose} />
       <DrawerBody>
-      {user && (
-        <div className="space-y-5">
-          <InlineAlert tone="info" title="Operator Summary">
-            {user.notesSummary}
-          </InlineAlert>
-          <DrawerSection title="User Snapshot">
-            <DrawerFormGrid>
-              {[
-                ['Email', user.email],
-                ['Phone', user.phone],
-                ['Country', user.country],
-                ['Funding', user.fundingState],
-                ['Wallet', user.walletBalance],
-                ['Equity', user.equity],
-              ].map(([label, value]) => (
-                <DrawerField key={label} label={label} value={value} />
-              ))}
-            </DrawerFormGrid>
-          </DrawerSection>
-        </div>
-      )}
+        {user && (
+          <div className="space-y-5">
+            <InlineAlert tone="info" title="Operator Summary">
+              {user.notesSummary}
+            </InlineAlert>
+            <DrawerSection title="User Snapshot">
+              <DrawerFormGrid>
+                {[
+                  ['Email', user.email],
+                  ['Phone', user.phone],
+                  ['Country', user.country],
+                  ['Funding', user.fundingState],
+                  ['Wallet', user.walletBalance],
+                  ['Equity', user.equity],
+                ].map(([label, value]) => (
+                  <DrawerField key={label} label={label} value={value} />
+                ))}
+              </DrawerFormGrid>
+            </DrawerSection>
+          </div>
+        )}
       </DrawerBody>
       <DrawerFooter>
         <div className="flex justify-end gap-2">
@@ -164,6 +164,10 @@ export function QuickUserDrawer({ open, user, onClose, onExpand }) {
 export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onResetPassword }) {
   const [leverage, setLeverage] = useState('');
   const [status, setStatus] = useState('');
+  const [server, setServer] = useState('MT5-LIVE-EU1');
+  const [group, setGroup] = useState('retail_usd_std');
+  const [deposit, setDeposit] = useState('1000');
+  const [customLogin, setCustomLogin] = useState('');
   const [showStatusSuccess, setShowStatusSuccess] = useState(false);
   const [prevEntry, setPrevEntry] = useState(null);
 
@@ -172,6 +176,10 @@ export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onReset
     if (entry) {
       setLeverage(entry.leverage || '1:100');
       setStatus(entry.status || 'CONNECTED');
+      setServer('MT5-LIVE-EU1');
+      setGroup('retail_usd_std');
+      setDeposit('1000');
+      setCustomLogin('');
       setShowStatusSuccess(false);
     }
   }
@@ -184,7 +192,17 @@ export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onReset
   const delta = equityVal - balanceVal;
 
   const handleSave = () => {
-    onSave?.({ ...entry, leverage, status });
+    if (isExistingAccount) {
+      onSave?.({ ...entry, leverage, status });
+    } else {
+      onSave?.({
+        server,
+        leverage,
+        group,
+        deposit,
+        login: customLogin || undefined
+      });
+    }
     setShowStatusSuccess(true);
     setTimeout(() => {
       setShowStatusSuccess(false);
@@ -198,169 +216,212 @@ export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onReset
       width="max-w-[720px]"
       onClose={onClose}
     >
-      <DrawerHeader title={entry ? `MT5 Account — #${entry.login ?? 'NEW'}` : 'MT5 Account'} subtitle="Inspect credentials, balance metrics, and adjust operational settings." eyebrow="MT5 Account Review" onClose={onClose} />
+      <DrawerHeader title={entry ? (isExistingAccount ? `MT5 Account — #${entry.login}` : `Create MT5 Account`) : 'MT5 Account'} subtitle={isExistingAccount ? "Inspect credentials, balance metrics, and adjust operational settings." : "Configure terminal settings for the new MT5 trading account."} eyebrow={isExistingAccount ? "MT5 Account Review" : "Configure MT5 Account"} onClose={onClose} />
       <DrawerBody>
-      <div className="space-y-6">
-        {isExistingAccount ? (
-          <>
-            {/* Connection Status Card */}
-            <div
-              className="rounded-[12px] border overflow-hidden p-4"
-              style={{ borderColor: `color-mix(in srgb, ${statusAccent} 22%, var(--border))`, background: `color-mix(in srgb, ${statusAccent} 4%, transparent)` }}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="text-[15px] font-black text-text">{entry.user ?? 'MT5 User'}</div>
-                  <div className="text-[10px] font-mono text-text-muted/50 mt-0.5">UID: {entry.uid || 'U-499201'}</div>
+        <div className="space-y-6">
+          {isExistingAccount ? (
+            <>
+              {/* Connection Status Card */}
+              <div
+                className="rounded-[12px] border overflow-hidden p-4"
+                style={{ borderColor: `color-mix(in srgb, ${statusAccent} 22%, var(--border))`, background: `color-mix(in srgb, ${statusAccent} 4%, transparent)` }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="text-[15px] font-semibold text-text">{entry.user ?? 'MT5 User'}</div>
+                    <div className="text-[11px] font-mono text-text-muted/70 mt-0.5">UID: {entry.uid || 'U-499201'}</div>
+                  </div>
+                  <StatusChip value={status} size="lg" />
                 </div>
-                <StatusChip value={status} size="lg" />
-              </div>
 
-              {/* Equity / Balance Scoreboard */}
-              <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border/10">
-                <div className="text-center">
-                  <div className="text-[9.5px] uppercase tracking-wider text-text-muted/50 mb-1">Balance</div>
-                  <div className="font-mono text-[13px] font-bold text-text">{entry.balance ?? '$0.00'}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-[9.5px] uppercase tracking-wider text-text-muted/50 mb-1">Equity</div>
-                  <div className="font-mono text-[13px] font-bold text-brand">{entry.equity ?? entry.balance ?? '$0.00'}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-[9.5px] uppercase tracking-wider text-text-muted/50 mb-1">Float</div>
-                  <div
-                    className="font-mono text-[13px] font-bold"
-                    style={{ color: delta >= 0 ? 'var(--positive)' : 'var(--negative)' }}
-                  >
-                    {delta >= 0 ? '+' : ''}{delta.toFixed(2)}
+                {/* Equity / Balance Scoreboard */}
+                <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border/10">
+                  <div className="text-center flex flex-col items-center gap-1.5">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 leading-none">Balance</div>
+                    <div className="font-mono text-[13.5px] font-semibold text-text leading-none">{entry.balance ?? '$0.00'}</div>
+                  </div>
+                  <div className="text-center flex flex-col items-center gap-1.5">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 leading-none">Equity</div>
+                    <div className="font-mono text-[13.5px] font-semibold text-brand leading-none">{entry.equity ?? entry.balance ?? '$0.00'}</div>
+                  </div>
+                  <div className="text-center flex flex-col items-center gap-1.5">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-text-muted/70 leading-none">Float</div>
+                    <div
+                      className="font-mono text-[13.5px] font-semibold leading-none"
+                      style={{ color: delta >= 0 ? 'var(--positive)' : 'var(--negative)' }}
+                    >
+                      {delta >= 0 ? '+' : ''}{delta.toFixed(2)}
+                    </div>
                   </div>
                 </div>
+
+                <div className="text-[10px] text-text-muted/55 flex items-center gap-1.5 mt-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
+                  Active cluster connection · Latency stable
+                </div>
               </div>
 
-              <div className="text-[10px] text-text-muted/55 flex items-center gap-1.5 mt-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-positive animate-pulse" />
-                Active cluster connection · Latency stable
-              </div>
-            </div>
+              {showStatusSuccess && (
+                <InlineAlert tone="success" title="MT5 Sync Complete">
+                  Leverage changed to {leverage} and status synchronized with MT5 Node.
+                </InlineAlert>
+              )}
 
-            {showStatusSuccess && (
-              <InlineAlert tone="success" title="MT5 Sync Complete">
-                Leverage changed to {leverage} and status synchronized with MT5 Node.
+              {/* Account Snapshot */}
+              <DrawerSection title="Account Snapshot">
+                <DrawerFormGrid>
+                  <DrawerField label="Login" value={entry.login} mono copyable />
+                  <DrawerField label="Server" value={entry.server} mono />
+                  <DrawerField label="Group" value={entry.group || 'retail_usd_std'} mono copyable />
+                  <DrawerField label="Account Type" value={entry.type || 'Live'} />
+                  <DrawerField label="Currency" value={entry.currency || 'USD'} />
+                  <DrawerField label="Last Synced" value={entry.lastSync} mono />
+                </DrawerFormGrid>
+              </DrawerSection>
+
+              {/* Capital Metrics */}
+              <DrawerSection title="Balance & Capital Metrics">
+                <DrawerFormGrid>
+                  <DrawerField label="Balance" value={entry.balance} mono accent="var(--cyan)" />
+                  <DrawerField label="Equity" value={entry.equity ?? entry.balance} mono accent="var(--brand)" />
+                  <DrawerField label="Margin Used" value={entry.margin || '$0'} mono accent="var(--warning)" />
+                  <DrawerField label="Free Margin" value={entry.freeMargin || entry.balance} mono accent="var(--positive)" />
+                  <DrawerField
+                    label="Margin Level"
+                    value={entry.marginLvl || '—'}
+                    mono
+                    accent={
+                      entry.marginLvl && entry.marginLvl.includes('%') && parseInt(entry.marginLvl) < 150
+                        ? 'var(--negative)'
+                        : 'var(--text)'
+                    }
+                  />
+                </DrawerFormGrid>
+              </DrawerSection>
+
+              {/* Dealing Desk Controls */}
+              <DrawerSection title="Dealing Desk Controls">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SelectField
+                    label="Adjust Account Leverage"
+                    value={leverage}
+                    onChange={setLeverage}
+                    options={['1:50', '1:100', '1:200', '1:500']}
+                  />
+                  <SelectField
+                    label="Operational Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={['CONNECTED', 'DISCONNECTED', 'SYNC_DELAY', 'BLOCKED', 'READONLY']}
+                  />
+                </div>
+              </DrawerSection>
+
+              {/* Quick Actions */}
+              <DrawerSection title="Quick Actions" collapsible>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSync?.(entry);
+                      setShowStatusSuccess(true);
+                      setTimeout(() => setShowStatusSuccess(false), 1500);
+                    }}
+                    className="flex items-center justify-center gap-1.5 h-9 rounded-[8px] border border-brand/20 bg-brand/5 text-brand text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                  >
+                    <RefreshCw size={12} className="animate-spin-slow" /> Force Sync
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onResetPassword?.(entry)}
+                    className="flex items-center justify-center gap-1.5 h-9 rounded-[8px] border border-negative/20 bg-negative/5 text-negative text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                  >
+                    <KeyRound size={12} /> Reset Password
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    className="flex items-center justify-center gap-1.5 h-9 rounded-[8px] border border-border/15 bg-surface-elevated text-text-muted/40 text-[11px] font-bold cursor-not-allowed opacity-50"
+                    title="Coming soon"
+                  >
+                    <History size={12} /> Trade History
+                  </button>
+                </div>
+              </DrawerSection>
+            </>
+          ) : (
+            <div className="space-y-5 animate-fade-up">
+              <InlineAlert tone="info" title="Configure New MT5 Trading Account">
+                Set up terminal settings for the new MT5 trading account under <strong>{entry?.name}</strong> (UID: {entry?.uid}).
               </InlineAlert>
-            )}
 
-            {/* Account Snapshot */}
-            <DrawerSection title="Account Snapshot">
-              <DrawerFormGrid>
-                <DrawerField label="Login" value={entry.login} mono copyable />
-                <DrawerField label="Server" value={entry.server} mono />
-                <DrawerField label="Group" value={entry.group || 'retail_usd_std'} mono copyable />
-                <DrawerField label="Account Type" value={entry.type || 'Live'} />
-                <DrawerField label="Currency" value={entry.currency || 'USD'} />
-                <DrawerField label="Last Synced" value={entry.lastSync} mono />
-              </DrawerFormGrid>
-            </DrawerSection>
+              {showStatusSuccess && (
+                <InlineAlert tone="success" title="MT5 Account Prepared">
+                  Preparing terminal instance and allocating dealing gateway bridges...
+                </InlineAlert>
+              )}
 
-            {/* Capital Metrics */}
-            <DrawerSection title="Balance & Capital Metrics">
-              <DrawerFormGrid>
-                <DrawerField label="Balance" value={entry.balance} mono accent="var(--cyan)" />
-                <DrawerField label="Equity" value={entry.equity ?? entry.balance} mono accent="var(--brand)" />
-                <DrawerField label="Margin Used" value={entry.margin || '$0'} mono accent="var(--warning)" />
-                <DrawerField label="Free Margin" value={entry.freeMargin || entry.balance} mono accent="var(--positive)" />
-                <DrawerField
-                  label="Margin Level"
-                  value={entry.marginLvl || '—'}
-                  mono
-                  accent={
-                    entry.marginLvl && entry.marginLvl.includes('%') && parseInt(entry.marginLvl) < 150
-                      ? 'var(--negative)'
-                      : 'var(--text)'
-                  }
-                />
-              </DrawerFormGrid>
-            </DrawerSection>
+              <DrawerSection title="Account Parameters">
+                <DrawerFormGrid cols={2}>
+                  <SelectField
+                    label="MetaTrader 5 Server"
+                    value={server}
+                    onChange={setServer}
+                    options={['MT5-LIVE-EU1', 'MT5-LIVE-EU2', 'MT5-LIVE-APAC', 'MT5-DEMO']}
+                  />
+                  <SelectField
+                    label="Account Leverage"
+                    value={leverage}
+                    onChange={setLeverage}
+                    options={['1:10', '1:30', '1:50', '1:100', '1:200', '1:500']}
+                  />
+                  <TextField
+                    label="Terminal Group"
+                    value={group}
+                    onChange={setGroup}
+                    placeholder="retail_usd_std"
+                  />
+                  <TextField
+                    label="Initial Capital Deposit ($)"
+                    value={deposit}
+                    onChange={setDeposit}
+                    placeholder="1000"
+                    type="number"
+                  />
+                </DrawerFormGrid>
+              </DrawerSection>
 
-            {/* Dealing Desk Controls */}
-            <DrawerSection title="Dealing Desk Controls">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <SelectField
-                  label="Adjust Account Leverage"
-                  value={leverage}
-                  onChange={setLeverage}
-                  options={['1:50', '1:100', '1:200', '1:500']}
-                />
-                <SelectField
-                  label="Operational Status"
-                  value={status}
-                  onChange={setStatus}
-                  options={['CONNECTED', 'DISCONNECTED', 'SYNC_DELAY', 'BLOCKED', 'READONLY']}
-                />
-              </div>
-            </DrawerSection>
-
-            {/* Quick Actions */}
-            <DrawerSection title="Quick Actions" collapsible>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSync?.(entry);
-                    setShowStatusSuccess(true);
-                    setTimeout(() => setShowStatusSuccess(false), 1500);
-                  }}
-                  className="flex items-center justify-center gap-1.5 h-9 rounded-[8px] border border-brand/20 bg-brand/5 text-brand text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-                >
-                  <RefreshCw size={12} className="animate-spin-slow" /> Force Sync
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onResetPassword?.(entry)}
-                  className="flex items-center justify-center gap-1.5 h-9 rounded-[8px] border border-negative/20 bg-negative/5 text-negative text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-                >
-                  <KeyRound size={12} /> Reset Password
-                </button>
-                <button
-                  type="button"
-                  disabled
-                  className="flex items-center justify-center gap-1.5 h-9 rounded-[8px] border border-border/15 bg-surface-elevated text-text-muted/40 text-[11px] font-bold cursor-not-allowed opacity-50"
-                  title="Coming soon"
-                >
-                  <History size={12} /> Trade History
-                </button>
-              </div>
-            </DrawerSection>
-          </>
-        ) : (
-          <div className="space-y-3">
-            <InlineAlert tone="info" title="New MT5 setup">
-              A placeholder account will be prepared for the dealing desk using the settings defined in the user form.
-            </InlineAlert>
-            <DrawerSection title="Setup Snapshot">
-              <DrawerFormGrid>
-                <DrawerField label="User" value={entry?.name} />
-                <DrawerField label="Segment" value={entry?.segment} />
-                <DrawerField label="Tier" value={entry?.tier} />
-                <DrawerField label="Wallet" value={entry?.walletBalance} mono />
-              </DrawerFormGrid>
-            </DrawerSection>
-          </div>
-        )}
-      </div>
+              <DrawerSection title="Advanced Credentials (Optional)" collapsible>
+                <div className="space-y-2.5">
+                  <TextField
+                    label="Custom Login ID"
+                    value={customLogin}
+                    onChange={setCustomLogin}
+                    placeholder="Leave empty to auto-generate"
+                    mono
+                  />
+                  <p className="text-[12px] text-text-muted/80 leading-relaxed">
+                    If left blank, our MT5 Dealing Bridge will automatically allocate an 8-digit randomized account number (starting with 881) for this terminal instance.
+                  </p>
+                </div>
+              </DrawerSection>
+            </div>
+          )}
+        </div>
       </DrawerBody>
       <DrawerFooter>
         <div className="flex items-center justify-between gap-4 w-full">
           <div className="text-[10px] text-text-muted/55 max-w-[280px] leading-snug">
-            Leverage adjustments push directly to the MT5 dealing gateway cluster.
+            {isExistingAccount ? "Leverage adjustments push directly to the MT5 dealing gateway cluster." : "Initializing standard capital leverage models directly on MT5 gateway nodes."}
           </div>
           <div className="flex items-center gap-2">
             <ActionBtn label="Close" variant="default" onClick={onClose} />
-            <ActionBtn 
-              label={showStatusSuccess ? "Pushed to MT5" : (isExistingAccount ? 'Keep Monitoring' : 'Save Setup')} 
+            <ActionBtn
+              label={showStatusSuccess ? (isExistingAccount ? "Pushed to MT5" : "Preparing...") : (isExistingAccount ? 'Keep Monitoring' : 'Save Setup')}
               Icon={showStatusSuccess ? Check : undefined}
-              variant="brand" 
-              disabled={showStatusSuccess} 
-              onClick={handleSave} 
+              variant="brand"
+              disabled={showStatusSuccess}
+              onClick={handleSave}
             />
           </div>
         </div>

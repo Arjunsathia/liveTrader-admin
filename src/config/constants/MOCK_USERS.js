@@ -56,6 +56,27 @@ export const users = [
     notes: [
       { id: 'NOTE-DEMO', author: 'System', time: '2024-01-01 00:00', text: 'Demo note' }
     ],
+    tags: ['Retail FX', 'Standard'],
+    sessions: [
+      { id: 'sess-1', device: 'Windows 11 · Chrome Pro', ip: '192.168.1.105', location: 'Singapore (SG)', lastActive: 'Just now' },
+      { id: 'sess-2', device: 'iPhone 15 · Safari Mobile', ip: '72.10.45.10', location: 'New York, US', lastActive: '3 hours ago' }
+    ],
+    withdrawalsBlocked: false,
+    readOnlyTerminals: false,
+    apiBlocked: false,
+    rebateRate: 10,
+    referrals: [
+      { id: 'ref-1', name: 'James Carter', uid: 'U-309481', registered: '2026-04-12 11:22', volume: '14.5 lots', earnings: '$145.00' },
+      { id: 'ref-2', name: 'Sophia Loren', uid: 'U-502941', registered: '2026-05-01 09:14', volume: '8.2 lots', earnings: '$82.00' }
+    ],
+    livePositions: [
+      { ticket: '9920141', symbol: 'EURUSD', side: 'BUY', lots: '1.50', openPrice: '1.08240', livePrice: '1.08310', swaps: '-$4.50', commissions: '-$15.00', pnl: '+$105.00' },
+      { ticket: '9920155', symbol: 'XAUUSD', side: 'SELL', lots: '0.50', openPrice: '2350.20', livePrice: '2351.80', swaps: '$0.00', commissions: '-$5.00', pnl: '-$80.00' }
+    ],
+    walletHistory: [
+      { id: 'TX-49910', type: 'DEPOSIT', amount: '+$50,000.00', method: 'Bank Wire Direct', time: '2026-03-31 10:00', status: 'SUCCESS' },
+      { id: 'TX-49911', type: 'WITHDRAWAL', amount: '-$5,000.00', method: 'ERC20 Wallet', time: '2026-04-20 14:15', status: 'SUCCESS' }
+    ],
   }
 ];
 
@@ -69,4 +90,8 @@ export const userActivityFeed = [
 
 export const mt5Accounts = [
   { id: 'MT5-DEMO', login: '000000', userId: 'usr-demo', user: 'Demo User', server: 'Demo', status: 'DISCONNECTED', connection: 'N/A', group: 'Demo', leverage: '1:100', balance: '$0', lastSync: 'N/A' }
+];
+
+export const adminAuditLogs = [
+  { id: 'LOG-1', author: 'System', target: 'Demo User', action: 'KYC Verification Level 1 Approved', time: '2026-05-25 10:00' }
 ];

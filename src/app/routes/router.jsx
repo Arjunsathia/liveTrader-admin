@@ -8,13 +8,13 @@ import { adminRedirectRoutes, adminRouteModules } from '@/config/routes/admin-ro
 
 // ── Feature pages — imported directly (no src/pages wrapper needed) ──
 import { DashboardPage } from '@/features/dashboard';
-import { UsersPage, MT5QueuePage, UserDetailPage, KYCQueuePage } from '@/features/users';
-import { FinancePage } from '@/features/finance';
+import { UsersPage, MT5QueuePage, UserDetailPage, KYCQueuePage, UsersAuditPage, MT5AccountReviewPage } from '@/features/users';
+import { DepositsPage, WithdrawalsPage, TransactionsPage, FailedPaymentsPage, ApprovalsPage, DepositDetailPage, WithdrawalDetailPage } from '@/features/finance';
 import { TradingAccountsPage, OrdersPage, PositionsPage, TradeHistoryPage, ExecutionLogsPage } from '@/features/trading';
 import { CopyTradingPage, CopyTradingDetailPage } from '@/features/copy-trading';
 import { IBSystemPage } from '@/features/ib-system';
 import { PropTradingPage } from '@/features/prop-trading';
-import { ReportsPage } from '@/features/reports';
+import { ReportsOverviewPage, FinanceReportsPage, TradingReportsPage, UserReportsPage, SystemReportsPage, ExportCenterPage } from '@/features/reports';
 import { SupportPage, TicketDetailPage } from '@/features/support';
 import { SettingsPage } from '@/features/settings';
 import { RolesPermissionsPage } from '@/features/roles-permissions';
@@ -26,8 +26,16 @@ const pageRegistry = {
   'users/users-list': UsersPage,
   'users/kyc-queue': KYCQueuePage,
   'users/mt5-queue': MT5QueuePage,
+  'users/mt5-review': MT5AccountReviewPage,
   'users/user-detail': UserDetailPage,
-  'finance/finance-workspace': FinancePage,
+  'users/users-audit': UsersAuditPage,
+  'finance/deposits': DepositsPage,
+  'finance/deposit-detail': DepositDetailPage,
+  'finance/withdrawals': WithdrawalsPage,
+  'finance/withdrawal-detail': WithdrawalDetailPage,
+  'finance/transactions': TransactionsPage,
+  'finance/failed-payments': FailedPaymentsPage,
+  'finance/approvals': ApprovalsPage,
   'trading/trading-accounts': TradingAccountsPage,
   'trading/orders': OrdersPage,
   'trading/positions': PositionsPage,
@@ -42,7 +50,12 @@ const pageRegistry = {
   'copy-trading/copy-trading-detail': CopyTradingDetailPage,
   'ib-system/ib-system-workspace': IBSystemPage,
   'prop-trading/prop-trading-workspace': PropTradingPage,
-  'reports/reports-workspace': ReportsPage,
+  'reports/overview': ReportsOverviewPage,
+  'reports/finance': FinanceReportsPage,
+  'reports/trading': TradingReportsPage,
+  'reports/users': UserReportsPage,
+  'reports/system': SystemReportsPage,
+  'reports/exports': ExportCenterPage,
   'support/support-workspace': SupportPage,
   'support/ticket-detail': TicketDetailPage,
   'settings/settings-workspace': SettingsPage,

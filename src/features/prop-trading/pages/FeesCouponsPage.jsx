@@ -15,7 +15,7 @@ function FeesCouponsPage() {
   const couponsCols = [
     { key: 'code',     label: 'Code',     render: (v) => <code className="font-mono font-bold text-[12px] text-cyan bg-cyan/[0.07] px-2 py-0.5 rounded-[5px] border border-cyan/[0.15]">{v}</code> },
     { key: 'discount', label: 'Discount', render: (v) => <span className="font-mono font-bold text-brand">{v}</span> },
-    { key: 'type',     label: 'Type',     render: (v) => <span className="text-[9.5px] font-black uppercase font-heading text-text-muted/50 border border-border/25 px-1.5 py-0.5 rounded-[4px]">{v}</span> },
+    { key: 'type',     label: 'Type',     render: (v) => <span className="text-[11px] font-semibold uppercase font-heading text-text-muted/75 border border-border/25 px-1.5 py-0.5 rounded-[4px]">{v}</span> },
     { key: 'uses',     label: 'Uses',     render: (v, r) => (
         <div>
           <div className="text-[10.5px] font-mono">{v.toLocaleString()}{r.maxUses ? <span className="text-text-muted/30"> / {r.maxUses.toLocaleString()}</span> : <span className="text-text-muted/30"> / ∞</span>}</div>
@@ -41,13 +41,13 @@ function FeesCouponsPage() {
     <div className="space-y-5 animate-fade-up">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
             Prop Trading
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
             Fees & Coupons
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
             Manage challenge entry fees and discount campaigns.
           </p>
         </div>

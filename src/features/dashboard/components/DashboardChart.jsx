@@ -48,7 +48,7 @@ const MINI_STATS = [
 ];
 
 const LEGEND = [
-  { label: 'Volume', color: 'var(--brand)' },
+  { label: 'Volume Flow', color: 'var(--brand)' },
   { label: 'Deposits', color: 'var(--positive)' },
   { label: 'Withdrawals', color: 'var(--negative)' },
 ];
@@ -57,25 +57,38 @@ function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div
-      className="rounded-[10px] border border-border/40 p-3"
+      className="rounded-[10px] p-3 backdrop-blur-md"
       style={{
-        background: 'var(--surface-2)',
-        boxShadow: 'var(--shadow-dynamic)',
+        background: 'rgba(15, 23, 42, 0.75)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
         fontSize: '11px',
         fontFamily: 'IBM Plex Mono, monospace',
       }}
     >
-      <div className="mb-2 text-[10px] uppercase tracking-[0.12em] text-text-muted/60 border-b border-border/20 pb-1.5">
+      <div className="mb-2 text-[10px] uppercase tracking-wider text-text-muted border-b border-border/20 pb-1.5">
         {label}
       </div>
       <div className="flex flex-col gap-1.5 mt-2">
-        {payload.map((p) => (
-          <div key={p.dataKey} className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full" style={{ background: p.color }} />
-            <span className="text-text-muted w-20">{p.name}:</span>
-            <span className="font-semibold text-text">${p.value}k</span>
-          </div>
-        ))}
+        {payload.map((p) => {
+          const isWD = p.dataKey === 'withdrawals';
+          const symbol = isWD ? '-' : '+';
+          return (
+            <div key={p.dataKey} className="flex items-center gap-2">
+              <span 
+                className="h-1.5 w-1.5 rounded-full" 
+                style={{ 
+                  background: p.color,
+                  boxShadow: `0 0 6px ${p.color}` 
+                }} 
+              />
+              <span className="text-text-muted w-20">{p.name}:</span>
+              <span className="font-semibold text-text" style={{ color: p.color }}>
+                {symbol}${p.value.toLocaleString()}k
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -86,26 +99,30 @@ export function DashboardChart() {
   const chartData = CHART_DATA[activeFilter];
 
   return (
-    <Card className="h-full p-0">
+    <Card className="h-full p-0 overflow-hidden">
       {/* Header */}
-      <div className="p-5 border-b border-border/15">
+      <div className="p-5 border-b border-border/15 bg-surface-elevated/45">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <div className="text-[14px] font-semibold text-text flex items-center gap-2">
-              <BarChart2 size={16} className="text-primary" />
+            <div className="text-[15px] font-semibold text-text flex items-center gap-2">
+              <BarChart2 size={16} className="text-brand animate-pulse" />
               Liquidity Flow &amp; Revenue
             </div>
-            <div className="text-[12px] text-text-muted/60 mt-1">
+            <div className="text-[12.5px] text-text-muted mt-1">
               Real-time platform volume, deposits, and performance metrics
             </div>
           </div>
           {/* Time Filters */}
-          <div className="flex items-center gap-1 rounded-[8px] border border-border/25 bg-bg/60 p-0.5">
+          <div className="flex items-center gap-1 rounded-[8px] border border-border/20 bg-bg/50 p-0.5">
             {TIME_FILTERS.map((f) => (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
-                className="rounded-[6px] px-3 py-1 text-[12px] font-semibold transition-all"
+                className={`rounded-[6px] px-3 py-1 text-[12.5px] font-medium transition-all cursor-pointer ${
+                  activeFilter === f
+                    ? 'shadow-[0_2px_8px_rgba(0,0,0,0.2)]'
+                    : 'hover:text-text'
+                }`}
                 style={{
                   background: activeFilter === f ? 'var(--brand)' : 'transparent',
                   color: activeFilter === f ? 'var(--text-on-accent)' : 'var(--text-muted)',
@@ -118,18 +135,23 @@ export function DashboardChart() {
         </div>
       </div>
 
-      <div className="p-5">
+      <div className="p-5 bg-surface/10">
         {/* Mini Stats Row */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {MINI_STATS.map(({ label, value, color }) => (
             <div
               key={label}
-              className="rounded-[8px] border border-border/20 bg-bg/50 px-4 py-3 flex flex-col group hover:bg-surface/40 hover:border-border/40 transition-colors cursor-default"
+              className="relative rounded-[10px] border border-border/20 bg-bg/40 px-4 py-3 flex flex-col overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-border/40 hover:shadow-card-subtle cursor-default group"
             >
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted/55">
+              {/* Top Accent Gradient Bar */}
+              <div 
+                className="absolute top-0 left-0 h-[2px] w-full" 
+                style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} 
+              />
+              <div className="text-[11.5px] font-bold uppercase tracking-wider text-text-muted group-hover:text-text transition-colors">
                 {label}
               </div>
-              <div className="mt-1.5 text-[20px] font-bold tracking-[-0.03em]" style={{ color }}>
+              <div className="mt-1.5 text-[20px] font-bold tracking-[-0.02em] transition-transform duration-300 group-hover:translate-x-0.5" style={{ color }}>
                 {value}
               </div>
             </div>
@@ -139,24 +161,34 @@ export function DashboardChart() {
         {/* Chart Legend */}
         <div className="mb-5 flex items-center gap-4">
           {LEGEND.map(({ label, color }) => (
-            <div key={label} className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full" style={{ background: color }} />
-              <span className="text-[12px] text-text-muted/70 font-medium">{label}</span>
+            <div key={label} className="flex items-center gap-1.5 group cursor-pointer">
+              <span 
+                className="h-2 w-2 rounded-full transition-transform duration-300 group-hover:scale-125" 
+                style={{ 
+                  background: color,
+                  boxShadow: `0 0 5px ${color}`
+                }} 
+              />
+              <span className="text-[12.5px] text-text-muted font-medium group-hover:text-text transition-colors">{label}</span>
             </div>
           ))}
         </div>
 
         {/* Chart */}
-        <div className="h-[320px] w-full">
+        <div className="w-full h-[320px] sm:h-[360px] xl:h-[430px] flex-shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="volGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--brand)" stopOpacity={0.25} />
+                  <stop offset="5%" stopColor="var(--brand)" stopOpacity={0.22} />
                   <stop offset="95%" stopColor="var(--brand)" stopOpacity={0} />
                 </linearGradient>
+                <linearGradient id="depGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--positive)" stopOpacity={0.06} />
+                  <stop offset="95%" stopColor="var(--positive)" stopOpacity={0} />
+                </linearGradient>
               </defs>
-              <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} strokeDasharray="3 3" />
+              <CartesianGrid stroke="rgba(255,255,255,0.03)" vertical={false} strokeDasharray="3 3" />
               <XAxis
                 dataKey="time"
                 axisLine={false}
@@ -169,9 +201,9 @@ export function DashboardChart() {
                 tickLine={false}
                 tick={{ fill: 'rgba(194,198,214,0.45)', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-              <Area type="monotone" dataKey="volume" name="Volume" stroke="var(--brand)" fill="url(#volGrad)" strokeWidth={2.2} />
-              <Line type="monotone" dataKey="deposits" name="Deposits" stroke="var(--positive)" strokeWidth={1.8} dot={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.04)', strokeWidth: 1 }} />
+              <Area type="monotone" dataKey="volume" name="Volume" stroke="var(--brand)" fill="url(#volGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="deposits" name="Deposits" stroke="var(--positive)" fill="url(#depGrad)" strokeWidth={1.8} />
               <Line type="monotone" dataKey="withdrawals" name="Withdrawals" stroke="var(--negative)" strokeWidth={1.6} dot={false} strokeDasharray="4 2" />
             </ComposedChart>
           </ResponsiveContainer>
@@ -180,3 +212,5 @@ export function DashboardChart() {
     </Card>
   );
 }
+
+export default DashboardChart;

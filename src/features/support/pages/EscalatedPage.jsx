@@ -1,16 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AlertCircle, AlertOctagon, Check, Download, Eye, UserPlus,
+  AlertCircle, AlertOctagon, Check, Download, Eye, UserPlus, Timer, ShieldAlert, Wallet
 } from 'lucide-react';
-import { MainTable, TableToolbar } from '../../../components/common/table';
+import { TableToolbar } from '../../../components/common/table';
+import { KpiCard } from '@/components/cards';
 import { escalatedData } from '@/config/constants/support/mockData';
 import {
   PriorityBadge, SupportStatusBadge, CatTag, SlaBar,
-  UserAvatar, SupportStatCard, SupportIconBtn, SupportToast,
+  UserAvatar, SupportIconBtn, SupportToast, TicketCard,
 } from '@/features/support/components/SupportComponents';
 
-const PER_PAGE = 10;
+const PER_PAGE = 8;
 
 function EscalatedPage() {
   const navigate = useNavigate();
@@ -41,125 +42,57 @@ function EscalatedPage() {
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const stats = [
-    { label: 'Total Escalated', val: escalatedData.length, color: 'var(--negative)', urgent: true },
-    { label: 'Critical Priority', val: escalatedData.filter((t) => t.priority === 'CRITICAL').length, color: 'var(--negative)', urgent: true },
-    { label: 'SLA Breached', val: escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length, color: 'var(--negative)', urgent: true },
-    { label: 'Compliance', val: escalatedData.filter((t) => t.category === 'Compliance').length, color: 'var(--warning)' },
-    { label: 'Financial', val: escalatedData.filter((t) => ['Finance', 'Prop'].includes(t.category)).length, color: 'var(--warning)' },
-    { label: 'Unassigned', val: escalatedData.filter((t) => t.owner === 'Unassigned').length, color: 'var(--negative)', urgent: true },
+    { label: 'Total Escalated', value: escalatedData.length, accent: 'var(--negative)', Icon: AlertOctagon, sub: 'Tickets sent to managers', trend: 'Urgent', trendUp: false },
+    { label: 'Critical Priority', value: escalatedData.filter((t) => t.priority === 'CRITICAL').length, accent: 'var(--negative)', Icon: AlertOctagon, sub: 'Needs immediate help', trend: 'Critical', trendUp: false },
+    { label: 'SLA Breached', value: escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length, accent: 'var(--negative)', Icon: Timer, sub: 'Response time expired', trend: 'Overdue', trendUp: false },
+    { label: 'Compliance Holds', value: escalatedData.filter((t) => t.category === 'Compliance').length, accent: 'var(--warning)', Icon: ShieldAlert, sub: 'Compliance & identity holds' },
+    { label: 'Finance Reviews', value: escalatedData.filter((t) => ['Finance', 'Prop'].includes(t.category)).length, accent: 'var(--warning)', Icon: Wallet, sub: 'Payment & funding checks' },
+    { label: 'Unassigned', value: escalatedData.filter((t) => t.owner === 'Unassigned').length, accent: 'var(--negative)', Icon: UserPlus, sub: 'No manager assigned', trend: escalatedData.filter((t) => t.owner === 'Unassigned').length > 0 ? 'Needs Owner' : 'Stable' }
   ];
-
-  const columns = [
-    {
-      key: 'id',
-      label: 'Ticket ID',
-      render: (value, row) => (
-        <div className="flex items-center gap-1.5">
-          {row.priority === 'CRITICAL' && <AlertOctagon size={11} className="flex-shrink-0 animate-pulse text-negative" />}
-          <span className="font-mono text-[10.5px] text-text-muted/55">{value}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'user',
-      label: 'User',
-      render: (_, row) => (
-        <div className="flex items-center gap-2">
-          <UserAvatar name={row.user} />
-          <div>
-            <div className="text-[12px] font-semibold text-text/85">{row.user}</div>
-            <div className="font-mono text-[9.5px] text-text-muted/35">{row.uid} · {row.region}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'subject',
-      label: 'Issue',
-      render: (value, row) => (
-        <div className="max-w-[220px]">
-          <div className="truncate text-[11.5px] font-medium text-text/75">{value}</div>
-          <CatTag value={row.category} />
-        </div>
-      ),
-    },
-    { key: 'priority', label: 'Priority', render: (value) => <PriorityBadge value={value} /> },
-    { key: 'escalationReason', label: 'Escalation Reason', render: (value) => <span className="line-clamp-1 text-[11px] text-warning/80">{value ?? 'Senior review required'}</span> },
-    {
-      key: 'owner',
-      label: 'Owner',
-      render: (value) => (
-        <span className={`text-[11px] font-semibold ${value === 'Unassigned' ? 'text-negative' : 'text-text-muted/55'}`}>
-          {value === 'Unassigned' && <AlertCircle size={10} className="mr-1 inline" />}
-          {value}
-        </span>
-      ),
-    },
-    { key: 'sla', label: 'SLA Time Left', render: (_, row) => <SlaBar pct={row.sla} slaMins={row.slaMins} /> },
-    { key: 'status', label: 'Status', render: (value) => <SupportStatusBadge value={value} /> },
-    {
-      key: 'actions',
-      label: 'Actions',
-      align: 'right',
-      render: (_, row) => (
-        <div className="flex justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100" onClick={(e) => e.stopPropagation()}>
-          <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/support/tickets/${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-border/25 text-text-muted/40 hover:text-text"><Eye size={10} /></button>
-          <button type="button" onClick={(e) => { e.stopPropagation(); act(`Assigned: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-cyan/20 text-cyan/50 hover:text-cyan"><UserPlus size={10} /></button>
-          <button type="button" onClick={(e) => { e.stopPropagation(); act(`Resolved: ${row.id}`); }} className="flex h-6 w-6 items-center justify-center rounded-[5px] border border-positive/20 text-positive/50 hover:text-positive"><Check size={10} /></button>
-        </div>
-      ),
-    },
-  ];
-
-  const tableState = {
-    page,
-    pageSize: PER_PAGE,
-    setPage,
-    setPageSize: () => {},
-    totalPages: totalPages
-  };
 
   return (
     <div className="space-y-5 animate-fade-up">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
-            Support Operations
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            Support Helpdesk
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
-            Escalations
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
+            Urgent Tickets
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
-            High-priority issues requiring senior support review.
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
+            Urgent user questions requiring manager review.
           </p>
         </div>
       </header>
 
       {/* ── Critical alert banner ── */}
-      <div className="flex items-start gap-3 rounded-[12px] border border-negative/25 bg-negative/[0.06] px-5 py-4" style={{ boxShadow: '0 0 24px rgba(239,68,68,0.07)' }}>
-        <AlertOctagon size={16} className="text-negative flex-shrink-0 mt-0.5 animate-pulse" />
-        <div className="flex-1">
-          <div className="text-[13px] font-bold text-negative font-heading tracking-[-0.01em]">
-            {escalatedData.length} Escalated Ticket{escalatedData.length > 1 ? 's' : ''} Require Immediate Attention
+      {escalatedData.length > 0 && (
+        <div className="flex items-start gap-3 rounded-[12px] border border-negative/25 bg-negative/[0.06] px-5 py-4" style={{ boxShadow: '0 0 24px rgba(239,68,68,0.07)' }}>
+          <AlertOctagon size={16} className="text-negative flex-shrink-0 mt-0.5 animate-pulse" />
+          <div className="flex-1">
+            <div className="text-[13px] font-semibold text-negative font-heading tracking-[-0.01em]">
+              {escalatedData.length} Urgent Ticket{escalatedData.length > 1 ? 's' : ''} Need Quick Response
+            </div>
+            <div className="text-[12px] text-negative/80 font-heading mt-1">
+              {escalatedData.filter((t) => t.priority === 'CRITICAL').length} high priority ·{' '}
+              {escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length} past due response time ·{' '}
+              {escalatedData.filter((t) => t.owner === 'Unassigned').length} with no assigned manager. Manager review needed.
+            </div>
           </div>
-          <div className="text-[11.5px] text-negative/70 font-heading mt-1">
-            {escalatedData.filter((t) => t.priority === 'CRITICAL').length} critical ·{' '}
-            {escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length} SLA breached ·{' '}
-            {escalatedData.filter((t) => t.owner === 'Unassigned').length} unassigned. Senior review required.
+          <div className="flex gap-2 flex-shrink-0">
+            <SupportIconBtn label="Assign Manager" Icon={UserPlus} variant="warning" small onClick={() => act('Bulk assign modal opened')} />
+            <SupportIconBtn label="Urgent Report" Icon={Download} variant="default" small onClick={() => act('Report escalated')} />
           </div>
         </div>
-        <div className="flex gap-2 flex-shrink-0">
-          <SupportIconBtn label="Bulk Assign" Icon={UserPlus} variant="warning" small onClick={() => act('Bulk assign modal opened')} />
-          <SupportIconBtn label="Escalation Report" Icon={Download} variant="default" small onClick={() => act('Report exported')} />
-        </div>
-      </div>
+      )}
 
       {/* ── Stat strip ── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+      <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         {stats.map((s) => (
-          <SupportStatCard key={s.label} label={s.label} val={s.val} color={s.color} urgent={s.urgent} />
+          <KpiCard key={s.label} {...s} />
         ))}
-      </div>
+      </section>
 
       <SupportToast msg={toast} onDone={() => setToast(null)} />
 
@@ -175,11 +108,11 @@ function EscalatedPage() {
           filters={
             <>
               <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Priority:</span>
+                <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Priority:</span>
                 <select
                   value={priorityF}
                   onChange={(e) => { setPriority(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   <option value="all">ALL</option>
@@ -189,11 +122,11 @@ function EscalatedPage() {
               </div>
 
               <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Cat:</span>
+                <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Category:</span>
                 <select
                   value={catF}
                   onChange={(e) => { setCatF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   <option value="all">ALL</option>
@@ -210,14 +143,58 @@ function EscalatedPage() {
           }
         />
 
-        <MainTable
-          columns={columns}
-          data={paginated}
-          onRowClick={(row) => navigate(`/support/tickets/${row.id}`)}
-          emptyTitle="No escalated tickets match filters"
-          pagination={tableState}
-          rowClassName={() => 'hover:bg-negative/5 hover:border-l-negative'}
-        />
+        <div className="p-5 border-t border-border/15">
+          {paginated.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-12 h-12 rounded-[12px] bg-negative/8 border border-negative/15 flex items-center justify-center mb-3">
+                <AlertOctagon size={20} className="text-negative/50" />
+              </div>
+              <p className="text-[13px] font-bold text-text/60 tracking-tight">No escalated tickets found</p>
+              <p className="text-[11.5px] text-text-muted/40 mt-1 max-w-[220px] leading-snug">
+                Try removing the filters or search keywords.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              {paginated.map((ticket) => (
+                <TicketCard
+                  key={ticket.id}
+                  ticket={ticket}
+                  onView={(t) => navigate(`/support/tickets/${t.id}`, { state: { fromEscalated: true } })}
+                  onAssign={(t) => act(`Assigned: ${t.id}`)}
+                  onResolve={(t) => act(`Resolved: ${t.id}`)}
+                  showEscalate={false}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-border/10 px-5 py-4 bg-bg/5">
+            <span className="text-[11px] font-mono text-text-muted/45 font-bold">
+              Showing {(page - 1) * PER_PAGE + 1} to {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length} escalated tickets
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="flex h-7.5 px-3 items-center justify-center rounded-[6px] border border-border/20 text-[10.5px] font-bold text-text-muted hover:text-text hover:border-border/40 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-all bg-surface"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="flex h-7.5 px-3 items-center justify-center rounded-[6px] border border-border/20 text-[10.5px] font-bold text-text-muted hover:text-text hover:border-border/40 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-all bg-surface"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

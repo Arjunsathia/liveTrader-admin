@@ -30,23 +30,23 @@ function RolesPage() {
             <Shield size={13} style={{ color: ROLE_CLR[r.name] || 'rgba(255,255,255,0.3)' }} />
           </div>
           <div>
-            <div className="text-[12px] font-semibold font-heading text-text/85">{v}</div>
-            <div className="text-[10px] text-text-muted/35 font-heading truncate max-w-[200px]">{r.desc}</div>
+            <div className="text-[13px] font-semibold font-heading text-text/90">{v}</div>
+            <div className="text-[11.5px] text-text-muted/75 font-heading truncate max-w-[200px]">{r.desc}</div>
           </div>
         </div>
       )
     },
-    { key: 'userCount', label: 'Admins', render: v => <span className="font-mono font-bold text-brand">{v}</span> },
-    { key: 'scope', label: 'Scope', render: v => <span className="text-[10px] font-heading border border-white/[0.06] px-1.5 py-0.5 rounded-[4px] text-text-muted/50">{v}</span> },
+    { key: 'userCount', label: 'Admins', render: v => <span className="font-mono font-semibold text-[12.5px] text-brand">{v}</span> },
+    { key: 'scope', label: 'Scope', render: v => <span className="text-[11px] font-semibold border border-white/[0.06] px-2 py-0.5 rounded-[4px] text-text-muted/75">{v}</span> },
     {
       key: 'perms', label: 'Permissions', render: (_, r) => (
         <div className="flex gap-1 flex-wrap max-w-[200px]">
-          {r.actions.map(a => <span key={a} className="text-[9px] font-mono px-1 py-0.5 rounded-[3px] bg-primary/[0.06] border border-primary/[0.12] text-primary">{a}</span>)}
+          {r.actions.map(a => <span key={a} className="text-[10px] font-mono px-1.5 py-0.5 rounded-[3px] bg-primary/[0.08] border border-primary/[0.15] text-primary">{a}</span>)}
         </div>
       )
     },
     { key: 'status', label: 'Status', render: v => <Badge value={v} /> },
-    { key: 'updated', label: 'Updated', render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
+    { key: 'updated', label: 'Updated', render: v => <span className="font-mono text-text-muted/70 text-[11px]">{v}</span> },
     {
       key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end" onClick={(e) => e.stopPropagation()}>
@@ -59,6 +59,21 @@ function RolesPage() {
 
   return (
     <div className="space-y-5 animate-fade-up">
+
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            Access Management
+          </p>
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
+            Roles
+          </h2>
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
+            Manage system roles, permissions scope, and assigned users.
+          </p>
+        </div>
+      </header>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
@@ -91,24 +106,24 @@ function RolesPage() {
                     <Shield size={15} style={{ color }} />
                   </div>
                   <div>
-                    <div className="text-[13px] font-bold font-heading text-text tracking-[-0.01em]">{role.label}</div>
-                    <div className="text-[10px] font-mono text-text-muted/35">{role.userCount} admin{role.userCount !== 1 ? 's' : ''}</div>
+                    <div className="text-[14px] font-semibold font-heading text-text tracking-[-0.01em]">{role.label}</div>
+                    <div className="text-[11px] font-mono text-text-muted/70">{role.userCount} admin{role.userCount !== 1 ? 's' : ''}</div>
                   </div>
                 </div>
                 <Badge value={role.status} />
               </div>
-              <div className="text-[11px] text-text-muted/45 font-heading leading-snug mb-3 line-clamp-2">{role.desc}</div>
+              <div className="text-[12.5px] text-text-muted/75 font-heading leading-snug mb-3 line-clamp-2">{role.desc}</div>
               <div className="flex flex-wrap gap-1 pt-2 border-t border-white/[0.04]">
                 {role.actions.map(a => (
-                  <span key={a} className="text-[9.5px] font-mono px-1.5 py-0.5 rounded-[4px]"
-                    style={{ color, background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 15%, transparent)` }}>
+                  <span key={a} className="text-[10px] font-mono px-1.5 py-0.5 rounded-[4px]"
+                    style={{ color, background: `color-mix(in srgb, ${color} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 22%, transparent)` }}>
                     {a}
                   </span>
                 ))}
               </div>
               <div className="flex items-center justify-between mt-2.5">
-                <span className="text-[10px] text-text-muted/25 font-heading">{role.modules.length} modules</span>
-                <ChevronRight size={12} className="text-text-muted/25 group-hover:text-primary transition-colors" />
+                <span className="text-[11px] text-text-muted/70 font-heading">{role.modules.length} modules</span>
+                <ChevronRight size={12} className="text-text-muted/50 group-hover:text-primary transition-colors" />
               </div>
             </Card>
           );
@@ -122,7 +137,7 @@ function RolesPage() {
           columns={cols} 
           data={rolesData} 
           onRowClick={r => drawerState.open(r)}
-          rowClassName={(r) => `hover:bg-primary/5 hover:border-l-primary cursor-pointer`}
+          rowClassName={() => `hover:bg-primary/5 hover:border-l-primary cursor-pointer`}
         />
       </section>
       

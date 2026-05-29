@@ -62,13 +62,13 @@ function EvaluationRequestsPage() {
     <div className="space-y-5 animate-fade-up">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
             Prop Trading
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
             Evaluation Requests
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
             Review and approve passed challenges for live funding.
           </p>
         </div>
@@ -96,11 +96,11 @@ function EvaluationRequestsPage() {
           searchPlaceholder="Search trader, ID…"
           filters={
             <div className="flex items-center gap-1">
-              <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Filter:</span>
+              <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Filter:</span>
               <select
                 value={ws.filter}
                 onChange={(e) => ws.setFilter(e.target.value)}
-                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none font-semibold"
                 style={{ minWidth: '70px' }}
               >
                 {['ALL', 'PENDING', 'REVIEW', 'APPROVED', 'REJECTED'].map(f => (

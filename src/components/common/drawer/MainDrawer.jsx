@@ -9,28 +9,28 @@ export function MainDrawer({
   width = 'max-w-[720px]',
 }) {
   const [active, setActive] = useState(false);
-  const [shouldRender, setShouldRender] = useState(false);
+  const [shouldRender, setShouldRender] = useState(open);
   const [cachedChildren, setCachedChildren] = useState(children);
 
-  useEffect(() => {
-    if (open) {
-      setCachedChildren(children);
-    }
-  }, [open, children]);
+  if (open && !shouldRender) {
+    setShouldRender(true);
+  }
+  if (open && children !== cachedChildren) {
+    setCachedChildren(children);
+  }
 
   useEffect(() => {
     let unmountTimer;
     let rAF;
 
     if (open) {
-      setShouldRender(true);
       rAF = requestAnimationFrame(() => {
         rAF = requestAnimationFrame(() => {
           setActive(true);
         });
       });
     } else {
-      setActive(false);
+      setTimeout(() => setActive(false), 0);
       unmountTimer = setTimeout(() => setShouldRender(false), 400);
     }
 

@@ -67,13 +67,13 @@ function FailedPaymentsPage() {
         {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
               {PAGE.description}
             </p>
           </div>
@@ -81,14 +81,14 @@ function FailedPaymentsPage() {
             <button
               type="button"
               onClick={() => act('Bulk retry', 'initiated')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
               <RefreshCw size={12} /> Retry All
             </button>
             <button
               type="button"
               onClick={() => act('Exported', 'failures')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
             >
               <Download size={12} /> Export Failures
             </button>
@@ -110,10 +110,10 @@ function FailedPaymentsPage() {
               <ShieldX size={14} className="text-negative relative z-10" />
             </div>
             <div className="flex-1">
-              <h4 className="text-[12px] font-bold text-negative font-heading">
+              <h4 className="text-[13px] font-bold text-negative font-heading">
                 {failedPaymentsData.filter(f => f.severity === 'CRITICAL').length} Critical Payment Failures — Manual Intervention Required
               </h4>
-              <p className="text-[11px] text-negative/70 font-heading mt-0.5 leading-relaxed">
+              <p className="text-[12px] text-negative/80 font-heading mt-1 leading-relaxed">
                 These cannot be retried automatically. MLRO or Finance lead sign-off needed.
               </p>
             </div>
@@ -132,11 +132,11 @@ function FailedPaymentsPage() {
                 className="w-1 h-5 rounded-full"
                 style={{ background: PAGE.accent }}
               />
-              <h3 className="font-black text-[12px] tracking-widest uppercase text-text/80">
+              <h3 className="font-bold text-[13px] tracking-widest uppercase text-text/90">
                 Failed Ledger Records
               </h3>
               <span
-                className="px-1.5 py-0.5 rounded-[5px] text-[10px] font-black border font-mono"
+                className="px-1.5 py-0.5 rounded-[5px] text-[11px] font-bold border font-mono"
                 style={{ color: PAGE.accent, background: `color-mix(in srgb, ${PAGE.accent} 10%, transparent)`, borderColor: `color-mix(in srgb, ${PAGE.accent} 22%, transparent)` }}
               >
                 {filtered.length}
@@ -145,23 +145,23 @@ function FailedPaymentsPage() {
 
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
-                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none" />
+                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted/50 pointer-events-none" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                   placeholder="Search failed txn…"
-                  className="h-7 pl-7 pr-3 w-36 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text placeholder:text-text-muted/35 outline-none focus:border-brand/40 focus:w-48 transition-all"
+                  className="h-7 pl-7 pr-3 w-36 rounded-[7px] border border-border/20 bg-bg text-[12px] text-text placeholder:text-text-muted/50 outline-none focus:border-brand/40 focus:w-48 transition-all"
                 />
               </div>
 
               {/* Status Select */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Status:</span>
                 <select
                   value={statusF}
                   onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   {['ALL', 'UNRESOLVED', 'RETRY', 'RESOLVED'].map((opt) => (
@@ -171,12 +171,12 @@ function FailedPaymentsPage() {
               </div>
 
               {/* Provider Select */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Provider:</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Provider:</span>
                 <select
                   value={providerF}
                   onChange={(e) => { setProviderF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   {['ALL', 'SWIFT', 'Stripe', 'Fireblocks', 'Skrill', 'Adyen', 'SEPA', 'Neteller'].map((opt) => (
@@ -186,12 +186,12 @@ function FailedPaymentsPage() {
               </div>
 
               {/* Severity Select */}
-              <div className="flex items-center gap-1">
-                <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Severity:</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Severity:</span>
                 <select
                   value={sevF}
                   onChange={(e) => { setSevF(e.target.value); setPage(1); }}
-                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                  className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                   style={{ minWidth: '70px' }}
                 >
                   {['ALL', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map((opt) => (
@@ -206,7 +206,7 @@ function FailedPaymentsPage() {
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
+                <tr className="text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted/65 border-b border-border/10 bg-bg/20">
                   <th className="px-4 py-3">Record ID</th>
                   <th className="px-4 py-3">User</th>
                   <th className="px-4 py-3">Method</th>
@@ -244,22 +244,22 @@ function FailedPaymentsPage() {
                             : 'hover:bg-positive/5 hover:border-l-positive'
                         }`}
                       >
-                        <td className="px-4 py-3.5 font-mono text-[11px] font-bold text-brand">{row.id}</td>
+                        <td className="px-4 py-3.5 font-mono text-[12px] font-bold text-brand">{row.id}</td>
                         <td className="px-4 py-3.5"><UserCell u={row.user} /></td>
                         <td className="px-4 py-3.5"><MethodBadge value={row.method} /></td>
                         <td className="px-4 py-3.5">
-                          <code className="font-mono text-[10.5px] text-cyan bg-cyan/[0.07] border border-cyan/[0.15] px-1.5 py-0.5 rounded-[4px]">
+                          <code className="font-mono text-[11.5px] text-cyan bg-cyan/[0.07] border border-cyan/[0.15] px-1.5 py-0.5 rounded-[4px]">
                             {row.provider}
                           </code>
                         </td>
                         <td className="px-4 py-3.5">
-                          <span className="text-[11px] font-mono text-text/70">
+                          <span className="text-[12px] font-mono text-text/80">
                             {row.reason.replace(/_/g, ' ')}
                           </span>
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.code}</td>
+                        <td className="px-4 py-3.5 font-mono text-[12px] text-text-muted/75">{row.code}</td>
                         <td className="px-4 py-3.5">
-                          <span className="text-[9.5px] font-black uppercase tracking-[0.09em] font-heading px-2 py-[3px] rounded-[5px]"
+                          <span className="text-[10.5px] font-semibold uppercase tracking-[0.09em] font-heading px-2.5 py-[3.5px] rounded-[5px]"
                             style={{ 
                               color: SEV_COLORS_MAP[row.severity], 
                               background: `color-mix(in srgb, ${SEV_COLORS_MAP[row.severity]} 10%, transparent)`, 
@@ -270,14 +270,14 @@ function FailedPaymentsPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3.5"><StatusBadge value={row.status} /></td>
-                        <td className="px-4 py-3.5 font-mono text-[11.5px]">
+                        <td className="px-4 py-3.5 font-mono text-[12.5px]">
                           {row.retries > 0 ? (
                             <span className="font-bold text-warning">{row.retries}×</span>
                           ) : (
-                            <span className="text-text-muted/40">—</span>
+                            <span className="text-text-muted/50">—</span>
                           )}
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-[11px] text-text-muted/50">{row.created}</td>
+                        <td className="px-4 py-3.5 font-mono text-[12px] text-text-muted/75">{row.created}</td>
                         <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                             {row.status !== 'RESOLVED' && (
@@ -321,7 +321,7 @@ function FailedPaymentsPage() {
       </div>
 
       {/* Failed Payment Drawer */}
-      <FinanceDrawer open={drawerState.isOpen} onClose={() => drawerState.close()} title={`Failed Payment — ${drawerState.value?.id}`} subtitle="Review failure context, gateway logs, and error resolution options." footer={
+      <FinanceDrawer open={drawerState.isOpen} onClose={() => drawerState.close()} eyebrow="Failed Payment Review" title={`Failed Payment — ${drawerState.value?.id}`} subtitle="Review failure context, gateway logs, and error resolution options." footer={
         drawerState.value ? (
           <div className="grid grid-cols-2 gap-2 w-full">
             {drawerState.value.status !== 'RESOLVED' && <>
@@ -335,13 +335,33 @@ function FailedPaymentsPage() {
       }>
         {drawerState.value && (
           <>
-            <div className="rounded-[12px] border border-negative/20 bg-negative/[0.05] p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <ShieldX size={14} className="text-negative" />
-                <span className="text-[13px] font-bold font-heading text-negative">Payment Failure Report</span>
+            <div className="rounded-[12px] border p-4 relative overflow-hidden bg-bg/50"
+              style={{
+                borderColor: 'color-mix(in srgb, var(--negative) 25%, var(--border))',
+                background: 'color-mix(in srgb, var(--negative) 4%, var(--bg))'
+              }}
+            >
+              {/* Background glow */}
+              <div
+                className="absolute -top-10 -right-10 w-28 h-28 rounded-full opacity-[0.08] pointer-events-none"
+                style={{ background: 'var(--negative)' }}
+              />
+              <div className="relative z-[1]">
+                <div className="flex items-center gap-2.5 mb-2 border-b border-negative/10 pb-2">
+                  <ShieldX size={14} className="text-negative animate-pulse" />
+                  <span className="text-[11px] font-bold tracking-wider uppercase text-negative">Payment Failure Report</span>
+                </div>
+                <div className="space-y-2 mt-3">
+                  <div className="text-[12px] text-text font-heading flex justify-between">
+                    <span className="text-text-muted/70 font-semibold">Provider & Code</span>
+                    <span className="font-mono font-bold text-text">{drawerState.value.provider} · {drawerState.value.code}</span>
+                  </div>
+                  <div className="text-[12px] text-text font-heading flex justify-between">
+                    <span className="text-text-muted/70 font-semibold">Failure Reason</span>
+                    <span className="font-bold text-negative/90 text-right max-w-[280px] leading-snug">{drawerState.value.reason.replace(/_/g, ' ')}</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-[11.5px] text-negative/70 font-heading">Provider: <strong>{drawerState.value.provider}</strong> · Code: <strong>{drawerState.value.code}</strong></div>
-              <div className="text-[11.5px] text-negative/70 font-heading mt-1">Reason: {drawerState.value.reason.replace(/_/g, ' ')}</div>
             </div>
             <DrawerSection title="Record Details">
               <DGrid>

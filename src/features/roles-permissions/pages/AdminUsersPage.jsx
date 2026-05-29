@@ -74,13 +74,13 @@ function AdminUsersPage() {
 
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
             Access Management
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
             Admin Users
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
             Manage admin accounts, their roles, and system access.
           </p>
         </div>
@@ -88,13 +88,13 @@ function AdminUsersPage() {
 
       {/* 2FA alert */}
       {adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length > 0 && (
-        <div className="flex items-start gap-3 rounded-[10px] border border-warning/20 bg-warning/[0.05] px-4 py-3">
+        <div className="flex items-start gap-3 rounded-[12px] border border-warning/20 bg-warning/[0.05] px-4 py-3 shadow-sm">
           <ShieldOff size={14} className="text-warning flex-shrink-0 mt-0.5" />
           <div>
-            <div className="text-[12px] font-bold text-warning font-heading">2FA Not Enabled on {adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length} Active Admin{adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length > 1 ? 's' : ''}</div>
-            <div className="text-[11px] text-warning/70 font-heading mt-0.5">Enforce 2FA for all admin accounts to comply with security policy.</div>
+            <div className="text-[13px] font-bold text-warning font-heading">2FA Not Enabled on {adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length} Active Admin{adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length > 1 ? 's' : ''}</div>
+            <div className="text-[12px] text-warning/80 font-heading mt-1">Enforce 2FA for all admin accounts to comply with security policy.</div>
           </div>
-          <button onClick={() => act('2FA enforced', 'all')} className="ml-auto flex-shrink-0 flex items-center gap-1.5 h-7 px-3 rounded-[7px] text-[10.5px] font-bold font-heading border border-warning/25 bg-warning/[0.08] text-warning cursor-pointer hover:brightness-110">
+          <button onClick={() => act('2FA enforced', 'all')} className="ml-auto flex-shrink-0 flex items-center gap-1.5 h-7 px-3 rounded-[7px] text-[11.5px] font-semibold font-heading border border-warning/25 bg-warning/[0.08] text-warning cursor-pointer hover:brightness-110">
             <Zap size={10} /> Enforce All
           </button>
         </div>
@@ -120,11 +120,11 @@ function AdminUsersPage() {
           searchPlaceholder="Search admins…"
           filters={
             <div className="flex items-center gap-1">
-              <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Filter:</span>
+              <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Filter:</span>
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                 style={{ minWidth: '70px' }}
               >
                 {['ALL', 'ACTIVE', 'INACTIVE', 'LOCKED', 'PENDING', '2FA', 'NO_2FA'].map(opt => (

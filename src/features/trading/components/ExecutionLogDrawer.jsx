@@ -31,6 +31,7 @@ export function ExecutionLogDrawer({ open, row, onClose }) {
   return (
     <TradingDrawer
       open={open}
+      eyebrow="Execution Event Review"
       title={row.eventId}
       subtitle={`${row.type} · Bridge: ${row.bridge}`}
       onClose={onClose}
@@ -40,24 +41,62 @@ export function ExecutionLogDrawer({ open, row, onClose }) {
       <div className="space-y-6">
         {/* Severity Banner */}
         <div
-          className={`rounded-[12px] border px-4 py-3 flex items-center justify-between ${sevMeta.bg}`}
+          className="rounded-[14px] border p-5 relative overflow-hidden animate-fade-in duration-300"
+          style={{
+            borderColor: `color-mix(in srgb, ${sevMeta.color} 20%, var(--border))`,
+            background: `color-mix(in srgb, ${sevMeta.color} 4%, var(--bg))`,
+          }}
         >
-          <div>
-            <div className="text-[9.5px] uppercase tracking-wider text-text-muted/55 mb-1">Severity Level</div>
-            <div className="text-[15px] font-black" style={{ color: sevMeta.color }}>
-              {sevMeta.label}
-            </div>
-            <div className="text-[10px] text-text-muted/55 mt-1 font-mono">{row.timestamp}</div>
-          </div>
+          {/* Background glow */}
           <div
-            className="font-mono text-[11px] font-bold px-2.5 py-1.5 rounded-[8px] border"
-            style={{
-              color: sevMeta.color,
-              borderColor: `color-mix(in srgb, ${sevMeta.color} 25%, transparent)`,
-              background: `color-mix(in srgb, ${sevMeta.color} 8%, transparent)`,
-            }}
-          >
-            {parseInt(row.latency) > 0 ? row.latency : row.latency}
+            className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-[0.06] pointer-events-none"
+            style={{ background: sevMeta.color }}
+          />
+
+          <div className="flex items-start justify-between gap-4 relative z-[1]">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-11 h-11 rounded-[11px] flex items-center justify-center border flex-shrink-0"
+                style={{
+                  background: `color-mix(in srgb, ${sevMeta.color} 12%, transparent)`,
+                  borderColor: `color-mix(in srgb, ${sevMeta.color} 22%, transparent)`,
+                }}
+              >
+                <Terminal size={20} style={{ color: sevMeta.color }} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span
+                    className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+                    style={{ color: sevMeta.color }}
+                  >
+                    Severity Level
+                  </span>
+                </div>
+                <div 
+                  className="text-[22px] font-semibold tracking-tight leading-tight mt-1"
+                  style={{ color: sevMeta.color }}
+                >
+                  {sevMeta.label}
+                </div>
+                <div className="text-[12.5px] font-mono text-text-muted/75 mt-1">
+                  Bridge: {row.bridge} · {row.timestamp}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+              <span 
+                className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider border font-heading"
+                style={{
+                  color: sevMeta.color,
+                  borderColor: `color-mix(in srgb, ${sevMeta.color} 20%, var(--border))`,
+                  background: `color-mix(in srgb, ${sevMeta.color} 8%, transparent)`,
+                }}
+              >
+                {row.latency}
+              </span>
+            </div>
           </div>
         </div>
 

@@ -107,7 +107,7 @@ export function TreeDetailPanel({ node, onClose }) {
             { label: 'Sub-IBs',         val: node.subIBs?.length ?? 0,          color: 'var(--cyan)' },
           ].map(s => (
             <div key={s.label} className="rounded-[9px] border border-border/30 bg-bg/60 px-3 py-2.5">
-              <div className="text-[9.5px] font-black uppercase tracking-[0.13em] text-text-muted/50 font-heading mb-1">{s.label}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 mb-1">{s.label}</div>
               <div className="text-[15px] font-bold font-mono" style={{ color: s.color }}>{s.val}</div>
             </div>
           ))}
@@ -121,9 +121,9 @@ export function TreeDetailPanel({ node, onClose }) {
               { label: 'Platform Retained',val: `${100 - parseInt(node.share)}%`, bar: (100 - parseInt(node.share)) * 2 },
             ].map(f => (
               <div key={f.label} className="space-y-1">
-                <div className="flex justify-between text-[10.5px]">
-                  <span className="text-text-muted/50 font-heading">{f.label}</span>
-                  <span className="font-mono text-text/70">{f.val}</span>
+                <div className="flex justify-between text-[11.5px] font-semibold">
+                  <span className="text-text-muted/70">{f.label}</span>
+                  <span className="font-mono text-text/95">{f.val}</span>
                 </div>
                 <div className="h-1 rounded-full bg-border/20">
                   <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(f.bar, 100)}%`, background: 'var(--brand)' }} />

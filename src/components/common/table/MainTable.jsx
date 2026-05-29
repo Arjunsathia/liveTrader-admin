@@ -42,7 +42,7 @@ export function MainTable({
       <div className="overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="text-[9.5px] uppercase font-black text-text-muted/50 tracking-[0.12em] border-b border-border/10 bg-bg/20">
+            <tr className="text-[10px] font-black uppercase tracking-[0.14em] text-text-muted/40 border-b border-border/10 bg-bg/20">
               {columns.map((col, idx) => (
                 <th
                   key={col.key || idx}

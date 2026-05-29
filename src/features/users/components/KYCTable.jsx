@@ -4,22 +4,83 @@ import { MainTable } from '../../../components/common/table';
 
 export function KYCTable({ tableState, onReviewUser }) {
   const columns = [
-    { key: 'id', label: 'Case ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
+    { 
+      key: 'id', 
+      label: 'Case ID', 
+      render: (val) => (
+        <span className="inline-flex px-2 py-0.5 rounded-[5px] border border-brand/15 bg-brand/[0.04] font-mono text-[11px] font-bold text-brand tracking-wider select-none">
+          {val}
+        </span>
+      ) 
+    },
     {
       key: 'user',
-      label: 'User',
+      label: 'User Profile',
       render: (_, row) => (
-        <div>
-          <div className="text-[12px] font-semibold text-text">{row.user}</div>
-          <div className="text-[10px] text-text-muted/50 font-medium">{row.country}</div>
+        <div className="flex items-center gap-2.5">
+          <div>
+            <div className="text-[13.5px] font-semibold text-text leading-tight">{row.user}</div>
+            <div className="flex items-center gap-1.5 mt-1 select-none">
+              <span className="px-1.5 py-0.5 rounded-[4px] border border-border/12 bg-bg/40 font-mono text-[10.5px] font-bold uppercase text-text-muted tracking-wider">
+                {row.country || 'GLOBAL'}
+              </span>
+              <span className="text-[10.5px] text-text-muted font-bold uppercase select-none">KYC Registry</span>
+            </div>
+          </div>
         </div>
       ),
     },
-    { key: 'tier', label: 'Tier', render: (val) => <span className="text-[12px] font-medium text-text">{val}</span> },
-    { key: 'docs', label: 'Docs', render: (val) => <span className="text-[12px] text-text-muted font-medium">{val}</span> },
-    { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
-    { key: 'risk', label: 'Risk', render: (val) => <RiskChip value={val} /> },
-    { key: 'eta', label: 'ETA', render: (val) => <span className="font-mono text-[11px] text-text-muted/50">{val}</span> },
+    { 
+      key: 'tier', 
+      label: 'pricing Tier', 
+      render: (val) => (
+        <span className="text-[13px] font-bold text-text select-none uppercase tracking-wide">
+          {val}
+        </span>
+      ) 
+    },
+    { 
+      key: 'docs', 
+      label: 'Dossier Files', 
+      render: (val) => (
+        <span className="font-mono text-[12.5px] text-text-muted font-medium select-none">
+          {val} files
+        </span>
+      ) 
+    },
+    { 
+      key: 'status', 
+      label: 'Audit Status', 
+      render: (val) => {
+        const isVerified = val === 'VERIFIED';
+        const isRejected = val === 'REJECTED';
+        const pulseColor = isVerified ? 'bg-positive shadow-[0_0_8px_var(--positive)]' : isRejected ? 'bg-negative shadow-[0_0_8px_var(--negative)]' : 'bg-warning shadow-[0_0_8px_var(--warning)]';
+        return (
+          <div className="flex items-center gap-2 select-none">
+            <span className={`h-1.5 w-1.5 rounded-full ${pulseColor} animate-pulse shrink-0`} />
+            <StatusBadge status={val} />
+          </div>
+        );
+      } 
+    },
+    { 
+      key: 'risk', 
+      label: 'Risk Index', 
+      render: (val) => (
+        <div className="select-none scale-[0.95] origin-left">
+          <RiskChip value={val} />
+        </div>
+      ) 
+    },
+    { 
+      key: 'eta', 
+      label: 'Audit Latency', 
+      render: (val) => (
+        <span className="font-mono text-[11.5px] text-text-muted font-medium select-none">
+          {val}
+        </span>
+      ) 
+    },
     {
       key: 'actions',
       label: 'Actions',
@@ -28,9 +89,9 @@ export function KYCTable({ tableState, onReviewUser }) {
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onReviewUser(row.userId); }}
-          className="rounded-[6px] border border-border/25 bg-bg/50 px-2.5 py-1 text-[11px] font-bold text-text-muted transition-all hover:border-border/55 hover:text-text cursor-pointer"
+          className="inline-flex items-center justify-center h-7 px-3.5 rounded-[7px] border border-border/15 bg-bg/25 text-text-muted hover:text-text hover:border-brand/40 hover:bg-bg/40 text-[10.5px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.94] shadow-sm select-none"
         >
-          Review
+          Audit dossier
         </button>
       ),
     },
@@ -46,10 +107,11 @@ export function KYCTable({ tableState, onReviewUser }) {
       rowClassName={(row) => {
         const isFlagged = ['REJECTED', 'FAILED', 'FLAGGED'].includes(row.status);
         const isPending = ['PENDING', 'NONE'].includes(row.status);
-        if (isFlagged) return 'hover:bg-negative/5 hover:border-l-negative';
-        if (isPending) return 'hover:bg-warning/5 hover:border-l-warning';
-        return 'hover:bg-positive/5 hover:border-l-positive';
+        if (isFlagged) return 'hover:bg-negative/[0.02] hover:border-l-negative hover:border-l-3 transition-all duration-150';
+        if (isPending) return 'hover:bg-warning/[0.02] hover:border-l-warning hover:border-l-3 transition-all duration-150';
+        return 'hover:bg-positive/[0.02] hover:border-l-positive hover:border-l-3 transition-all duration-150';
       }}
     />
   );
 }
+

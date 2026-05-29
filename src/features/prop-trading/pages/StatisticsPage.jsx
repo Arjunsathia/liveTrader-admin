@@ -8,8 +8,8 @@ import { PropStatsCards } from '../components/PropStatsCards';
 import { MainTable, TableToolbar } from '../../../components/common/table';
 
 const perfCols = [
-  { key: 'name',    label: 'Challenge',    render: (v) => <span className="font-heading font-semibold text-text/75">{v}</span> },
-  { key: 'apps',    label: 'Applications', render: (v) => <span className="font-mono text-text-muted/60">{v.toLocaleString()}</span> },
+  { key: 'name',    label: 'Challenge',    render: (v) => <span className="font-heading font-semibold text-text/80">{v}</span> },
+  { key: 'apps',    label: 'Applications', render: (v) => <span className="font-mono text-text-muted/75">{v.toLocaleString()}</span> },
   { key: 'pass',    label: 'Pass Rate',    render: (v) => (
     <div className="flex items-center gap-2">
       <div className="w-16 h-1.5 rounded-full bg-white/[0.05]">
@@ -20,8 +20,8 @@ const perfCols = [
   )},
   { key: 'fail',    label: 'Fail Rate',    render: (v) => <span className="font-mono text-negative">{v}%</span> },
   { key: 'funded',  label: 'Funded',       render: (v) => <span className="font-mono text-brand font-bold">{v}</span> },
-  { key: 'revenue', label: 'Revenue',      render: (v) => <span className="font-mono font-bold text-text/70">{v}</span> },
-  { key: 'avgDays', label: 'Avg. Days',    render: (_, r, i) => <span className="font-mono text-text-muted/50">~{12 + (i ?? 0) * 1}d</span> },
+  { key: 'revenue', label: 'Revenue',      render: (v) => <span className="font-mono font-bold text-text/75">{v}</span> },
+  { key: 'avgDays', label: 'Avg. Days',    render: (_, r, i) => <span className="font-mono text-text-muted/70">~{12 + (i ?? 0) * 1}d</span> },
 ];
 
 function StatisticsPage() {
@@ -32,7 +32,7 @@ function StatisticsPage() {
   // Override render to use _idx
   const cols = perfCols.map(c => 
     c.key === 'avgDays' 
-    ? { ...c, render: (_, r) => <span className="font-mono text-text-muted/50">~{12 + r._idx * 1}d</span> }
+    ? { ...c, render: (_, r) => <span className="font-mono text-text-muted/70">~{12 + r._idx * 1}d</span> }
     : c
   );
 
@@ -40,13 +40,13 @@ function StatisticsPage() {
     <div className="space-y-5 animate-fade-up">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
             Prop Trading
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
             Statistics & Performance
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
             Analytics on challenge pass rates, application trends, and revenue.
           </p>
         </div>
@@ -54,8 +54,8 @@ function StatisticsPage() {
           <div className="flex gap-1 mr-2">
             {['1M', '3M', '6M', '1Y', 'ALL'].map(p => (
               <button key={p} onClick={() => setPeriod(p)}
-                className={`px-3 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all duration-150 border
-                  ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-border/10 text-text-muted/40 hover:text-text-muted bg-transparent'}`}>
+                className={`px-3 h-8 rounded-[7px] text-[11.5px] font-semibold font-heading cursor-pointer transition-all duration-150 border
+                  ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-border/10 text-text-muted/75 hover:text-text-muted bg-transparent'}`}>
                 {p}
               </button>
             ))}

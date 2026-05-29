@@ -25,25 +25,25 @@ function ReferralsPage() {
   }, [search, filter]);
 
   const cols = [
-    { key: 'id', label: 'ID', render: v => <span className="font-mono text-text-muted/55 text-[10.5px]">{v}</span> },
+    { key: 'id', label: 'ID', render: v => <span className="font-mono text-text-muted/70 text-[11px]">{v}</span> },
     {
       key: 'name', label: 'Partner', render: (v, r) => (
         <div className="flex items-center gap-2.5">
           <TraderAvatar name={v} />
           <div>
-            <div className="text-[12px] font-semibold font-heading text-text/82">{v}</div>
-            <div className="text-[10px] font-mono text-text-muted/40">{r.code}</div>
+            <div className="text-[12.5px] font-semibold text-text/90">{v}</div>
+            <div className="text-[10px] font-mono text-text-muted/60">{r.code}</div>
           </div>
         </div>
       )
     },
-    { key: 'region', label: 'Region', render: v => <span className="text-text-muted/55 font-heading font-semibold text-[11px]">{v}</span> },
+    { key: 'region', label: 'Region', render: v => <span className="text-text-muted/70 font-semibold text-[11.5px]">{v}</span> },
     { key: 'referred', label: 'Referred', render: v => <span className="font-mono font-bold text-brand">{v?.toLocaleString()}</span> },
     { key: 'active', label: 'Active', render: v => <span className="font-mono text-positive font-semibold">{v?.toLocaleString()}</span> },
     { key: 'share', label: 'Rev. Share', render: v => <span className="font-mono font-bold text-warning">{v}</span> },
     { key: 'tier', label: 'Tier', render: v => <IBTierBadge value={v} /> },
     { key: 'status', label: 'Status', render: v => <IBBadge value={v} /> },
-    { key: 'lastActivity', label: 'Last Active', render: v => <span className="font-mono text-text-muted/40 text-[10.5px]">{v}</span> },
+    { key: 'lastActivity', label: 'Last Active', render: v => <span className="font-mono text-text-muted/60 text-[11px]">{v}</span> },
     {
       key: 'actions', label: 'Actions', align: 'right', render: (_, r) => (
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end" onClick={(e) => e.stopPropagation()}>
@@ -58,13 +58,13 @@ function ReferralsPage() {
     <div className="space-y-5 animate-fade-up">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
             IB System
           </p>
-          <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
             Referrals
           </h2>
-          <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
             Manage IB partners, referral networks, and their status.
           </p>
         </div>
@@ -90,7 +90,7 @@ function ReferralsPage() {
         ].map(p => (
           <div key={p.label} className="flex items-center gap-2 rounded-[8px] border border-border/30 bg-bg/60 px-3 py-1.5">
             <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
-            <span className="text-[11px] text-text-muted/50 font-heading">{p.label}</span>
+            <span className="text-[11px] text-text-muted/70 font-semibold">{p.label}</span>
             <span className="text-[11px] font-mono font-bold" style={{ color: p.color }}>{p.val}</span>
           </div>
         ))}
@@ -105,12 +105,12 @@ function ReferralsPage() {
           onSearchChange={setSearch}
           searchPlaceholder="Search partners, codes, IDs…"
           filters={
-            <div className="flex items-center gap-1">
-              <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Filter:</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">Filter:</span>
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none font-semibold"
                 style={{ minWidth: '70px' }}
               >
                 <option value="ALL">ALL</option>

@@ -32,9 +32,9 @@ export function Card({ children, className = '', pad = true }) {
 export function FormField({ label, children, hint }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-[10px] font-black uppercase tracking-[0.14em] text-text-muted/40 font-heading">{label}</label>
+      <label className="block text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 font-heading">{label}</label>
       {children}
-      {hint && <p className="text-[10px] text-text-muted/30 font-heading">{hint}</p>}
+      {hint && <p className="text-[11.5px] text-text-muted/65 font-heading">{hint}</p>}
     </div>
   );
 }
@@ -67,7 +67,7 @@ export function Toggle({ val, onChange, label, hint }) {
     <div className="flex items-start justify-between gap-4 py-3 border-b border-white/[0.04] last:border-0">
       <div>
         <div className="text-[12.5px] font-semibold text-text/75 font-heading">{label}</div>
-        {hint && <div className="text-[10.5px] text-text-muted/35 font-heading mt-0.5">{hint}</div>}
+        {hint && <div className="text-[11.5px] text-text-muted/75 font-heading mt-0.5">{hint}</div>}
       </div>
       <button
         onClick={() => onChange(!val)}
@@ -83,11 +83,11 @@ export function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-[10px] border border-white/[0.1] bg-[var(--surface-elevated,#1a1a1a)] shadow-xl px-3 py-2.5 text-[11px] font-mono">
-      <div className="text-[9px] font-black uppercase tracking-widest text-text-muted/50 mb-1.5 font-heading">{label}</div>
+      <div className="text-[10.5px] font-bold uppercase tracking-widest text-text-muted/75 mb-1.5 font-heading">{label}</div>
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
-          <span className="text-text-muted/60 capitalize">{String(p.dataKey).replace('_', ' ')}</span>
+          <span className="text-text-muted/75 capitalize">{String(p.dataKey).replace('_', ' ')}</span>
           <span className="font-semibold ml-1" style={{ color: p.color }}>
             {p.dataKey === 'payouts' ? `$${(p.value / 1000).toFixed(0)}K` : p.value}
             {(p.dataKey === 'pass' || p.dataKey === 'fail') ? '%' : ''}

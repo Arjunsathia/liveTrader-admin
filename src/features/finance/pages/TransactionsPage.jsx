@@ -67,7 +67,7 @@ function TransactionsPage() {
   };
 
   const columns = [
-    { key: 'id', label: 'TXN ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
+    { key: 'id', label: 'TXN ID', render: (val) => <span className="font-mono text-[12px] font-bold text-brand">{val}</span> },
     { key: 'user', label: 'User', render: (_, row) => <UserCell u={row.user} /> },
     {
       key: 'type',
@@ -76,8 +76,8 @@ function TransactionsPage() {
         const Ic = TXN_ICONS[val] || ArrowLeftRight;
         const c = TXN_TYPE_CLR[val] || 'var(--text-muted)';
         return (
-          <span className="inline-flex items-center gap-1.5 text-[10.5px] font-black uppercase tracking-[0.05em] font-heading" style={{ color: c }}>
-            <Ic size={11} className="flex-shrink-0" />
+          <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.05em] font-heading" style={{ color: c }}>
+            <Ic size={12} className="flex-shrink-0" />
             {val}
           </span>
         );
@@ -85,9 +85,9 @@ function TransactionsPage() {
     },
     { key: 'amount', label: 'Amount', render: (_, row) => <AmountCell value={row.amount} type={row.type} /> },
     { key: 'method', label: 'Method', render: (val) => <MethodBadge value={val} /> },
-    { key: 'reference', label: 'Reference', render: (val) => <span className="font-mono text-[11px] text-cyan hover:underline">{val}</span> },
+    { key: 'reference', label: 'Reference', render: (val) => <span className="font-mono text-[12px] text-cyan hover:underline">{val}</span> },
     { key: 'status', label: 'Status', render: (val) => <StatusBadge value={val} /> },
-    { key: 'ts', label: 'Timestamp', render: (val) => <span className="font-mono text-[11px] text-text-muted/50">{val}</span> },
+    { key: 'ts', label: 'Timestamp', render: (val) => <span className="font-mono text-[12px] text-text-muted/75">{val}</span> },
     {
       key: 'actions',
       label: 'Actions',
@@ -96,7 +96,7 @@ function TransactionsPage() {
         <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={(e) => { e.stopPropagation(); act('Exported', row.id); }}
-            className="w-6 h-6 rounded-[5px] border border-border/20 bg-bg text-text-muted/60 hover:text-text cursor-pointer flex items-center justify-center transition-colors"
+            className="w-6 h-6 rounded-[5px] border border-border/20 bg-bg text-text-muted/80 hover:text-text cursor-pointer flex items-center justify-center transition-colors"
           >
             <Download size={10} />
           </button>
@@ -128,13 +128,13 @@ function TransactionsPage() {
         {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
               {PAGE.description}
             </p>
           </div>
@@ -142,7 +142,7 @@ function TransactionsPage() {
             <button
               type="button"
               onClick={() => act('Exported', 'ledger')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
               <Download size={12} /> Export Ledger
             </button>
@@ -169,12 +169,12 @@ function TransactionsPage() {
             searchPlaceholder="Search ledger…"
             filters={
               <>
-                <div className="flex items-center gap-1">
-                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Type:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Type:</span>
                   <select
                     value={typeF}
                     onChange={(e) => { setTypeF(e.target.value); setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
                     {['ALL', 'DEPOSIT', 'WITHDRAWAL', 'FEE', 'REVERSAL', 'COMMISSION', 'ADJUSTMENT'].map((opt) => (
@@ -183,12 +183,12 @@ function TransactionsPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Status:</span>
                   <select
                     value={statusF}
                     onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
                     {['ALL', 'SETTLED', 'PENDING', 'FLAGGED', 'FROZEN'].map((opt) => (
@@ -197,12 +197,12 @@ function TransactionsPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Method:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Method:</span>
                   <select
                     value={methodF}
                     onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
                     {['ALL', 'Bank Wire', 'Card', 'Crypto', 'E-Wallet', 'Internal'].map((opt) => (

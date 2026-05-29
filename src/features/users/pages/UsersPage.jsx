@@ -54,6 +54,23 @@ function UsersPage() {
 
   const quickDrawer = useDrawerState(null);
   const mt5Drawer = useDrawerState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
+
+  const handleSaveMt5Account = (accountData) => {
+    const targetUser = mt5Drawer.value;
+    if (targetUser) {
+      const newAcct = usersService.createMt5AccountForUser(targetUser.id, accountData);
+      if (newAcct) {
+        setUserRows(usersService.list()); // Refresh list of users to sync counts
+        triggerToast(`Successfully created MT5 Account #${newAcct.login} for ${targetUser.name}`);
+      }
+    }
+  };
 
   const filteredUsers = useMemo(() => {
     let rows = filterBySearch(userRows, search, ['name', 'uid', 'email', 'phone', 'segment']);
@@ -89,18 +106,26 @@ function UsersPage() {
 
   return (
     <PageShell>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-6 right-6 z-[300] bg-surface-elevated border border-brand/20 text-text text-[11px] font-bold px-4 py-3 rounded-[8px] shadow-[0_4px_24px_rgba(0,0,0,0.4)] animate-fade-in flex items-center gap-2.5">
+          <span className="w-2 h-2 bg-positive rounded-full animate-ping" />
+          {toastMessage}
+        </div>
+      )}
+
       <div className="space-y-5">
 
         {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
               {PAGE.description}
             </p>
           </div>
@@ -139,11 +164,11 @@ function UsersPage() {
             filters={
               <>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-text-muted/45 font-bold uppercase tracking-wider shrink-0">KYC:</span>
+                  <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">KYC:</span>
                   <select
                     value={kycFilter}
                     onChange={(e) => { setKycFilter(e.target.value); usersTable.setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-4 outline-none focus:border-brand/40 transition-all cursor-pointer"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '76px' }}
                   >
                     <option value="all">ALL</option>
@@ -154,11 +179,11 @@ function UsersPage() {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-text-muted/45 font-bold uppercase tracking-wider shrink-0">RISK:</span>
+                  <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">RISK:</span>
                   <select
                     value={riskFilter}
                     onChange={(e) => { setRiskFilter(e.target.value); usersTable.setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-4 outline-none focus:border-brand/40 transition-all cursor-pointer"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '76px' }}
                   >
                     <option value="all">ALL</option>
@@ -169,11 +194,11 @@ function UsersPage() {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-text-muted/45 font-bold uppercase tracking-wider shrink-0">FUNDING:</span>
+                  <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">FUNDING:</span>
                   <select
                     value={fundingFilter}
                     onChange={(e) => { setFundingFilter(e.target.value); usersTable.setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-4 outline-none focus:border-brand/40 transition-all cursor-pointer"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] font-semibold text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '76px' }}
                   >
                     <option value="all">ALL</option>
@@ -199,7 +224,7 @@ function UsersPage() {
 
       <AddUserDrawer open={formOpen} mode={formMode} draft={userDraft} setDraft={setUserDraft} onSubmit={handleSaveUser} onClose={() => setFormOpen(false)} />
       <QuickUserDrawer open={quickDrawer.isOpen} user={quickDrawer.value} onClose={quickDrawer.close} onExpand={(uid) => { quickDrawer.close(); openUser(uid); }} />
-      <Mt5AccountDrawer open={mt5Drawer.isOpen} entry={mt5Drawer.value} onClose={mt5Drawer.close} />
+      <Mt5AccountDrawer open={mt5Drawer.isOpen} entry={mt5Drawer.value} onClose={mt5Drawer.close} onSave={handleSaveMt5Account} />
     </PageShell>
   );
 }

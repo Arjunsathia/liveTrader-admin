@@ -63,6 +63,20 @@ function IBOverviewPage() {
 
   return (
     <div className="space-y-5 animate-fade-up">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            IB System
+          </p>
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
+            IB Overview
+          </h2>
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
+            Introducing Broker network overview, active partners, and revenue statistics.
+          </p>
+        </div>
+      </header>
+
       <IBToast msg={toast} />
 
       {/* KPI row */}
@@ -98,7 +112,7 @@ function IBOverviewPage() {
           </div>
           <div className="flex gap-4 mt-2">
             {[['Total Referrals', 'var(--brand)'], ['Active Users', 'var(--positive)']].map(([l, c]) => (
-              <div key={l} className="flex items-center gap-1.5 text-[10px] font-heading text-text-muted/50">
+              <div key={l} className="flex items-center gap-1.5 text-[11px] font-semibold text-text-muted/75">
                 <span className="w-2 h-2 rounded-full" style={{ background: c }} />{l}
               </div>
             ))}
@@ -121,7 +135,7 @@ function IBOverviewPage() {
           </div>
           <div className="flex gap-4 mt-2">
             {[['Approved', 'var(--brand)'], ['Pending', 'var(--warning)']].map(([l, c]) => (
-              <div key={l} className="flex items-center gap-1.5 text-[10px] font-heading text-text-muted/50">
+              <div key={l} className="flex items-center gap-1.5 text-[11px] font-semibold text-text-muted/75">
                 <span className="w-2 h-2 rounded-full" style={{ background: c }} />{l}
               </div>
             ))}
@@ -134,7 +148,7 @@ function IBOverviewPage() {
         <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden flex flex-col">
           <TableToolbar 
             title="Top IB Partners" 
-            actions={<button className="text-[10px] text-primary font-bold hover:underline cursor-pointer font-heading">View all →</button>}
+            actions={<button className="text-[11.5px] text-primary font-bold hover:underline cursor-pointer">View all →</button>}
           />
           <MainTable 
             columns={rankedCols} 
@@ -154,8 +168,8 @@ function IBOverviewPage() {
                   ${a.urgent ? 'border-negative/[0.25] bg-negative/[0.06]' : 'border-border/25 bg-bg/50'}`}>
                 <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${a.urgent ? 'bg-negative animate-pulse' : 'bg-positive'}`} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11.5px] font-semibold text-text/80 font-heading truncate">{a.partner}</div>
-                  <div className="text-[10px] font-mono text-text-muted/40">{a.id} · {a.ts}</div>
+                  <div className="text-[12px] font-semibold text-text/80 truncate">{a.partner}</div>
+                  <div className="text-[11px] font-mono text-text-muted/60">{a.id} · {a.ts}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
                   <span className="font-mono font-bold text-[12px] text-brand">{a.amount}</span>

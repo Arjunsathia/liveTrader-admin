@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Download, RefreshCw } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
 import { KpiCard } from '../../../components/cards';
@@ -33,7 +33,7 @@ function latencyBadge(value) {
     : 'color-mix(in srgb, var(--positive) 8%, transparent)';
   return (
     <span
-      className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 font-mono text-[10px] font-black"
+      className="inline-flex items-center rounded-[4px] px-2 py-1 font-mono text-[11.5px] font-semibold"
       style={{ color, background: bg }}
     >
       {value}
@@ -46,12 +46,12 @@ function ExecutionLogsPage() {
   const drawerRowState = useDrawerState(null);
 
   const columns = [
-    { key: 'eventId', label: 'Event ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
-    { key: 'type', label: 'Type', render: (val) => <span className="text-[10px] font-black uppercase tracking-[0.08em] text-text-muted/70">{val}</span> },
-    { key: 'bridge', label: 'Bridge', render: (val) => <span className="text-[10px] font-bold border border-border/25 rounded-[4px] px-1.5 py-0.5 text-text-muted font-mono">{val}</span> },
-    { key: 'symbol', label: 'Symbol', render: (val) => <span className="font-mono text-[12px] text-text-muted/70">{val}</span> },
+    { key: 'eventId', label: 'Event ID', render: (val) => <span className="font-mono text-[12px] font-bold text-brand">{val}</span> },
+    { key: 'type', label: 'Type', render: (val) => <span className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-text-muted/85">{val}</span> },
+    { key: 'bridge', label: 'Bridge', render: (val) => <span className="text-[11.5px] font-semibold border border-border/25 rounded-[4px] px-2 py-1 text-text-muted/85 font-mono bg-surface-elevated/40">{val}</span> },
+    { key: 'symbol', label: 'Symbol', render: (val) => <span className="font-mono text-[13px] text-text-muted/85">{val}</span> },
     { key: 'latency', label: 'Latency', render: (val) => latencyBadge(val) },
-    { key: 'code', label: 'Code', render: (val) => <span className="font-mono text-[11px] text-text-muted/55">{val}</span> },
+    { key: 'code', label: 'Code', render: (val) => <span className="font-mono text-[12px] text-text-muted/75">{val}</span> },
     {
       key: 'severity',
       label: 'Severity',
@@ -59,7 +59,7 @@ function ExecutionLogsPage() {
         const sev = SEVERITY_META[val] ?? SEVERITY_META.INFO;
         return (
           <span
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[5px] text-[10px] font-black"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[5px] text-[11px] font-semibold"
             style={{ color: sev.color, background: sev.bg, border: `1px solid ${sev.border}` }}
           >
             {val}
@@ -67,8 +67,8 @@ function ExecutionLogsPage() {
         );
       },
     },
-    { key: 'timestamp', label: 'Timestamp', render: (val) => <span className="font-mono text-[11px] text-text-muted/55">{val}</span> },
-    { key: 'detail', label: 'Detail', render: (val) => <span className="block truncate max-w-[220px] text-[11px] text-text-muted/65" title={val}>{val}</span> },
+    { key: 'timestamp', label: 'Timestamp', render: (val) => <span className="font-mono text-[12px] text-text-muted/75">{val}</span> },
+    { key: 'detail', label: 'Detail', render: (val) => <span className="block truncate max-w-[220px] text-[12.5px] text-text-muted/80 font-medium" title={val}>{val}</span> },
   ];
 
   return (
@@ -78,13 +78,13 @@ function ExecutionLogsPage() {
         {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
               {PAGE.description}
             </p>
           </div>
@@ -92,14 +92,14 @@ function ExecutionLogsPage() {
             <button
               type="button"
               onClick={() => exportRows(ws.filtered, 'trading-execution-logs.csv')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
               <Download size={12} /> Export
             </button>
             <button
               type="button"
               onClick={() => {}}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
               <RefreshCw size={12} /> Refresh
             </button>
@@ -127,18 +127,18 @@ function ExecutionLogsPage() {
                 {ws.filtered.filter(r => r.severity === 'ERROR' || r.severity === 'CRITICAL').length > 0 && (
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-negative/20 bg-negative/8 mr-2">
                     <span className="h-1.5 w-1.5 animate-ping rounded-full bg-negative" />
-                    <span className="text-[9.5px] font-black uppercase tracking-widest text-negative">
+                    <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-negative">
                       {ws.filtered.filter(r => r.severity === 'ERROR' || r.severity === 'CRITICAL').length} Errors
                     </span>
                   </div>
                 )}
                 {ws.filterSets.map((fs) => (
-                  <div key={fs.label} className="flex items-center gap-1">
-                    <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">{fs.label}:</span>
+                  <div key={fs.label} className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-text-muted/70 font-bold uppercase tracking-wider shrink-0">{fs.label}:</span>
                     <select
                       value={fs.get}
                       onChange={(e) => fs.set(e.target.value)}
-                      className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                      className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none font-semibold"
                       style={{ minWidth: '80px' }}
                     >
                       <option value="all">All</option>

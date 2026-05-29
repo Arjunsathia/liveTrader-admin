@@ -37,9 +37,9 @@ export function FormatBadge({ value }) {
   const Icon = FORMAT_ICONS[value] || FileText;
   const color = FORMAT_CLR[value] || 'var(--text-muted)';
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-[5px] px-2 py-[3px] text-[9.5px] font-black uppercase tracking-[0.09em] whitespace-nowrap font-heading"
+    <span className="inline-flex items-center gap-1.5 rounded-[5px] px-2 py-[3px] text-[11px] font-semibold uppercase tracking-[0.05em] whitespace-nowrap"
       style={{ color, background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 20%, transparent)` }}>
-      <Icon size={9} className="flex-shrink-0" />{value}
+      <Icon size={10} className="flex-shrink-0" />{value}
     </span>
   );
 }
@@ -47,7 +47,7 @@ export function FormatBadge({ value }) {
 export function TypePill({ value }) {
   const color = TYPE_CLR[value] || 'rgba(255,255,255,0.35)';
   return (
-    <span className="inline-flex items-center rounded-[5px] px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.09em] whitespace-nowrap font-heading"
+    <span className="inline-flex items-center rounded-[5px] px-2 py-[3px] text-[11px] font-semibold uppercase tracking-[0.05em] whitespace-nowrap"
       style={{ color, background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 18%, transparent)` }}>
       {value}
     </span>

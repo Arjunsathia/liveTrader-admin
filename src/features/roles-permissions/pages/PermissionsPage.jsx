@@ -124,19 +124,33 @@ function PermissionsPage() {
 
   return (
     <div className="space-y-4 animate-fade-up">
+
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            Access Management
+          </p>
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
+            Permissions Matrix
+          </h2>
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
+            Configure system module permissions and action accesses across roles.
+          </p>
+        </div>
+      </header>
       {/* Role selector */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-[11px] font-black uppercase tracking-[0.15em] text-text-muted/35 font-heading flex-shrink-0">Editing Role:</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted/70 font-heading flex-shrink-0">Editing Role:</span>
         <div className="flex gap-1.5 flex-wrap">
           {rolesData.map(r => {
             const c = ROLE_CLR[r.name] || 'rgba(255,255,255,0.3)';
             const isActive = activeRole === r.name;
             return (
               <button key={r.name} onClick={() => setActiveRole(r.name)}
-                className="flex items-center gap-2 px-3 h-8 rounded-[8px] text-[11.5px] font-bold font-heading cursor-pointer transition-all border"
+                className="flex items-center gap-2 px-3 h-8 rounded-[8px] text-[12px] font-semibold font-heading cursor-pointer transition-all border"
                 style={isActive
                   ? { color: c, background: `color-mix(in srgb, ${c} 12%, transparent)`, borderColor: `color-mix(in srgb, ${c} 30%, transparent)` }
-                  : { color: 'rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
+                  : { color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                 <Shield size={11} />
                 {r.label}
               </button>
@@ -161,12 +175,12 @@ function PermissionsPage() {
         <div className="flex items-center gap-4 px-5 py-4">
           <Shield size={18} className="flex-shrink-0" style={{ color: roleColor }} />
           <div className="flex-1 min-w-0">
-            <span className="text-[14px] font-bold font-heading text-text">{roleObj?.label}</span>
-            <span className="text-[12px] text-text-muted/50 font-heading ml-3">{roleObj?.desc}</span>
+            <span className="text-[14.5px] font-semibold font-heading text-text">{roleObj?.label}</span>
+            <span className="text-[13px] text-text-muted/75 font-heading ml-3">{roleObj?.desc}</span>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-[12px] font-mono font-bold" style={{ color: roleColor }}>{countActive()}</span>
-            <span className="text-[11px] text-text-muted/40 font-heading">/ {PERM_MODULES.length * PERM_ACTIONS.length} permissions active</span>
+            <span className="text-[12.5px] font-mono font-semibold" style={{ color: roleColor }}>{countActive()}</span>
+            <span className="text-[11px] text-text-muted/70 font-heading">/ {PERM_MODULES.length * PERM_ACTIONS.length} permissions active</span>
           </div>
         </div>
 
@@ -176,7 +190,7 @@ function PermissionsPage() {
       </Card>
 
       {/* Legend */}
-      <div className="flex items-center gap-6 text-[10.5px] font-heading text-text-muted/40 flex-wrap">
+      <div className="flex items-center gap-6 text-[11px] font-heading text-text-muted/70 flex-wrap">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-[4px] border border-positive/30 bg-positive/[0.15] flex items-center justify-center"><Check size={9} strokeWidth={3} className="text-positive" /></div>
           Permission granted

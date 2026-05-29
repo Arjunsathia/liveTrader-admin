@@ -25,14 +25,14 @@ export function IBTierBadge({ value }) {
   const color = TIER_CLR[value] || IB_TIER_COLORS[value] || 'rgba(255,255,255,0.4)';
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-[5px] px-2 py-[3px] text-[9.5px] font-black uppercase tracking-[0.09em] whitespace-nowrap font-heading"
+      className="inline-flex items-center gap-1 rounded-[5px] px-2 py-[3px] text-[11px] font-semibold uppercase tracking-[0.05em] whitespace-nowrap font-heading"
       style={{
         color,
         background: `color-mix(in srgb, ${color} 12%, transparent)`,
         border: `1px solid color-mix(in srgb, ${color} 22%, transparent)`,
       }}
     >
-      <Star size={8} className="flex-shrink-0" /> {value}
+      <Star size={10} className="flex-shrink-0" /> {value}
     </span>
   );
 }

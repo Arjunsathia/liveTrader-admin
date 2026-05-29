@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { AlertOctagon, ArrowUpRight, CheckCircle2, Clock, Download, Lock, Play, ShieldAlert, TrendingDown, XCircle, Search, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { AlertOctagon, ArrowUpRight, CheckCircle2, Clock, Download, Lock, Play, ShieldAlert, TrendingDown, XCircle, Plus } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
 import { withdrawalsData } from '@/config/constants/finance/mockData';
 import { KpiCard, StatusBadge, RiskBadge, MethodBadge, AmountCell, Toast } from '../components/FinanceComponents';
-import { UserCell, QuickActions, FinanceRecordDrawer } from '../components/FinanceDrawer';
+import { UserCell, QuickActions } from '../components/FinanceDrawer';
 import { MainTable, TableToolbar } from '../../../components/common/table';
-import { useDrawerState } from '@/hooks/useDrawerState';
 
 const PAGE = {
   accent: 'var(--negative)',
@@ -15,13 +15,14 @@ const PAGE = {
 };
 
 function WithdrawalsPage() {
+
   const [search, setSearch] = useState('');
   const [statusF, setStatusF] = useState('ALL');
   const [methodF, setMethodF] = useState('ALL');
   const [riskF, setRiskF] = useState('ALL');
   const [page, setPage] = useState(1);
-  const drawerState = useDrawerState(null);
   const [toast, setToast] = useState(null);
+  const navigate = useNavigate();
   
   const PER = 7;
   const act = (msg, id) => setToast(`${msg}: ${id}`);
@@ -46,19 +47,19 @@ function WithdrawalsPage() {
   const vol24 = withdrawalsData.filter(d => d.status === 'PAID').reduce((s, d) => s + d.amtRaw, 0);
 
   const kpis = [
-    { label: 'Total Withdrawals', value: withdrawalsData.length, Icon: ArrowUpRight, accent: 'var(--cyan)', sub: 'All time' },
-    { label: 'Pending Review', value: withdrawalsData.filter(d => d.status === 'PENDING').length, Icon: Clock, accent: 'var(--warning)', sub: 'Awaiting action' },
-    { label: 'Approved Today', value: withdrawalsData.filter(d => d.status === 'PAID').length, Icon: CheckCircle2, accent: 'var(--positive)', sub: 'Paid out successfully' },
-    { label: 'Frozen/Rejected', value: withdrawalsData.filter(d => ['FROZEN', 'REJECTED'].includes(d.status)).length, Icon: Lock, accent: 'var(--negative)', sub: 'Blocked withdrawals', urgent: true },
-    { label: 'Flagged', value: withdrawalsData.filter(d => d.status === 'FLAGGED').length, Icon: ShieldAlert, accent: 'var(--negative)', sub: 'AML / sanctions hold', urgent: true },
-    { label: '24h Volume', value: `$${(vol24 / 1000).toFixed(1)}K`, Icon: TrendingDown, accent: 'var(--brand)', sub: 'Gross payout volume' },
+    { label: 'Total Withdrawals', value: withdrawalsData.length, Icon: ArrowUpRight, accent: 'var(--cyan)', sub: 'All time', trend: '+4.1%', trendUp: true },
+    { label: 'Pending Review', value: withdrawalsData.filter(d => d.status === 'PENDING').length, Icon: Clock, accent: 'var(--warning)', sub: 'Awaiting action', trend: 'Requires action', trendUp: false },
+    { label: 'Approved Today', value: withdrawalsData.filter(d => d.status === 'PAID').length, Icon: CheckCircle2, accent: 'var(--positive)', sub: 'Paid out successfully', trend: '+6.8%', trendUp: true },
+    { label: 'Frozen/Rejected', value: withdrawalsData.filter(d => ['FROZEN', 'REJECTED'].includes(d.status)).length, Icon: Lock, accent: 'var(--negative)', sub: 'Blocked withdrawals', trend: 'stable', trendUp: true },
+    { label: 'Flagged', value: withdrawalsData.filter(d => d.status === 'FLAGGED').length, Icon: ShieldAlert, accent: 'var(--negative)', sub: 'AML / sanctions hold', trend: 'AML Alert', trendUp: false },
+    { label: '24h Volume', value: `$${(vol24 / 1000).toFixed(1)}K`, Icon: TrendingDown, accent: 'var(--brand)', sub: 'Gross payout volume', trend: '+15.2%', trendUp: true },
   ];
 
   const columns = [
-    { key: 'id', label: 'WDR ID', render: (val) => <span className="font-mono text-[11px] font-bold text-brand">{val}</span> },
+    { key: 'id', label: 'WDR ID', render: (val) => <span className="font-mono text-[12px] font-bold text-brand">{val}</span> },
     { key: 'user', label: 'User', render: (_, row) => <UserCell u={row.user} /> },
     { key: 'amount', label: 'Amount', render: (_, row) => <AmountCell value={`-${row.amount}`} type="WITHDRAWAL" /> },
-    { key: 'destination', label: 'Destination', render: (val) => <span className="font-mono text-text-muted/55 text-[11px] max-w-[160px] block truncate" title={val}>{val}</span> },
+    { key: 'destination', label: 'Destination', render: (val) => <span className="font-mono text-text-muted/75 text-[12px] max-w-[160px] block truncate" title={val}>{val}</span> },
     { key: 'method', label: 'Method', render: (val) => <MethodBadge value={val} /> },
     { key: 'status', label: 'Status', render: (val) => <StatusBadge value={val} /> },
     { key: 'risk', label: 'Risk', render: (val) => <RiskBadge value={val} /> },
@@ -66,7 +67,7 @@ function WithdrawalsPage() {
       key: 'compliance',
       label: 'Compliance',
       render: (val) => (
-        <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
+        <span className="text-[11px] font-semibold uppercase tracking-[0.05em] font-heading px-2 py-1 rounded-[5px]"
           style={{ 
             color: val === 'PASS' ? 'var(--positive)' : 'var(--negative)', 
             background: `color-mix(in srgb, ${val === 'PASS' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
@@ -80,7 +81,7 @@ function WithdrawalsPage() {
       key: 'aml',
       label: 'AML',
       render: (val) => (
-        <span className="text-[10px] font-black uppercase tracking-[0.05em] font-heading px-1.5 py-0.5 rounded-[5px]"
+        <span className="text-[11px] font-semibold uppercase tracking-[0.05em] font-heading px-2 py-1 rounded-[5px]"
           style={{ 
             color: val === 'CLEAR' ? 'var(--positive)' : 'var(--negative)', 
             background: `color-mix(in srgb, ${val === 'CLEAR' ? 'var(--positive)' : 'var(--negative)'} 10%, transparent)` 
@@ -90,7 +91,7 @@ function WithdrawalsPage() {
         </span>
       ),
     },
-    { key: 'created', label: 'Created', render: (val) => <span className="font-mono text-[11px] text-text-muted/50">{val}</span> },
+    { key: 'created', label: 'Created', render: (val) => <span className="font-mono text-[12px] text-text-muted/75">{val}</span> },
     {
       key: 'actions',
       label: 'Actions',
@@ -123,13 +124,13 @@ function WithdrawalsPage() {
         {/* ── Page Header ── */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/45 mb-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
               {PAGE.eyebrow}
             </p>
-            <h2 className="text-[22px] font-black tracking-[-0.04em] text-text leading-none">
+            <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
               {PAGE.title}
             </h2>
-            <p className="text-[12px] text-text-muted/55 mt-1.5 leading-snug max-w-lg">
+            <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
               {PAGE.description}
             </p>
           </div>
@@ -137,16 +138,16 @@ function WithdrawalsPage() {
             <button
               type="button"
               onClick={() => act('Exported', 'withdrawals')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer"
+              className="group flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted/85 hover:text-text hover:border-border/40 text-[12px] font-semibold transition-all cursor-pointer"
             >
-              <Download size={12} /> Export
+              <Download size={12} className="transition-transform duration-300 group-hover:-translate-y-0.5" /> Export
             </button>
             <button
               type="button"
               onClick={() => act('Batch', 'initiated')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+              className="group flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[12px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
             >
-              <Plus size={12} /> Batch Process
+              <Plus size={12} className="transition-transform duration-300 group-hover:rotate-90" /> Batch Process
             </button>
           </div>
         </header>
@@ -166,10 +167,10 @@ function WithdrawalsPage() {
               <AlertOctagon size={14} className="text-negative relative z-10" />
             </div>
             <div className="flex-1">
-              <h4 className="text-[12px] font-bold text-negative font-heading">
+              <h4 className="text-[13px] font-bold text-negative font-heading">
                 {withdrawalsData.filter(d => d.aml === 'FLAG').length} Withdrawals with AML Flag — Manual Review Required
               </h4>
-              <p className="text-[11px] text-negative/70 font-heading mt-0.5 leading-relaxed">
+              <p className="text-[12px] text-negative/80 font-heading mt-1 leading-relaxed">
                 Funds are frozen pending compliance clearance. Do not release without MLRO sign-off.
               </p>
             </div>
@@ -189,12 +190,12 @@ function WithdrawalsPage() {
             searchPlaceholder="Search payouts…"
             filters={
               <>
-                <div className="flex items-center gap-1">
-                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Status:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Status:</span>
                   <select
                     value={statusF}
                     onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
                     {['ALL', 'PENDING', 'PROCESSING', 'PAID', 'FROZEN', 'FLAGGED', 'REJECTED'].map((opt) => (
@@ -203,12 +204,12 @@ function WithdrawalsPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Method:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Method:</span>
                   <select
                     value={methodF}
                     onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
                     {['ALL', 'Bank Wire', 'Crypto', 'E-Wallet'].map((opt) => (
@@ -217,12 +218,12 @@ function WithdrawalsPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <span className="text-[9.5px] text-text-muted/40 font-bold uppercase tracking-wider shrink-0">Risk:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Risk:</span>
                   <select
                     value={riskF}
                     onChange={(e) => { setRiskF(e.target.value); setPage(1); }}
-                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[11px] text-text-muted px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
+                    className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
                     {['ALL', 'LOW', 'MEDIUM', 'HIGH'].map((opt) => (
@@ -237,7 +238,7 @@ function WithdrawalsPage() {
           <MainTable
             columns={columns}
             data={paged}
-            onRowClick={(row) => drawerState.open(row)}
+            onRowClick={(row) => navigate(`/finance/withdrawals/${row.id}`)}
             emptyTitle="No withdrawals found matching filters."
             pagination={tableState}
             rowClassName={(row) => {
@@ -250,14 +251,6 @@ function WithdrawalsPage() {
           />
         </section>
       </div>
-
-      <FinanceRecordDrawer
-        row={drawerState.value}
-        open={drawerState.isOpen}
-        onClose={() => drawerState.close()}
-        type="Withdrawal"
-        onAction={act}
-      />
     </PageShell>
   );
 }

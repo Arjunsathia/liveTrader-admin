@@ -8,4 +8,5 @@ export const userDetailTabs = [
   { id: 'activity-logs', label: 'Activity Logs' },
   { id: 'risk-view', label: 'Risk View' },
   { id: 'notes', label: 'Notes' },
+  { id: 'referrals', label: 'Referrals' },
 ];

@@ -11,7 +11,7 @@ import { MainTable, TableToolbar } from '../../../components/common/table';
 
 const perfCols = [
   { key: 'rank', label: 'Rank', render: (_, r, i) => (
-      <span className={`text-[13px] font-black font-heading ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-600' : 'text-text-muted/30'}`}>
+      <span className={`text-[13px] font-bold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-600' : 'text-text-muted/30'}`}>
         #{(i ?? 0) + 1}
       </span>
     )
@@ -20,8 +20,8 @@ const perfCols = [
       <div className="flex items-center gap-2">
         <TraderAvatar name={v} />
         <div>
-          <div className="text-[12px] font-semibold font-heading text-text/80">{v}</div>
-          <div className="text-[10px] text-text-muted/40 font-heading">{r.region}</div>
+          <div className="text-[12.5px] font-semibold text-text/90">{v}</div>
+          <div className="text-[10px] font-mono text-text-muted/60">{r.region}</div>
         </div>
       </div>
     )
@@ -40,19 +40,33 @@ function IBPerformancePage() {
 
   return (
     <div className="space-y-5 animate-fade-up">
-      {/* Period selector */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1">
-          {['1M', '3M', '6M', '1Y', 'ALL'].map(p => (
-            <button key={p} onClick={() => setPeriod(p)}
-              className={`px-3 h-8 rounded-[7px] text-[11px] font-bold font-heading cursor-pointer transition-all duration-150 border
-                ${period === p ? 'bg-primary/[0.12] text-primary border-primary/20' : 'border-border/30 text-text-muted/40 hover:text-text-muted bg-transparent'}`}>
-              {p}
-            </button>
-          ))}
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5">
+            IB System
+          </p>
+          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-text leading-tight">
+            IB Performance
+          </h2>
+          <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-xl">
+            Analyze tier distribution, partner conversion funnel, and low/top performing brokers.
+          </p>
         </div>
-        <IBIconBtn label="Export Report" Icon={Download} variant="default" />
-      </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex gap-1 bg-surface-elevated/40 p-0.5 rounded-[8px] border border-border/20">
+            {['1M', '3M', '6M', '1Y', 'ALL'].map(p => (
+              <button key={p} onClick={() => setPeriod(p)}
+                className={`px-3 h-7 rounded-[6px] text-[11px] font-bold font-heading cursor-pointer transition-all duration-150
+                  ${period === p ? 'bg-primary text-text-on-accent' : 'text-text-muted hover:text-text bg-transparent'}`}>
+                {p}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => {}} className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] border border-border/20 bg-surface-elevated text-text-muted hover:text-text hover:border-border/40 text-[11px] font-semibold transition-all cursor-pointer">
+            <Download size={12} /> Export Report
+          </button>
+        </div>
+      </header>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -87,7 +101,7 @@ function IBPerformancePage() {
           </div>
           <div className="flex gap-4 mt-2">
             {[['Total Partners', 'var(--cyan)'], ['Churned', 'var(--negative)']].map(([l, c]) => (
-              <div key={l} className="flex items-center gap-1.5 text-[10px] font-heading text-text-muted/50">
+              <div key={l} className="flex items-center gap-1.5 text-[11px] font-semibold text-text-muted/75">
                 <span className="w-2 h-2 rounded-full" style={{ background: c }} />{l}
               </div>
             ))}
@@ -116,8 +130,8 @@ function IBPerformancePage() {
               {tierDistrib.map(t => (
                 <div key={t.name} className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: t.color }} />
-                  <span className="text-[10px] font-heading text-text-muted/55 truncate">{t.name}</span>
-                  <span className="text-[10.5px] font-mono font-bold ml-auto pl-2" style={{ color: t.color }}>{((t.value / DONUT_TOTAL) * 100).toFixed(0)}%</span>
+                  <span className="text-[11px] font-semibold text-text-muted/70 truncate">{t.name}</span>
+                  <span className="text-[11.5px] font-mono font-bold ml-auto pl-2" style={{ color: t.color }}>{((t.value / DONUT_TOTAL) * 100).toFixed(0)}%</span>
                 </div>
               ))}
             </div>
@@ -156,10 +170,10 @@ function IBPerformancePage() {
                 { label: 'Active Traders',  val: 9210,  pct: 19,  color: 'var(--positive)' },
               ].map(f => (
                 <div key={f.label} className="space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-text-muted/60 font-heading">{f.label}</span>
+                  <div className="flex items-center justify-between text-[11.5px] font-semibold">
+                    <span className="text-text-muted/75">{f.label}</span>
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-text-muted/45">{f.val.toLocaleString()}</span>
+                      <span className="font-mono text-text-muted/60">{f.val.toLocaleString()}</span>
                       <span className="font-mono font-bold w-8 text-right" style={{ color: f.color }}>{f.pct}%</span>
                     </div>
                   </div>

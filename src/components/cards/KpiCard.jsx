@@ -27,7 +27,7 @@ export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, tren
 
       {/* Label + Icon */}
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted/60">
+        <span className="text-[11px] font-black uppercase tracking-[0.12em] text-text-muted/45 select-none">
           {label}
         </span>
         {Icon && (
@@ -41,7 +41,7 @@ export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, tren
       </div>
 
       {/* Value */}
-      <div className="text-[24px] font-semibold tracking-[-0.03em] text-text leading-none mt-1">
+      <div className="text-[28px] font-black tracking-[-0.04em] font-mono text-text leading-none mt-1">
         {value}
       </div>
 
@@ -52,7 +52,7 @@ export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, tren
             {trendUp === true && <ArrowUpRight size={11} className="text-positive shrink-0" />}
             {trendUp === false && <ArrowDownRight size={11} className="text-negative shrink-0" />}
             <span
-              className="text-[12px] font-semibold"
+              className="text-[11px] font-black font-mono tracking-wider"
               style={{ color: trendUp === true ? 'var(--positive)' : trendUp === false ? 'var(--negative)' : 'var(--text-muted)' }}
             >
               {trend}
@@ -62,7 +62,7 @@ export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, tren
           <Activity size={11} className="text-text-muted/50 shrink-0" />
         ) : null}
         {sub && (
-          <span className="text-[12px] text-text-muted/50">{sub}</span>
+          <span className="text-[10.5px] text-text-muted/35 leading-none">{sub}</span>
         )}
       </div>
     </div>

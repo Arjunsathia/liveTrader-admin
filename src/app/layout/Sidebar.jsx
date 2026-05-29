@@ -6,6 +6,9 @@ import { adminNavigation, adminNavigationSections } from '../../config/sidebar/a
 import { hasPermission } from '../../config/permissions/permissions';
 import { useAdminSession } from '../providers/AdminSessionProvider';
 
+/* ─────────────────────────────────────────────────────────────
+   SIDEBAR ITEM
+───────────────────────────────────────────────────────────── */
 function SidebarItem({
   item,
   collapsed,
@@ -17,11 +20,11 @@ function SidebarItem({
   hoverNode,
   onToggleExpand,
 }) {
-  const Icon = item.icon;
-  const ref = useRef(null);
-  const hasSubItems = item.subItems && item.subItems.length > 0;
-  const isExpanded = expandedId === item.id;
-  const isActive =
+  const Icon         = item.icon;
+  const ref          = useRef(null);
+  const hasSubItems  = item.subItems && item.subItems.length > 0;
+  const isExpanded   = expandedId === item.id;
+  const isActive     =
     activeId === item.id ||
     (hasSubItems && item.subItems.some((s) => activeId === s.id));
   const isHoveredPortal = collapsed && hoverNode?.item.id === item.id;
@@ -47,60 +50,71 @@ function SidebarItem({
         onClick={handleClick}
         className={`
           group/btn relative flex items-center outline-none cursor-pointer select-none
-          transition-all duration-200 rounded-[10px] w-full
-          ${collapsed ? 'justify-center px-0 py-3 mx-auto w-11 h-11' : 'px-3.5 py-2.5 gap-3'}
+          transition-all duration-200
+          ${collapsed
+            ? 'justify-center rounded-[10px] mx-auto w-10 h-10'
+            : 'px-3 py-2.5 gap-3 rounded-[8px] w-full'
+          }
           ${isActive
-            ? 'bg-primary/[0.12] text-primary'
-            : `text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80
-               ${isHoveredPortal ? 'bg-white/[0.04] text-text/80' : ''}`
+            ? collapsed
+              ? 'bg-primary/[0.14] text-primary'
+              : 'bg-primary/[0.08] text-primary'
+            : `text-text-muted/50 hover:bg-white/[0.03] hover:text-text/75
+               ${isHoveredPortal ? 'bg-white/[0.03] text-text/75' : ''}`
           }
         `}
       >
-        {/* Active left accent bar */}
+        {/* Active left accent — expanded only */}
         {isActive && !collapsed && (
-          <span className="absolute left-0 top-[18%] bottom-[18%] w-[3px] bg-primary rounded-r-full" />
+          <span className="absolute left-0 top-[20%] bottom-[20%] w-[2.5px] bg-primary rounded-r-full" />
         )}
-
-
 
         {/* Icon */}
         <span
-          className={`shrink-0 flex items-center justify-center w-[18px] h-[18px] transition-all duration-200
+          className={`
+            relative shrink-0 flex items-center justify-center transition-all duration-200
+            ${collapsed ? 'w-5 h-5' : 'w-[18px] h-[18px]'}
             ${isActive
               ? 'text-primary'
-              : 'group-hover/btn:text-text/80 group-hover/btn:scale-110'
-            }`}
+              : 'text-text-muted/40 group-hover/btn:text-text/70 group-hover/btn:scale-110'
+            }
+          `}
         >
-          <Icon size={17} strokeWidth={isActive ? 2 : 1.8} />
+          <Icon size={16} strokeWidth={isActive ? 2.1 : 1.75} />
         </span>
 
-        {/* Label + chevron */}
+        {/* Label + chevron — expanded only */}
         {!collapsed && (
           <span className="flex-1 flex items-center justify-between min-w-0">
             <span
-              className={`text-[14px] font-heading font-medium tracking-[-0.025em] truncate transition-colors duration-200
-                ${isActive ? 'text-text' : 'text-text-muted/60 group-hover/btn:text-text/80'}`}
+              className={`
+                text-[14.5px] font-heading font-medium tracking-[-0.02em] truncate
+                transition-colors duration-200
+                ${isActive ? 'text-text font-semibold' : 'text-text-muted/55 group-hover/btn:text-text/80'}
+              `}
             >
               {item.label}
             </span>
             {hasSubItems && (
               <ChevronDown
-                size={13}
+                size={12}
                 strokeWidth={2.5}
-                className={`ml-2 shrink-0 transition-transform duration-350 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                  ${isExpanded ? 'rotate-180 text-primary' : 'text-text-muted/25'}`}
+                className={`
+                  ml-2 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                  ${isExpanded ? 'rotate-180 text-primary' : 'text-text-muted/20'}
+                `}
               />
             )}
           </span>
         )}
 
-        {/* Collapsed active dot */}
+        {/* Collapsed active indicator dot */}
         {isActive && collapsed && (
-          <span className="absolute right-1.5 top-1.5 w-1 h-1 rounded-full bg-primary" />
+          <span className="absolute right-1 top-1 w-1.5 h-1.5 rounded-full bg-primary" />
         )}
       </button>
 
-      {/* Sub-items */}
+      {/* Sub-items (expanded sidebar only) */}
       {hasSubItems && !collapsed && (
         <div
           className="grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
@@ -110,9 +124,9 @@ function SidebarItem({
           }}
         >
           <div className="overflow-hidden min-h-0">
-            <div className="relative ml-[29px] pt-1 pb-2 flex flex-col gap-0.5">
-              {/* Connector line */}
-              <span className="absolute left-0 top-2 bottom-2 w-px bg-border/[0.15]" />
+            <div className="relative ml-[30px] pt-1 pb-1.5 flex flex-col gap-px">
+              {/* Vertical connector line */}
+              <span className="absolute left-0 top-1.5 bottom-1.5 w-px bg-border/[0.12]" />
 
               {item.subItems.map((sub) => {
                 const isSub = activeId === sub.id;
@@ -121,21 +135,29 @@ function SidebarItem({
                     key={sub.id}
                     data-active={isSub}
                     onClick={() => navigate(sub.path)}
-                    className={`group/sub relative flex items-center gap-2.5 pl-4 pr-3 py-[7px] rounded-[8px]
-                      text-[13px] font-heading font-medium tracking-[-0.01em]
-                      outline-none cursor-pointer transition-all duration-200
+                    className={`
+                      group/sub relative flex items-center gap-2.5 pl-4 pr-3 py-2 rounded-[7px]
+                      text-[13.5px] font-heading font-medium tracking-[-0.01em]
+                      outline-none cursor-pointer transition-all duration-150
                       ${isSub
-                        ? 'bg-primary/[0.1] text-primary'
-                        : 'text-text-muted/50 hover:bg-white/[0.04] hover:text-text/75'
-                      }`}
+                        ? 'bg-primary/[0.08] text-primary'
+                        : 'text-text-muted/45 hover:bg-white/[0.03] hover:text-text/70'
+                      }
+                    `}
                   >
-                    {/* Connector tick */}
+                    {/* Horizontal connector tick */}
                     <span
-                      className={`absolute left-0 top-1/2 -translate-y-1/2
-                        w-[11px] h-px transition-all duration-200
-                        ${isSub ? 'bg-primary' : 'bg-border/25 group-hover/sub:bg-border/40'}`}
+                      className={`
+                        absolute left-0 top-1/2 -translate-y-1/2 w-[10px] h-px
+                        transition-colors duration-150
+                        ${isSub ? 'bg-primary/60' : 'bg-border/20 group-hover/sub:bg-border/35'}
+                      `}
                     />
-                    {sub.label}
+                    {/* Active sub dot */}
+                    {isSub && (
+                      <span className="w-1 h-1 rounded-full bg-primary shrink-0 -ml-0.5" />
+                    )}
+                    <span className={isSub ? '-ml-0.5' : ''}>{sub.label}</span>
                   </button>
                 );
               })}
@@ -148,17 +170,18 @@ function SidebarItem({
 }
 
 /* ─────────────────────────────────────────────────────────────
-   SECTION LABEL (groups nav items visually)
+   NAV SECTION LABEL
 ───────────────────────────────────────────────────────────── */
 function NavSection({ label, collapsed }) {
   if (collapsed) {
-    return <div className="w-6 h-px bg-border/[0.12] mx-auto my-2" />;
+    return <div className="w-5 h-px mx-auto my-3" style={{ background: 'var(--border)' }} />;
   }
   return (
-    <div className="px-4 pt-5 pb-1.5">
-      <span className="text-[9.5px] font-bold tracking-[0.18em] uppercase text-text-muted/25 font-heading select-none">
+    <div className="flex items-center gap-3 px-3 pt-7 pb-2.5">
+      <span className="text-[10.5px] font-black tracking-[0.22em] uppercase text-text-muted/25 select-none whitespace-nowrap">
         {label}
       </span>
+      <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.04)' }} />
     </div>
   );
 }
@@ -167,14 +190,18 @@ function NavSection({ label, collapsed }) {
    SIDEBAR
 ───────────────────────────────────────────────────────────── */
 export function Sidebar({ collapsed, isMobile }) {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const { permissions } = useAdminSession();
-  const [hoverNode, setHoverNode] = useState(null);
-  const hoverTimer = useRef(null);
-  const [manualExpandedId, setManualExpandedId] = useState(null);
-  const [manualExpandedPath, setManualExpandedPath] = useState(null);
 
+  const [hoverNode,         setHoverNode]         = useState(null);
+  const [manualExpandedId,  setManualExpandedId]  = useState(null);
+  const [manualExpandedPath,setManualExpandedPath]= useState(null);
+
+  const hoverTimer = useRef(null);
+  const navRef     = useRef(null);
+
+  /* ── Allowed items ── */
   const allowedItems = useMemo(
     () =>
       adminNavigation
@@ -186,33 +213,45 @@ export function Sidebar({ collapsed, isMobile }) {
     [permissions],
   );
 
+  /* ── Active ID resolution ── */
   const getUsersActiveId = () => {
-    if (location.state?.usersView === 'kyc') return 'users-kyc';
-    if (location.state?.usersView === 'mt5') return 'users-mt5';
+    if (location.pathname.includes('/users/kyc') || location.state?.usersView === 'kyc')  return 'users-kyc';
+    if (location.pathname.includes('/users/mt5') || location.state?.usersView === 'mt5')  return 'users-mt5';
     return 'users-list';
   };
 
   const getFinanceActiveId = (pathname) => {
-    if (pathname.includes('/finance/deposits')) return 'finance-deposits';
-    if (pathname.includes('/finance/withdrawals')) return 'finance-withdrawals';
+    if (pathname.includes('/finance/deposits'))     return 'finance-deposits';
+    if (pathname.includes('/finance/withdrawals'))  return 'finance-withdrawals';
     if (pathname.includes('/finance/transactions')) return 'finance-transactions';
-    if (pathname.includes('/finance/failed')) return 'finance-failed';
-    if (pathname.includes('/finance/approvals')) return 'finance-approvals';
+    if (pathname.includes('/finance/failed'))       return 'finance-failed';
+    if (pathname.includes('/finance/approvals'))    return 'finance-approvals';
     return 'finance-deposits';
   };
 
   const getActiveId = () => {
     const { pathname } = location;
     if (pathname === '/') return 'dashboard';
+    if (location.state?.fromTrading && pathname.startsWith('/users/mt5')) return 'trading-accounts';
+    
     for (const item of allowedItems) {
       if (item.path === pathname && (!item.subItems || item.subItems.length === 0)) return item.id;
       if (item.subItems) {
         const sub = item.subItems.find((c) => c.path === pathname);
         if (sub) return sub.id;
       }
-      if (pathname.startsWith('/users/') && item.id === 'users') return getUsersActiveId();
-      if (pathname.startsWith('/finance/') && item.id === 'finance') return getFinanceActiveId(pathname);
-      if (pathname.startsWith('/support/tickets/') && item.id === 'support') return 'support-tickets';
+      if (pathname.startsWith('/users/')        && item.id === 'users')        return getUsersActiveId();
+      if (pathname.startsWith('/finance/')      && item.id === 'finance')      return getFinanceActiveId(pathname);
+      if (pathname.startsWith('/trading/')      && item.id === 'trading') {
+        if (pathname.includes('/trading/orders')) return 'trading-orders';
+        if (pathname.includes('/trading/positions')) return 'trading-positions';
+        if (pathname.includes('/trading/history')) return 'trading-history';
+        if (pathname.includes('/trading/execution-logs')) return 'trading-logs';
+        return 'trading-accounts';
+      }
+      if (pathname.startsWith('/support/tickets/') && item.id === 'support') {
+        return location.state?.fromEscalated ? 'support-escalated' : 'support-tickets';
+      }
       if (pathname.startsWith('/copy-trading/') && item.id === 'copy-trading') {
         const slug = pathname.split('/')[2];
         return slug ? `copy-${slug}` : 'copy-strategies';
@@ -223,43 +262,45 @@ export function Sidebar({ collapsed, isMobile }) {
 
   const activeId = getActiveId();
 
+  /* ── Expanded section ── */
   const routeExpandedId = useMemo(
-    () => allowedItems.find(
-      (item) =>
-        item.path === location.pathname ||
-        item.subItems?.some((subItem) => subItem.path === location.pathname) ||
-        (location.pathname.startsWith('/users/') && item.id === 'users') ||
-        (location.pathname.startsWith('/finance/') && item.id === 'finance') ||
-        (location.pathname.startsWith('/support/tickets/') && item.id === 'support') ||
-        (location.pathname.startsWith('/copy-trading/') && item.id === 'copy-trading'),
-    )?.id ?? null,
-    [allowedItems, location.pathname],
+    () => {
+      if (location.state?.fromTrading && location.pathname.startsWith('/users/mt5')) return 'trading';
+      
+      return allowedItems.find(
+        (item) =>
+          item.path === location.pathname ||
+          item.subItems?.some((s) => s.path === location.pathname) ||
+          (location.pathname.startsWith('/users/')         && item.id === 'users') ||
+          (location.pathname.startsWith('/finance/')       && item.id === 'finance') ||
+          (location.pathname.startsWith('/trading/')       && item.id === 'trading') ||
+          (location.pathname.startsWith('/copy-trading/')  && item.id === 'copy-trading') ||
+          (location.pathname.startsWith('/support/')       && item.id === 'support'),
+      )?.id ?? null;
+    },
+    [allowedItems, location.pathname, location.state],
   );
 
-  const expandedId = manualExpandedPath === location.pathname
-    ? manualExpandedId
-    : routeExpandedId;
+  const expandedId =
+    manualExpandedPath === location.pathname ? manualExpandedId : routeExpandedId;
 
   const toggleExpand = (id) => {
     setManualExpandedPath(location.pathname);
     setManualExpandedId(expandedId === id ? null : id);
   };
 
-  const navRef = useRef(null);
-
-  // Auto-scroll to active item
+  /* ── Auto-scroll to active ── */
   useEffect(() => {
     if (activeId && !collapsed && navRef.current) {
       const activeEl = navRef.current.querySelector('[data-active="true"]');
       if (activeEl) {
-        const timer = setTimeout(() => {
-          activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 150);
+        const timer = setTimeout(() => activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 150);
         return () => clearTimeout(timer);
       }
     }
   }, [activeId, collapsed, expandedId]);
 
+  /* ── Hover portal handlers ── */
   const handleHoverStart = (item, rect) => {
     if (isMobile) return;
     clearTimeout(hoverTimer.current);
@@ -268,12 +309,10 @@ export function Sidebar({ collapsed, isMobile }) {
 
   const handleHoverEnd = () => {
     if (isMobile) return;
-    hoverTimer.current = window.setTimeout(() => setHoverNode(null), 250);
+    hoverTimer.current = window.setTimeout(() => setHoverNode(null), 220);
   };
 
-  const sidebarWidth = isMobile ? '280px' : collapsed ? '72px' : '252px';
-  const sidebarLeft = isMobile && collapsed ? '-280px' : '0';
-
+  /* ── Grouped nav ── */
   const groupedItems = useMemo(
     () =>
       adminNavigationSections.map((section) => ({
@@ -283,62 +322,77 @@ export function Sidebar({ collapsed, isMobile }) {
     [allowedItems],
   );
 
+  const sidebarWidth = isMobile ? '272px' : collapsed ? '68px' : '248px';
+  const sidebarLeft  = isMobile && collapsed ? '-272px' : '0';
+
   return (
     <aside
       className="fixed top-0 h-screen z-[100] flex flex-col overflow-hidden"
       style={{
-        width: sidebarWidth,
-        left: sidebarLeft,
-        transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
+        width:      sidebarWidth,
+        left:       sidebarLeft,
+        transition: 'all 0.38s cubic-bezier(0.16,1,0.3,1)',
         backgroundColor: 'var(--surface-2)',
         borderRight: '1px solid var(--border)',
-        boxShadow: 'none',
       }}
     >
 
-      {/* ── LOGO ─────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════
+          LOGO HEADER
+      ══════════════════════════════════════ */}
       <div
-        className={`flex items-center shrink-0 h-[68px] transition-all duration-400
-          ${collapsed ? 'justify-center px-0' : 'px-5 gap-3.5'}`}
+        className={`
+          relative flex items-center shrink-0 h-16 transition-all duration-400
+          ${collapsed ? 'justify-center px-0' : 'px-4 gap-3'}
+        `}
         style={{ borderBottom: '1px solid var(--border)' }}
       >
-        {/* Mark */}
+        {/* Logo mark */}
         <button
           onClick={() => navigate('/')}
-          className="relative shrink-0 w-9 h-9 rounded-[10px] flex items-center justify-center bg-primary cursor-pointer group/logo transition-all duration-300 active:scale-95"
+          className="relative shrink-0 w-8 h-8 rounded-[9px] flex items-center justify-center bg-primary cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{ boxShadow: '0 0 14px color-mix(in srgb, var(--primary) 30%, transparent)' }}
         >
-          {/* Grid mark */}
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="1" y="1" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.55)" />
-            <rect x="11" y="1" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.35)" />
-            <rect x="1" y="11" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.35)" />
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+            <rect x="1"  y="1"  width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.55)" />
+            <rect x="11" y="1"  width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.35)" />
+            <rect x="1"  y="11" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.35)" />
             <rect x="11" y="11" width="6" height="6" rx="1.5" fill="rgba(0,0,0,0.15)" />
           </svg>
         </button>
 
         {/* Wordmark */}
         {!collapsed && (
-          <div className="flex flex-col gap-0.5 overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
-            <div className="flex items-baseline gap-1.5 leading-none">
-              <span className="font-heading font-bold text-[17px] tracking-[-0.05em] text-text">
+          <div className="flex flex-col gap-0.5 overflow-hidden animate-in fade-in slide-in-from-left-2 duration-250">
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="font-heading font-bold text-[16px] tracking-[-0.05em] text-text">
                 LiveTrade<span className="text-primary">.</span>
               </span>
-              <span className="text-[8.5px] font-bold tracking-[0.22em] uppercase text-primary/70 px-1 py-0.5 rounded-[4px] bg-primary/[0.1] border border-primary/[0.2] leading-none">
+              <span className="text-[8px] font-black tracking-[0.22em] uppercase text-primary/65 px-1.5 py-0.5 rounded-[3px] bg-primary/[0.08] border border-primary/[0.15] leading-none">
                 PRO
               </span>
             </div>
-            <span className="text-[9.5px] font-medium text-text-muted/30 tracking-[0.04em]">
+            <span className="text-[8px] font-black uppercase tracking-[0.18em] text-text-muted/30 leading-none mt-px select-none">
               Admin Console
             </span>
           </div>
         )}
       </div>
 
-      {/* ── NAV ──────────────────────────────────────────── */}
-      <nav ref={navRef} className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative">
-        <div className={`flex flex-col pt-3 pb-8 ${collapsed ? 'items-center gap-1 px-2' : 'gap-0.5 px-3'}`}>
-
-          {groupedItems.map((section) => (
+      {/* ══════════════════════════════════════
+          NAVIGATION
+      ══════════════════════════════════════ */}
+      <nav
+        ref={navRef}
+        className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar"
+      >
+        <div
+          className={`
+            flex flex-col pt-2 pb-8
+            ${collapsed ? 'items-center gap-1 px-[14px]' : 'gap-px px-2.5'}
+          `}
+        >
+          {groupedItems.map((section) =>
             section.items.length > 0 ? (
               <React.Fragment key={section.id}>
                 <NavSection label={section.label} collapsed={collapsed} />
@@ -357,76 +411,98 @@ export function Sidebar({ collapsed, isMobile }) {
                   />
                 ))}
               </React.Fragment>
-            ) : null
-          ))}
+            ) : null,
+          )}
         </div>
       </nav>
 
-
-
-
+      {/* ══════════════════════════════════════
+          COLLAPSED HOVER PORTAL
+      ══════════════════════════════════════ */}
       {collapsed && hoverNode &&
         createPortal(
           <div
             className="fixed z-[99999]"
-            style={{ 
-              top: hoverNode.rect.top > window.innerHeight - 300 ? 'auto' : hoverNode.rect.top, 
-              bottom: hoverNode.rect.top > window.innerHeight - 300 ? (window.innerHeight - hoverNode.rect.bottom) : 'auto',
-              left: 76 
+            style={{
+              top:    hoverNode.rect.top > window.innerHeight - 300 ? 'auto' : hoverNode.rect.top,
+              bottom: hoverNode.rect.top > window.innerHeight - 300
+                ? window.innerHeight - hoverNode.rect.bottom
+                : 'auto',
+              left: 76,
             }}
             onMouseEnter={() => clearTimeout(hoverTimer.current)}
             onMouseLeave={handleHoverEnd}
           >
-            {/* Arrow connector */}
+            {/* Arrow tip */}
             <div
-              className={`absolute left-0 w-2 h-2 rotate-45 -translate-x-1 border-l border-b border-border/30
-                ${hoverNode.rect.top > window.innerHeight - 300 ? 'bottom-4' : 'top-4'}`}
-              style={{ backgroundColor: 'var(--surface-2)' }}
-            />
-
-              <div
-              className="flex flex-col rounded-[12px] overflow-hidden min-w-[210px] border border-border/60 shadow-card-subtle"
+              className={`
+                absolute left-0 w-2 h-2 rotate-45 -translate-x-[5px] border-l border-b
+                ${hoverNode.rect.top > window.innerHeight - 300 ? 'bottom-[14px]' : 'top-[14px]'}
+              `}
               style={{
                 backgroundColor: 'var(--surface-2)',
-                animation: 'sideTooltip 0.18s cubic-bezier(0.16,1,0.3,1)',
+                borderColor: 'rgba(255,255,255,0.08)',
+              }}
+            />
+
+            {/* Flyout panel */}
+            <div
+              className="flex flex-col rounded-[10px] overflow-hidden min-w-[205px]"
+              style={{
+                backgroundColor: 'var(--surface-2)',
+                border:     '1px solid rgba(255,255,255,0.08)',
+                boxShadow:  '0 16px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3)',
+                animation:  'sideTooltip 0.17s cubic-bezier(0.16,1,0.3,1)',
               }}
             >
-              {/* Header */}
-              <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              {/* Flyout header */}
+              <div
+                className="flex items-center gap-2.5 px-3.5 py-3"
+                style={{ borderBottom: '1px solid rgba(255,255,255,0.055)' }}
+              >
                 {hoverNode.item.icon && (
-                  <span className="w-7 h-7 rounded-[8px] bg-primary/[0.12] border border-primary/[0.18] flex items-center justify-center text-primary shrink-0">
-                    <hoverNode.item.icon size={14} strokeWidth={2} />
+                  <span
+                    className="w-6 h-6 rounded-[7px] flex items-center justify-center text-primary shrink-0"
+                    style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}
+                  >
+                    <hoverNode.item.icon size={13} strokeWidth={2} />
                   </span>
                 )}
-                <span className="text-[13px] font-heading font-semibold tracking-[-0.02em] text-text">
+                <span className="text-[14.0px] font-heading font-semibold tracking-[-0.025em] text-text leading-none">
                   {hoverNode.item.label}
                 </span>
               </div>
 
-              {/* Sub-items or direct link */}
-              <div className="p-2">
+              {/* Flyout links */}
+              <div className="p-1.5">
                 {hoverNode.item.subItems?.length > 0 ? (
                   hoverNode.item.subItems.map((sub) => (
                     <button
                       key={sub.id}
                       onClick={() => { navigate(sub.path); setHoverNode(null); }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-[12px] font-heading font-medium tracking-[-0.01em]
-                        transition-all duration-150 cursor-pointer outline-none text-left
-                        hover:bg-primary/[0.08] hover:text-primary
-                        ${activeId === sub.id ? 'bg-primary/[0.12] text-primary' : 'text-text-muted/60'}`}
+                      className={`
+                        w-full flex items-center gap-2 px-3 py-2 rounded-[7px]
+                        text-[13.5px] font-heading font-medium tracking-[-0.01em]
+                        transition-all duration-130 cursor-pointer outline-none text-left
+                        ${activeId === sub.id
+                          ? 'bg-primary/[0.10] text-primary'
+                          : 'text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80'
+                        }
+                      `}
                     >
-                      {activeId === sub.id && (
-                        <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
-                      )}
+                      {activeId === sub.id
+                        ? <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                        : <span className="w-1.5 h-1.5 rounded-full bg-border/30 shrink-0" />
+                      }
                       {sub.label}
                     </button>
                   ))
                 ) : (
                   <button
                     onClick={() => { navigate(hoverNode.item.path); setHoverNode(null); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-[12px] font-heading font-medium text-text-muted/60 hover:bg-primary/[0.08] hover:text-primary transition-all duration-150 cursor-pointer outline-none text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80 transition-all duration-130 cursor-pointer outline-none text-left"
                   >
-                    <ChevronRight size={12} strokeWidth={2.5} className="text-primary/40" />
+                    <ChevronRight size={11} strokeWidth={2.5} className="text-primary/50 shrink-0" />
                     Open {hoverNode.item.label}
                   </button>
                 )}
@@ -436,7 +512,6 @@ export function Sidebar({ collapsed, isMobile }) {
           document.body,
         )
       }
-
 
     </aside>
   );

@@ -11,9 +11,10 @@ import {
   AlertTriangle, ArrowUpRight, Check, CheckCircle2,
   ChevronDown, Copy, Download, Eye, Flag, Lock,
   MessageSquare, Play, RefreshCw, Search, Send, ShieldAlert,
-  User, X, XCircle,
+  User, X, XCircle, Clock, Activity, CreditCard,
+  Building2, Bitcoin, CircleDollarSign, Database,
 } from 'lucide-react';
-import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR } from '@/config/constants/finance/mockData';
+import { STATUS_CLR, RISK_CLR, TXN_TYPE_CLR, METHOD_ICONS } from '@/config/constants/finance/mockData';
 import { MainDrawer, DrawerHeader, DrawerBody, DrawerFooter } from '../../../components/common/drawer';
 import { DrawerField, DrawerFormGrid as DrawerFormGrid, DrawerSection } from '../../../components/common/drawer';
 import { ActionBtn as IconBtn } from '../../../components/ui';
@@ -34,10 +35,10 @@ export { SectionHead } from '../../../components/ui/SectionHead';
 export { Pagination } from '../../../components/common/table';
 
 /* ── Base drawer shell ───────────────────────────────────────── */
-function FinanceDrawer({ open, onClose, title, subtitle, children, footer }) {
+function FinanceDrawer({ open, onClose, title, subtitle, children, footer, eyebrow = "Record Review" }) {
   return (
     <MainDrawer open={open} onClose={onClose} width="max-w-[720px]">
-      <DrawerHeader title={title} subtitle={subtitle} eyebrow="Record Review" onClose={onClose} />
+      <DrawerHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onClose={onClose} />
       <DrawerBody>
         <div className="space-y-6">
           {children}
@@ -49,21 +50,58 @@ function FinanceDrawer({ open, onClose, title, subtitle, children, footer }) {
 }
 
 /* ── Audit trail ─────────────────────────────────────────────── */
-function DrawerAuditTrail({ entries }) {
+function DrawerAuditTrail({ entries, statusColor }) {
+  const nodeColor = statusColor || 'var(--warning)';
+  const lastIdx = entries.length - 1;
+
   return (
-    <div className="space-y-0 relative">
-      <div className="absolute left-[7px] top-3 bottom-3 w-px bg-border/20" />
-      {entries.map((e, i) => (
-        <div key={i} className="flex gap-3 pb-3">
-          <div className="w-3.5 h-3.5 rounded-full border border-border/30 bg-surface-elevated flex-shrink-0 mt-1 z-10"
-            style={{ boxShadow: '0 0 0 2px var(--bg)' }} />
-          <div className="min-w-0">
-            <div className="text-[11.5px] font-heading font-semibold text-text/75">{e.action}</div>
-            <div className="text-[10px] font-mono text-text-muted/35 mt-0.5">{e.by} · {e.ts}</div>
-            {e.note && <div className="text-[10.5px] text-text-muted/45 font-heading mt-0.5">{e.note}</div>}
+    <div className="relative space-y-0">
+      {/* Connector line */}
+      <div
+        className="absolute left-[9px] top-3 w-px"
+        style={{
+          bottom: '12px',
+          background: `linear-gradient(to bottom, color-mix(in srgb, ${nodeColor} 25%, transparent), transparent)`,
+        }}
+      />
+      {entries.map((e, i) => {
+        const isLast = i === lastIdx;
+        const isError = e.action.toLowerCase().includes('error') || e.action.toLowerCase().includes('fail') || e.action.toLowerCase().includes('reject');
+        const dotColor = isError ? 'var(--negative)' : isLast ? nodeColor : 'var(--border)';
+        return (
+          <div key={i} className="flex gap-3.5 pb-4">
+            {/* Node */}
+            <div
+              className="relative mt-0.5 flex-shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center z-10 border"
+              style={{
+                borderColor: `color-mix(in srgb, ${dotColor} 40%, transparent)`,
+                background: `color-mix(in srgb, ${dotColor} 10%, var(--bg))`,
+                boxShadow: isLast ? `0 0 8px color-mix(in srgb, ${dotColor} 30%, transparent)` : 'none',
+              }}
+            >
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: dotColor, opacity: isLast ? 1 : 0.55 }}
+              />
+            </div>
+            {/* Content */}
+            <div className="min-w-0 flex-1 pt-0.5">
+              <div
+                className="text-[11.5px] font-semibold font-heading"
+                style={{ color: isError ? 'var(--negative)' : 'var(--text)' }}
+              >
+                {e.action}
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[9.5px] font-mono text-text-muted/70">{e.by}</span>
+                <span className="text-text-muted/40 text-[9px]">·</span>
+                <span className="text-[9.5px] font-mono text-text-muted/65">{e.ts}</span>
+              </div>
+              {e.note && <div className="text-[10px] text-text-muted/75 font-heading mt-1">{e.note}</div>}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -73,12 +111,18 @@ function DrawerNoteEditor({ onSave }) {
   const [text, setText] = useState('');
   return (
     <div className="space-y-2.5">
-      <textarea value={text} onChange={e => setText(e.target.value)} rows={3}
-        placeholder="Add internal note…"
-        className="w-full resize-none rounded-[10px] border border-border/25 bg-bg px-3 py-2.5 text-[12px] text-text outline-none transition-all placeholder:text-text-muted/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
-      <button onClick={() => { if (text.trim()) { onSave(text); setText(''); } }}
+      <textarea
+        value={text}
+        onChange={e => setText(e.target.value)}
+        rows={3}
+        placeholder="Add internal operator review notes..."
+        className="w-full resize-none rounded-[10px] border border-border/25 bg-bg px-3 py-2.5 text-[12px] text-text outline-none transition-all placeholder:text-text-muted/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+      />
+      <button
+        onClick={() => { if (text.trim()) { onSave(text); setText(''); } }}
         disabled={!text.trim()}
-        className="flex items-center gap-1.5 h-7 px-3 rounded-[7px] text-[10.5px] font-bold font-heading border border-primary/20 bg-primary/[0.07] text-primary cursor-pointer hover:brightness-110 transition-all disabled:opacity-30">
+        className="flex items-center gap-1.5 h-8 px-4 rounded-[8px] text-[10.5px] font-bold font-heading border border-primary/20 bg-primary/[0.07] text-primary cursor-pointer hover:brightness-110 transition-all disabled:opacity-30 active:scale-95 duration-200"
+      >
         <Send size={10} /> Save Note
       </button>
     </div>
@@ -92,31 +136,131 @@ function RiskPanel({ risk, flags = [] }) {
     LOW:    ['Standard transaction velocity', 'No sanctions match', 'Verified KYC'],
     MEDIUM: ['Unusual transaction size', 'KYC review recommended'],
     HIGH:   ['AML threshold triggered', 'OFAC screening match', 'Source of funds unverified'],
+    CRITICAL: ['Sanction list hit', 'IP address mismatch', 'Potential account takeover'],
   };
   const allFlags = flags.length > 0 ? flags : (defaultFlags[risk] || []);
+
   return (
-    <div className="rounded-[10px] border px-4 py-3.5 space-y-3"
-      style={{ borderColor: `color-mix(in srgb, ${color} 22%, transparent)`, background: `color-mix(in srgb, ${color} 5%, transparent)` }}>
-      <div className="flex items-center justify-between">
+    <div
+      className="rounded-[12px] border p-4 relative overflow-hidden"
+      style={{
+        borderColor: `color-mix(in srgb, ${color} 20%, var(--border))`,
+        background: `color-mix(in srgb, ${color} 4%, var(--bg))`
+      }}
+    >
+      {/* Glow */}
+      <div
+        className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-[0.06] pointer-events-none"
+        style={{ background: color }}
+      />
+
+      <div className="flex items-center justify-between gap-4 mb-3 pb-3 border-b" style={{ borderColor: `color-mix(in srgb, ${color} 10%, var(--border))` }}>
         <div className="flex items-center gap-2">
           <ShieldAlert size={14} style={{ color }} />
-          <span className="text-[12px] font-bold font-heading" style={{ color }}>Risk Level: {risk}</span>
+          <span className="text-[12.5px] font-bold font-heading tracking-tight" style={{ color }}>
+            Compliance & AML Risk
+          </span>
         </div>
         <RiskChip value={risk} />
       </div>
-      <div className="space-y-1.5">
+
+      <div className="space-y-2">
         {allFlags.map((f, i) => {
-          const flagColor = risk === 'HIGH' ? 'var(--negative)' : risk === 'MEDIUM' && i === 0 ? 'var(--warning)' : 'var(--positive)';
+          const flagColor = ['HIGH', 'CRITICAL'].includes(risk)
+            ? 'var(--negative)'
+            : risk === 'MEDIUM' && i === 0
+            ? 'var(--warning)'
+            : 'var(--positive)';
           return (
-            <div key={i} className="flex items-center gap-2 text-[11.5px] font-heading">
-              {risk === 'HIGH' || (risk === 'MEDIUM' && i === 0)
-                ? <AlertTriangle size={11} style={{ color: flagColor }} className="flex-shrink-0" />
-                : <Check size={11} style={{ color: flagColor }} className="flex-shrink-0" />
+            <div key={i} className="flex items-start gap-2 text-[11px] font-heading font-semibold">
+              {['HIGH', 'CRITICAL'].includes(risk) || (risk === 'MEDIUM' && i === 0)
+                ? <AlertTriangle size={11.5} style={{ color: flagColor }} className="flex-shrink-0 mt-0.5" />
+                : <Check size={11.5} style={{ color: flagColor }} className="flex-shrink-0 mt-0.5" />
               }
-              <span style={{ color: flagColor }}>{f}</span>
+              <span className="leading-normal" style={{ color: flagColor }}>{f}</span>
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+/* ── Status hero banner ───────────────────────────────────────── */
+function StatusHeroBanner({ status, amount, id, created, method, rail, type }) {
+  const statusColor = STATUS_CLR[status] || 'var(--text-muted)';
+
+  let StatusIcon = Clock;
+  let labelText = 'Awaiting Action';
+
+  if (['APPROVED', 'PAID', 'SETTLED', 'RESOLVED'].includes(status)) {
+    StatusIcon = CheckCircle2;
+    labelText = status === 'SETTLED' ? 'Settled & Completed' : 'Approved & Processed';
+  } else if (['FAILED', 'REJECTED', 'UNRESOLVED'].includes(status)) {
+    StatusIcon = XCircle;
+    labelText = status === 'FAILED' ? 'Transaction Failed' : 'Request Rejected';
+  } else if (['FLAGGED', 'FROZEN', 'LOCKED'].includes(status)) {
+    StatusIcon = ShieldAlert;
+    labelText = status === 'FLAGGED' ? 'Flagged for Compliance' : 'Account Frozen/Locked';
+  } else if (['PROCESSING', 'RETRY'].includes(status)) {
+    StatusIcon = Activity;
+    labelText = 'Processing In Progress';
+  }
+
+  const MethodIc = METHOD_ICONS[method] || CreditCard;
+
+  return (
+    <div
+      className="rounded-[14px] border p-5 relative overflow-hidden"
+      style={{
+        borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))`,
+        background: `color-mix(in srgb, ${statusColor} 4%, var(--bg))`,
+      }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-[0.06] pointer-events-none"
+        style={{ background: statusColor }}
+      />
+
+      <div className="flex items-start justify-between gap-4 relative z-[1]">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-11 h-11 rounded-[11px] flex items-center justify-center border flex-shrink-0"
+            style={{
+              background: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+              borderColor: `color-mix(in srgb, ${statusColor} 22%, transparent)`,
+            }}
+          >
+            <MethodIc size={20} style={{ color: statusColor }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <StatusIcon size={12} style={{ color: statusColor }} />
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.12em]"
+                style={{ color: statusColor }}
+              >
+                {labelText}
+              </span>
+            </div>
+            <div className="text-[20px] font-bold tracking-tight text-text font-mono leading-none mt-1">
+              {amount}
+            </div>
+            <div className="text-[10.5px] font-mono text-text-muted/70 mt-1">
+              {id} · {created}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <StatusChip value={status} size="lg" />
+          {method && (
+            <span className="inline-flex items-center gap-1 text-[9.5px] font-bold uppercase tracking-[0.09em] rounded-[5px] px-2 py-[3px] border border-border/25 text-text-muted/75 bg-bg/40 font-heading">
+              {method} {rail ? `· ${rail}` : ''}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -147,67 +291,63 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
   const statusColor = STATUS_CLR[row.status] || 'var(--text-muted)';
 
   return (
-    <FinanceDrawer open={open} onClose={onClose} title={`${type} — ${row.id}`} subtitle="Inspect record details, user context, and audit logs." footer={
-      <div className="grid grid-cols-2 gap-2 w-full">
-        {isTxn ? (
-          <>
-            <IconBtn label="Copy Record ID" Icon={Copy}         variant="default" onClick={() => { navigator.clipboard.writeText(row.id); onAction('ID copied', row.id); }} />
-            <IconBtn label="Export Record"  Icon={Download}     variant="default" onClick={() => onAction('Exported', row.id)} />
-            <IconBtn label="View User"      Icon={User}         variant="cyan"    onClick={() => onAction('User profile opened', row.id)} />
-            {row.status === 'FLAGGED' && (
-              <IconBtn label="Review"       Icon={Eye}          variant="warning" onClick={() => { onAction('Reviewed', row.id); onClose(); }} />
-            )}
-          </>
-        ) : (
-          <>
-            {row.status === 'PENDING' && <>
-              <IconBtn label="Approve"      Icon={CheckCircle2} variant="success" onClick={() => { onAction('Approved', row.id); onClose(); }} />
-              <IconBtn label="Reject"       Icon={XCircle}      variant="danger"  onClick={() => { onAction('Rejected', row.id); onClose(); }} />
-            </>}
-            {(row.status === 'FLAGGED' || row.status === 'FROZEN') && <>
-              <IconBtn label="Release Hold" Icon={Play}         variant="warning" onClick={() => { onAction('Hold released', row.id); onClose(); }} />
-              <IconBtn label="Escalate"     Icon={ArrowUpRight} variant="orange"  onClick={() => { onAction('Escalated', row.id);    onClose(); }} />
-            </>}
-            {row.status === 'FAILED' && <>
-              <IconBtn label="Retry"        Icon={RefreshCw}    variant="warning" onClick={() => { onAction('Retried', row.id);      onClose(); }} />
-            </>}
-            <IconBtn label="Copy Record ID" Icon={Copy}         variant="default" onClick={() => { navigator.clipboard.writeText(row.id); onAction('ID copied', row.id); }} />
-            <IconBtn label="Export Record"  Icon={Download}     variant="default" onClick={() => onAction('Exported', row.id)} />
-            <IconBtn label="View User"      Icon={User}         variant="cyan"    onClick={() => onAction('User profile opened', row.id)} />
-            {row.status !== 'REJECTED' && row.status !== 'PAID' && row.status !== 'SETTLED' &&
-              <IconBtn label="Lock Record"  Icon={Lock}         variant="danger"  onClick={() => { onAction('Locked', row.id); onClose(); }} />
-            }
-          </>
-        )}
+    <FinanceDrawer open={open} onClose={onClose} eyebrow={`${type} Record Review`} title={`${type} — ${row.id}`} subtitle="Inspect record details, user context, and audit logs." footer={
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+        {/* Left side: Utilities */}
+        <div className="flex flex-wrap gap-1.5">
+          <IconBtn label="Copy ID" Icon={Copy} variant="default" small onClick={() => { navigator.clipboard.writeText(row.id); onAction('ID copied', row.id); }} />
+          <IconBtn label="Export" Icon={Download} variant="default" small onClick={() => onAction('Exported', row.id)} />
+          <IconBtn label="View User" Icon={User} variant="cyan" small onClick={() => onAction('User profile opened', row.id)} />
+          {!isTxn && row.status !== 'REJECTED' && row.status !== 'PAID' && row.status !== 'SETTLED' && (
+            <IconBtn label="Lock" Icon={Lock} variant="danger" small onClick={() => { onAction('Locked', row.id); onClose(); }} />
+          )}
+        </div>
+        
+        {/* Right side: Primary actions */}
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          {isTxn ? (
+            row.status === 'FLAGGED' && (
+              <IconBtn label="Mark Reviewed" Icon={Eye} variant="warning" onClick={() => { onAction('Reviewed', row.id); onClose(); }} />
+            )
+          ) : (
+            <>
+              {row.status === 'PENDING' && (
+                <>
+                  <IconBtn label="Approve Transaction" Icon={CheckCircle2} variant="success" onClick={() => { onAction('Approved', row.id); onClose(); }} />
+                  <IconBtn label="Reject Request" Icon={XCircle} variant="danger" onClick={() => { onAction('Rejected', row.id); onClose(); }} />
+                </>
+              )}
+              {(row.status === 'FLAGGED' || row.status === 'FROZEN') && (
+                <>
+                  <IconBtn label="Release Hold" Icon={Play} variant="warning" onClick={() => { onAction('Hold released', row.id); onClose(); }} />
+                  <IconBtn label="Escalate to Compliance" Icon={ArrowUpRight} variant="orange" onClick={() => { onAction('Escalated', row.id); onClose(); }} />
+                </>
+              )}
+              {row.status === 'FAILED' && (
+                <IconBtn label="Retry Dispatch" Icon={RefreshCw} variant="warning" onClick={() => { onAction('Retried', row.id); onClose(); }} />
+              )}
+            </>
+          )}
+          <IconBtn label="Close" onClick={onClose} variant="default" />
+        </div>
       </div>
     }>
-      {/* Status header */}
-      <DrawerSection title="Status Overview">
-        <div className="rounded-[12px] border overflow-hidden"
-          style={{ borderColor: `color-mix(in srgb, ${statusColor} 20%, var(--border))` }}>
-          <div className="px-4 py-3.5 flex items-center justify-between"
-            style={{ background: `color-mix(in srgb, ${statusColor} 6%, transparent)`, borderBottom: '1px solid var(--border)' }}>
-            <div>
-              <div className="text-[16px] font-black font-heading text-text tracking-[-0.02em]">{row.amount}</div>
-              <div className="text-[10px] font-mono text-text-muted/40 mt-0.5">{row.id} · {rowTs}</div>
-            </div>
-            <div className="flex flex-col items-end gap-1.5">
-              <StatusChip value={row.status} size="lg" />
-              {row.risk && <RiskChip value={row.risk} />}
-            </div>
-          </div>
-          <div className="px-4 py-2.5 flex gap-4 flex-wrap">
-            {row.method && <MethodBadge value={row.method} />}
-            {row.rail && <span className="text-[10px] font-heading text-text-muted/40 border border-border/30 px-2 py-0.5 rounded-[4px]">{row.rail}</span>}
-          </div>
-        </div>
-      </DrawerSection>
+      {/* Dynamic Status Hero Banner */}
+      <StatusHeroBanner
+        status={row.status}
+        amount={row.amount}
+        id={row.id}
+        created={rowTs}
+        method={row.method}
+        rail={row.rail}
+        type={type}
+      />
 
       {/* Transaction Summary */}
       <DrawerSection title="Transaction Summary">
         <DrawerFormGrid>
           <DrawerField label="Record ID"     value={row.id}      mono copyable />
-          <DrawerField label="Status"        value={row.status}  accent={STATUS_CLR[row.status]} />
+          <DrawerField label="Status"        value={row.status}  accent={statusColor} />
           <DrawerField label="Amount"        value={row.amount}  mono accent={row.amtRaw > 0 ? 'var(--positive)' : 'var(--negative)'} />
           <DrawerField label="Method"        value={row.method} />
           {row.type && <DrawerField label="Tx Type" value={row.type} accent={TXN_TYPE_CLR[row.type]} />}
@@ -224,22 +364,43 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
 
       {/* User Context */}
       <DrawerSection title="User Context">
-        <div className="rounded-[10px] border border-border/25 bg-bg/50 p-3.5">
-          <div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/15">
-            <div className="w-9 h-9 rounded-[9px] bg-primary/[0.1] border border-primary/[0.18] flex items-center justify-center text-[12px] font-bold text-primary font-heading flex-shrink-0">
+        <div 
+          className="rounded-[12px] border bg-bg/20 p-4 space-y-4"
+          style={{ borderColor: 'color-mix(in srgb, var(--brand) 12%, var(--border))' }}
+        >
+          <div className="flex items-center gap-3.5 pb-3 border-b border-border/10">
+            <div 
+              className="w-10 h-10 rounded-[11px] border flex items-center justify-center text-[13px] font-bold text-brand font-heading flex-shrink-0"
+              style={{
+                background: 'color-mix(in srgb, var(--brand) 10%, transparent)',
+                borderColor: 'color-mix(in srgb, var(--brand) 20%, transparent)',
+              }}
+            >
               {u.name.split(' ').map(n => n[0]).join('')}
             </div>
-            <div>
-              <div className="text-[13px] font-bold font-heading text-text">{u.name}</div>
-              <div className="text-[10.5px] font-mono text-text-muted/40">{u.uid} · {u.email}</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[13.5px] font-bold font-heading text-text tracking-tight truncate">{u.name}</div>
+              <div className="text-[10.5px] font-mono text-text-muted/70 mt-0.5 truncate">{u.uid} · {u.email}</div>
             </div>
-            <div className="ml-auto text-[10px] font-heading font-semibold text-text-muted/40">{u.region}</div>
+            <div 
+              className="px-2 py-0.5 rounded-[5px] border border-border/25 text-[9.5px] font-mono text-text-muted/70 bg-bg/40 flex-shrink-0"
+            >
+              {u.region || 'GLOBAL'}
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-[11px]">
-            {[['KYC', 'VERIFIED', 'var(--positive)'], ['Wallet', 'ACTIVE', 'var(--positive)'], ['Trading', 'ACTIVE', 'var(--positive)']].map(([l, v, c]) => (
-              <div key={l} className="text-center">
-                <div className="text-[9px] text-text-muted/35 font-heading mb-0.5 uppercase tracking-wide">{l}</div>
-                <div className="font-bold font-heading text-[10.5px]" style={{ color: c }}>{v}</div>
+
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: 'KYC Status', val: 'VERIFIED', color: 'var(--positive)' },
+              { label: 'Wallet Status', val: 'ACTIVE', color: 'var(--positive)' },
+              { label: 'Trading Status', val: 'ACTIVE', color: 'var(--positive)' },
+            ].map(m => (
+              <div 
+                key={m.label} 
+                className="flex flex-col gap-1 items-center text-center p-2 rounded-[8px] border border-border/10 bg-bg/10"
+              >
+                <span className="text-[9px] font-bold uppercase tracking-wider text-text-muted/70 leading-none">{m.label}</span>
+                <span className="text-[11px] font-bold font-heading mt-1" style={{ color: m.color }}>{m.val}</span>
               </div>
             ))}
           </div>
@@ -256,16 +417,16 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
       {/* Ledger Mapping specific to Transactions */}
       {isTxn && (
         <DrawerSection title="Ledger Mapping">
-          <div className="rounded-[10px] border border-border/20 bg-bg/30 px-4 py-3 space-y-2">
+          <div className="rounded-[12px] border border-border/15 bg-bg/25 p-4 space-y-3">
             {[
               { label: 'Debit Account', val: row.amtRaw > 0 ? 'External Gateway' : 'User Wallet' },
               { label: 'Credit Account', val: row.amtRaw > 0 ? 'User Wallet' : 'External Gateway' },
               { label: 'Ledger Entry', val: `${row.reference} · ${rowTs}` },
               { label: 'Settled', val: row.status === 'SETTLED' ? 'Yes' : 'No' },
             ].map(l => (
-              <div key={l.label} className="flex justify-between text-[11px] font-heading">
-                <span className="text-text-muted/45">{l.label}</span>
-                <span className="font-semibold text-text/80">{l.val}</span>
+              <div key={l.label} className="flex justify-between items-center text-[11px] font-heading pb-2 border-b border-border/5 last:border-0 last:pb-0">
+                <span className="text-text-muted/45 font-semibold">{l.label}</span>
+                <span className="font-bold text-text/80 font-mono">{l.val}</span>
               </div>
             ))}
           </div>
@@ -274,22 +435,36 @@ function FinanceRecordDrawer({ row, open, onClose, type, onAction }) {
 
       {/* Internal Notes */}
       <DrawerSection title="Internal Notes" collapsible>
-        {row.note && (
-          <div className="rounded-[9px] border border-border/25 bg-bg/50 px-3 py-2.5 mb-2.5 text-[12px] text-text-muted/65 font-heading leading-snug">
-            {row.note}
-          </div>
-        )}
-        <DrawerNoteEditor onSave={n => { setLocalNote(n); onAction('Note saved', row.id); }} />
-        {localNote && (
-          <div className="rounded-[9px] border border-purple/20 bg-purple/[0.05] px-3 py-2.5 mt-2 text-[12px] text-purple-300/80 font-heading leading-snug">
-            {localNote}
-          </div>
-        )}
+        <div className="space-y-3">
+          {row.note && (
+            <div className="rounded-[10px] border border-border/20 bg-bg/40 px-3.5 py-2.5 text-[11.5px] text-text-muted/70 font-heading leading-relaxed">
+              {row.note}
+            </div>
+          )}
+          
+          <DrawerNoteEditor onSave={n => { setLocalNote(n); onAction('Note saved', row.id); }} />
+          
+          {localNote && (
+            <div 
+              className="rounded-[10px] border px-3.5 py-2.5 text-[11.5px] font-heading leading-relaxed"
+              style={{
+                borderColor: 'color-mix(in srgb, var(--brand) 20%, var(--border))',
+                background: 'color-mix(in srgb, var(--brand) 5%, transparent)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              <div className="flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-wider text-brand mb-1">
+                <MessageSquare size={10} /> Operator Addition
+              </div>
+              {localNote}
+            </div>
+          )}
+        </div>
       </DrawerSection>
 
       {/* Audit Trail */}
       <DrawerSection title="Audit Trail" collapsible>
-        <DrawerAuditTrail entries={auditBase} />
+        <DrawerAuditTrail entries={auditBase} statusColor={statusColor} />
       </DrawerSection>
     </FinanceDrawer>
   );
@@ -337,11 +512,11 @@ function FilterRow({ filters }) {
     <div className="flex items-center gap-3 flex-wrap">
       {filters.map(grp => (
         <div key={grp.label} className="flex items-center gap-1.5">
-          <span className="text-[9.5px] font-black uppercase tracking-[0.15em] text-text-muted/30 font-heading">{grp.label}:</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-muted/70 font-heading">{grp.label}:</span>
           <div className="flex gap-1">
             {grp.options.map(o => (
               <button key={o} onClick={() => grp.set(o)}
-                className={`px-2 h-7 rounded-[6px] text-[10.5px] font-bold font-heading cursor-pointer transition-all border
+                className={`px-2.5 h-7 rounded-[6px] text-[10.5px] font-bold uppercase tracking-wider font-heading cursor-pointer transition-all border
                   ${grp.value === o ? 'bg-primary/[0.1] text-primary border-primary/25' : 'border-border/20 text-text-muted/45 hover:text-text-muted hover:border-border/40 hover:bg-surface-bright/10 bg-transparent'}`}>
                 {o}
               </button>
@@ -361,8 +536,8 @@ function UserCell({ u }) {
         {u.name.split(' ').map(n => n[0]).join('')}
       </div>
       <div>
-        <div className="text-[12px] font-semibold font-heading text-text/85">{u.name}</div>
-        <div className="text-[9.5px] font-mono text-text-muted/35">{u.uid}</div>
+        <div className="text-[13px] font-semibold font-heading tracking-[-0.01em] text-text/85">{u.name}</div>
+        <div className="text-[10px] font-mono font-semibold text-text-muted/45 mt-0.5">{u.uid}</div>
       </div>
     </div>
   );

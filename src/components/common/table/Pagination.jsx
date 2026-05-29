@@ -61,7 +61,7 @@ export function Pagination({
         {/* Rows-per-page */}
         {_setSize && (
           <div className="flex items-center gap-1.5 mr-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted/40">Rows</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.12em] text-text-muted/40">Rows</span>
             <select
               value={_pageSize}
               onChange={(e) => _setSize(Number(e.target.value))}

@@ -89,6 +89,15 @@ export const adminRouteModules = [
         ],
       },
       {
+        id: 'users-mt5-review',
+        path: '/users/mt5/:login',
+        pageKey: 'users/mt5-review',
+        permission: PERMISSIONS.users.mt5,
+        meta: [
+          { pattern: '/users/mt5/:login', title: 'MT5 Account Review', section: 'Users', permission: PERMISSIONS.users.mt5 },
+        ],
+      },
+      {
         id: 'users-detail',
         path: '/users/:userId',
         pageKey: 'users/user-detail',
@@ -125,7 +134,7 @@ export const adminRouteModules = [
       {
         id: 'finance-deposits',
         path: '/finance/deposits',
-        pageKey: 'finance/finance-workspace',
+        pageKey: 'finance/deposits',
         navLabel: 'Deposits',
         permission: PERMISSIONS.finance.view,
         meta: [
@@ -133,9 +142,18 @@ export const adminRouteModules = [
         ],
       },
       {
+        id: 'finance-deposit-detail',
+        path: '/finance/deposits/:id',
+        pageKey: 'finance/deposit-detail',
+        permission: PERMISSIONS.finance.view,
+        meta: [
+          { pattern: '/finance/deposits/:id', title: 'Deposit Details', section: 'Finance', permission: PERMISSIONS.finance.view },
+        ],
+      },
+      {
         id: 'finance-withdrawals',
         path: '/finance/withdrawals',
-        pageKey: 'finance/finance-workspace',
+        pageKey: 'finance/withdrawals',
         navLabel: 'Withdrawals',
         permission: PERMISSIONS.finance.view,
         meta: [
@@ -143,9 +161,18 @@ export const adminRouteModules = [
         ],
       },
       {
+        id: 'finance-withdrawal-detail',
+        path: '/finance/withdrawals/:id',
+        pageKey: 'finance/withdrawal-detail',
+        permission: PERMISSIONS.finance.view,
+        meta: [
+          { pattern: '/finance/withdrawals/:id', title: 'Withdrawal Details', section: 'Finance', permission: PERMISSIONS.finance.view },
+        ],
+      },
+      {
         id: 'finance-transactions',
         path: '/finance/transactions',
-        pageKey: 'finance/finance-workspace',
+        pageKey: 'finance/transactions',
         navLabel: 'Transactions',
         permission: PERMISSIONS.finance.view,
         meta: [
@@ -155,7 +182,7 @@ export const adminRouteModules = [
       {
         id: 'finance-failed',
         path: '/finance/failed-payments',
-        pageKey: 'finance/finance-workspace',
+        pageKey: 'finance/failed-payments',
         navLabel: 'Failed Payments',
         permission: PERMISSIONS.finance.view,
         meta: [
@@ -165,7 +192,7 @@ export const adminRouteModules = [
       {
         id: 'finance-approvals',
         path: '/finance/approvals',
-        pageKey: 'finance/finance-workspace',
+        pageKey: 'finance/approvals',
         navLabel: 'Approvals',
         permission: PERMISSIONS.finance.approve,
         meta: [
@@ -193,6 +220,7 @@ export const adminRouteModules = [
           { pattern: '/trading/accounts', title: 'Trading Accounts', section: 'Trading', permission: PERMISSIONS.trading.view },
         ],
       },
+
       {
         id: 'trading-orders',
         path: '/trading/orders',
@@ -475,7 +503,7 @@ export const adminRouteModules = [
       {
         id: 'reports-overview',
         path: '/reports/overview',
-        pageKey: 'reports/reports-workspace',
+        pageKey: 'reports/overview',
         navLabel: 'Overview',
         permission: PERMISSIONS.reports.view,
         meta: [
@@ -485,7 +513,7 @@ export const adminRouteModules = [
       {
         id: 'reports-finance',
         path: '/reports/finance',
-        pageKey: 'reports/reports-workspace',
+        pageKey: 'reports/finance',
         navLabel: 'Finance Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
@@ -495,7 +523,7 @@ export const adminRouteModules = [
       {
         id: 'reports-trading',
         path: '/reports/trading',
-        pageKey: 'reports/reports-workspace',
+        pageKey: 'reports/trading',
         navLabel: 'Trading Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
@@ -505,7 +533,7 @@ export const adminRouteModules = [
       {
         id: 'reports-users',
         path: '/reports/users',
-        pageKey: 'reports/reports-workspace',
+        pageKey: 'reports/users',
         navLabel: 'User Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
@@ -515,7 +543,7 @@ export const adminRouteModules = [
       {
         id: 'reports-system',
         path: '/reports/system',
-        pageKey: 'reports/reports-workspace',
+        pageKey: 'reports/system',
         navLabel: 'System Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
@@ -525,7 +553,7 @@ export const adminRouteModules = [
       {
         id: 'reports-exports',
         path: '/reports/exports',
-        pageKey: 'reports/reports-workspace',
+        pageKey: 'reports/exports',
         navLabel: 'Export Center',
         permission: PERMISSIONS.reports.export,
         meta: [
@@ -536,9 +564,9 @@ export const adminRouteModules = [
   },
   {
     id: 'support',
-    label: 'Support',
+    label: 'Support Desk',
     icon: LifeBuoy,
-    navSection: 'system',
+    navSection: 'management',
     permission: PERMISSIONS.support.view,
     defaultPath: '/support/tickets',
     routes: [
@@ -546,20 +574,20 @@ export const adminRouteModules = [
         id: 'support-tickets',
         path: '/support/tickets',
         pageKey: 'support/support-workspace',
-        navLabel: 'Tickets',
+        navLabel: 'All Tickets',
         permission: PERMISSIONS.support.view,
         meta: [
-          { pattern: '/support/tickets', title: 'Tickets Queue', section: 'Support', permission: PERMISSIONS.support.view },
+          { pattern: '/support/tickets', title: 'All Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.view },
         ],
       },
       {
         id: 'support-escalated',
         path: '/support/escalated',
         pageKey: 'support/support-workspace',
-        navLabel: 'Escalated Tickets',
+        navLabel: 'Urgent Tickets',
         permission: PERMISSIONS.support.escalate,
         meta: [
-          { pattern: '/support/escalated', title: 'Escalated Tickets', section: 'Support', permission: PERMISSIONS.support.escalate },
+          { pattern: '/support/escalated', title: 'Urgent Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.escalate },
         ],
       },
       {
@@ -568,7 +596,7 @@ export const adminRouteModules = [
         pageKey: 'support/ticket-detail',
         permission: PERMISSIONS.support.view,
         meta: [
-          { pattern: '/support/tickets/:ticketId', title: 'Ticket Details', section: 'Support', permission: PERMISSIONS.support.view },
+          { pattern: '/support/tickets/:ticketId', title: 'Ticket Details', section: 'Support Desk', permission: PERMISSIONS.support.view },
         ],
       },
     ],
@@ -695,6 +723,7 @@ export const adminRedirectRoutes = [
   { path: '/support', to: '/support/tickets' },
   { path: '/settings', to: '/settings/api' },
   { path: '/admin-mgmt', to: '/admin-mgmt/users' },
+  { path: '/admin', to: '/' },
 ];
 
 export const adminRouteMeta = adminRouteModules.flatMap((module) =>
