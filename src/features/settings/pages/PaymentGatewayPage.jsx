@@ -82,7 +82,7 @@ export function PaymentGatewayPage({
 
       {activeTab === 'gateways' && (
         <div className="space-y-3.5">
-          {gateways.map((gw, index) => {
+          {gateways.map((gw) => {
             const isExpanded = expandedGateway === gw.id;
             const GatewayIcon = gatewayIcons[gw.id] || CreditCard;
             return (

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { INITIAL_API_CONFIG } from '../configs/api.config';
@@ -49,8 +49,8 @@ export function usePlatformSettingsWorkspace() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Active section state (can be overview, api, gateways, kyc, trading, notifications, system)
-  const [section, setSectionState] = useState('overview');
+  // Active section derived from URL path (single source of truth)
+  const section = pathToSection[location.pathname] || 'overview';
 
   // Form states
   const [apiConfig, setApiConfig] = useState(INITIAL_API_CONFIG);
@@ -61,17 +61,8 @@ export function usePlatformSettingsWorkspace() {
   const [notificationConfig, setNotificationConfig] = useState(INITIAL_NOTIFICATION_CONFIG);
   const [systemConfig, setSystemConfig] = useState(INITIAL_SYSTEM_CONFIG);
 
-  // Sync active section state with URL path on load or location change
-  useEffect(() => {
-    const matchedSection = pathToSection[location.pathname];
-    if (matchedSection) {
-      setSectionState(matchedSection);
-    }
-  }, [location.pathname]);
-
   // Wrapper setSection to navigate between routes when clicked
   const setSection = useCallback((newSection) => {
-    setSectionState(newSection);
     const targetPath = sectionToPath[newSection];
     if (targetPath && location.pathname !== targetPath) {
       navigate(targetPath);

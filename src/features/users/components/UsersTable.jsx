@@ -194,59 +194,6 @@ export function UsersListTable({
   );
 }
 
-export function UsersKYCTable({ tableState, onReviewUser }) {
-  const columns = [
-    { key: 'id', label: 'Case ID', render: (val) => <span className="font-mono text-[11.5px] font-semibold text-text">{val}</span> },
-    {
-      key: 'user',
-      label: 'User',
-      render: (val, row) => (
-        <div>
-          <div className="text-[13px] font-medium text-text">{val}</div>
-          <div className="text-[11.5px] text-text-muted/80">{row.country}</div>
-        </div>
-      ),
-    },
-    { key: 'tier', label: 'Tier', render: (val) => <span className="text-[13px] font-medium text-text">{val}</span> },
-    { key: 'docs', label: 'Docs', render: (val) => <span className="text-[13px] text-text-muted">{val}</span> },
-    { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
-    { key: 'risk', label: 'Risk', render: (val) => <StatusBadge status={val} dot={false} /> },
-    { key: 'eta', label: 'ETA', render: (val) => <span className="font-mono text-[11.5px] font-medium text-text-muted">{val}</span> },
-    {
-      key: 'action',
-      label: '',
-      align: 'right',
-      render: (_, row) => (
-        <button
-          type="button"
-          onClick={() => onReviewUser(row.userId)}
-          className="rounded-[8px] border border-border/25 px-3 py-1.5 text-[11.5px] font-semibold text-text-muted transition-all hover:border-border/55 hover:text-text"
-        >
-          Review
-        </button>
-      ),
-    },
-  ];
-
-  return (
-    <MainTable
-      columns={columns}
-      data={tableState.items}
-      rowKey="id"
-      emptyTitle="No KYC cases matched the current search"
-      pagination={tableState}
-      rowClassName={(item) => {
-        const isFlagged = ['REJECTED', 'FAILED', 'FLAGGED'].includes(item.status);
-        const isPending = ['PENDING', 'NONE'].includes(item.status);
-
-        if (isFlagged) return 'hover:bg-negative/5 hover:border-l-negative';
-        if (isPending) return 'hover:bg-warning/5 hover:border-l-warning';
-        return 'hover:bg-positive/5 hover:border-l-positive';
-      }}
-    />
-  );
-}
-
 export function UsersMt5Table({ tableState, onOpenUser, onOpenMt5 }) {
   const columns = [
     {
