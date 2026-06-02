@@ -15,7 +15,7 @@ const KPI_DATA = [
 
 export function DashboardKpis() {
   return (
-    <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6">
+    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
       {KPI_DATA.map((k) => (
         <KpiCard key={k.label} {...k} />
       ))}

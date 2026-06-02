@@ -607,8 +607,18 @@ export const adminRouteModules = [
     icon: Settings,
     navSection: 'system',
     permission: PERMISSIONS.settings.view,
-    defaultPath: '/settings/api',
+    defaultPath: '/settings/overview',
     routes: [
+      {
+        id: 'settings-overview',
+        path: '/settings/overview',
+        pageKey: 'settings/settings-workspace',
+        navLabel: 'Settings Overview',
+        permission: PERMISSIONS.settings.view,
+        meta: [
+          { pattern: '/settings/overview', title: 'Settings Overview', section: 'Settings', permission: PERMISSIONS.settings.view },
+        ],
+      },
       {
         id: 'settings-api',
         path: '/settings/api',
@@ -721,7 +731,7 @@ export const adminRedirectRoutes = [
   { path: '/ib-system', to: '/ib-system/overview' },
   { path: '/reports', to: '/reports/overview' },
   { path: '/support', to: '/support/tickets' },
-  { path: '/settings', to: '/settings/api' },
+  { path: '/settings', to: '/settings/overview' },
   { path: '/admin-mgmt', to: '/admin-mgmt/users' },
   { path: '/admin', to: '/' },
 ];
