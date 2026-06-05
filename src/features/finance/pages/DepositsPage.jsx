@@ -219,7 +219,7 @@ function DepositsPage() {
           <MainTable
             columns={columns}
             data={paged}
-            onRowClick={(row) => navigate(`/finance/deposits/${row.id}`)}
+            onRowClick={(row) => navigate(`/admin/finance/deposits/${row.id}`)}
             emptyTitle="No deposits found matching filters."
             pagination={tableState}
             rowClassName={(row) => {

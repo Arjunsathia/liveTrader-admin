@@ -89,7 +89,7 @@ function UsersPage() {
     { label: 'Flagged / Risk', value: userRows.filter((user) => ['ELEVATED', 'WATCHLIST', 'FLAGGED'].includes(user.riskStatus)).length, subtext: 'watchlist or elevated', trend: `${RISK_OPTIONS.length} groups`, positive: false, Icon: ShieldAlert, accent: 'var(--negative)' },
   ], [userRows]);
 
-  const openUser = (nextUserId) => navigate(`/users/${nextUserId}`);
+  const openUser = (nextUserId) => navigate(`/admin/users/${nextUserId}`);
 
   const handleSaveUser = () => {
     if (formMode === 'edit' && editingUserId) {

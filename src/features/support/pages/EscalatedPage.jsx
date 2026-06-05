@@ -160,7 +160,7 @@ function EscalatedPage() {
                 <TicketCard
                   key={ticket.id}
                   ticket={ticket}
-                  onView={(t) => navigate(`/support/tickets/${t.id}`, { state: { fromEscalated: true } })}
+                  onView={(t) => navigate(`/admin/support/tickets/${t.id}`, { state: { fromEscalated: true } })}
                   onAssign={(t) => act(`Assigned: ${t.id}`)}
                   onResolve={(t) => act(`Resolved: ${t.id}`)}
                   showEscalate={false}

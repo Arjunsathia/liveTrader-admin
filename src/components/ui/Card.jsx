@@ -19,6 +19,7 @@ export function Card({
   actions,
   className = '',
   padding = true,
+  contentClassName = '',
   ...props
 }) {
   const displayHeading = heading ?? subtitle; // backward compat
@@ -45,7 +46,8 @@ export function Card({
           {actions && <div className="flex gap-2 items-center shrink-0">{actions}</div>}
         </div>
       )}
-      <div className={padding ? 'p-5' : ''}>{children}</div>
+      <div className={padding ? `p-5 ${contentClassName}` : contentClassName}>{children}</div>
     </div>
   );
 }
+

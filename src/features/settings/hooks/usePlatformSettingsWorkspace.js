@@ -49,8 +49,10 @@ export function usePlatformSettingsWorkspace() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Normalize path by stripping /admin prefix if present
+  const cleanPath = location.pathname.replace(/^\/admin/, '');
   // Active section derived from URL path (single source of truth)
-  const section = pathToSection[location.pathname] || 'overview';
+  const section = pathToSection[cleanPath] || 'overview';
 
   // Form states
   const [apiConfig, setApiConfig] = useState(INITIAL_API_CONFIG);
@@ -64,8 +66,13 @@ export function usePlatformSettingsWorkspace() {
   // Wrapper setSection to navigate between routes when clicked
   const setSection = useCallback((newSection) => {
     const targetPath = sectionToPath[newSection];
-    if (targetPath && location.pathname !== targetPath) {
-      navigate(targetPath);
+    if (targetPath) {
+      // Prepend /admin prefix if current route is hosted under /admin
+      const hasAdmin = location.pathname.startsWith('/admin');
+      const navigatedPath = hasAdmin ? `/admin${targetPath}` : targetPath;
+      if (location.pathname !== navigatedPath) {
+        navigate(navigatedPath);
+      }
     }
   }, [navigate, location.pathname]);
 

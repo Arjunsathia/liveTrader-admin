@@ -27,7 +27,7 @@ export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, tren
 
       {/* Label + Icon */}
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-black uppercase tracking-[0.12em] text-text-muted/45 select-none">
+        <span className="text-[11px] font-black uppercase tracking-[0.12em] text-text-muted select-none">
           {label}
         </span>
         {Icon && (
@@ -59,10 +59,10 @@ export function KPICard({ label, value, accent = 'var(--brand)', Icon, sub, tren
             </span>
           </>
         ) : isStable ? (
-          <Activity size={11} className="text-text-muted/50 shrink-0" />
+          <Activity size={11} className="text-text-muted shrink-0" />
         ) : null}
         {sub && (
-          <span className="text-[10.5px] text-text-muted/35 leading-none">{sub}</span>
+          <span className="text-[10.5px] text-text-muted leading-none">{sub}</span>
         )}
       </div>
     </div>

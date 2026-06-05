@@ -11,13 +11,13 @@ import FeesCouponsPage from './FeesCouponsPage';
 import { RiskRulesPanel }               from '../components/RiskRulesPanel';
 
 const NAV_ITEMS = [
-  { id: 'overview',    path: '/prop-trading',                       label: 'Overview',           Icon: PieChart  },
-  { id: 'challenges',  path: '/prop-trading/challenge-configurations', label: 'Challenge Config.',  Icon: Layers    },
-  { id: 'evaluations', path: '/prop-trading/evaluation-requests',   label: 'Evaluation Requests', Icon: Clipboard, badge: 247 },
-  { id: 'funded',      path: '/prop-trading/funded-accounts',       label: 'Funded Accounts',    Icon: Trophy    },
-  { id: 'statistics',  path: '/prop-trading/statistics',            label: 'Statistics',          Icon: BarChart2 },
-  { id: 'fees',        path: '/prop-trading/fees-coupons',          label: 'Fees & Coupons',      Icon: Tag       },
-  { id: 'rules',       path: '/prop-trading/rules-risk',            label: 'Rules / Risk',        Icon: Shield    },
+  { id: 'overview',    path: '/admin/prop-trading',                       label: 'Overview',           Icon: PieChart  },
+  { id: 'challenges',  path: '/admin/prop-trading/challenge-configurations', label: 'Challenge Config.',  Icon: Layers    },
+  { id: 'evaluations', path: '/admin/prop-trading/evaluation-requests',   label: 'Evaluation Requests', Icon: Clipboard, badge: 247 },
+  { id: 'funded',      path: '/admin/prop-trading/funded-accounts',       label: 'Funded Accounts',    Icon: Trophy    },
+  { id: 'statistics',  path: '/admin/prop-trading/statistics',            label: 'Statistics',          Icon: BarChart2 },
+  { id: 'fees',        path: '/admin/prop-trading/fees-coupons',          label: 'Fees & Coupons',      Icon: Tag       },
+  { id: 'rules',       path: '/admin/prop-trading/rules-risk',            label: 'Rules / Risk',        Icon: Shield    },
 ];
 
 const PAGE_MAP = {

@@ -12,12 +12,12 @@ import { PERMISSIONS, hasPermission } from '@/config/permissions/permissions';
 import { useAdminSession } from '@/app/providers/AdminSessionProvider';
 
 const NAV_ITEMS = [
-  { id: 'overview',  path: '/reports',          label: 'Overview',        Icon: LayoutDashboard, permission: PERMISSIONS.reports.view },
-  { id: 'finance',   path: '/reports/finance',   label: 'Finance',         Icon: DollarSign,      permission: PERMISSIONS.reports.view },
-  { id: 'trading',   path: '/reports/trading',   label: 'Trading',         Icon: TrendingUp,      permission: PERMISSIONS.reports.view },
-  { id: 'users',     path: '/reports/users',     label: 'Users',           Icon: Users,           permission: PERMISSIONS.reports.view },
-  { id: 'system',    path: '/reports/system',    label: 'System Jobs',     Icon: Cpu,             permission: PERMISSIONS.reports.view },
-  { id: 'exports',   path: '/reports/exports',   label: 'Export Center',   Icon: Send,            permission: PERMISSIONS.reports.export },
+  { id: 'overview',  path: '/admin/reports',          label: 'Overview',        Icon: LayoutDashboard, permission: PERMISSIONS.reports.view },
+  { id: 'finance',   path: '/admin/reports/finance',   label: 'Finance',         Icon: DollarSign,      permission: PERMISSIONS.reports.view },
+  { id: 'trading',   path: '/admin/reports/trading',   label: 'Trading',         Icon: TrendingUp,      permission: PERMISSIONS.reports.view },
+  { id: 'users',     path: '/admin/reports/users',     label: 'Users',           Icon: Users,           permission: PERMISSIONS.reports.view },
+  { id: 'system',    path: '/admin/reports/system',    label: 'System Jobs',     Icon: Cpu,             permission: PERMISSIONS.reports.view },
+  { id: 'exports',   path: '/admin/reports/exports',   label: 'Export Center',   Icon: Send,            permission: PERMISSIONS.reports.export },
 ];
 
 const PAGE_MAP = {

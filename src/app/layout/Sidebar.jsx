@@ -1,10 +1,11 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronUp, User, Lock, Bell, History, Key, ShieldCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { adminNavigation, adminNavigationSections } from '../../config/sidebar/admin-sidebar.config';
 import { hasPermission } from '../../config/permissions/permissions';
 import { useAdminSession } from '../providers/AdminSessionProvider';
+import { useAuth } from '@/auth/AuthContext';
 
 /* ─────────────────────────────────────────────────────────────
    SIDEBAR ITEM
@@ -59,8 +60,8 @@ function SidebarItem({
             ? collapsed
               ? 'bg-primary/[0.14] text-primary'
               : 'bg-primary/[0.08] text-primary'
-            : `text-text-muted/50 hover:bg-white/[0.03] hover:text-text/75
-               ${isHoveredPortal ? 'bg-white/[0.03] text-text/75' : ''}`
+            : `text-text-muted/50 hover:bg-text/[0.04] hover:text-text/75
+               ${isHoveredPortal ? 'bg-text/[0.04] text-text/75' : ''}`
           }
         `}
       >
@@ -141,7 +142,7 @@ function SidebarItem({
                       outline-none cursor-pointer transition-all duration-150
                       ${isSub
                         ? 'bg-primary/[0.08] text-primary'
-                        : 'text-text-muted/45 hover:bg-white/[0.03] hover:text-text/70'
+                        : 'text-text-muted/45 hover:bg-text/[0.04] hover:text-text/70'
                       }
                     `}
                   >
@@ -181,7 +182,7 @@ function NavSection({ label, collapsed }) {
       <span className="text-[10.5px] font-black tracking-[0.22em] uppercase text-text-muted/25 select-none whitespace-nowrap">
         {label}
       </span>
-      <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.04)' }} />
+      <span className="flex-1 h-px bg-border/20" />
     </div>
   );
 }
@@ -193,6 +194,34 @@ export function Sidebar({ collapsed, isMobile }) {
   const navigate  = useNavigate();
   const location  = useLocation();
   const { permissions } = useAdminSession();
+  const { user } = useAuth();
+  
+  const [profileMenuExpanded, setProfileMenuExpanded] = useState(false);
+
+  const profileSubTabs = useMemo(() => {
+    const tabs = [
+      { id: 'overview', label: 'Overview', path: '/admin/account/overview', icon: ShieldCheck },
+      { id: 'profile', label: 'Profile Details', path: '/admin/account/profile', icon: User },
+      { id: 'security', label: 'Security & 2FA', path: '/admin/account/security', icon: Lock },
+      { id: 'notifications', label: 'Notifications', path: '/admin/account/notifications', icon: Bell },
+      { id: 'activity', label: 'Activity Log', path: '/admin/account/activity', icon: History },
+    ];
+    if (user?.role === 'super-admin' || user?.role === 'client') {
+      tabs.push({ id: 'api-keys', label: 'API Keys', path: '/admin/account/api-keys', icon: Key });
+    }
+    return tabs;
+  }, [user]);
+
+  const profileItem = useMemo(() => ({
+    id: 'account',
+    label: 'My Account',
+    icon: User,
+    subItems: profileSubTabs.map(sub => ({
+      id: sub.id,
+      label: sub.label,
+      path: sub.path
+    }))
+  }), [profileSubTabs]);
 
   const [hoverNode,         setHoverNode]         = useState(null);
   const [manualExpandedId,  setManualExpandedId]  = useState(null);
@@ -215,24 +244,24 @@ export function Sidebar({ collapsed, isMobile }) {
 
   /* ── Active ID resolution ── */
   const getUsersActiveId = () => {
-    if (location.pathname.includes('/users/kyc') || location.state?.usersView === 'kyc')  return 'users-kyc';
-    if (location.pathname.includes('/users/mt5') || location.state?.usersView === 'mt5')  return 'users-mt5';
+    if (location.pathname.includes('/admin/users/kyc') || location.state?.usersView === 'kyc')  return 'users-kyc';
+    if (location.pathname.includes('/admin/users/mt5') || location.state?.usersView === 'mt5')  return 'users-mt5';
     return 'users-list';
   };
 
   const getFinanceActiveId = (pathname) => {
-    if (pathname.includes('/finance/deposits'))     return 'finance-deposits';
-    if (pathname.includes('/finance/withdrawals'))  return 'finance-withdrawals';
-    if (pathname.includes('/finance/transactions')) return 'finance-transactions';
-    if (pathname.includes('/finance/failed'))       return 'finance-failed';
-    if (pathname.includes('/finance/approvals'))    return 'finance-approvals';
+    if (pathname.includes('/admin/finance/deposits'))     return 'finance-deposits';
+    if (pathname.includes('/admin/finance/withdrawals'))  return 'finance-withdrawals';
+    if (pathname.includes('/admin/finance/transactions')) return 'finance-transactions';
+    if (pathname.includes('/admin/finance/failed'))       return 'finance-failed';
+    if (pathname.includes('/admin/finance/approvals'))    return 'finance-approvals';
     return 'finance-deposits';
   };
 
   const getActiveId = () => {
     const { pathname } = location;
-    if (pathname === '/') return 'dashboard';
-    if (location.state?.fromTrading && pathname.startsWith('/users/mt5')) return 'trading-accounts';
+    if (pathname === '/admin' || pathname === '/admin/') return 'dashboard';
+    if (location.state?.fromTrading && pathname.startsWith('/admin/users/mt5')) return 'trading-accounts';
     
     for (const item of allowedItems) {
       if (item.path === pathname && (!item.subItems || item.subItems.length === 0)) return item.id;
@@ -240,20 +269,20 @@ export function Sidebar({ collapsed, isMobile }) {
         const sub = item.subItems.find((c) => c.path === pathname);
         if (sub) return sub.id;
       }
-      if (pathname.startsWith('/users/')        && item.id === 'users')        return getUsersActiveId();
-      if (pathname.startsWith('/finance/')      && item.id === 'finance')      return getFinanceActiveId(pathname);
-      if (pathname.startsWith('/trading/')      && item.id === 'trading') {
-        if (pathname.includes('/trading/orders')) return 'trading-orders';
-        if (pathname.includes('/trading/positions')) return 'trading-positions';
-        if (pathname.includes('/trading/history')) return 'trading-history';
-        if (pathname.includes('/trading/execution-logs')) return 'trading-logs';
+      if (pathname.startsWith('/admin/users/')        && item.id === 'users')        return getUsersActiveId();
+      if (pathname.startsWith('/admin/finance/')      && item.id === 'finance')      return getFinanceActiveId(pathname);
+      if (pathname.startsWith('/admin/trading/')      && item.id === 'trading') {
+        if (pathname.includes('/admin/trading/orders')) return 'trading-orders';
+        if (pathname.includes('/admin/trading/positions')) return 'trading-positions';
+        if (pathname.includes('/admin/trading/history')) return 'trading-history';
+        if (pathname.includes('/admin/trading/execution-logs')) return 'trading-logs';
         return 'trading-accounts';
       }
-      if (pathname.startsWith('/support/tickets/') && item.id === 'support') {
+      if (pathname.startsWith('/admin/support/tickets/') && item.id === 'support') {
         return location.state?.fromEscalated ? 'support-escalated' : 'support-tickets';
       }
-      if (pathname.startsWith('/copy-trading/') && item.id === 'copy-trading') {
-        const slug = pathname.split('/')[2];
+      if (pathname.startsWith('/admin/copy-trading/') && item.id === 'copy-trading') {
+        const slug = pathname.split('/')[3];
         return slug ? `copy-${slug}` : 'copy-strategies';
       }
     }
@@ -265,17 +294,17 @@ export function Sidebar({ collapsed, isMobile }) {
   /* ── Expanded section ── */
   const routeExpandedId = useMemo(
     () => {
-      if (location.state?.fromTrading && location.pathname.startsWith('/users/mt5')) return 'trading';
+      if (location.state?.fromTrading && location.pathname.startsWith('/admin/users/mt5')) return 'trading';
       
       return allowedItems.find(
         (item) =>
           item.path === location.pathname ||
           item.subItems?.some((s) => s.path === location.pathname) ||
-          (location.pathname.startsWith('/users/')         && item.id === 'users') ||
-          (location.pathname.startsWith('/finance/')       && item.id === 'finance') ||
-          (location.pathname.startsWith('/trading/')       && item.id === 'trading') ||
-          (location.pathname.startsWith('/copy-trading/')  && item.id === 'copy-trading') ||
-          (location.pathname.startsWith('/support/')       && item.id === 'support'),
+          (location.pathname.startsWith('/admin/users/')         && item.id === 'users') ||
+          (location.pathname.startsWith('/admin/finance/')       && item.id === 'finance') ||
+          (location.pathname.startsWith('/admin/trading/')       && item.id === 'trading') ||
+          (location.pathname.startsWith('/admin/copy-trading/')  && item.id === 'copy-trading') ||
+          (location.pathname.startsWith('/admin/support/')       && item.id === 'support'),
       )?.id ?? null;
     },
     [allowedItems, location.pathname, location.state],
@@ -349,7 +378,7 @@ export function Sidebar({ collapsed, isMobile }) {
       >
         {/* Logo mark */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/admin')}
           className="relative shrink-0 w-8 h-8 rounded-[9px] flex items-center justify-center bg-primary cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
           style={{ boxShadow: '0 0 14px color-mix(in srgb, var(--primary) 30%, transparent)' }}
         >
@@ -441,7 +470,7 @@ export function Sidebar({ collapsed, isMobile }) {
               `}
               style={{
                 backgroundColor: 'var(--surface-2)',
-                borderColor: 'rgba(255,255,255,0.08)',
+                borderColor: 'var(--border)',
               }}
             />
 
@@ -450,7 +479,7 @@ export function Sidebar({ collapsed, isMobile }) {
               className="flex flex-col rounded-[10px] overflow-hidden min-w-[205px]"
               style={{
                 backgroundColor: 'var(--surface-2)',
-                border:     '1px solid rgba(255,255,255,0.08)',
+                border:     '1px solid var(--border)',
                 boxShadow:  '0 16px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3)',
                 animation:  'sideTooltip 0.17s cubic-bezier(0.16,1,0.3,1)',
               }}
@@ -458,7 +487,7 @@ export function Sidebar({ collapsed, isMobile }) {
               {/* Flyout header */}
               <div
                 className="flex items-center gap-2.5 px-3.5 py-3"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.055)' }}
+                style={{ borderBottom: '1px solid var(--border)' }}
               >
                 {hoverNode.item.icon && (
                   <span
@@ -486,7 +515,7 @@ export function Sidebar({ collapsed, isMobile }) {
                         transition-all duration-130 cursor-pointer outline-none text-left
                         ${activeId === sub.id
                           ? 'bg-primary/[0.10] text-primary'
-                          : 'text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80'
+                          : 'text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80'
                         }
                       `}
                     >
@@ -500,7 +529,7 @@ export function Sidebar({ collapsed, isMobile }) {
                 ) : (
                   <button
                     onClick={() => { navigate(hoverNode.item.path); setHoverNode(null); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80 transition-all duration-130 cursor-pointer outline-none text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80 transition-all duration-130 cursor-pointer outline-none text-left"
                   >
                     <ChevronRight size={11} strokeWidth={2.5} className="text-primary/50 shrink-0" />
                     Open {hoverNode.item.label}
@@ -512,6 +541,104 @@ export function Sidebar({ collapsed, isMobile }) {
           document.body,
         )
       }
+      {/* Sticky Bottom My Account Profile Card */}
+      <div
+        className="shrink-0 p-3 border-t bg-surface-elevated flex flex-col gap-1.5"
+        style={{
+          borderColor: 'var(--border)',
+        }}
+      >
+        {/* Accordion Submenu (Slides Upward) */}
+        {!collapsed && (
+          <div
+            className="grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+            style={{
+              gridTemplateRows: profileMenuExpanded ? '1fr' : '0fr',
+              opacity: profileMenuExpanded ? 1 : 0,
+            }}
+          >
+            <div className="overflow-hidden min-h-0">
+              <div className="flex flex-col gap-0.5 pb-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                {profileSubTabs.map((sub) => {
+                  const isSubActive = location.pathname === sub.path;
+                  const SubIcon = sub.icon;
+                  return (
+                    <button
+                      key={sub.id}
+                      onClick={() => navigate(sub.path)}
+                      className={`
+                        w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px]
+                        text-[13px] font-heading font-medium tracking-[-0.01em]
+                        outline-none cursor-pointer transition-all duration-150 text-left
+                        ${isSubActive
+                          ? 'bg-primary/[0.08] text-primary font-bold'
+                          : 'text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80'
+                        }
+                      `}
+                    >
+                      <SubIcon size={12} className={isSubActive ? 'text-primary' : 'text-text-muted/30'} />
+                      <span>{sub.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={() => {
+            if (collapsed) {
+              navigate('/admin/account/overview');
+            } else {
+              setProfileMenuExpanded(!profileMenuExpanded);
+            }
+          }}
+          onMouseEnter={(e) => {
+            if (collapsed) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              handleHoverStart(profileItem, rect);
+            }
+          }}
+          onMouseLeave={handleHoverEnd}
+          className={`
+            flex items-center gap-3 w-full rounded-[8px] transition-all duration-200 cursor-pointer outline-none text-left
+            ${collapsed ? 'justify-center p-1.5' : 'p-2 hover:bg-text/[0.04]'}
+            ${location.pathname.startsWith('/admin/account') || (collapsed && hoverNode?.item.id === 'account') ? 'bg-primary/[0.08] text-primary font-bold' : 'text-text-muted/65'}
+          `}
+        >
+          {/* Initials Avatar */}
+          <div
+            className={`
+              w-7.5 h-7.5 rounded-[7px] flex items-center justify-center font-heading font-black text-[10px] tracking-tight shrink-0 transition-all
+              ${location.pathname.startsWith('/admin/account') 
+                ? 'bg-primary text-bg' 
+                : 'bg-primary/[0.12] text-primary border border-primary/20'
+              }
+            `}
+          >
+            {user?.initials ?? 'U'}
+          </div>
+          
+          {/* Expanded text info & Chevron toggle */}
+          {!collapsed && (
+            <>
+              <div className="flex-1 flex flex-col items-start gap-0.5 text-left min-w-0 animate-in fade-in slide-in-from-left-1 duration-200">
+                <span className="text-[12.5px] font-heading font-bold text-text truncate w-full leading-tight">
+                  {user?.name ?? 'User'}
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-[0.1em] text-text-muted/45 leading-none">
+                  {user?.role === 'super-admin' ? 'Super Admin' : (user?.role === 'operations' ? 'Operations' : 'Auditor')}
+                </span>
+              </div>
+              
+              <div className="w-6.5 h-6.5 flex items-center justify-center text-text-muted/40 shrink-0 transition-transform">
+                <ChevronUp size={13} className={`transition-transform duration-350 ${profileMenuExpanded ? 'rotate-180 text-primary' : 'rotate-0'}`} />
+              </div>
+            </>
+          )}
+        </button>
+      </div>
 
     </aside>
   );

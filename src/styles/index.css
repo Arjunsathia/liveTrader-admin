@@ -9,6 +9,9 @@
   --font-body: "Hind", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
 
+  /* Redefine white color dynamically based on light/dark mode for automatic theme support in all panels */
+  --color-white: var(--white-dynamic);
+
   /* Surface & layout colors */
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -49,6 +52,7 @@
   :root {
     /* ── DIGITAL OBSIDIAN (Light) ── */
     --bg: #f8fafc;
+    --white-dynamic: #0b1326;
     --surface: #ffffff;
     --surface-2: #f1f5f9;
     --muted-surface: #e2e8f0;
@@ -86,6 +90,7 @@
   .dark {
     /* ── DIGITAL OBSIDIAN (Dark) ── */
     --bg: #0b1326; /* Primary void */
+    --white-dynamic: #ffffff;
     --surface: #060e20; /* Card surface */
     --surface-2: #131b2e; /* Section surface / Nav */
     --muted-surface: #1a2540; /* Active panels */
@@ -120,6 +125,388 @@
 
     /* Shadows */
     --shadow-dynamic: 0 4px 16px -2px rgba(0, 0, 0, 0.45), 0 3px 6px -2px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ══════════════════════════════════════════
+     EMERALD HORIZON PREMIUM
+     Identity: Wealth teal — growth & prosperity
+     Light bg tint: pure mint-green ivory
+     Dark bg: deep rainforest void
+  ══════════════════════════════════════════ */
+  [data-theme="emerald"] {
+    --bg: #f2fdfb;
+    --white-dynamic: #052220;
+    --surface: #ffffff;
+    --surface-2: #e4f7f2;
+    --muted-surface: #c6ede4;
+    --surface-bright: #a8dfd4;
+    --brand: #0f8f82;
+    --brand-strong: #0d766c;
+    --accent: #16c784;
+    --text: #052220;
+    --text-muted: #3d6460;
+    --border: rgba(15, 143, 130, 0.14);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(15, 143, 130, 0.15);
+    --primary-rgb: 15, 143, 130;
+    --glass: rgba(15, 143, 130, 0.08);
+    --shadow-dynamic: 0 4px 12px -2px rgba(15, 143, 130, 0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="emerald"] {
+    --bg: #030f0d;
+    --white-dynamic: #e9fbf8;
+    --surface: #091e1a;
+    --surface-2: #102e29;
+    --muted-surface: #184038;
+    --surface-bright: #1f5249;
+    --brand: #2dd4bf;
+    --brand-strong: #0f8f82;
+    --accent: #34d399;
+    --text: #e9fbf8;
+    --text-muted: #8ec9c1;
+    --border: rgba(45, 212, 191, 0.13);
+    --text-on-accent: #030f0d;
+    --scrollbar-thumb: rgba(45, 212, 191, 0.12);
+    --primary-rgb: 45, 212, 191;
+    --glass: rgba(45, 212, 191, 0.07);
+    --shadow-dynamic: 0 4px 20px -2px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(45, 212, 191, 0.06);
+  }
+
+  /* ══════════════════════════════════════════
+     OBSIDIAN LUXE
+     Identity: Deep sapphire corporate luxury
+     Brand: Rich navy sapphire (darker/richer than default)
+     Accent: Ice cyan — premium wealth management
+     Light bg tint: cool silver-white with blue cast
+     Dark bg: near-black sapphire abyss
+  ══════════════════════════════════════════ */
+  [data-theme="obsidian-luxe"] {
+    --bg: #f5f7fc;
+    --white-dynamic: #090f20;
+    --surface: #ffffff;
+    --surface-2: #ebf0fa;
+    --muted-surface: #d8e2f5;
+    --surface-bright: #c0d0ec;
+    --brand: #1e3a6e;
+    --brand-strong: #152d58;
+    --accent: #00b4d8;
+    --text: #090f20;
+    --text-muted: #3d4d68;
+    --border: rgba(30, 58, 110, 0.13);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(30, 58, 110, 0.14);
+    --primary-rgb: 30, 58, 110;
+    --glass: rgba(30, 58, 110, 0.08);
+    --shadow-dynamic: 0 4px 14px -2px rgba(30, 58, 110, 0.1), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="obsidian-luxe"] {
+    --bg: #04080f;
+    --white-dynamic: #eaf2ff;
+    --surface: #0a1220;
+    --surface-2: #111d31;
+    --muted-surface: #192a47;
+    --surface-bright: #22395e;
+    --brand: #90b8f8;
+    --brand-strong: #1e3a6e;
+    --accent: #00d4f5;
+    --text: #eaf2ff;
+    --text-muted: #8aa4c8;
+    --border: rgba(144, 184, 248, 0.12);
+    --text-on-accent: #04080f;
+    --scrollbar-thumb: rgba(144, 184, 248, 0.1);
+    --primary-rgb: 144, 184, 248;
+    --glass: rgba(144, 184, 248, 0.07);
+    --shadow-dynamic: 0 4px 22px -2px rgba(0, 0, 0, 0.7), 0 2px 10px -2px rgba(144, 184, 248, 0.06);
+  }
+
+  /* ══════════════════════════════════════════
+     INDIGO LUXE
+     Identity: Electric indigo — futuristic fintech
+     Brand: Vivid electric indigo-violet
+     Accent: Royal orchid magenta — VIP signal
+     Light bg tint: warm lavender-white
+     Dark bg: deep electric void
+  ══════════════════════════════════════════ */
+  [data-theme="indigo"] {
+    --bg: #fafaff;
+    --white-dynamic: #0e0c28;
+    --surface: #ffffff;
+    --surface-2: #f0effd;
+    --muted-surface: #e0dffb;
+    --surface-bright: #ccc9f7;
+    --brand: #5856eb;
+    --brand-strong: #4543d4;
+    --accent: #c026d3;
+    --text: #0e0c28;
+    --text-muted: #4e4c72;
+    --border: rgba(88, 86, 235, 0.13);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(88, 86, 235, 0.14);
+    --primary-rgb: 88, 86, 235;
+    --glass: rgba(88, 86, 235, 0.08);
+    --shadow-dynamic: 0 4px 14px -2px rgba(88, 86, 235, 0.1), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="indigo"] {
+    --bg: #08071a;
+    --white-dynamic: #ededff;
+    --surface: #100f2e;
+    --surface-2: #191844;
+    --muted-surface: #23225a;
+    --surface-bright: #2f2e73;
+    --brand: #a5a3ff;
+    --brand-strong: #5856eb;
+    --accent: #e879f9;
+    --text: #ededff;
+    --text-muted: #9d9bbf;
+    --border: rgba(165, 163, 255, 0.12);
+    --text-on-accent: #08071a;
+    --scrollbar-thumb: rgba(165, 163, 255, 0.1);
+    --primary-rgb: 165, 163, 255;
+    --glass: rgba(165, 163, 255, 0.07);
+    --shadow-dynamic: 0 4px 22px -2px rgba(0, 0, 0, 0.65), 0 2px 10px -2px rgba(165, 163, 255, 0.08);
+  }
+
+  /* ══════════════════════════════════════════
+     GRAPHITE STEEL
+     Identity: Cold executive steel — minimal precision
+     Brand: Warm graphite (with visible warmth, not neutral)
+     Accent: Vivid steel cyan — sharp contrast signal
+     Light bg tint: warm off-white (NOT #f8fafc — distinct)
+     Dark bg: cold steel-carbon black
+  ══════════════════════════════════════════ */
+  [data-theme="slate"] {
+    --bg: #f6f7f9;
+    --white-dynamic: #111827;
+    --surface: #ffffff;
+    --surface-2: #edf0f4;
+    --muted-surface: #dde2ea;
+    --surface-bright: #c8d0dc;
+    --brand: #374659;
+    --brand-strong: #28364a;
+    --accent: #0891b2;
+    --text: #111827;
+    --text-muted: #4b5a6e;
+    --border: rgba(55, 70, 89, 0.13);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(55, 70, 89, 0.13);
+    --primary-rgb: 55, 70, 89;
+    --glass: rgba(55, 70, 89, 0.07);
+    --shadow-dynamic: 0 4px 12px -2px rgba(55, 70, 89, 0.1), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="slate"] {
+    --bg: #080d14;
+    --white-dynamic: #f1f5f9;
+    --surface: #0f1620;
+    --surface-2: #182130;
+    --muted-surface: #222d3f;
+    --surface-bright: #2d3c52;
+    --brand: #c8d6e8;
+    --brand-strong: #374659;
+    --accent: #0ea5e9;
+    --text: #f1f5f9;
+    --text-muted: #8a99ad;
+    --border: rgba(200, 214, 232, 0.11);
+    --text-on-accent: #080d14;
+    --scrollbar-thumb: rgba(200, 214, 232, 0.1);
+    --primary-rgb: 200, 214, 232;
+    --glass: rgba(200, 214, 232, 0.06);
+    --shadow-dynamic: 0 4px 20px -2px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(200, 214, 232, 0.05);
+  }
+
+  /* ══════════════════════════════════════════
+     AMBER LUXE
+     Identity: Champagne gold — premium wealth & confidence
+     Brand: Burnished bronze-gold
+     Accent: Pure liquid gold
+     Light bg tint: warm ivory cream (distinct from white)
+     Dark bg: warm charcoal ebony
+  ══════════════════════════════════════════ */
+  [data-theme="amber"] {
+    --bg: #fefcf5;
+    --white-dynamic: #1e1204;
+    --surface: #fffdf5;
+    --surface-2: #f8edcf;
+    --muted-surface: #f0dca8;
+    --surface-bright: #e8cd90;
+    --brand: #a86c18;
+    --brand-strong: #8a5610;
+    --accent: #d4a017;
+    --text: #1e1204;
+    --text-muted: #614e30;
+    --border: rgba(168, 108, 24, 0.14);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(168, 108, 24, 0.14);
+    --primary-rgb: 168, 108, 24;
+    --glass: rgba(168, 108, 24, 0.08);
+    --shadow-dynamic: 0 4px 12px -2px rgba(168, 108, 24, 0.1), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="amber"] {
+    --bg: #0e0904;
+    --white-dynamic: #fff8e8;
+    --surface: #18100a;
+    --surface-2: #261a0d;
+    --muted-surface: #352310;
+    --surface-bright: #462f14;
+    --brand: #f4bc41;
+    --brand-strong: #a86c18;
+    --accent: #ffce47;
+    --text: #fff8e8;
+    --text-muted: #c9b68a;
+    --border: rgba(244, 188, 65, 0.13);
+    --text-on-accent: #0e0904;
+    --scrollbar-thumb: rgba(244, 188, 65, 0.11);
+    --primary-rgb: 244, 188, 65;
+    --glass: rgba(244, 188, 65, 0.07);
+    --shadow-dynamic: 0 4px 20px -2px rgba(0, 0, 0, 0.65), 0 2px 10px -2px rgba(244, 188, 65, 0.07);
+  }
+
+  /* ══════════════════════════════════════════
+     CRIMSON NOIR
+     Identity: Velvet crimson — authority & high-stakes
+     Brand: Deep crimson red
+     Accent: Antique royal gold — prestige contrast
+     Light bg tint: warm neutral cream (NOT pink — refined)
+     Dark bg: deep garnet-charcoal noir
+  ══════════════════════════════════════════ */
+  [data-theme="crimson"] {
+    --bg: #fdf8f5;
+    --white-dynamic: #1f0808;
+    --surface: #ffffff;
+    --surface-2: #f7eeea;
+    --muted-surface: #eeddd8;
+    --surface-bright: #e2c8c2;
+    --brand: #aa1f1f;
+    --brand-strong: #8b1717;
+    --accent: #c4922a;
+    --text: #1f0808;
+    --text-muted: #614444;
+    --border: rgba(170, 31, 31, 0.13);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(170, 31, 31, 0.13);
+    --primary-rgb: 170, 31, 31;
+    --glass: rgba(170, 31, 31, 0.07);
+    --shadow-dynamic: 0 4px 12px -2px rgba(170, 31, 31, 0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="crimson"] {
+    --bg: #0d0404;
+    --white-dynamic: #fff3f0;
+    --surface: #170808;
+    --surface-2: #231010;
+    --muted-surface: #321616;
+    --surface-bright: #421e1e;
+    --brand: #f87171;
+    --brand-strong: #aa1f1f;
+    --accent: #e2a832;
+    --text: #fff3f0;
+    --text-muted: #c4a4a4;
+    --border: rgba(248, 113, 113, 0.12);
+    --text-on-accent: #0d0404;
+    --scrollbar-thumb: rgba(248, 113, 113, 0.1);
+    --primary-rgb: 248, 113, 113;
+    --glass: rgba(248, 113, 113, 0.06);
+    --shadow-dynamic: 0 4px 22px -2px rgba(0, 0, 0, 0.7), 0 2px 10px -2px rgba(248, 113, 113, 0.06);
+  }
+
+  /* ══════════════════════════════════════════
+     MIDNIGHT NAVY
+     Identity: Deep royal navy — enterprise elite
+     Brand: Richer royal navy (distinct from Obsidian Luxe sapphire)
+     Accent: Sky blue — clarity signal
+     Light bg tint: crisp cool white-blue
+     Dark bg: near-black royal navy abyss
+  ══════════════════════════════════════════ */
+  [data-theme="navy"] {
+    --bg: #f4f8ff;
+    --white-dynamic: #070f24;
+    --surface: #ffffff;
+    --surface-2: #e6eeff;
+    --muted-surface: #cfdaf8;
+    --surface-bright: #b2c5f0;
+    --brand: #1a3680;
+    --brand-strong: #122868;
+    --accent: #0ea5e9;
+    --text: #070f24;
+    --text-muted: #3a4c6a;
+    --border: rgba(26, 54, 128, 0.13);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(26, 54, 128, 0.14);
+    --primary-rgb: 26, 54, 128;
+    --glass: rgba(26, 54, 128, 0.08);
+    --shadow-dynamic: 0 4px 14px -2px rgba(26, 54, 128, 0.1), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="navy"] {
+    --bg: #020712;
+    --white-dynamic: #e8f0ff;
+    --surface: #080f22;
+    --surface-2: #0e1936;
+    --muted-surface: #16254e;
+    --surface-bright: #1f3368;
+    --brand: #7db0f8;
+    --brand-strong: #1a3680;
+    --accent: #38bdf8;
+    --text: #e8f0ff;
+    --text-muted: #7a96c2;
+    --border: rgba(125, 176, 248, 0.12);
+    --text-on-accent: #020712;
+    --scrollbar-thumb: rgba(125, 176, 248, 0.1);
+    --primary-rgb: 125, 176, 248;
+    --glass: rgba(125, 176, 248, 0.07);
+    --shadow-dynamic: 0 4px 22px -2px rgba(0, 0, 0, 0.72), 0 2px 10px -2px rgba(125, 176, 248, 0.06);
+  }
+
+  /* ══════════════════════════════════════════
+     AURORA LUXE
+     Identity: Deep cosmos violet — visionary & premium
+     Brand: Saturated amethyst (distinct from Indigo's electric blue)
+     Accent: Aurora teal-green — northern lights contrast
+     Light bg tint: misty violet-white (NOT lavender-blue)
+     Dark bg: absolute cosmos black-violet
+  ══════════════════════════════════════════ */
+  [data-theme="aurora"] {
+    --bg: #faf7ff;
+    --white-dynamic: #160826;
+    --surface: #ffffff;
+    --surface-2: #f0e8ff;
+    --muted-surface: #e2d1ff;
+    --surface-bright: #ccb4ff;
+    --brand: #7c3aed;
+    --brand-strong: #6824d4;
+    --accent: #14b8a6;
+    --text: #160826;
+    --text-muted: #563e72;
+    --border: rgba(124, 58, 237, 0.13);
+    --text-on-accent: #ffffff;
+    --scrollbar-thumb: rgba(124, 58, 237, 0.13);
+    --primary-rgb: 124, 58, 237;
+    --glass: rgba(124, 58, 237, 0.08);
+    --shadow-dynamic: 0 4px 14px -2px rgba(124, 58, 237, 0.1), 0 2px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  .dark[data-theme="aurora"] {
+    --bg: #060210;
+    --white-dynamic: #f2ecff;
+    --surface: #0e0820;
+    --surface-2: #160f35;
+    --muted-surface: #20174a;
+    --surface-bright: #2c2060;
+    --brand: #c084fc;
+    --brand-strong: #7c3aed;
+    --accent: #2dd4bf;
+    --text: #f2ecff;
+    --text-muted: #aa90cc;
+    --border: rgba(192, 132, 252, 0.12);
+    --text-on-accent: #060210;
+    --scrollbar-thumb: rgba(192, 132, 252, 0.11);
+    --primary-rgb: 192, 132, 252;
+    --glass: rgba(192, 132, 252, 0.07);
+    --shadow-dynamic: 0 4px 22px -2px rgba(0, 0, 0, 0.72), 0 2px 10px -2px rgba(192, 132, 252, 0.07);
   }
 
   body {
@@ -399,7 +786,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  color: var(--text-muted);
 }
 
 /* ── Typography Drawer Title ── */
@@ -408,7 +795,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: color-mix(in srgb, var(--text-muted) 55%, transparent);
+  color: var(--text-muted);
 }
 
 /* ── Typography KPI Value (Primary) ── */
@@ -435,7 +822,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  color: var(--text-muted);
 }
 
 /* ── Typography Data Row Label ── */
@@ -444,7 +831,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  color: var(--text-muted);
 }
 
 /* ── Typography Table Header ── */
@@ -453,7 +840,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  color: var(--text-muted);
 }
 
 

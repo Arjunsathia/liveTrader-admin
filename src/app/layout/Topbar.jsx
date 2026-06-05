@@ -14,12 +14,20 @@ import {
 import { useRouteMeta } from '../routes/use-route-meta';
 import { useNavigate } from 'react-router-dom';
 import { useClickOutside } from '../../hooks/useClickOutside';
+import { useAuth } from '@/auth/AuthContext';
 
 export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenCommand }) {
   const routeMeta = useRouteMeta();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useClickOutside(() => setIsProfileOpen(false));
+
+  const handleSignOut = () => {
+    setIsProfileOpen(false);
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <header
@@ -146,8 +154,8 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
             hover:border-border/25
           "
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderColor: 'rgba(255,255,255,0.09)',
+            background: 'var(--surface-2)',
+            borderColor: 'var(--border)',
           }}
         >
           {/* Track: static icons */}
@@ -179,7 +187,7 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
           className="
             group relative flex items-center justify-center w-8 h-8 rounded-[7px]
             text-text-muted/75 hover:text-text
-            hover:bg-white/[0.04] border border-transparent hover:border-border/[0.12]
+            hover:bg-text/[0.04] border border-transparent hover:border-border/[0.12]
             transition-all duration-200 cursor-pointer
           "
         >
@@ -199,22 +207,21 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
 
         {/* Vertical rule */}
         <div
-          className="w-px h-4 shrink-0"
-          style={{ background: 'rgba(255,255,255,0.07)' }}
+          className="w-px h-4 shrink-0 bg-border/40"
         />
 
         {/* ── Profile dropdown ── */}
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className={`
-              group flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-[8px]
-              border transition-all duration-200 cursor-pointer outline-none
-              ${isProfileOpen
-                ? 'border-primary/25 bg-primary/[0.07]'
-                : 'border-transparent hover:bg-white/[0.04] hover:border-border/[0.12]'
-              }
-            `}
+              className={`
+                group flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-[8px]
+                border transition-all duration-200 cursor-pointer outline-none
+                ${isProfileOpen
+                  ? 'border-primary/25 bg-primary/[0.07]'
+                  : 'border-transparent hover:bg-text/[0.04] hover:border-border/[0.12]'
+                }
+              `}
           >
             {/* Avatar */}
             <div className="relative shrink-0">
@@ -226,7 +233,7 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
                   ${isProfileOpen ? 'bg-primary text-bg' : 'bg-primary/[0.12] text-primary border border-primary/20'}
                 `}
               >
-                AS
+                {user?.initials ?? 'U'}
               </div>
               {/* Online dot */}
               <div className="absolute -bottom-0.5 -right-0.5 w-[7px] h-[7px] rounded-full flex items-center justify-center"
@@ -238,12 +245,12 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
             {/* Name + role */}
             <div className="hidden lg:flex flex-col items-start gap-0 max-w-[100px]">
               <span
-                className={`
-                  text-[11px] font-semibold tracking-[-0.02em] leading-tight truncate transition-colors
-                  ${isProfileOpen ? 'text-primary' : 'text-text group-hover:text-text/90'}
-                `}
-              >
-                Arjun Sathia
+                  className={`
+                    text-[11px] font-semibold tracking-[-0.02em] leading-tight truncate transition-colors
+                    ${isProfileOpen ? 'text-primary' : 'text-text group-hover:text-text/90'}
+                  `}
+                >
+                  {user?.name ?? 'User'}
               </span>
               <span className="text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-muted/55 leading-none mt-0.5">
                Administrator
@@ -266,14 +273,14 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
               className="absolute top-full right-0 mt-2 w-[200px] rounded-[10px] overflow-hidden z-[100] animate-in fade-in zoom-in-95 slide-in-from-top-1.5 duration-150"
               style={{
                 background: 'var(--surface-2)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                border: '1px solid var(--border)',
                 boxShadow: '0 16px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3)',
               }}
             >
               {/* Dropdown header */}
               <div
                 className="px-3.5 py-3"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.055)' }}
+                style={{ borderBottom: '1px solid var(--border)' }}
               >
                 <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-text-muted/55 leading-none mb-1.5 select-none">
                   Administration
@@ -286,15 +293,15 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
               {/* Menu items */}
               <div className="p-1.5 flex flex-col gap-px">
                 <button
-                  onClick={() => { setIsProfileOpen(false); navigate('/profile'); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px] text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80 transition-all duration-150 text-left group/item outline-none cursor-pointer"
+                  onClick={() => { setIsProfileOpen(false); navigate('/admin/account/overview'); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px] text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80 transition-all duration-150 text-left group/item outline-none cursor-pointer"
                 >
                   <User size={13} strokeWidth={1.8} className="shrink-0 group-hover/item:scale-110 transition-transform" />
                   <span className="text-[12.5px] font-medium tracking-[-0.01em] text-text-muted/85 group-hover/item:text-text transition-colors">Account Profile</span>
                 </button>
                 <button
-                  onClick={() => { setIsProfileOpen(false); navigate('/settings/system'); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px] text-text-muted/55 hover:bg-white/[0.04] hover:text-text/80 transition-all duration-150 text-left group/item outline-none cursor-pointer"
+                  onClick={() => { setIsProfileOpen(false); navigate('/admin/settings/system'); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px] text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80 transition-all duration-150 text-left group/item outline-none cursor-pointer"
                 >
                   <Settings size={13} strokeWidth={1.8} className="shrink-0 group-hover/item:scale-110 transition-transform" />
                   <span className="text-[12.5px] font-medium tracking-[-0.01em] text-text-muted/85 group-hover/item:text-text transition-colors">System Settings</span>
@@ -303,14 +310,14 @@ export function Topbar({ collapsed, setCollapsed, theme, toggleTheme, onOpenComm
 
               {/* Divider */}
               <div
-                className="mx-2"
-                style={{ height: '1px', background: 'rgba(255,255,255,0.055)' }}
+                className="mx-2 bg-border/40"
+                style={{ height: '1px' }}
               />
 
               {/* Sign out */}
               <div className="p-1.5">
                 <button
-                  onClick={() => setIsProfileOpen(false)}
+                  onClick={handleSignOut}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px] text-negative hover:bg-negative/[0.08] transition-all duration-150 text-left group/item outline-none cursor-pointer"
                 >
                   <LogOut size={13} strokeWidth={1.8} className="shrink-0 group-hover/item:translate-x-0.5 transition-transform" />

@@ -326,7 +326,7 @@ export function DepositDetailPage() {
         <div className="flex items-center gap-2 select-none">
           <button
             type="button"
-            onClick={() => navigate('/finance/deposits')}
+            onClick={() => navigate('/admin/finance/deposits')}
             className="flex h-7 w-7 items-center justify-center rounded-[7px] border border-border/18 bg-surface-elevated text-text-muted hover:text-text hover:border-border/30 transition-all cursor-pointer shrink-0"
           >
             <ArrowLeft size={12} />
@@ -335,7 +335,7 @@ export function DepositDetailPage() {
           <ChevronRight size={11} className="text-text-muted/25" />
           <button
             type="button"
-            onClick={() => navigate('/finance/deposits')}
+            onClick={() => navigate('/admin/finance/deposits')}
             className="text-[11px] text-text-muted/35 font-medium hover:text-text-muted/65 transition-colors"
           >
             Deposits

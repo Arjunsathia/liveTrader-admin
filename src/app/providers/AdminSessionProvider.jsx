@@ -1,28 +1,27 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useMemo } from 'react';
-import { ROLE_PRESETS } from '@/config/permissions/permissions';
+import { useAuth } from '@/auth/AuthContext';
+
+/**
+ * AdminSessionProvider
+ *
+ * A thin bridge that exposes the same `useAdminSession()` API that
+ * all existing admin pages rely on, but now derives its data from
+ * the real AuthProvider instead of a hardcoded object.
+ *
+ * No existing admin page component needs to change.
+ */
 
 const AdminSessionContext = createContext(null);
 
-const defaultSession = {
-  user: {
-    id: 'adm-01',
-    name: 'Ariana Reed',
-    initials: 'AR',
-    role: 'super-admin',
-  },
-};
-
 export function AdminSessionProvider({ children }) {
-  const value = useMemo(() => {
-    const permissions = ROLE_PRESETS[defaultSession.user.role] ?? [];
+  const { user, permissions, isAuthenticated } = useAuth();
 
-    return {
-      ...defaultSession,
-      permissions,
-      isAuthenticated: true,
-    };
-  }, []);
+  const value = useMemo(() => ({
+    user: user ?? { id: '', name: '', initials: '', role: '' },
+    permissions,
+    isAuthenticated,
+  }), [user, permissions, isAuthenticated]);
 
   return (
     <AdminSessionContext.Provider value={value}>

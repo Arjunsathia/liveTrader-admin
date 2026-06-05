@@ -21,6 +21,7 @@ import {
   TIER_OPTIONS,
 } from '@/config/constants/USER_FORM';
 import { isUserDraftValid } from '@/utils/validators';
+import { groupService } from '@/features/group-management/services/groupService';
 
 /* ══════════════════════════════════════════════════════════
    FORM PRIMITIVES — inline premium components
@@ -420,12 +421,12 @@ export function AddUserDrawer({ open, mode, draft, setDraft, onSubmit, onClose }
                     options={LEVERAGE_OPTIONS}
                     placeholder="Select leverage"
                   />
-                  <PField
+                  <PSelect
                     label="Group"
                     value={draft.mt5Group}
                     onChange={setField('mt5Group')}
-                    placeholder="retail_usd_std"
-                    mono
+                    options={groupService.list().map(g => g.name)}
+                    placeholder="Select group"
                   />
                   <PField
                     label="Initial Deposit"

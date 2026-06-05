@@ -154,8 +154,8 @@ function MT5QueuePage() {
 
           <UsersMt5Table
             tableState={mt5Table}
-            onOpenUser={(nextUserId, nextTab) => navigate(`/users/${nextUserId}${nextTab ? `/${nextTab}` : ''}`)}
-            onOpenMt5={(entry) => navigate(`/users/mt5/${entry.login}`)}
+            onOpenUser={(nextUserId, nextTab) => navigate(`/admin/users/${nextUserId}${nextTab ? `/${nextTab}` : ''}`)}
+            onOpenMt5={(entry) => navigate(`/admin/users/mt5/${entry.login}`)}
           />
         </Card>
 

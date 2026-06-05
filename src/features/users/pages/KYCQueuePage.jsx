@@ -178,7 +178,7 @@ function KYCQueuePage() {
 
           <KYCTable
             tableState={tableState}
-            onReviewUser={(nextUserId) => navigate(`/users/${nextUserId}/kyc`)}
+            onReviewUser={(nextUserId) => navigate(`/admin/users/${nextUserId}/kyc`)}
           />
         </section>
 

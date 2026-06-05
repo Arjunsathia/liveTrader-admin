@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Ban, Edit2, Eye, Monitor, MoreHorizontal } from 'lucide-react';
 import { MainTable } from '../../../components/common/table';
 import { StatusBadge } from '../../../components/ui';
-import { useClickOutside } from '../../../hooks/useClickOutside';
 
 function getAvatarStyle(name = '?') {
   const seed = name.charCodeAt(0) * 37;
@@ -26,9 +26,49 @@ function UserAvatar({ name }) {
 
 function RowActionsMenu({ user, onOpenUser, onQuickView, onEditUser, onSuspendUser, onOpenMt5 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
 
-  useClickOutside(ref, () => setOpen(false));
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (
+        (triggerRef.current && triggerRef.current.contains(e.target)) ||
+        (dropdownRef.current && dropdownRef.current.contains(e.target))
+      ) {
+        return;
+      }
+      setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleScroll = () => setOpen(false);
+    window.addEventListener('scroll', handleScroll, { capture: true });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, { capture: true });
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [open]);
+
+  const handleToggle = (e) => {
+    e.stopPropagation();
+    if (!open) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const menuHeight = 175; // Approx height for 5 items
+      const showAbove = rect.bottom + 6 + menuHeight > window.innerHeight;
+      setCoords({
+        top: showAbove ? rect.top - 6 - menuHeight : rect.bottom + 6,
+        left: Math.max(10, rect.right - 170), // Avoid offscreen left
+      });
+    }
+    setOpen(!open);
+  };
 
   const actions = [
     { label: 'Open User', Icon: Eye, onClick: () => onOpenUser(user.id) },
@@ -39,30 +79,39 @@ function RowActionsMenu({ user, onOpenUser, onQuickView, onEditUser, onSuspendUs
   ];
 
   return (
-    <div ref={ref} className="relative" onClick={(e) => e.stopPropagation()}>
+    <div className="relative" onClick={(e) => e.stopPropagation()}>
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-border/25 bg-bg/70 text-text-muted transition-all hover:border-border/50 hover:text-text"
+        onClick={handleToggle}
+        className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-border/25 bg-bg/70 text-text-muted transition-all hover:border-border/50 hover:text-text cursor-pointer"
       >
         <MoreHorizontal size={14} />
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-full z-40 mt-1.5 w-[170px] rounded-[10px] border border-border/35 bg-surface p-1 shadow-card-subtle">
+      {open && createPortal(
+        <div
+          ref={dropdownRef}
+          className="fixed z-[99999] w-[170px] rounded-[10px] border border-border/35 bg-surface p-1 shadow-card-subtle animate-in fade-in zoom-in-95 duration-100"
+          style={{
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+          }}
+        >
           {actions.map((action) => (
             <button
               key={action.label}
               type="button"
               onClick={() => { action.onClick(); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-[8px] px-3 py-2 text-left text-[12.5px] transition-colors hover:bg-surface-elevated"
+              className="flex w-full items-center gap-2 rounded-[8px] px-3 py-2 text-left text-[12.5px] transition-colors hover:bg-surface-elevated cursor-pointer"
               style={{ color: action.danger ? 'var(--negative)' : 'var(--text)' }}
             >
               <action.Icon size={13} />
               {action.label}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

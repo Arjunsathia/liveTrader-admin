@@ -168,14 +168,14 @@ export function MT5AccountReviewPage() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => navigate(fromTrading ? '/trading/accounts' : '/users/mt5')}
+            onClick={() => navigate(fromTrading ? '/admin/trading/accounts' : '/admin/users/mt5')}
             className="group flex h-7 w-7 items-center justify-center rounded-[6px] border border-border/18 bg-bg/30 text-text-muted hover:text-text hover:border-border/35 transition-colors cursor-pointer shrink-0"
           >
             <ArrowLeft size={13} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
           </button>
           <span
             className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 font-heading cursor-pointer hover:text-text transition-colors"
-            onClick={() => navigate(fromTrading ? '/trading/accounts' : '/users/mt5')}
+            onClick={() => navigate(fromTrading ? '/admin/trading/accounts' : '/admin/users/mt5')}
           >
             {fromTrading ? 'Trading Accounts' : 'MT5 Accounts Bridge'}
           </span>

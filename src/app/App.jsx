@@ -1,19 +1,30 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
-import { adminRouter } from './routes/router';
+import { store } from './store';
+import { queryClient } from './query/queryClient';
+import { appRouter } from './routes/router';
+import { AuthProvider } from '@/auth/AuthProvider';
 import { AdminSessionProvider } from './providers/AdminSessionProvider';
 import { AdminUiProvider } from './providers/AdminUiProvider';
 import { UniversalDrawerProvider } from '../components/overlays';
 
 function App() {
   return (
-    <AdminSessionProvider>
-      <AdminUiProvider>
-        <UniversalDrawerProvider>
-          <RouterProvider router={adminRouter} />
-        </UniversalDrawerProvider>
-      </AdminUiProvider>
-    </AdminSessionProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AdminSessionProvider>
+            <AdminUiProvider>
+              <UniversalDrawerProvider>
+                <RouterProvider router={appRouter} />
+              </UniversalDrawerProvider>
+            </AdminUiProvider>
+          </AdminSessionProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </Provider>
   );
 }
 

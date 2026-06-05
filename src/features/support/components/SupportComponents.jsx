@@ -258,7 +258,7 @@ export function TicketCard({ ticket, onView, onAssign, onEscalate, onResolve, sh
       <div className="flex items-center justify-between gap-2 px-5 py-3.5 border-t border-border/12 bg-bg/15 mt-auto">
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); navigate(`/support/tickets/${ticket.id}`, { state: { fromEscalated: ticket.status === 'ESCALATED' } }); }}
+          onClick={(e) => { e.stopPropagation(); navigate(`/admin/support/tickets/${ticket.id}`, { state: { fromEscalated: ticket.status === 'ESCALATED' } }); }}
           className="flex items-center gap-1 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent text-[11.5px] font-semibold uppercase tracking-[0.05em] hover:brightness-110 transition-all cursor-pointer"
         >
           <Eye size={11} /> Open

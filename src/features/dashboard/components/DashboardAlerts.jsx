@@ -4,10 +4,10 @@ import { ChevronRight, ShieldAlert } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 
 const ALERTS = [
-  { id: 1, level: 'critical', cat: 'RISK', title: 'Margin breach — Account #8821', text: 'Equity dropped 94% on open XAUUSD long. Auto-liquidation threshold breached.', stamp: '2m ago', path: '/users/usr-18552/risk-view' },
-  { id: 2, level: 'critical', cat: 'FINANCE', title: '$47,500 withdrawal pending', text: 'Bank wire above threshold. AML flag triggered.', stamp: '11m ago', path: '/finance/withdrawals' },
-  { id: 3, level: 'warning', cat: 'KYC', title: 'Document mismatch — #10043', text: 'Uploaded ID surname differs from registration.', stamp: '34m ago', path: '/users/kyc' },
-  { id: 4, level: 'warning', cat: 'COPY', title: 'Signal provider drawdown >12%', text: '"FX_Alpha" strategy hit 12.4% drawdown today. 231 followers impacted.', stamp: '51m ago', path: '/copy-trading' },
+  { id: 1, level: 'critical', cat: 'RISK', title: 'Margin breach — Account #8821', text: 'Equity dropped 94% on open XAUUSD long. Auto-liquidation threshold breached.', stamp: '2m ago', path: '/admin/users/usr-18552/risk-view' },
+  { id: 2, level: 'critical', cat: 'FINANCE', title: '$47,500 withdrawal pending', text: 'Bank wire above threshold. AML flag triggered.', stamp: '11m ago', path: '/admin/finance/withdrawals' },
+  { id: 3, level: 'warning', cat: 'KYC', title: 'Document mismatch — #10043', text: 'Uploaded ID surname differs from registration.', stamp: '34m ago', path: '/admin/users/kyc' },
+  { id: 4, level: 'warning', cat: 'COPY', title: 'Signal provider drawdown >12%', text: '"FX_Alpha" strategy hit 12.4% drawdown today. 231 followers impacted.', stamp: '51m ago', path: '/admin/copy-trading' },
 ];
 
 const LEVEL_COLOR = {

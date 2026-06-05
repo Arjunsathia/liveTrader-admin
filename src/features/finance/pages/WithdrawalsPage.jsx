@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertOctagon, ArrowUpRight, CheckCircle2, Clock, Download, Lock, Play, ShieldAlert, TrendingDown, XCircle, Plus } from 'lucide-react';
 import { PageShell } from '../../../components/layout/PageShell';
 import { withdrawalsData } from '@/config/constants/finance/mockData';
@@ -15,17 +15,38 @@ const PAGE = {
 };
 
 function WithdrawalsPage() {
-
-  const [search, setSearch] = useState('');
-  const [statusF, setStatusF] = useState('ALL');
-  const [methodF, setMethodF] = useState('ALL');
-  const [riskF, setRiskF] = useState('ALL');
-  const [page, setPage] = useState(1);
-  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [toast, setToast] = useState(null);
+
+  // Read URL search params with defaults
+  const search = searchParams.get('search') || '';
+  const statusF = searchParams.get('status') || 'ALL';
+  const methodF = searchParams.get('method') || 'ALL';
+  const riskF = searchParams.get('risk') || 'ALL';
+  const page = parseInt(searchParams.get('page') || '1', 10);
   
   const PER = 7;
   const act = (msg, id) => setToast(`${msg}: ${id}`);
+
+  // Helper to update specific parameters
+  const updateFilters = (newParams) => {
+    const updated = new URLSearchParams(searchParams);
+    Object.entries(newParams).forEach(([key, val]) => {
+      if (val === 'ALL' || val === '' || val === null || val === undefined) {
+        updated.delete(key);
+      } else {
+        updated.set(key, String(val));
+      }
+    });
+
+    // Reset page to 1 if we're altering other filter fields (i.e. if not explicitly updating page)
+    if (newParams.page === undefined) {
+      updated.delete('page'); // Let it fallback to 1 implicitly
+    }
+
+    setSearchParams(updated);
+  };
 
   const filtered = useMemo(() => {
     let r = [...withdrawalsData];
@@ -112,7 +133,7 @@ function WithdrawalsPage() {
   const tableState = {
     page,
     pageSize: PER,
-    setPage,
+    setPage: (p) => updateFilters({ page: p }),
     setPageSize: () => {},
     totalPages: Math.ceil(filtered.length / PER)
   };
@@ -186,7 +207,7 @@ function WithdrawalsPage() {
             count={filtered.length}
             accentColor={PAGE.accent}
             search={search}
-            onSearchChange={(v) => { setSearch(v); setPage(1); }}
+            onSearchChange={(v) => updateFilters({ search: v })}
             searchPlaceholder="Search payouts…"
             filters={
               <>
@@ -194,7 +215,7 @@ function WithdrawalsPage() {
                   <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Status:</span>
                   <select
                     value={statusF}
-                    onChange={(e) => { setStatusF(e.target.value); setPage(1); }}
+                    onChange={(e) => updateFilters({ status: e.target.value })}
                     className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
@@ -208,7 +229,7 @@ function WithdrawalsPage() {
                   <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Method:</span>
                   <select
                     value={methodF}
-                    onChange={(e) => { setMethodF(e.target.value); setPage(1); }}
+                    onChange={(e) => updateFilters({ method: e.target.value })}
                     className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
@@ -222,7 +243,7 @@ function WithdrawalsPage() {
                   <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted/70 shrink-0">Risk:</span>
                   <select
                     value={riskF}
-                    onChange={(e) => { setRiskF(e.target.value); setPage(1); }}
+                    onChange={(e) => updateFilters({ risk: e.target.value })}
                     className="h-7 rounded-[7px] border border-border/20 bg-bg text-[12.5px] text-text px-2 pr-5 outline-none focus:border-brand/40 transition-all cursor-pointer appearance-none"
                     style={{ minWidth: '70px' }}
                   >
@@ -238,7 +259,7 @@ function WithdrawalsPage() {
           <MainTable
             columns={columns}
             data={paged}
-            onRowClick={(row) => navigate(`/finance/withdrawals/${row.id}`)}
+            onRowClick={(row) => navigate(`/admin/finance/withdrawals/${row.id}`)}
             emptyTitle="No withdrawals found matching filters."
             pagination={tableState}
             rowClassName={(row) => {

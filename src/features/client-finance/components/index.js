@@ -1,0 +1,14 @@
+// Barrel export for client-finance components
+export { WalletBalanceHero }      from './WalletBalanceHero';
+export { WalletStatCards }        from './WalletStatCards';
+export { DepositMethodSelector }  from './DepositMethodSelector';
+export { DepositAmountForm }      from './DepositAmountForm';
+export { DepositInstructions }    from './DepositInstructions';
+export { WithdrawMethodSelector } from './WithdrawMethodSelector';
+export { WithdrawAmountForm }     from './WithdrawAmountForm';
+export { WithdrawConfirmStep }    from './WithdrawConfirmStep';
+export { PaymentMethodCard }      from './PaymentMethodCard';
+export { AddPaymentMethodDrawer } from './AddPaymentMethodDrawer';
+export { LimitsFeeTable }         from './LimitsFeeTable';
+export { TransactionDetailDrawer } from './TransactionDetailDrawer';
+export { PaymentMethodForm }       from './PaymentMethodForm';

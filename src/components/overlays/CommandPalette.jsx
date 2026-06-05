@@ -52,7 +52,7 @@ export function CommandPalette({ isOpen, onClose }) {
     if (item.type === 'nav') {
       navigate(item.path);
     } else if (item.id === 'action-add-user') {
-      navigate('/users');
+      navigate('/admin/users');
       // Ideally trigger user create modal, but for now navigate to users
     }
     onClose();

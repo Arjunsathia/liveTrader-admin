@@ -54,6 +54,10 @@ export const PERMISSIONS = {
     view: 'admin-mgmt.view',
     manage: 'admin-mgmt.manage',
   },
+  groupManagement: {
+    view: 'group-management.view',
+    manage: 'group-management.manage',
+  },
 
 };
 
@@ -85,6 +89,8 @@ export const ROLE_PRESETS = {
     PERMISSIONS.reports.view,
     PERMISSIONS.support.view,
     PERMISSIONS.support.escalate,
+    PERMISSIONS.groupManagement.view,
+    PERMISSIONS.groupManagement.manage,
   ],
   auditor: [
     PERMISSIONS.dashboard.view,

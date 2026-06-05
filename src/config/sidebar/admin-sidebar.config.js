@@ -12,19 +12,34 @@ export const adminNavigationSections = [
   { id: 'system', label: 'System' },
 ];
 
-export const adminNavigation = adminRouteModules.map((module) => ({
-  id: module.id,
-  label: module.label,
-  icon: module.icon,
-  path: module.defaultPath,
-  permission: module.permission,
-  navSection: module.navSection,
-  subItems: module.routes
-    .filter((route) => route.navLabel)
-    .map((route) => ({
-      id: route.id,
-      label: route.navLabel,
-      path: route.path,
-      permission: route.permission,
-    })),
-}));
+const ensureAdminPrefix = (path) => {
+  if (path.startsWith('/admin')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `/admin${cleanPath}`;
+};
+
+export const adminNavigation = adminRouteModules.map((module) => {
+  const defaultPath = ensureAdminPrefix(module.defaultPath);
+
+  return {
+    id: module.id,
+    label: module.label,
+    icon: module.icon,
+    path: defaultPath,
+    permission: module.permission,
+    navSection: module.navSection,
+    subItems: module.routes
+      .filter((route) => route.navLabel)
+      .map((route) => {
+        const subPath = ensureAdminPrefix(route.path);
+        return {
+          id: route.id,
+          label: route.navLabel,
+          path: subPath,
+          permission: route.permission,
+        };
+      }),
+  };
+});

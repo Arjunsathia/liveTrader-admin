@@ -210,7 +210,7 @@ function TicketsPage() {
                 <TicketCard
                   key={ticket.id}
                   ticket={ticket}
-                  onView={(t) => navigate(`/support/tickets/${t.id}`, { state: { fromEscalated: false } })}
+                  onView={(t) => navigate(`/admin/support/tickets/${t.id}`, { state: { fromEscalated: false } })}
                   onAssign={(t) => act(`Reassigned: ${t.id}`)}
                   onEscalate={(t) => act(`Escalated: ${t.id}`)}
                   onResolve={(t) => act(`Closed: ${t.id}`)}

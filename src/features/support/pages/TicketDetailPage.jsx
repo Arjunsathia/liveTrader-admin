@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
   ArrowLeft, ArrowUp, Bookmark, Check, CheckCircle2,
   ChevronDown, ChevronRight, ClipboardList, CreditCard,
@@ -387,12 +387,14 @@ function AssignDropdown({ owner, onAssign, open, setOpen }) {
 export function TicketDetailPage() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromEscalated = location.state?.fromEscalated;
   const ticket = ticketsData.find(t => t.id === ticketId);
-  if (!ticket) return <Navigate to="/support/tickets" replace />;
+  if (!ticket) return <Navigate to="/admin/support/tickets" replace />;
   return (
     <TicketDetail
       ticket={ticket}
-      onBack={() => navigate('/support/tickets')}
+      onBack={() => navigate(fromEscalated ? '/admin/support/escalated' : '/admin/support/tickets')}
       navigate={navigate}
     />
   );
@@ -724,7 +726,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
               </div>
 
               <button
-                onClick={() => navigate(`/users/${t.uid}`)}
+                onClick={() => navigate(`/admin/users/${t.uid}`)}
                 className="w-full h-8 flex items-center justify-center gap-1.5 rounded-[7px] border border-border/14 bg-bg/10 text-text-muted/70 hover:text-text hover:border-border/28 hover:bg-bg/22 text-[10.5px] font-semibold uppercase tracking-wider font-heading transition-all cursor-pointer"
               >
                 <ExternalLink size={10} />
@@ -781,7 +783,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
                 {relatedTickets.map(r => (
                   <div
                     key={r.id}
-                    onClick={() => navigate(`/support/tickets/${r.id}`)}
+                    onClick={() => navigate(`/admin/support/tickets/${r.id}`)}
                     className="flex items-center gap-2.5 rounded-[7px] border border-border/10 bg-bg/10 px-3 py-2 hover:border-border/24 hover:bg-bg/20 transition-all cursor-pointer group"
                   >
                     <div className="flex-1 min-w-0">
@@ -802,7 +804,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
             <PanelHead icon={Zap} title="Admin Controls" />
             <div className="p-3 space-y-1.5">
               {[
-                { label: 'View Account Profile',    icon: User,        variant: 'ghost',   cb: () => navigate(`/users/${t.uid}`) },
+                { label: 'View Account Profile',    icon: User,        variant: 'ghost',   cb: () => navigate(`/admin/users/${t.uid}`) },
                 { label: 'Check Payment Wallet',    icon: CreditCard,  variant: 'ghost',   cb: () => notify('Wallet ledger opened') },
                 { label: 'Flag for Security Check', icon: ShieldAlert, variant: 'warning', cb: () => notify('Flagged for security review') },
                 { label: 'Suspend User Access',     icon: Lock,        variant: 'danger',  cb: () => notify('Suspension dialog opened') },

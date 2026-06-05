@@ -22,6 +22,7 @@ import { StatusBadge } from '../../../components/ui';
 import { StatusChip } from '../../../components/ui';
 import { userDetailTabs } from '@/config/constants/USER_TABS';
 import { UserDetailContent } from './UserDetailContent';
+import { groupService } from '@/features/group-management/services/groupService';
 
 const tabIcons = {
   overview: BarChart2,
@@ -165,7 +166,7 @@ export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onReset
   const [leverage, setLeverage] = useState('');
   const [status, setStatus] = useState('');
   const [server, setServer] = useState('MT5-LIVE-EU1');
-  const [group, setGroup] = useState('retail_usd_std');
+  const [group, setGroup] = useState('');
   const [deposit, setDeposit] = useState('1000');
   const [customLogin, setCustomLogin] = useState('');
   const [showStatusSuccess, setShowStatusSuccess] = useState(false);
@@ -177,7 +178,11 @@ export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onReset
       setLeverage(entry.leverage || '1:100');
       setStatus(entry.status || 'CONNECTED');
       setServer('MT5-LIVE-EU1');
-      setGroup('retail_usd_std');
+      
+      const activeGroups = groupService.list();
+      const defaultGroupName = activeGroups.length > 0 ? activeGroups[0].name : 'Standard';
+      setGroup(entry.group || defaultGroupName);
+      
       setDeposit('1000');
       setCustomLogin('');
       setShowStatusSuccess(false);
@@ -375,11 +380,11 @@ export function Mt5AccountDrawer({ open, entry, onClose, onSave, onSync, onReset
                     onChange={setLeverage}
                     options={['1:10', '1:30', '1:50', '1:100', '1:200', '1:500']}
                   />
-                  <TextField
+                  <SelectField
                     label="Terminal Group"
                     value={group}
                     onChange={setGroup}
-                    placeholder="retail_usd_std"
+                    options={groupService.list().map(g => g.name)}
                   />
                   <TextField
                     label="Initial Capital Deposit ($)"

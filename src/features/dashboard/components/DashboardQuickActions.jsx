@@ -4,12 +4,12 @@ import { Activity, Copy, CreditCard, Search, Terminal, UserCheck } from 'lucide-
 import { Card } from '../../../components/ui/Card';
 
 const QUICK_ACTIONS = [
-  { label: 'Approve KYC Requests', Icon: UserCheck, path: '/users/kyc', accent: 'var(--positive)' },
-  { label: 'Review Withdrawals', Icon: CreditCard, path: '/finance/withdrawals', accent: 'var(--warning)' },
-  { label: 'User Master Directory', Icon: Search, path: '/users', accent: 'var(--brand)' },
-  { label: 'Execution Logs Stream', Icon: Terminal, path: '/trading/execution-logs', accent: 'var(--purple)' },
-  { label: 'Copy Strategy Board', Icon: Copy, path: '/copy-trading', accent: 'var(--cyan)' },
-  { label: 'Support Queue Management', Icon: Activity, path: '/support', accent: 'var(--negative)' },
+  { label: 'Approve KYC Requests', Icon: UserCheck, path: '/admin/users/kyc', accent: 'var(--positive)' },
+  { label: 'Review Withdrawals', Icon: CreditCard, path: '/admin/finance/withdrawals', accent: 'var(--warning)' },
+  { label: 'User Master Directory', Icon: Search, path: '/admin/users', accent: 'var(--brand)' },
+  { label: 'Execution Logs Stream', Icon: Terminal, path: '/admin/trading/execution-logs', accent: 'var(--purple)' },
+  { label: 'Copy Strategy Board', Icon: Copy, path: '/admin/copy-trading', accent: 'var(--cyan)' },
+  { label: 'Support Queue Management', Icon: Activity, path: '/admin/support', accent: 'var(--negative)' },
 ];
 
 export function DashboardQuickActions() {

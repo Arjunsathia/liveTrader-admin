@@ -167,7 +167,7 @@ export function UserDetailPage() {
       <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-4">
         <h2 className="text-xl font-black text-text">User Not Found</h2>
         <p className="text-[12px] text-text-muted/55">The user with ID {userId} could not be located.</p>
-        <Button variant="primary" onClick={() => navigate('/users')}>Back to Users</Button>
+        <Button variant="primary" onClick={() => navigate('/admin/users')}>Back to Users</Button>
       </div>
     );
   }
@@ -196,13 +196,13 @@ export function UserDetailPage() {
         {/* ── Breadcrumb bar ── */}
         <div className="flex items-center gap-2.5">
           <button
-            onClick={() => navigate('/users')}
+            onClick={() => navigate('/admin/users')}
             className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border/18 bg-bg/30 text-text-muted hover:text-text hover:border-border/35 hover:bg-bg/50 transition-all cursor-pointer shrink-0"
           >
             <ArrowLeft size={13} />
           </button>
           <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-text-muted/70 select-none">
-            <span className="hover:text-text-muted/60 cursor-pointer transition-colors" onClick={() => navigate('/users')}>
+            <span className="hover:text-text-muted/60 cursor-pointer transition-colors" onClick={() => navigate('/admin/users')}>
               User Management
             </span>
             <ChevronRight size={10} className="text-text-muted/20" />
@@ -424,7 +424,7 @@ export function UserDetailPage() {
                   return (
                     <button
                       key={t.id}
-                      onClick={() => navigate(`/users/${userId}/${t.id}`)}
+                      onClick={() => navigate(`/admin/users/${userId}/${t.id}`)}
                       className={`relative group flex items-center gap-2 px-4 h-11 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150 cursor-pointer shrink-0 border-b-2
                         ${active
                           ? 'border-b-brand text-brand bg-brand/[0.04]'

@@ -278,7 +278,7 @@ function TradingAccountsPage() {
         <TradingAccountCards
           accounts={accounts}
           filterStatus={filterStatus}
-          onViewDetails={(account) => navigate(`/users/mt5/${account.login}`, { state: { fromTrading: true } })}
+          onViewDetails={(account) => navigate(`/admin/users/mt5/${account.login}`, { state: { fromTrading: true } })}
           onSync={handleSyncOne}
         />
 

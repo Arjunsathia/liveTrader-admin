@@ -63,7 +63,7 @@ export function CopyTradingDetailPage() {
     if (slug === 'follower') plural = 'followers';
     if (slug === 'subscription') plural = 'subscriptions';
     if (slug === 'log') plural = 'logs';
-    navigate(`/copy-trading/${plural}`);
+    navigate(`/admin/copy-trading/${plural}`);
   };
 
   const handleAction = (msg, entityId) => {

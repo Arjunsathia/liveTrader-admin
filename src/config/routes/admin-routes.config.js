@@ -8,6 +8,7 @@ import {
   Share2,
   ShieldCheck,
   Trophy,
+  User,
   Users,
   Wallet,
 } from 'lucide-react';
@@ -15,20 +16,12 @@ import { PERMISSIONS } from '@/config/permissions/permissions';
 
 /**
  * Admin Route Modules Configuration
- * 
- * This file serves as the single source of truth for the frontend routing schema.
- * It defines the top-level route modules (which become main navigation items)
- * and their nested child routes (which become sub-navigation and actual pages).
- * 
- * Each module contains:
- * - `id`: Unique identifier
- * - `label`: The display name for the sidebar main section
- * - `icon`: Lucide-react icon component
- * - `navSection`: Grouping under the sidebar sections (e.g., 'main', 'management', 'system')
- * - `permission`: The global permission required to view this module
- * - `routes`: Array of nested routes. Routes with `navLabel` will appear in the sidebar.
- *   - `pageKey`: Used by `router.jsx` to map to the actual React component.
- *   - `meta`: Used for breadcrumbs, page headers, or search palette.
+ *
+ * All paths are RELATIVE (no leading slash) because they live
+ * under the /admin parent route in the router.
+ *
+ * defaultPath values keep a leading slash so Navigate components
+ * can use them as absolute hash paths.
  */
 export const adminRouteModules = [
   {
@@ -37,15 +30,15 @@ export const adminRouteModules = [
     icon: LayoutDashboard,
     navSection: 'main',
     permission: PERMISSIONS.dashboard.view,
-    defaultPath: '/',
+    defaultPath: '/admin',
     routes: [
       {
         id: 'dashboard',
-        path: '/',
+        path: '',           // index route under /admin
         pageKey: 'dashboard/dashboard',
         permission: PERMISSIONS.dashboard.view,
         meta: [
-          { pattern: '/', title: 'Dashboard Control', section: 'Dashboard', permission: PERMISSIONS.dashboard.view },
+          { pattern: '/admin', title: 'Dashboard Control', section: 'Dashboard', permission: PERMISSIONS.dashboard.view },
         ],
       },
     ],
@@ -56,68 +49,59 @@ export const adminRouteModules = [
     icon: Users,
     navSection: 'main',
     permission: PERMISSIONS.users.view,
-    defaultPath: '/users',
+    defaultPath: '/admin/users',
     routes: [
       {
         id: 'users-list',
-        path: '/users',
+        path: 'users',
         pageKey: 'users/users-list',
         navLabel: 'User List',
         permission: PERMISSIONS.users.view,
         meta: [
-          { pattern: '/users', title: 'Master User List', section: 'Users', permission: PERMISSIONS.users.view },
+          { pattern: '/admin/users', title: 'Master User List', section: 'Users', permission: PERMISSIONS.users.view },
         ],
       },
       {
         id: 'users-kyc',
-        path: '/users/kyc',
+        path: 'users/kyc',
         pageKey: 'users/kyc-queue',
         navLabel: 'KYC Requests',
         permission: PERMISSIONS.users.kyc,
         meta: [
-          { pattern: '/users/kyc', title: 'KYC Requests', section: 'Users', permission: PERMISSIONS.users.kyc },
+          { pattern: '/admin/users/kyc', title: 'KYC Requests', section: 'Users', permission: PERMISSIONS.users.kyc },
         ],
       },
       {
         id: 'users-mt5',
-        path: '/users/mt5',
+        path: 'users/mt5',
         pageKey: 'users/mt5-queue',
         navLabel: 'MT5 Accounts',
         permission: PERMISSIONS.users.mt5,
         meta: [
-          { pattern: '/users/mt5', title: 'MT5 Accounts', section: 'Users', permission: PERMISSIONS.users.mt5 },
+          { pattern: '/admin/users/mt5', title: 'MT5 Accounts', section: 'Users', permission: PERMISSIONS.users.mt5 },
         ],
       },
       {
         id: 'users-mt5-review',
-        path: '/users/mt5/:login',
+        path: 'users/mt5/:login',
         pageKey: 'users/mt5-review',
         permission: PERMISSIONS.users.mt5,
         meta: [
-          { pattern: '/users/mt5/:login', title: 'MT5 Account Review', section: 'Users', permission: PERMISSIONS.users.mt5 },
+          { pattern: '/admin/users/mt5/:login', title: 'MT5 Account Review', section: 'Users', permission: PERMISSIONS.users.mt5 },
         ],
       },
       {
         id: 'users-detail',
-        path: '/users/:userId',
+        path: 'users/:userId',
         pageKey: 'users/user-detail',
         permission: PERMISSIONS.users.view,
         meta: [
-          { pattern: '/users/:userId', title: 'User Overview', section: 'Users', permission: PERMISSIONS.users.view },
-          { pattern: '/users/:userId/overview', title: 'User Overview', section: 'Users', permission: PERMISSIONS.users.view },
-          { pattern: '/users/:userId/profile', title: 'User Profile', section: 'Users', permission: PERMISSIONS.users.view },
-          { pattern: '/users/:userId/kyc', title: 'User Details', section: 'Users', permission: PERMISSIONS.users.kyc },
-          { pattern: '/users/:userId/wallet', title: 'User Wallet', section: 'Users', permission: PERMISSIONS.users.view },
-          { pattern: '/users/:userId/mt5-accounts', title: 'User MT5 Accounts', section: 'Users', permission: PERMISSIONS.users.mt5 },
-          { pattern: '/users/:userId/trading-history', title: 'User Trading History', section: 'Users', permission: PERMISSIONS.users.view },
-          { pattern: '/users/:userId/activity-logs', title: 'User Activity Logs', section: 'Users', permission: PERMISSIONS.users.view },
-          { pattern: '/users/:userId/risk-view', title: 'User Risk View', section: 'Users', permission: PERMISSIONS.users.risk },
-          { pattern: '/users/:userId/notes', title: 'User Notes', section: 'Users', permission: PERMISSIONS.users.view },
+          { pattern: '/admin/users/:userId', title: 'User Overview', section: 'Users', permission: PERMISSIONS.users.view },
         ],
       },
       {
         id: 'users-detail-tab',
-        path: '/users/:userId/:tab',
+        path: 'users/:userId/:tab',
         pageKey: 'users/user-detail',
         permission: PERMISSIONS.users.view,
       },
@@ -129,78 +113,77 @@ export const adminRouteModules = [
     icon: Wallet,
     navSection: 'main',
     permission: PERMISSIONS.finance.view,
-    defaultPath: '/finance/deposits',
+    defaultPath: '/admin/finance/deposits',
     routes: [
       {
         id: 'finance-deposits',
-        path: '/finance/deposits',
+        path: 'finance/deposits',
         pageKey: 'finance/deposits',
         navLabel: 'Deposits',
         permission: PERMISSIONS.finance.view,
         meta: [
-          { pattern: '/finance/deposits', title: 'Deposit Ledger', section: 'Finance', permission: PERMISSIONS.finance.view },
+          { pattern: '/admin/finance/deposits', title: 'Deposit Ledger', section: 'Finance', permission: PERMISSIONS.finance.view },
         ],
       },
       {
         id: 'finance-deposit-detail',
-        path: '/finance/deposits/:id',
+        path: 'finance/deposits/:id',
         pageKey: 'finance/deposit-detail',
         permission: PERMISSIONS.finance.view,
         meta: [
-          { pattern: '/finance/deposits/:id', title: 'Deposit Details', section: 'Finance', permission: PERMISSIONS.finance.view },
+          { pattern: '/admin/finance/deposits/:id', title: 'Deposit Details', section: 'Finance', permission: PERMISSIONS.finance.view },
         ],
       },
       {
         id: 'finance-withdrawals',
-        path: '/finance/withdrawals',
+        path: 'finance/withdrawals',
         pageKey: 'finance/withdrawals',
         navLabel: 'Withdrawals',
         permission: PERMISSIONS.finance.view,
         meta: [
-          { pattern: '/finance/withdrawals', title: 'Withdrawal Approvals', section: 'Finance', permission: PERMISSIONS.finance.view },
+          { pattern: '/admin/finance/withdrawals', title: 'Withdrawal Approvals', section: 'Finance', permission: PERMISSIONS.finance.view },
         ],
       },
       {
         id: 'finance-withdrawal-detail',
-        path: '/finance/withdrawals/:id',
+        path: 'finance/withdrawals/:id',
         pageKey: 'finance/withdrawal-detail',
         permission: PERMISSIONS.finance.view,
         meta: [
-          { pattern: '/finance/withdrawals/:id', title: 'Withdrawal Details', section: 'Finance', permission: PERMISSIONS.finance.view },
+          { pattern: '/admin/finance/withdrawals/:id', title: 'Withdrawal Details', section: 'Finance', permission: PERMISSIONS.finance.view },
         ],
       },
       {
         id: 'finance-transactions',
-        path: '/finance/transactions',
+        path: 'finance/transactions',
         pageKey: 'finance/transactions',
         navLabel: 'Transactions',
         permission: PERMISSIONS.finance.view,
         meta: [
-          { pattern: '/finance/transactions', title: 'Transaction Stream', section: 'Finance', permission: PERMISSIONS.finance.view },
+          { pattern: '/admin/finance/transactions', title: 'Transaction Stream', section: 'Finance', permission: PERMISSIONS.finance.view },
         ],
       },
       {
         id: 'finance-failed',
-        path: '/finance/failed-payments',
+        path: 'finance/failed-payments',
         pageKey: 'finance/failed-payments',
         navLabel: 'Failed Payments',
         permission: PERMISSIONS.finance.view,
         meta: [
-          { pattern: '/finance/failed-payments', title: 'Failed Payments', section: 'Finance', permission: PERMISSIONS.finance.view },
+          { pattern: '/admin/finance/failed-payments', title: 'Failed Payments', section: 'Finance', permission: PERMISSIONS.finance.view },
         ],
       },
       {
         id: 'finance-approvals',
-        path: '/finance/approvals',
+        path: 'finance/approvals',
         pageKey: 'finance/approvals',
         navLabel: 'Approvals',
         permission: PERMISSIONS.finance.approve,
         meta: [
-          { pattern: '/finance/approvals', title: 'Manual Approvals', section: 'Finance', permission: PERMISSIONS.finance.approve },
+          { pattern: '/admin/finance/approvals', title: 'Manual Approvals', section: 'Finance', permission: PERMISSIONS.finance.approve },
         ],
       },
     ],
-
   },
   {
     id: 'trading',
@@ -208,57 +191,56 @@ export const adminRouteModules = [
     icon: LineChart,
     navSection: 'main',
     permission: PERMISSIONS.trading.view,
-    defaultPath: '/trading/accounts',
+    defaultPath: '/admin/trading/accounts',
     routes: [
       {
         id: 'trading-accounts',
-        path: '/trading/accounts',
+        path: 'trading/accounts',
         pageKey: 'trading/trading-accounts',
         navLabel: 'Trading Accounts',
         permission: PERMISSIONS.trading.view,
         meta: [
-          { pattern: '/trading/accounts', title: 'Trading Accounts', section: 'Trading', permission: PERMISSIONS.trading.view },
+          { pattern: '/admin/trading/accounts', title: 'Trading Accounts', section: 'Trading', permission: PERMISSIONS.trading.view },
         ],
       },
-
       {
         id: 'trading-orders',
-        path: '/trading/orders',
+        path: 'trading/orders',
         pageKey: 'trading/orders',
         navLabel: 'Orders',
         permission: PERMISSIONS.trading.view,
         meta: [
-          { pattern: '/trading/orders', title: 'Orders Monitor', section: 'Trading', permission: PERMISSIONS.trading.view },
+          { pattern: '/admin/trading/orders', title: 'Orders Monitor', section: 'Trading', permission: PERMISSIONS.trading.view },
         ],
       },
       {
         id: 'trading-positions',
-        path: '/trading/positions',
+        path: 'trading/positions',
         pageKey: 'trading/positions',
         navLabel: 'Positions',
         permission: PERMISSIONS.trading.view,
         meta: [
-          { pattern: '/trading/positions', title: 'Live Positions', section: 'Trading', permission: PERMISSIONS.trading.view },
+          { pattern: '/admin/trading/positions', title: 'Live Positions', section: 'Trading', permission: PERMISSIONS.trading.view },
         ],
       },
       {
         id: 'trading-history',
-        path: '/trading/history',
+        path: 'trading/history',
         pageKey: 'trading/trade-history',
         navLabel: 'Trade History',
         permission: PERMISSIONS.trading.view,
         meta: [
-          { pattern: '/trading/history', title: 'Trade History', section: 'Trading', permission: PERMISSIONS.trading.view },
+          { pattern: '/admin/trading/history', title: 'Trade History', section: 'Trading', permission: PERMISSIONS.trading.view },
         ],
       },
       {
         id: 'trading-logs',
-        path: '/trading/execution-logs',
+        path: 'trading/execution-logs',
         pageKey: 'trading/execution-logs',
         navLabel: 'Execution Logs',
         permission: PERMISSIONS.trading.view,
         meta: [
-          { pattern: '/trading/execution-logs', title: 'Execution Logs', section: 'Trading', permission: PERMISSIONS.trading.view },
+          { pattern: '/admin/trading/execution-logs', title: 'Execution Logs', section: 'Trading', permission: PERMISSIONS.trading.view },
         ],
       },
     ],
@@ -269,75 +251,75 @@ export const adminRouteModules = [
     icon: Copy,
     navSection: 'management',
     permission: PERMISSIONS.copyTrading.view,
-    defaultPath: '/copy-trading/strategies',
+    defaultPath: '/admin/copy-trading/strategies',
     routes: [
       {
         id: 'copy-strategies',
-        path: '/copy-trading/strategies',
+        path: 'copy-trading/strategies',
         pageKey: 'copy-trading/strategies',
         navLabel: 'Strategies',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/strategies', title: 'Copy Strategies', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/strategies', title: 'Copy Strategies', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
       {
         id: 'copy-providers',
-        path: '/copy-trading/providers',
+        path: 'copy-trading/providers',
         pageKey: 'copy-trading/providers',
         navLabel: 'Providers',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/providers', title: 'Copy Providers', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/providers', title: 'Copy Providers', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
       {
         id: 'copy-followers',
-        path: '/copy-trading/followers',
+        path: 'copy-trading/followers',
         pageKey: 'copy-trading/followers',
         navLabel: 'Followers',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/followers', title: 'Copy Followers', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/followers', title: 'Copy Followers', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
       {
         id: 'copy-subscriptions',
-        path: '/copy-trading/subscriptions',
+        path: 'copy-trading/subscriptions',
         pageKey: 'copy-trading/subscriptions',
         navLabel: 'Subscriptions',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/subscriptions', title: 'Copy Subscriptions', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/subscriptions', title: 'Copy Subscriptions', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
       {
         id: 'copy-performance',
-        path: '/copy-trading/performance',
+        path: 'copy-trading/performance',
         pageKey: 'copy-trading/performance',
         navLabel: 'Performance',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/performance', title: 'Copy Performance', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/performance', title: 'Copy Performance', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
       {
         id: 'copy-logs',
-        path: '/copy-trading/logs',
+        path: 'copy-trading/logs',
         pageKey: 'copy-trading/logs',
         navLabel: 'Logs',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/logs', title: 'Copy Logs', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/logs', title: 'Copy Logs', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
       {
         id: 'copy-detail',
-        path: '/copy-trading/:slug/:id',
+        path: 'copy-trading/:slug/:id',
         pageKey: 'copy-trading/copy-trading-detail',
         permission: PERMISSIONS.copyTrading.view,
         meta: [
-          { pattern: '/copy-trading/:slug/:id', title: 'Copy Trading Detail', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
+          { pattern: '/admin/copy-trading/:slug/:id', title: 'Copy Trading Detail', section: 'Copy-Trading', permission: PERMISSIONS.copyTrading.view },
         ],
       },
     ],
@@ -348,76 +330,76 @@ export const adminRouteModules = [
     icon: Trophy,
     navSection: 'management',
     permission: PERMISSIONS.propTrading.view,
-    defaultPath: '/prop-trading',
+    defaultPath: '/admin/prop-trading',
     routes: [
       {
         id: 'prop-overview',
-        path: '/prop-trading',
+        path: 'prop-trading',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Overview',
         permission: PERMISSIONS.propTrading.view,
         meta: [
-          { pattern: '/prop-trading', title: 'Prop Trading Overview', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.view },
+          { pattern: '/admin/prop-trading', title: 'Prop Trading Overview', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.view },
         ],
       },
       {
         id: 'prop-configs',
-        path: '/prop-trading/challenge-configurations',
+        path: 'prop-trading/challenge-configurations',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Challenges',
         permission: PERMISSIONS.propTrading.manage,
         meta: [
-          { pattern: '/prop-trading/challenge-configurations', title: 'Challenges', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
+          { pattern: '/admin/prop-trading/challenge-configurations', title: 'Challenges', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
         ],
       },
       {
         id: 'prop-evaluations',
-        path: '/prop-trading/evaluation-requests',
+        path: 'prop-trading/evaluation-requests',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Evaluation Requests',
         permission: PERMISSIONS.propTrading.approve,
         meta: [
-          { pattern: '/prop-trading/evaluation-requests', title: 'Evaluation Requests', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.approve },
+          { pattern: '/admin/prop-trading/evaluation-requests', title: 'Evaluation Requests', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.approve },
         ],
       },
       {
         id: 'prop-funded',
-        path: '/prop-trading/funded-accounts',
+        path: 'prop-trading/funded-accounts',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Funded Accounts',
         permission: PERMISSIONS.propTrading.view,
         meta: [
-          { pattern: '/prop-trading/funded-accounts', title: 'Funded Accounts', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.view },
+          { pattern: '/admin/prop-trading/funded-accounts', title: 'Funded Accounts', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.view },
         ],
       },
       {
         id: 'prop-statistics',
-        path: '/prop-trading/statistics',
+        path: 'prop-trading/statistics',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Statistics',
         permission: PERMISSIONS.propTrading.view,
         meta: [
-          { pattern: '/prop-trading/statistics', title: 'Challenge Statistics', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.view },
+          { pattern: '/admin/prop-trading/statistics', title: 'Challenge Statistics', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.view },
         ],
       },
       {
         id: 'prop-fees',
-        path: '/prop-trading/fees-coupons',
+        path: 'prop-trading/fees-coupons',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Fees & Coupons',
         permission: PERMISSIONS.propTrading.manage,
         meta: [
-          { pattern: '/prop-trading/fees-coupons', title: 'Fees & Coupons', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
+          { pattern: '/admin/prop-trading/fees-coupons', title: 'Fees & Coupons', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
         ],
       },
       {
         id: 'prop-rules',
-        path: '/prop-trading/rules-risk',
+        path: 'prop-trading/rules-risk',
         pageKey: 'prop-trading/prop-trading-workspace',
         navLabel: 'Rules / Risk Settings',
         permission: PERMISSIONS.propTrading.manage,
         meta: [
-          { pattern: '/prop-trading/rules-risk', title: 'Rules / Risk Settings', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
+          { pattern: '/admin/prop-trading/rules-risk', title: 'Rules / Risk Settings', section: 'Prop-Trading', permission: PERMISSIONS.propTrading.manage },
         ],
       },
     ],
@@ -428,66 +410,85 @@ export const adminRouteModules = [
     icon: Share2,
     navSection: 'management',
     permission: PERMISSIONS.ibSystem.view,
-    defaultPath: '/ib-system/overview',
+    defaultPath: '/admin/ib-system/overview',
     routes: [
       {
         id: 'ib-overview',
-        path: '/ib-system/overview',
+        path: 'ib-system/overview',
         pageKey: 'ib-system/ib-system-workspace',
         navLabel: 'Overview',
         permission: PERMISSIONS.ibSystem.view,
         meta: [
-          { pattern: '/ib-system/overview', title: 'IB System Overview', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
+          { pattern: '/admin/ib-system/overview', title: 'IB System Overview', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
         ],
       },
       {
         id: 'ib-referrals',
-        path: '/ib-system/referrals',
+        path: 'ib-system/referrals',
         pageKey: 'ib-system/ib-system-workspace',
         navLabel: 'Referrals',
         permission: PERMISSIONS.ibSystem.view,
         meta: [
-          { pattern: '/ib-system/referrals', title: 'Referral Network', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
+          { pattern: '/admin/ib-system/referrals', title: 'Referral Network', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
         ],
       },
       {
         id: 'ib-commissions',
-        path: '/ib-system/commissions',
+        path: 'ib-system/commissions',
         pageKey: 'ib-system/ib-system-workspace',
         navLabel: 'Commissions',
         permission: PERMISSIONS.ibSystem.view,
         meta: [
-          { pattern: '/ib-system/commissions', title: 'Commission History', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
+          { pattern: '/admin/ib-system/commissions', title: 'Commission History', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
         ],
       },
       {
         id: 'ib-payouts',
-        path: '/ib-system/payouts',
+        path: 'ib-system/payouts',
         pageKey: 'ib-system/ib-system-workspace',
         navLabel: 'Payouts',
         permission: PERMISSIONS.ibSystem.payouts,
         meta: [
-          { pattern: '/ib-system/payouts', title: 'IB Payouts', section: 'IB-System', permission: PERMISSIONS.ibSystem.payouts },
+          { pattern: '/admin/ib-system/payouts', title: 'IB Payouts', section: 'IB-System', permission: PERMISSIONS.ibSystem.payouts },
         ],
       },
       {
         id: 'ib-performance',
-        path: '/ib-system/performance',
+        path: 'ib-system/performance',
         pageKey: 'ib-system/ib-system-workspace',
         navLabel: 'IB Performance',
         permission: PERMISSIONS.ibSystem.view,
         meta: [
-          { pattern: '/ib-system/performance', title: 'IB Performance', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
+          { pattern: '/admin/ib-system/performance', title: 'IB Performance', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
         ],
       },
       {
         id: 'ib-tree',
-        path: '/ib-system/tree',
+        path: 'ib-system/tree',
         pageKey: 'ib-system/ib-system-workspace',
         navLabel: 'Partner Tree',
         permission: PERMISSIONS.ibSystem.view,
         meta: [
-          { pattern: '/ib-system/tree', title: 'Partner Tree', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
+          { pattern: '/admin/ib-system/tree', title: 'Partner Tree', section: 'IB-System', permission: PERMISSIONS.ibSystem.view },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'group-management',
+    label: 'Group Management',
+    icon: Users,
+    navSection: 'management',
+    permission: PERMISSIONS.groupManagement.view,
+    defaultPath: '/admin/group-management',
+    routes: [
+      {
+        id: 'group-workspace',
+        path: 'group-management',
+        pageKey: 'group-management/workspace',
+        permission: PERMISSIONS.groupManagement.view,
+        meta: [
+          { pattern: '/admin/group-management', title: 'Group Management', section: 'Group Management', permission: PERMISSIONS.groupManagement.view },
         ],
       },
     ],
@@ -498,66 +499,66 @@ export const adminRouteModules = [
     icon: FileText,
     navSection: 'management',
     permission: PERMISSIONS.reports.view,
-    defaultPath: '/reports/overview',
+    defaultPath: '/admin/reports/overview',
     routes: [
       {
         id: 'reports-overview',
-        path: '/reports/overview',
+        path: 'reports/overview',
         pageKey: 'reports/overview',
         navLabel: 'Overview',
         permission: PERMISSIONS.reports.view,
         meta: [
-          { pattern: '/reports/overview', title: 'Reports Overview', section: 'Reports', permission: PERMISSIONS.reports.view },
+          { pattern: '/admin/reports/overview', title: 'Reports Overview', section: 'Reports', permission: PERMISSIONS.reports.view },
         ],
       },
       {
         id: 'reports-finance',
-        path: '/reports/finance',
+        path: 'reports/finance',
         pageKey: 'reports/finance',
         navLabel: 'Finance Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
-          { pattern: '/reports/finance', title: 'Finance Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
+          { pattern: '/admin/reports/finance', title: 'Finance Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
         ],
       },
       {
         id: 'reports-trading',
-        path: '/reports/trading',
+        path: 'reports/trading',
         pageKey: 'reports/trading',
         navLabel: 'Trading Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
-          { pattern: '/reports/trading', title: 'Trading Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
+          { pattern: '/admin/reports/trading', title: 'Trading Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
         ],
       },
       {
         id: 'reports-users',
-        path: '/reports/users',
+        path: 'reports/users',
         pageKey: 'reports/users',
         navLabel: 'User Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
-          { pattern: '/reports/users', title: 'User Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
+          { pattern: '/admin/reports/users', title: 'User Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
         ],
       },
       {
         id: 'reports-system',
-        path: '/reports/system',
+        path: 'reports/system',
         pageKey: 'reports/system',
         navLabel: 'System Reports',
         permission: PERMISSIONS.reports.view,
         meta: [
-          { pattern: '/reports/system', title: 'System Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
+          { pattern: '/admin/reports/system', title: 'System Reports', section: 'Reports', permission: PERMISSIONS.reports.view },
         ],
       },
       {
         id: 'reports-exports',
-        path: '/reports/exports',
+        path: 'reports/exports',
         pageKey: 'reports/exports',
         navLabel: 'Export Center',
         permission: PERMISSIONS.reports.export,
         meta: [
-          { pattern: '/reports/exports', title: 'Export Center', section: 'Reports', permission: PERMISSIONS.reports.export },
+          { pattern: '/admin/reports/exports', title: 'Export Center', section: 'Reports', permission: PERMISSIONS.reports.export },
         ],
       },
     ],
@@ -568,35 +569,35 @@ export const adminRouteModules = [
     icon: LifeBuoy,
     navSection: 'management',
     permission: PERMISSIONS.support.view,
-    defaultPath: '/support/tickets',
+    defaultPath: '/admin/support/tickets',
     routes: [
       {
         id: 'support-tickets',
-        path: '/support/tickets',
+        path: 'support/tickets',
         pageKey: 'support/support-workspace',
         navLabel: 'All Tickets',
         permission: PERMISSIONS.support.view,
         meta: [
-          { pattern: '/support/tickets', title: 'All Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.view },
+          { pattern: '/admin/support/tickets', title: 'All Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.view },
         ],
       },
       {
         id: 'support-escalated',
-        path: '/support/escalated',
+        path: 'support/escalated',
         pageKey: 'support/support-workspace',
         navLabel: 'Urgent Tickets',
         permission: PERMISSIONS.support.escalate,
         meta: [
-          { pattern: '/support/escalated', title: 'Urgent Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.escalate },
+          { pattern: '/admin/support/escalated', title: 'Urgent Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.escalate },
         ],
       },
       {
         id: 'support-detail',
-        path: '/support/tickets/:ticketId',
+        path: 'support/tickets/:ticketId',
         pageKey: 'support/ticket-detail',
         permission: PERMISSIONS.support.view,
         meta: [
-          { pattern: '/support/tickets/:ticketId', title: 'Ticket Details', section: 'Support Desk', permission: PERMISSIONS.support.view },
+          { pattern: '/admin/support/tickets/:ticketId', title: 'Ticket Details', section: 'Support Desk', permission: PERMISSIONS.support.view },
         ],
       },
     ],
@@ -607,76 +608,76 @@ export const adminRouteModules = [
     icon: Settings,
     navSection: 'system',
     permission: PERMISSIONS.settings.view,
-    defaultPath: '/settings/overview',
+    defaultPath: '/admin/settings/overview',
     routes: [
       {
         id: 'settings-overview',
-        path: '/settings/overview',
+        path: 'settings/overview',
         pageKey: 'settings/settings-workspace',
         navLabel: 'Settings Overview',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/overview', title: 'Settings Overview', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/overview', title: 'Settings Overview', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
         id: 'settings-api',
-        path: '/settings/api',
+        path: 'settings/api',
         pageKey: 'settings/settings-workspace',
         navLabel: 'API Config',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/api', title: 'API Configuration', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/api', title: 'API Configuration', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
         id: 'settings-payments',
-        path: '/settings/payment-gateway',
+        path: 'settings/payment-gateway',
         pageKey: 'settings/settings-workspace',
         navLabel: 'Payment Gateway',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/payment-gateway', title: 'Payment Gateway', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/payment-gateway', title: 'Payment Gateway', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
         id: 'settings-kyc',
-        path: '/settings/kyc',
+        path: 'settings/kyc',
         pageKey: 'settings/settings-workspace',
         navLabel: 'KYC Settings',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/kyc', title: 'KYC Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/kyc', title: 'KYC Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
         id: 'settings-trading',
-        path: '/settings/trading',
+        path: 'settings/trading',
         pageKey: 'settings/settings-workspace',
         navLabel: 'Trading Settings',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/trading', title: 'Trading Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/trading', title: 'Trading Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
         id: 'settings-notifications',
-        path: '/settings/notifications',
+        path: 'settings/notifications',
         pageKey: 'settings/settings-workspace',
         navLabel: 'Notification Settings',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/notifications', title: 'Notification Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/notifications', title: 'Notification Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
         id: 'settings-system',
-        path: '/settings/system',
+        path: 'settings/system',
         pageKey: 'settings/settings-workspace',
         navLabel: 'System Settings',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/settings/system', title: 'System Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/system', title: 'System Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
     ],
@@ -687,53 +688,70 @@ export const adminRouteModules = [
     icon: ShieldCheck,
     navSection: 'system',
     permission: PERMISSIONS.rolesPermissions.view,
-    defaultPath: '/admin-mgmt/users',
+    defaultPath: '/admin/admin-mgmt/users',
     routes: [
       {
         id: 'admin-users',
-        path: '/admin-mgmt/users',
+        path: 'admin-mgmt/users',
         pageKey: 'admin-mgmt/roles-permissions-workspace',
         navLabel: 'Admin Users',
         permission: PERMISSIONS.rolesPermissions.view,
         meta: [
-          { pattern: '/admin-mgmt/users', title: 'Admin Users', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
+          { pattern: '/admin/admin-mgmt/users', title: 'Admin Users', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
         ],
       },
       {
         id: 'admin-roles',
-        path: '/admin-mgmt/roles',
+        path: 'admin-mgmt/roles',
         pageKey: 'admin-mgmt/roles-permissions-workspace',
         navLabel: 'Roles',
         permission: PERMISSIONS.rolesPermissions.view,
         meta: [
-          { pattern: '/admin-mgmt/roles', title: 'Roles', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
+          { pattern: '/admin/admin-mgmt/roles', title: 'Roles', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
         ],
       },
       {
         id: 'admin-permissions',
-        path: '/admin-mgmt/permissions',
+        path: 'admin-mgmt/permissions',
         pageKey: 'admin-mgmt/roles-permissions-workspace',
         navLabel: 'Permissions',
         permission: PERMISSIONS.rolesPermissions.view,
         meta: [
-          { pattern: '/admin-mgmt/permissions', title: 'Permissions Matrix', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
+          { pattern: '/admin/admin-mgmt/permissions', title: 'Permissions Matrix', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
         ],
       },
-
     ],
   },
+  {
+    id: 'account',
+    label: 'My Account',
+    icon: User,
+    navSection: 'personal',
+    permission: null,
+    defaultPath: '/admin/account/overview',
+    routes: [
+      {
+        id: 'account-overview',
+        path: 'account/:tab',
+        pageKey: 'account/account-center',
+        permission: null,
+        meta: [
+          { pattern: '/admin/account/:tab', title: 'My Account', section: 'Account Center', permission: null },
+        ]
+      }
+    ]
+  }
 ];
 
 export const adminRedirectRoutes = [
-  { path: '/finance', to: '/finance/deposits' },
-  { path: '/trading', to: '/trading/accounts' },
-  { path: '/copy-trading', to: '/copy-trading/strategies' },
-  { path: '/ib-system', to: '/ib-system/overview' },
-  { path: '/reports', to: '/reports/overview' },
-  { path: '/support', to: '/support/tickets' },
-  { path: '/settings', to: '/settings/overview' },
-  { path: '/admin-mgmt', to: '/admin-mgmt/users' },
-  { path: '/admin', to: '/' },
+  { path: 'finance',      to: '/admin/finance/deposits' },
+  { path: 'trading',      to: '/admin/trading/accounts' },
+  { path: 'copy-trading', to: '/admin/copy-trading/strategies' },
+  { path: 'ib-system',   to: '/admin/ib-system/overview' },
+  { path: 'reports',     to: '/admin/reports/overview' },
+  { path: 'support',     to: '/admin/support/tickets' },
+  { path: 'settings',    to: '/admin/settings/overview' },
+  { path: 'admin-mgmt',  to: '/admin/admin-mgmt/users' },
 ];
 
 export const adminRouteMeta = adminRouteModules.flatMap((module) =>

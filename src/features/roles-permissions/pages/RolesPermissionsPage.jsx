@@ -10,9 +10,9 @@ export function RolesPermissionsPage() {
 
   const renderPage = () => {
     switch (location.pathname) {
-      case '/admin-mgmt/users': return <AdminUsersPage />;
-      case '/admin-mgmt/roles': return <RolesPage />;
-      case '/admin-mgmt/permissions': return <PermissionsPage />;
+      case '/admin/admin-mgmt/users': return <AdminUsersPage />;
+      case '/admin/admin-mgmt/roles': return <RolesPage />;
+      case '/admin/admin-mgmt/permissions': return <PermissionsPage />;
       default: return null;
     }
   };

@@ -21,7 +21,7 @@ export function MainLayout() {
   }, []);
 
   return (
-    <div className={`min-h-screen bg-bg text-text transition-colors duration-500 overflow-x-clip ${theme}`}>
+    <div className="min-h-screen bg-bg text-text transition-colors duration-500 overflow-x-clip">
       {isMobile && !collapsed && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] animate-fade-in"

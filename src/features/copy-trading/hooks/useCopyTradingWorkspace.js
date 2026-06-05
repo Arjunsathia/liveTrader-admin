@@ -13,7 +13,7 @@ export function useCopyTradingWorkspace() {
   }, [location.pathname]);
 
   const setActiveTab = (tabId) => {
-    navigate(`/copy-trading/${tabId}`);
+    navigate(`/admin/copy-trading/${tabId}`);
   };
 
   return {
