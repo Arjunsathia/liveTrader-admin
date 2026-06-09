@@ -1,1 +1,0 @@
-export { PRIORITY_CLR, PRIORITY_ORDER, STATUS_CLR, CAT_CLR, KYC_CLR, WALL_CLR, TRADE_CLR, PriorityBadge, SupportStatusBadge, CatTag, SlaBar, UserAvatar, SupportSectionHead, SupportToast, SlaCheckRow, TicketCard } from './SupportComponents';

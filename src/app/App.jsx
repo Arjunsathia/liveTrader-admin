@@ -5,23 +5,26 @@ import { RouterProvider } from 'react-router-dom';
 import { store } from './store';
 import { queryClient } from './query/queryClient';
 import { appRouter } from './routes/router';
-import { AuthProvider } from '@/auth/AuthProvider';
+import { AuthProvider } from '@/shared/features/auth/AuthProvider';
 import { AdminSessionProvider } from './providers/AdminSessionProvider';
 import { AdminUiProvider } from './providers/AdminUiProvider';
-import { UniversalDrawerProvider } from '../components/overlays';
+import { UniversalDrawerProvider } from '@/shared/components/overlays';
+import { PlatformSettingsProvider } from '@/shared/features/settings/PlatformSettingsContext';
 
 function App() {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AdminSessionProvider>
-            <AdminUiProvider>
-              <UniversalDrawerProvider>
-                <RouterProvider router={appRouter} />
-              </UniversalDrawerProvider>
-            </AdminUiProvider>
-          </AdminSessionProvider>
+          <PlatformSettingsProvider>
+            <AdminSessionProvider>
+              <AdminUiProvider>
+                <UniversalDrawerProvider>
+                  <RouterProvider router={appRouter} />
+                </UniversalDrawerProvider>
+              </AdminUiProvider>
+            </AdminSessionProvider>
+          </PlatformSettingsProvider>
         </AuthProvider>
       </QueryClientProvider>
     </Provider>

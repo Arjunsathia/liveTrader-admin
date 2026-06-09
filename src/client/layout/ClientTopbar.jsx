@@ -10,8 +10,8 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useClickOutside } from '@/hooks/useClickOutside';
-import { useAuth } from '@/auth/AuthContext';
+import { useClickOutside } from '@/shared/hooks/useClickOutside';
+import { useAuth } from '@/shared/features/auth/AuthContext';
 
 export function ClientTopbar({ collapsed, setCollapsed, theme, toggleTheme }) {
   const navigate = useNavigate();

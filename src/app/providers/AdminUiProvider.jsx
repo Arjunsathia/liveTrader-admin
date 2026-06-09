@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { toggleTheme, setColorTheme, setSidebarCollapsed } from '../store/slices/themeSlice';
+import { toggleTheme, setTheme, setColorTheme, setSidebarCollapsed } from '../store/slices/themeSlice';
 
 const AdminUiContext = createContext(null);
 
@@ -15,6 +15,8 @@ export function AdminUiProvider({ children }) {
   
   // Local responsive visual state
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+  // Tracks whether the sidebar is temporarily expanded by hover
+  const [sidebarHovered, setSidebarHovered] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -45,22 +47,24 @@ export function AdminUiProvider({ children }) {
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch]);
 
+  // The sidebar is visually expanded when: not collapsed OR (collapsed but hovered on desktop)
+  const sidebarExpanded = !collapsed || (!isMobile && sidebarHovered);
+  const effectiveSidebarWidth = isMobile ? 0 : (sidebarExpanded ? 248 : 68);
+
   const value = useMemo(() => ({
     collapsed,
     setCollapsed: (val) => dispatch(setSidebarCollapsed(val)),
     theme,
-    setTheme: (val) => {
-      // Allow setting theme explicitly or toggling if arg is empty/unmatched
-      if (val === 'light' || val === 'dark') {
-        // We'll support setting theme explicitly in state slice by importing it
-        // but for now toggle is standard. We can toggle standard or set it.
-      }
-    },
+    setTheme: (val) => dispatch(setTheme(val)),
     toggleTheme: () => dispatch(toggleTheme()),
     colorTheme,
     setColorTheme: (val) => dispatch(setColorTheme(val)),
     isMobile,
-  }), [collapsed, theme, colorTheme, isMobile, dispatch]);
+    sidebarHovered,
+    setSidebarHovered,
+    sidebarExpanded,
+    effectiveSidebarWidth,
+  }), [collapsed, theme, colorTheme, isMobile, sidebarHovered, sidebarExpanded, effectiveSidebarWidth, dispatch]);
 
   return (
     <AdminUiContext.Provider value={value}>

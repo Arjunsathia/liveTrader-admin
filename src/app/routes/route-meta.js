@@ -1,5 +1,5 @@
 import { matchPath } from 'react-router-dom';
-import { adminRouteMeta } from '@/config/routes/admin-routes.config';
+import { adminRouteMeta } from '@/shared/config/routes/admin-routes.config';
 
 
 export const ROUTE_META = adminRouteMeta;

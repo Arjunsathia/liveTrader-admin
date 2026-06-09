@@ -2,8 +2,8 @@ import React, { useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp, User, Lock, Bell, History, Key, ShieldCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { clientNavigation, clientNavigationSections } from '@/config/sidebar/client-sidebar.config';
-import { useAuth } from '@/auth/AuthContext';
+import { clientNavigation, clientNavigationSections } from '@/shared/config/sidebar/client-sidebar.config';
+import { useAuth } from '@/shared/features/auth/AuthContext';
 
 /* ─────────────────────────────────────────────
    CLIENT SIDEBAR ITEM
@@ -409,7 +409,7 @@ export function ClientSidebar({ collapsed, isMobile }) {
             <div className="overflow-hidden min-h-0">
               <div className="flex flex-col gap-0.5 pb-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                 {profileSubTabs.map((sub) => {
-                  const isSubActive = location.pathname === sub.path;
+                  const isSubActive = location.pathname === sub.path || (location.pathname === '/client/settings' && sub.id === 'profile');
                   const SubIcon = sub.icon;
                   return (
                     <button
@@ -453,7 +453,7 @@ export function ClientSidebar({ collapsed, isMobile }) {
           className={`
             flex items-center gap-3 w-full rounded-[8px] transition-all duration-200 cursor-pointer outline-none text-left
             ${collapsed ? 'justify-center p-1.5' : 'p-2 hover:bg-text/[0.04]'}
-            ${location.pathname.startsWith('/client/account') || (collapsed && hoverNode?.item.id === 'account') ? 'bg-primary/[0.08] text-primary font-bold' : 'text-text-muted/65'}
+            ${location.pathname.startsWith('/client/account') || location.pathname === '/client/settings' || (collapsed && hoverNode?.item.id === 'account') ? 'bg-primary/[0.08] text-primary font-bold' : 'text-text-muted/65'}
           `}
         >
           {/* Initials Avatar */}
