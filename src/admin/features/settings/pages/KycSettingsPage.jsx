@@ -55,7 +55,7 @@ export function KycSettingsPage({
         <div className="space-y-5">
           <SettingsCard
             title="Verification Provider"
-            desc="Connect and configure your identity verification service."
+            desc="Connect your identity check service."
             Icon={ShieldCheck}
           >
             <FGroup cols={2}>
@@ -110,7 +110,7 @@ export function KycSettingsPage({
                 onChange={(v) => updateKycField('resubmissionAllowed', v)}
               />
               <div>
-                <FieldLabel hint="Days a rejected user must wait before retrying">Retry Cooldown</FieldLabel>
+                <FieldLabel hint="Days a rejected user must wait before retrying">Wait Before Retry</FieldLabel>
                 <TInput
                   value={kycConfig.resubmissionDays || kycConfig.ResubmissionDays}
                   onChange={(v) => updateKycField('resubmissionDays', v)}
@@ -192,13 +192,13 @@ export function KycSettingsPage({
         <div className="space-y-5">
           <SettingsCard
             title="AML Scanning"
-            desc="Check users against global anti-money laundering databases."
+            desc="Check users against global AML databases."
             Icon={ShieldAlert}
           >
             <div className="space-y-4">
               <ToggleRow
                 label="Enable AML Checks"
-                desc="Screen high-volume accounts against sanctions databases"
+                desc="Check high-volume accounts against sanctions lists"
                 val={kycConfig.amlScanEnabled}
                 onChange={(v) => updateKycField('amlScanEnabled', v)}
               />

@@ -4,12 +4,12 @@ import {
 } from 'lucide-react';
 
 export const OVERVIEW_KPIS = [
-  { label: 'Platform Status', value: 'ONLINE', color: 'var(--positive)', Icon: Activity, sub: 'All systems operational', status: 'OK' },
+  { label: 'Platform Status', value: 'ONLINE', color: 'var(--positive)', Icon: Activity, sub: 'All systems working', status: 'OK' },
   { label: 'Active Integrations', value: '12', color: 'var(--cyan)', Icon: Network, sub: 'APIs and services', status: 'OK' },
-  { label: 'Pending Changes', value: '3', color: 'var(--warning)', Icon: Clock, sub: 'Awaiting publish', status: 'WARN' },
-  { label: 'Failed Syncs', value: '1', color: 'var(--negative)', Icon: WifiOff, sub: 'Requires attention', status: 'ERROR' },
-  { label: 'Enabled Gateways', value: '4 / 6', color: 'var(--brand)', Icon: CreditCard, sub: 'Payment processors', status: 'OK' },
-  { label: 'Config Health', value: '94%', color: 'var(--positive)', Icon: ShieldCheck, sub: 'All checks passing', status: 'OK' },
+  { label: 'Pending Changes', value: '3', color: 'var(--warning)', Icon: Clock, sub: 'Ready to publish', status: 'WARN' },
+  { label: 'Failed Syncs', value: '1', color: 'var(--negative)', Icon: WifiOff, sub: 'Needs attention', status: 'ERROR' },
+  { label: 'Enabled Gateways', value: '4 / 6', color: 'var(--brand)', Icon: CreditCard, sub: 'Payment services', status: 'OK' },
+  { label: 'Settings Health', value: '94%', color: 'var(--positive)', Icon: ShieldCheck, sub: 'All checks passed', status: 'OK' },
 ];
 
 export const INTEGRATIONS_LIST = [
@@ -24,9 +24,9 @@ export const INTEGRATIONS_LIST = [
 ];
 
 export const QUICK_LINKS = [
-  { id: 'api', label: 'API Config', Icon: Key, desc: 'Endpoints, keys, webhooks' },
-  { id: 'gateways', label: 'Payment Gateways', Icon: CreditCard, desc: 'Rails, fees, currencies' },
-  { id: 'kyc', label: 'KYC Settings', Icon: ShieldCheck, desc: 'Documents, AML, thresholds' },
+  { id: 'api', label: 'API Settings', Icon: Key, desc: 'URLs, keys, and webhooks' },
+  { id: 'gateways', label: 'Payment Gateways', Icon: CreditCard, desc: 'Methods, fees, and currencies' },
+  { id: 'kyc', label: 'KYC Settings', Icon: ShieldCheck, desc: 'Documents, AML, and limits' },
   { id: 'trading', label: 'Trading Settings', Icon: BarChart2, desc: 'Leverage, limits, symbols' },
   { id: 'notifications', label: 'Notifications', Icon: Bell, desc: 'Email, SMS, webhooks' },
   { id: 'system', label: 'System Settings', Icon: Settings, desc: 'Brand, security, maintenance' },

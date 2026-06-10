@@ -57,7 +57,7 @@ function EscalatedPage() {
       value: escalatedData.length,
       accent: 'var(--negative)',
       Icon: AlertOctagon,
-      sub: 'Tickets waiting for review',
+      sub: 'Waiting for review',
     },
     {
       label: 'Critical',
@@ -71,7 +71,7 @@ function EscalatedPage() {
       value: escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length,
       accent: 'var(--negative)',
       Icon: Timer,
-      sub: 'Past due time',
+      sub: 'Past due',
     },
     {
       label: 'Compliance',
@@ -92,7 +92,7 @@ function EscalatedPage() {
       value: escalatedData.filter((t) => t.owner === 'Unassigned').length,
       accent: 'var(--negative)',
       Icon: UserPlus,
-      sub: 'Waiting for owner',
+      sub: 'Needs an owner',
     },
   ];
 
@@ -107,7 +107,7 @@ function EscalatedPage() {
             Urgent Tickets
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
-            Tickets that need quick review and action.
+            Review and act on urgent tickets.
           </p>
         </div>
       </header>

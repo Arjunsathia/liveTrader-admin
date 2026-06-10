@@ -547,10 +547,10 @@ export function SystemSettingsPage({
   };
 
   const tabs = [
-    { id: 'general', label: 'General & Region', Icon: Settings },
-    { id: 'security', label: 'Security & Access', Icon: Shield },
-    { id: 'appearance', label: 'Appearance & Themes', Icon: Palette },
-    { id: 'backup', label: 'Maintenance & Backups', Icon: HardDrive },
+    { id: 'general', label: 'General', Icon: Settings },
+    { id: 'security', label: 'Security', Icon: Shield },
+    { id: 'appearance', label: 'Appearance', Icon: Palette },
+    { id: 'backup', label: 'Backups', Icon: HardDrive },
   ];
 
   const handleLaunchBackup = async () => {
@@ -564,7 +564,7 @@ export function SystemSettingsPage({
     <div className="space-y-5.5">
       <SettingsSection
         title="System Settings"
-        desc="Setup localized parameters, configure session controls, dictate security policies, and manage database maintenance."
+        desc="Set your brand info, locale, security rules, and backup settings."
       />
 
       <SettingsTabs tabs={tabs} active={activeTab} setActive={setActiveTab} />
@@ -572,13 +572,13 @@ export function SystemSettingsPage({
       {activeTab === 'general' && (
         <div className="space-y-5">
           <SettingsCard
-            title="General Branding Information"
-            desc="Configure brand labels and primary support contacts."
+            title="Brand Info"
+            desc="Set your brand name and support contact."
             Icon={Settings}
           >
             <FGroup cols={2}>
               <div>
-                <FieldLabel required hint="Display label for system interfaces">Brand Name</FieldLabel>
+                <FieldLabel required hint="Shown across the platform">Brand Name</FieldLabel>
                 <TInput
                   value={systemConfig.brandName}
                   onChange={(v) => updateSystemField('brandName', v)}
@@ -586,7 +586,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel required hint="Root internet domain identifier">Brand Domain</FieldLabel>
+                <FieldLabel required hint="Your main website domain">Brand Domain</FieldLabel>
                 <TInput
                   value={systemConfig.brandDomain}
                   onChange={(v) => updateSystemField('brandDomain', v)}
@@ -596,7 +596,7 @@ export function SystemSettingsPage({
               </div>
             </FGroup>
             <div className="mt-4">
-              <FieldLabel required hint="Default destination for support tickets dispatches">Primary Support Email</FieldLabel>
+              <FieldLabel required hint="Where support tickets are sent">Support Email</FieldLabel>
               <TInput
                 value={systemConfig.supportEmail}
                 onChange={(v) => updateSystemField('supportEmail', v)}
@@ -607,13 +607,13 @@ export function SystemSettingsPage({
           </SettingsCard>
 
           <SettingsCard
-            title="Regional Locale Coordinates"
-            desc="Specify system dates formatting, primary language, and clearing currencies."
+            title="Region & Locale"
+            desc="Set date formats, language, and base currency."
             Icon={Sliders}
           >
             <FGroup cols={2}>
               <div>
-                <FieldLabel hint="Primary timezone coordinates governing daily schedules">Platform Timezone</FieldLabel>
+                <FieldLabel hint="Platform timezone for all schedules">Timezone</FieldLabel>
                 <TSelect
                   value={systemConfig.timezone}
                   onChange={(v) => updateSystemField('timezone', v)}
@@ -621,7 +621,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel hint="Default language selection applied on client portals">Primary Locale Language</FieldLabel>
+                <FieldLabel hint="Default language for client portals">Language</FieldLabel>
                 <TSelect
                   value={systemConfig.locale}
                   onChange={(v) => updateSystemField('locale', v)}
@@ -629,7 +629,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel hint="Primary currency of all fee estimations">Default System Currency</FieldLabel>
+                <FieldLabel hint="Currency used for fee calculations">Base Currency</FieldLabel>
                 <TSelect
                   value={systemConfig.currency}
                   onChange={(v) => updateSystemField('currency', v)}
@@ -637,7 +637,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel hint="Visual arrangement of dates displayed in tables and ledgers">Date Format Layout</FieldLabel>
+                <FieldLabel hint="How dates are displayed in tables">Date Format</FieldLabel>
                 <TSelect
                   value={systemConfig.dateFormat}
                   onChange={(v) => updateSystemField('dateFormat', v)}
@@ -652,13 +652,13 @@ export function SystemSettingsPage({
       {activeTab === 'security' && (
         <div className="space-y-5">
           <SettingsCard
-            title="Session Access Controls"
-            desc="Regulate concurrent access variables and idle session limits."
+            title="Session Controls"
+            desc="Set idle timeout and max active sessions."
             Icon={Shield}
           >
             <FGroup cols={2}>
               <div>
-                <FieldLabel required hint="Minutes of inactivity before automatic session logouts">Session Idle Timeout</FieldLabel>
+                <FieldLabel required hint="Minutes of inactivity before auto-logout">Session Timeout</FieldLabel>
                 <TInput
                   value={systemConfig.sessionTimeout}
                   onChange={(v) => updateSystemField('sessionTimeout', v)}
@@ -667,7 +667,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel required hint="Max parallel active sessions per single operator">Max Concurrent Sessions</FieldLabel>
+                <FieldLabel required hint="Max simultaneous logins per admin">Max Sessions</FieldLabel>
                 <TInput
                   value={systemConfig.maxSessions}
                   onChange={(v) => updateSystemField('maxSessions', v)}
@@ -678,8 +678,8 @@ export function SystemSettingsPage({
 
             <div className="mt-4">
               <ToggleRow
-                label="Enforce Multi-Factor Authentication"
-                desc="Mandate MFA validation using Google Authenticator or SMS codes on all administrator accounts"
+                label="Require MFA"
+                desc="All admin accounts must use Google Authenticator or SMS for login"
                 val={systemConfig.mfaRequired}
                 onChange={(v) => updateSystemField('mfaRequired', v)}
               />
@@ -687,13 +687,13 @@ export function SystemSettingsPage({
           </SettingsCard>
 
           <SettingsCard
-            title="Password Security Policy"
-            desc="Setup strength guidelines and expiration boundaries for administrative credentials."
+            title="Password Policy"
+            desc="Set password strength and expiry rules."
             Icon={Key}
           >
             <FGroup cols={3}>
               <div>
-                <FieldLabel hint="Min characters required for passwords creation">Minimum Password Length</FieldLabel>
+                <FieldLabel hint="Minimum characters required">Min Password Length</FieldLabel>
                 <TInput
                   value={systemConfig.passwordMinLength}
                   onChange={(v) => updateSystemField('passwordMinLength', v)}
@@ -701,7 +701,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel hint="Days passwords remain valid before rotation prompt">Credentials Expiry Interval</FieldLabel>
+                <FieldLabel hint="Days before password expires">Password Expiry</FieldLabel>
                 <TInput
                   value={systemConfig.passwordExpiry}
                   onChange={(v) => updateSystemField('passwordExpiry', v)}
@@ -710,7 +710,7 @@ export function SystemSettingsPage({
                 />
               </div>
               <div>
-                <FieldLabel hint="Maximum failed password retries before IP block triggers">Max Login Attempts</FieldLabel>
+                <FieldLabel hint="Failed attempts before account is blocked">Max Login Attempts</FieldLabel>
                 <TInput
                   value={systemConfig.loginAttempts}
                   onChange={(v) => updateSystemField('loginAttempts', v)}
@@ -725,21 +725,21 @@ export function SystemSettingsPage({
       {activeTab === 'backup' && (
         <div className="space-y-5">
           <SettingsCard
-            title="Database Snapshots & Maintenance"
-            desc="Configure database backup schedules to safeguard system recovery pipelines."
+            title="Backups & Maintenance"
+            desc="Schedule database backups and manage data retention."
             Icon={HardDrive}
           >
             <div className="space-y-4">
               <ToggleRow
-                label="Automated Daily Backups"
-                desc="Commit cold snapshot backups of all clearing parameters daily"
+                label="Automatic Daily Backups"
+                desc="Back up all system data automatically every day"
                 val={systemConfig.backupEnabled}
                 onChange={(v) => updateSystemField('backupEnabled', v)}
               />
 
               <FGroup cols={2}>
                 <div>
-                  <FieldLabel hint="Periodical scheduling coordinator rules for backups">Backups Frequencies</FieldLabel>
+                  <FieldLabel hint="How often backups run">Backup Frequency</FieldLabel>
                   <TSelect
                     value={systemConfig.backupFrequency}
                     onChange={(v) => updateSystemField('backupFrequency', v)}
@@ -748,7 +748,7 @@ export function SystemSettingsPage({
                   />
                 </div>
                 <div>
-                  <FieldLabel hint="Days backup snapshots are retained in secure cloud nodes">Backups Retentions Duration</FieldLabel>
+                  <FieldLabel hint="Days to keep backup snapshots">Backup Retention</FieldLabel>
                   <TInput
                     value={systemConfig.backupRetention}
                     onChange={(v) => updateSystemField('backupRetention', v)}
@@ -761,14 +761,14 @@ export function SystemSettingsPage({
 
               <div className="pt-2">
                 <ToggleRow
-                  label="Enforce Audit Logging"
-                  desc="Log all administrative session events, modifications, and query updates"
+                  label="Audit Logging"
+                  desc="Log all admin actions, changes, and queries"
                   val={systemConfig.auditLogEnabled}
                   onChange={(v) => updateSystemField('auditLogEnabled', v)}
                 />
                 <FGroup cols={2}>
                   <div>
-                    <FieldLabel hint="Days to retain audit logs in data lakes">Audit Logs Retentions</FieldLabel>
+                    <FieldLabel hint="How long to keep audit logs">Audit Log Retention</FieldLabel>
                     <TInput
                       value={systemConfig.auditLogRetention}
                       onChange={(v) => updateSystemField('auditLogRetention', v)}
@@ -778,7 +778,7 @@ export function SystemSettingsPage({
                     />
                   </div>
                   <div>
-                    <FieldLabel hint="General client transaction logs storage duration bounds">General Transaction Retentions</FieldLabel>
+                    <FieldLabel hint="How long to keep transaction records">Transaction Log Retention</FieldLabel>
                     <TInput
                       value={systemConfig.dataRetention}
                       onChange={(v) => updateSystemField('dataRetention', v)}
@@ -792,7 +792,7 @@ export function SystemSettingsPage({
               <div className="pt-4 border-t border-border/10">
                 <Btn
                   Icon={Database}
-                  label={backingUp ? 'Creating Snapshot...' : 'Create Backup Snapshot Now'}
+                  label={backingUp ? 'Creating Backup...' : 'Create Backup Now'}
                   variant="cyan"
                   onClick={handleLaunchBackup}
                   loading={backingUp}
@@ -808,7 +808,7 @@ export function SystemSettingsPage({
           {/* Interface Mode Card */}
           <SettingsCard
             title="Interface Mode"
-            desc="Toggle between standard light theme and bioluminescent dark theme environments."
+            desc="Switch between light and dark theme."
             Icon={localTheme === 'dark' ? Moon : Sun}
           >
             <div className="flex flex-wrap gap-4 pt-2">
@@ -829,7 +829,7 @@ export function SystemSettingsPage({
                 <Sun size={18} className={localTheme === 'light' ? 'animate-spin' : ''} style={{ animationDuration: '6s' }} />
                 <div className="text-left">
                   <p className="text-[13px] font-bold leading-tight">Light Mode</p>
-                  <p className="text-[10px] text-text-muted/60 mt-0.5 leading-none">Clean & readable in sunlight</p>
+                  <p className="text-[10px] text-text-muted/60 mt-0.5 leading-none">Clean & bright</p>
                 </div>
               </button>
 
@@ -850,7 +850,7 @@ export function SystemSettingsPage({
                 <Moon size={18} />
                 <div className="text-left">
                   <p className="text-[13px] font-bold leading-tight">Dark Mode</p>
-                  <p className="text-[10px] text-text-muted/60 mt-0.5 leading-none">Low eye-strain void environment</p>
+                  <p className="text-[10px] text-text-muted/60 mt-0.5 leading-none">Easy on the eyes</p>
                 </div>
               </button>
             </div>
@@ -858,8 +858,8 @@ export function SystemSettingsPage({
 
           {/* Preset Themes Card */}
           <SettingsCard
-            title="Brand Color Presets"
-            desc="Select from our curated list of professional, high-contrast visual systems."
+            title="Color Themes"
+            desc="Choose a color preset for the platform."
             Icon={Palette}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
@@ -939,7 +939,7 @@ export function SystemSettingsPage({
         isDirty={isDirty || isAppearanceDirty}
         onSave={handleSaveAll}
         onReset={handleResetAll}
-        label="Save System Rules"
+        label="Save System Settings"
       />
 
       {/* Developer Reference Copy-Paste Modal */}
@@ -947,7 +947,7 @@ export function SystemSettingsPage({
         open={isDeveloperModalOpen}
         onClose={() => setIsDeveloperModalOpen(false)}
         title="Theme Code Reference"
-        subtitle="Quickly copy custom properties and JavaScript schemas to integrate colors across your platform."
+        subtitle="Copy theme values to use across your platform."
         actionLabel="Developer Reference"
         maxWidth="max-w-[720px]"
       >
@@ -992,7 +992,7 @@ export function SystemSettingsPage({
           {/* Preset selector for CSS-vars */}
           {modalTab === 'css-vars' && (
             <div className="flex flex-wrap items-center gap-2 pb-1">
-              <span className="text-xs text-text-muted/80 mr-1 font-semibold">Select Theme Preset:</span>
+              <span className="text-xs text-text-muted/80 mr-1 font-semibold">Select Theme:</span>
               <select
                 value={localColorTheme}
                 onChange={(e) => {
@@ -1064,7 +1064,7 @@ export function SystemSettingsPage({
           </div>
 
           <p className="text-[10px] text-text-muted/60 leading-normal">
-            * Note: Map the custom properties to your CSS variables layer. In Tailwind CSS, map them to your colors config (e.g. <code>--color-brand: var(--brand)</code>).
+            * Note: Map these values to your CSS variables. For Tailwind CSS, add them to your color settings (for example, <code>--color-brand: var(--brand)</code>).
           </p>
         </div>
       </AdminModal>

@@ -178,7 +178,7 @@ export function TradingSettingsPage({
       {activeTab === 'risk' && (
         <div className="space-y-5">
           <SettingsCard
-            title="Slippage & Risk Controls"
+            title="Slippage & Risk Rules"
             desc="Set slippage limits and order validation rules."
             Icon={ShieldAlert}
           >
@@ -263,7 +263,7 @@ export function TradingSettingsPage({
         <div className="space-y-5">
           <SettingsCard
             title="Prop Challenge Rules"
-            desc="Set rules and targets for prop trading evaluations."
+            desc="Set prop trading challenge rules and targets."
             Icon={BarChart2}
           >
             <FGroup cols={3}>

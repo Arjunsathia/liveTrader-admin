@@ -465,7 +465,7 @@ export function NotificationSettingsPage({
                           label="Preview"
                           variant="default"
                           small
-                          onClick={() => alert(`Launching layout preview for template: ${tpl.name}`)}
+                          onClick={() => alert(`Opening preview: ${tpl.name}`)}
                         />
                       </td>
                     </tr>

@@ -55,7 +55,7 @@ export function ApiConfigPage({
   return (
     <div className="space-y-5.5">
       <SettingsSection
-        title="API Configuration"
+        title="API Settings"
         desc="Manage API endpoints, keys, rate limits, and security settings."
       />
 
@@ -195,7 +195,7 @@ export function ApiConfigPage({
 
           <SettingsCard
             title="Key Rotation"
-            desc="Schedule how often your keys expire and get replaced."
+            desc="Choose how often keys are replaced."
             Icon={Sliders}
           >
             <FGroup cols={2}>
@@ -282,7 +282,7 @@ export function ApiConfigPage({
                 />
               </div>
               <ToggleRow
-                label="Enforce IP Whitelist"
+                label="Require Allowed IPs"
                 desc="Block all traffic from IPs not on the list"
                 val={true}
                 onChange={() => { }}

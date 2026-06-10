@@ -83,14 +83,14 @@ function PermissionsPage() {
     try {
       if (moduleModal.mode === 'create') {
         createModule(moduleLabel.trim(), moduleIcon, moduleDesc.trim());
-        act(`Module "${moduleLabel.trim()}" created successfully`);
+        act(`Module "${moduleLabel.trim()}" created`);
       } else {
         updateModule(moduleModal.moduleData.id, moduleLabel.trim(), moduleIcon, moduleDesc.trim());
-        act(`Module "${moduleLabel.trim()}" updated successfully`);
+        act(`Module "${moduleLabel.trim()}" updated`);
       }
       setModuleModal({ isOpen: false, mode: 'create', moduleData: null });
     } catch (err) {
-      setModalError(err.message || 'An error occurred.');
+      setModalError(err.message || 'Something went wrong.');
     }
   };
 
@@ -207,20 +207,20 @@ function PermissionsPage() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5 font-heading">
-            Access Management
+            Admin Access
           </p>
           <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text font-heading">
-            Permissions Matrix
+            Permissions
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg font-heading">
-            Configure system module permissions and action accesses across roles.
+            Choose what each role can view and do.
           </p>
         </div>
       </header>
 
       {/* Role selector and Quick Actions toolbar */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted/70 font-heading flex-shrink-0">Editing Role:</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted/70 font-heading flex-shrink-0">Role:</span>
         <div className="flex gap-1.5 flex-wrap">
           {roles.map(r => {
             const c = r.color || ROLE_CLR[r.name] || 'rgba(255,255,255,0.3)';
@@ -261,7 +261,7 @@ function PermissionsPage() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className="text-[12.5px] font-mono font-semibold" style={{ color: roleColor }}>{countActive()}</span>
-            <span className="text-[11px] text-text-muted/70 font-heading">/ {modules.length * PERM_ACTIONS.length} permissions active</span>
+            <span className="text-[11px] text-text-muted/70 font-heading">/ {modules.length * PERM_ACTIONS.length} permissions enabled</span>
           </div>
         </div>
 
@@ -274,11 +274,11 @@ function PermissionsPage() {
       <div className="flex items-center gap-6 text-[11px] font-heading text-text-muted/70 flex-wrap pt-2">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-[4px] border border-positive/30 bg-positive/[0.15] flex items-center justify-center"><Check size={9} strokeWidth={3} className="text-positive" /></div>
-          Permission granted
+          Allowed
         </div>
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-[4px] border border-white/[0.08] bg-transparent" />
-          Permission denied
+          Not allowed
         </div>
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-[4px] border border-cyan/25 bg-cyan/[0.1] flex items-center justify-center"><Check size={9} strokeWidth={3} className="text-cyan" /></div>
@@ -302,7 +302,7 @@ function PermissionsPage() {
               System Modules
             </p>
             <h2 className="text-[20px] font-bold tracking-[-0.022em] text-text leading-tight font-heading">
-              {moduleModal.mode === 'create' ? 'Create New Module' : 'Edit Module Configuration'}
+              {moduleModal.mode === 'create' ? 'Create Module' : 'Edit Module'}
             </h2>
           </div>
           <button
@@ -318,7 +318,7 @@ function PermissionsPage() {
         <form onSubmit={handleModalSubmit} className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           <div className="space-y-1.5">
             <label className="block text-[9.5px] font-black uppercase tracking-[0.14em] text-text-muted/50 font-heading">
-              Module Name / Label
+              Module Name
             </label>
             <input
               type="text"
@@ -334,13 +334,13 @@ function PermissionsPage() {
 
           <div className="space-y-1.5">
             <label className="block text-[9.5px] font-black uppercase tracking-[0.14em] text-text-muted/50 font-heading">
-              System Identifier (Slug / ID)
+              Module ID
             </label>
             <div className="flex h-9 items-center rounded-[8px] border border-white/[0.04] bg-bg/25 px-3 text-[12px] font-mono text-text-muted select-none">
               {moduleLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || '(Enter module name)'}
             </div>
             <span className="block text-[10.5px] text-text-muted/40 font-heading">
-              Used internally for API mapping and permission checks.
+              Used by the system for APIs and permission checks.
             </span>
           </div>
 
@@ -351,7 +351,7 @@ function PermissionsPage() {
             <textarea
               value={moduleDesc}
               onChange={(e) => setModuleDesc(e.target.value)}
-              placeholder="Describe what access this module governs..."
+              placeholder="Describe what this module controls..."
               rows={4}
               className="w-full resize-none rounded-[8px] border border-white/[0.1] bg-bg/40 px-3 py-2.5 text-[12.5px] text-text outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/10 transition-all leading-relaxed font-heading"
               maxLength={150}

@@ -26,7 +26,7 @@ const MAIN_SECTIONS = [
 
 const SECTION_TITLES = {
   overview: 'Platform Overview',
-  api: 'API Configuration',
+  api: 'API Settings',
   gateways: 'Payment Gateways',
   kyc: 'KYC Settings',
   trading: 'Trading Settings',

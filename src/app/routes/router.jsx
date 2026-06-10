@@ -61,9 +61,18 @@ import { WithdrawPage }          from '@/client/features/client-finance/pages/Wi
 import { PaymentMethodsPage }    from '@/client/features/client-finance/pages/PaymentMethodsPage';
 import { LimitsFeesPage }        from '@/client/features/client-finance/pages/LimitsFeesPage';
 import { ClientTransactionsPage } from '@/client/features/client-finance/pages/ClientTransactionsPage';
-import { SupportTicketsPage }   from '@/client/features/client-support/pages/SupportTicketsPage';
-import { NewTicketPage }        from '@/client/features/client-support/pages/NewTicketPage';
+import { SupportTicketsPage }    from '@/client/features/client-support/pages/SupportTicketsPage';
+import { NewTicketPage }         from '@/client/features/client-support/pages/NewTicketPage';
 import { ClientTicketDetailPage } from '@/client/features/client-support/pages/TicketDetailPage';
+import { SupportOverviewPage }   from '@/client/features/client-support/pages/SupportOverviewPage';
+import { CreateTicketPage }      from '@/client/features/client-support/pages/CreateTicketPage';
+import { KnowledgeBasePage }     from '@/client/features/client-support/pages/KnowledgeBasePage';
+import { AnnouncementsPage }     from '@/client/features/client-support/pages/AnnouncementsPage';
+import { LiveChatPage }          from '@/client/features/client-support/pages/LiveChatPage';
+import KycOverviewPage from '@/client/features/client-kyc/pages/KycOverviewPage';
+import KycUploadPage from '@/client/features/client-kyc/pages/KycUploadPage';
+import KycStatusPage from '@/client/features/client-kyc/pages/KycStatusPage';
+import KycHistoryPage from '@/client/features/client-kyc/pages/KycHistoryPage';
 
 /* ─────────────────────────────────────────────────────────
    ADMIN PAGE REGISTRY
@@ -201,11 +210,21 @@ export const appRouter = createHashRouter([
       { path: 'finance/payment-methods',   element: <PaymentMethodsPage /> },
       { path: 'finance/limits',            element: <LimitsFeesPage /> },
       { path: 'finance/transactions',      element: <ClientTransactionsPage /> },
+      { path: 'support',                 element: <Navigate to="/client/support/overview" replace /> },
+      { path: 'support/overview',         element: <SupportOverviewPage /> },
       { path: 'support/tickets',          element: <SupportTicketsPage /> },
       { path: 'support/tickets/new',      element: <NewTicketPage /> },
+      { path: 'support/create',           element: <CreateTicketPage /> },
       { path: 'support/tickets/:id',      element: <ClientTicketDetailPage /> },
-      // Support FAQ — redirect to tickets until FAQ page is built
-      { path: 'support/faq',             element: <Navigate to="/client/support/tickets" replace /> },
+      { path: 'support/kb',               element: <KnowledgeBasePage /> },
+      { path: 'support/announcements',    element: <AnnouncementsPage /> },
+      { path: 'support/chat',             element: <LiveChatPage /> },
+      { path: 'kyc',                      element: <KycOverviewPage /> },
+      { path: 'kyc/upload',               element: <KycUploadPage /> },
+      { path: 'kyc/status',               element: <KycStatusPage /> },
+      { path: 'kyc/history',              element: <KycHistoryPage /> },
+      // Support FAQ redirect → knowledge base
+      { path: 'support/faq',              element: <Navigate to="/client/support/kb" replace /> },
       // Stub routes for sidebar items not yet built (redirect to dashboard)
       { path: 'copy-trading',            element: <Navigate to="/client" replace /> },
       { path: 'prop-trading',            element: <Navigate to="/client" replace /> },

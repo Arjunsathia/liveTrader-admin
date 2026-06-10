@@ -135,13 +135,13 @@ function RolesPage() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5 font-heading">
-            Access Management
+            Admin Access
           </p>
           <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text font-heading">
             Roles
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg font-heading">
-            Manage system roles, permissions scope, and assigned users.
+            Manage roles, permissions, and assigned admins.
           </p>
         </div>
       </header>
@@ -212,7 +212,7 @@ function RolesPage() {
 
       {/* Also show as table */}
       <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
-        <TableToolbar title="Role Table View" count={roles.length} accentColor="var(--primary)" />
+        <TableToolbar title="Roles List" count={roles.length} accentColor="var(--primary)" />
         <MainTable 
           columns={cols} 
           data={roles} 
@@ -278,7 +278,7 @@ function RolesPage() {
             <textarea
               value={roleDesc}
               onChange={(e) => setRoleDesc(e.target.value)}
-              placeholder="Describe the scope and actions this role can perform..."
+              placeholder="Describe what this role can access and do..."
               rows={4}
               className="w-full resize-none rounded-[8px] border border-white/[0.1] bg-bg/40 px-3 py-2.5 text-[12.5px] text-text outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/10 transition-all leading-relaxed font-heading"
               maxLength={150}

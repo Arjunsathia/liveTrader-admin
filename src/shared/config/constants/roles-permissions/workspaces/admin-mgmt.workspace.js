@@ -16,44 +16,44 @@ export const adminUsers = [
 ];
 
 export const adminNotes = {
-  'ADM-001': 'Primary super-admin. Has full system access. Audited quarterly.',
+  'ADM-001': 'Main super admin. Has full access. Reviewed every quarter.',
   'ADM-007': 'Account locked after 5 failed 2FA attempts on 2024-07-29. Pending re-verification.',
   'ADM-008': 'New hire — awaiting IT onboarding and 2FA setup.',
 };
 
 export const rolesData = [
   {
-    id: 'ROLE-001', name: 'SUPER_ADMIN', label: 'Super Admin', desc: 'Full unrestricted access to all modules and system settings.',
+    id: 'ROLE-001', name: 'SUPER_ADMIN', label: 'Super Admin', desc: 'Full access to all modules and settings.',
     userCount: 1, scope: 'ALL_MODULES', status: 'ACTIVE', updated: '2024-01-15', color: '#e5c07b',
     modules: ['Dashboard', 'Users', 'Finance', 'Trading', 'Copy Trading', 'Prop Trading', 'IB System', 'Reports', 'Settings', 'Admin Mgmt'],
     actions: ['view', 'create', 'edit', 'approve', 'delete', 'export', 'assign'],
   },
   {
-    id: 'ROLE-002', name: 'RISK_OFFICER', label: 'Risk Officer', desc: 'Access to risk management, trading oversight, and compliance monitoring.',
+    id: 'ROLE-002', name: 'RISK_OFFICER', label: 'Risk Officer', desc: 'Access to risk, trading, and compliance tools.',
     userCount: 2, scope: 'RISK_MODULES', status: 'ACTIVE', updated: '2024-02-20', color: '#ef4444',
     modules: ['Dashboard', 'Users', 'Trading', 'Copy Trading', 'Prop Trading', 'Reports'],
     actions: ['view', 'edit', 'approve', 'export'],
   },
   {
-    id: 'ROLE-003', name: 'COMPLIANCE', label: 'Compliance', desc: 'KYC, AML, document review, and regulatory reporting access.',
+    id: 'ROLE-003', name: 'COMPLIANCE', label: 'Compliance', desc: 'Access to KYC, AML, document reviews, and reports.',
     userCount: 2, scope: 'COMPLIANCE_MODULES', status: 'ACTIVE', updated: '2024-03-10', color: '#a78bfa',
     modules: ['Dashboard', 'Users', 'Finance', 'Reports'],
     actions: ['view', 'create', 'edit', 'approve', 'export'],
   },
   {
-    id: 'ROLE-004', name: 'FINANCE', label: 'Finance', desc: 'Finance, payouts, commissions, and billing management.',
+    id: 'ROLE-004', name: 'FINANCE', label: 'Finance', desc: 'Access to payments, payouts, commissions, and billing.',
     userCount: 2, scope: 'FINANCE_MODULES', status: 'ACTIVE', updated: '2024-04-05', color: 'var(--brand)',
     modules: ['Dashboard', 'Finance', 'IB System', 'Reports'],
     actions: ['view', 'create', 'edit', 'approve', 'export'],
   },
   {
-    id: 'ROLE-005', name: 'SUPPORT', label: 'Support Agent', desc: 'User-facing support, ticket management, and basic account actions.',
+    id: 'ROLE-005', name: 'SUPPORT', label: 'Support Agent', desc: 'Access to support tickets and basic account actions.',
     userCount: 3, scope: 'SUPPORT_MODULES', status: 'ACTIVE', updated: '2024-05-18', color: 'var(--cyan)',
     modules: ['Dashboard', 'Users', 'Finance'],
     actions: ['view', 'create', 'edit'],
   },
   {
-    id: 'ROLE-006', name: 'READ_ONLY', label: 'Read Only', desc: 'View-only access to all non-sensitive modules. No write permissions.',
+    id: 'ROLE-006', name: 'READ_ONLY', label: 'Read Only', desc: 'Can view approved modules but cannot make changes.',
     userCount: 0, scope: 'VIEW_ONLY', status: 'DRAFT', updated: '2024-07-01', color: 'rgba(255,255,255,0.3)',
     modules: ['Dashboard', 'Reports'],
     actions: ['view', 'export'],
@@ -70,7 +70,7 @@ export const PERM_MODULES = [
   { id: 'ib_system', label: 'IB System', Icon: Network },
   { id: 'reports', label: 'Reports', Icon: FileText },
   { id: 'settings', label: 'Settings', Icon: Settings },
-  { id: 'admin_mgmt', label: 'Admin Mgmt', Icon: Shield },
+  { id: 'admin_mgmt', label: 'Admins & Access', Icon: Shield },
 ];
 
 export const PERM_ACTIONS = ['view', 'create', 'edit', 'approve', 'delete', 'export', 'assign'];

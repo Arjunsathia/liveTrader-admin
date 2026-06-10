@@ -1,6 +1,15 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronRight, ChevronUp, User, Lock, Bell, History, Key, ShieldCheck } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  User,
+  Lock,
+  Bell,
+  History,
+  Key,
+  ShieldCheck,
+} from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { adminNavigation, adminNavigationSections } from '@/shared/config/sidebar/admin-sidebar.config';
 import { hasPermission } from '@/shared/config/permissions/permissions';
@@ -72,11 +81,12 @@ function SidebarItem({
           }
         `}
       >
-        {/* Active left accent */}
+        {/* Active left accent bar */}
         <span
           className={`
-            absolute left-0 top-[20%] bottom-[20%] w-[2.5px] bg-primary rounded-r-full transition-all duration-200
-            ${(isActive && !collapsed) ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}
+            absolute left-0 top-[20%] bottom-[20%] w-[2.5px] bg-primary rounded-r-full
+            transition-all duration-200
+            ${isActive && !collapsed ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}
           `}
         />
 
@@ -94,11 +104,11 @@ function SidebarItem({
           <Icon size={16} strokeWidth={isActive ? 2.1 : 1.75} />
         </span>
 
-        {/* Label + chevron — transition opacity & width */}
+        {/* Label + chevron (hidden when collapsed) */}
         <span
           className={`
             flex-1 flex items-center justify-between min-w-0 transition-all duration-200
-            ${collapsed ? 'opacity-0 w-0 pointer-events-none' : 'opacity-100 w-auto'}
+            ${collapsed ? 'opacity-0 w-0 overflow-hidden pointer-events-none' : 'opacity-100 w-auto'}
           `}
         >
           <span
@@ -115,8 +125,9 @@ function SidebarItem({
               size={12}
               strokeWidth={2.5}
               className={`
-                ml-2 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                ${isExpanded ? 'rotate-180 text-primary' : 'text-text-muted/20'}
+                ml-2 shrink-0 transition-transform duration-300
+                ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                ${isExpanded ? 'rotate-180 text-primary' : 'rotate-0 text-text-muted/25'}
               `}
             />
           )}
@@ -126,20 +137,24 @@ function SidebarItem({
         <span
           className={`
             absolute right-1 top-1 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-200
-            ${(isActive && collapsed) ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}
+            ${isActive && collapsed ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}
           `}
         />
       </button>
 
-      {/* Sub-items (expanded sidebar only) */}
+      {/* Sub-items accordion (expanded sidebar only) */}
       {hasSubItems && (
         <div
-          className="grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="grid"
           style={{
-            gridTemplateRows: (isExpanded && !collapsed) ? '1fr' : '0fr',
-            opacity: (isExpanded && !collapsed) ? 1 : 0,
+            // Use explicit property names for reliable cross-browser transition
+            transition: 'grid-template-rows 280ms cubic-bezier(0.4,0,0.2,1), opacity 220ms ease',
+            gridTemplateRows: isExpanded && !collapsed ? '1fr' : '0fr',
+            opacity: isExpanded && !collapsed ? 1 : 0,
+            pointerEvents: isExpanded && !collapsed ? 'auto' : 'none',
           }}
         >
+          {/* overflow-hidden + min-h-0 is essential for grid accordion technique */}
           <div className="overflow-hidden min-h-0">
             <div className="relative ml-[30px] pt-1 pb-1.5 flex flex-col gap-px">
               {/* Vertical connector line */}
@@ -214,29 +229,35 @@ export function Sidebar({ collapsed, isMobile }) {
 
   const [profileMenuExpanded, setProfileMenuExpanded] = useState(false);
 
+  // Close profile submenu whenever the sidebar collapses
+  useEffect(() => {
+    if (collapsed) setProfileMenuExpanded(false);
+  }, [collapsed]);
+
   const profileSubTabs = useMemo(() => {
     const tabs = [
-      { id: 'overview', label: 'Overview', path: '/admin/account/overview', icon: ShieldCheck },
-      { id: 'profile', label: 'Profile Details', path: '/admin/account/profile', icon: User },
-      { id: 'security', label: 'Security & 2FA', path: '/admin/account/security', icon: Lock },
-      { id: 'notifications', label: 'Notifications', path: '/admin/account/notifications', icon: Bell },
-      { id: 'activity', label: 'Activity Log', path: '/admin/account/activity', icon: History },
+      { id: 'acct-overview', label: 'Overview', path: '/admin/account/overview', icon: ShieldCheck },
+      { id: 'acct-profile', label: 'Profile Details', path: '/admin/account/profile', icon: User },
+      { id: 'acct-security', label: 'Security & 2FA', path: '/admin/account/security', icon: Lock },
+      { id: 'acct-notifications', label: 'Notifications', path: '/admin/account/notifications', icon: Bell },
+      { id: 'acct-activity', label: 'Activity Log', path: '/admin/account/activity', icon: History },
     ];
     if (user?.role === 'super-admin' || user?.role === 'client') {
-      tabs.push({ id: 'api-keys', label: 'API Keys', path: '/admin/account/api-keys', icon: Key });
+      tabs.push({ id: 'acct-api-keys', label: 'API Keys', path: '/admin/account/api-keys', icon: Key });
     }
     return tabs;
   }, [user]);
 
+  // Prefixed profile item for the collapsed hover flyout
   const profileItem = useMemo(() => ({
     id: 'account',
     label: 'My Account',
     icon: User,
-    subItems: profileSubTabs.map(sub => ({
+    subItems: profileSubTabs.map((sub) => ({
       id: sub.id,
       label: sub.label,
-      path: sub.path
-    }))
+      path: sub.path,
+    })),
   }), [profileSubTabs]);
 
   const [hoverNode, setHoverNode] = useState(null);
@@ -246,7 +267,7 @@ export function Sidebar({ collapsed, isMobile }) {
   const hoverTimer = useRef(null);
   const navRef = useRef(null);
 
-  /* ── Allowed items ── */
+  /* ── Allowed nav items ── */
   const allowedItems = useMemo(
     () =>
       adminNavigation
@@ -258,7 +279,7 @@ export function Sidebar({ collapsed, isMobile }) {
     [permissions],
   );
 
-  /* ── Active ID resolution ── */
+  /* ── Active ID helpers ── */
   const getUsersActiveId = () => {
     if (location.pathname.includes('/admin/users/kyc') || location.state?.usersView === 'kyc') return 'users-kyc';
     if (location.pathname.includes('/admin/users/mt5') || location.state?.usersView === 'mt5') return 'users-mt5';
@@ -276,6 +297,11 @@ export function Sidebar({ collapsed, isMobile }) {
 
   const getActiveId = () => {
     const { pathname } = location;
+
+    // ── Check profile sub-items first so the flyout highlights them correctly ──
+    const profileSub = profileSubTabs.find((s) => s.path === pathname);
+    if (profileSub) return profileSub.id;
+
     if (pathname === '/admin' || pathname === '/admin/') return 'dashboard';
     if (location.state?.fromTrading && pathname.startsWith('/admin/users/mt5')) return 'trading-accounts';
 
@@ -306,41 +332,37 @@ export function Sidebar({ collapsed, isMobile }) {
   };
 
   const activeId = getActiveId();
+  const isAccountActive = location.pathname.startsWith('/admin/account');
 
   /* ── Expanded section ── */
-  const routeExpandedId = useMemo(
-    () => {
-      if (location.state?.fromTrading && location.pathname.startsWith('/admin/users/mt5')) return 'trading';
+  const routeExpandedId = useMemo(() => {
+    if (location.state?.fromTrading && location.pathname.startsWith('/admin/users/mt5')) return 'trading';
+    return allowedItems.find(
+      (item) =>
+        item.path === location.pathname ||
+        item.subItems?.some((s) => s.path === location.pathname) ||
+        (location.pathname.startsWith('/admin/users/') && item.id === 'users') ||
+        (location.pathname.startsWith('/admin/finance/') && item.id === 'finance') ||
+        (location.pathname.startsWith('/admin/trading/') && item.id === 'trading') ||
+        (location.pathname.startsWith('/admin/copy-trading/') && item.id === 'copy-trading') ||
+        (location.pathname.startsWith('/admin/support/') && item.id === 'support'),
+    )?.id ?? null;
+  }, [allowedItems, location.pathname, location.state]);
 
-      return allowedItems.find(
-        (item) =>
-          item.path === location.pathname ||
-          item.subItems?.some((s) => s.path === location.pathname) ||
-          (location.pathname.startsWith('/admin/users/') && item.id === 'users') ||
-          (location.pathname.startsWith('/admin/finance/') && item.id === 'finance') ||
-          (location.pathname.startsWith('/admin/trading/') && item.id === 'trading') ||
-          (location.pathname.startsWith('/admin/copy-trading/') && item.id === 'copy-trading') ||
-          (location.pathname.startsWith('/admin/support/') && item.id === 'support'),
-      )?.id ?? null;
-    },
-    [allowedItems, location.pathname, location.state],
-  );
-
-  const expandedId =
-    manualExpandedPath === location.pathname ? manualExpandedId : routeExpandedId;
+  const expandedId = manualExpandedPath === location.pathname ? manualExpandedId : routeExpandedId;
 
   const toggleExpand = (id) => {
     setManualExpandedPath(location.pathname);
     setManualExpandedId(expandedId === id ? null : id);
   };
 
-  /* ── Auto-scroll to active ── */
+  /* ── Auto-scroll active item into view ── */
   useEffect(() => {
     if (activeId && !collapsed && navRef.current) {
       const activeEl = navRef.current.querySelector('[data-active="true"]');
       if (activeEl) {
-        const timer = setTimeout(() => activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 150);
-        return () => clearTimeout(timer);
+        const t = setTimeout(() => activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 150);
+        return () => clearTimeout(t);
       }
     }
   }, [activeId, collapsed, expandedId]);
@@ -357,7 +379,7 @@ export function Sidebar({ collapsed, isMobile }) {
     hoverTimer.current = window.setTimeout(() => setHoverNode(null), 220);
   };
 
-  /* ── Grouped nav ── */
+  /* ── Grouped nav sections ── */
   const groupedItems = useMemo(
     () =>
       adminNavigationSections.map((section) => ({
@@ -377,23 +399,29 @@ export function Sidebar({ collapsed, isMobile }) {
       style={{
         width: sidebarWidth,
         left: sidebarLeft,
-        transition: 'all 0.38s cubic-bezier(0.16,1,0.3,1)',
+        transition: 'width 0.38s cubic-bezier(0.16,1,0.3,1), left 0.38s cubic-bezier(0.16,1,0.3,1)',
         backgroundColor: 'var(--surface-2)',
         borderRight: '1px solid var(--border)',
       }}
     >
+      {/* Flyout keyframe — defined once per render, no perf impact */}
+      <style>{`
+        @keyframes sideTooltip {
+          from { opacity: 0; transform: translateX(-6px) scale(0.97); }
+          to   { opacity: 1; transform: translateX(0)   scale(1);    }
+        }
+      `}</style>
 
       {/* ══════════════════════════════════════
           LOGO HEADER
       ══════════════════════════════════════ */}
       <div
         className={`
-          relative flex items-center shrink-0 h-16 transition-all duration-400
+          relative flex items-center shrink-0 h-16 transition-all duration-300
           ${collapsed ? 'justify-center px-0' : 'px-4 gap-3'}
         `}
         style={{ borderBottom: '1px solid var(--border)' }}
       >
-        {/* Logo mark */}
         <button
           onClick={() => navigate('/admin')}
           className="relative shrink-0 w-8 h-8 rounded-[9px] flex items-center justify-center bg-primary cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
@@ -407,9 +435,8 @@ export function Sidebar({ collapsed, isMobile }) {
           </svg>
         </button>
 
-        {/* Wordmark */}
         {!collapsed && (
-          <div className="flex flex-col gap-0.5 overflow-hidden animate-in fade-in slide-in-from-left-2 duration-250">
+          <div className="flex flex-col gap-0.5 overflow-hidden animate-in fade-in slide-in-from-left-2 duration-200">
             <div className="flex items-center gap-1.5 leading-none">
               <span className="font-heading font-bold text-[16px] tracking-[-0.05em] text-text">
                 LiveTrade<span className="text-primary">.</span>
@@ -463,7 +490,7 @@ export function Sidebar({ collapsed, isMobile }) {
       </nav>
 
       {/* ══════════════════════════════════════
-          COLLAPSED HOVER PORTAL
+          COLLAPSED HOVER FLYOUT (portal)
       ══════════════════════════════════════ */}
       {collapsed && hoverNode &&
         createPortal(
@@ -485,10 +512,7 @@ export function Sidebar({ collapsed, isMobile }) {
                 absolute left-0 w-2 h-2 rotate-45 -translate-x-[5px] border-l border-b
                 ${hoverNode.rect.top > window.innerHeight - 300 ? 'bottom-[14px]' : 'top-[14px]'}
               `}
-              style={{
-                backgroundColor: 'var(--surface-2)',
-                borderColor: 'var(--border)',
-              }}
+              style={{ backgroundColor: 'var(--surface-2)', borderColor: 'var(--border)' }}
             />
 
             {/* Flyout panel */}
@@ -501,7 +525,7 @@ export function Sidebar({ collapsed, isMobile }) {
                 animation: 'sideTooltip 0.17s cubic-bezier(0.16,1,0.3,1)',
               }}
             >
-              {/* Flyout header */}
+              {/* Header */}
               <div
                 className="flex items-center gap-2.5 px-3.5 py-3"
                 style={{ borderBottom: '1px solid var(--border)' }}
@@ -514,39 +538,45 @@ export function Sidebar({ collapsed, isMobile }) {
                     <hoverNode.item.icon size={13} strokeWidth={2} />
                   </span>
                 )}
-                <span className="text-[14.0px] font-heading font-semibold tracking-[-0.025em] text-text leading-none">
+                <span className="text-[14px] font-heading font-semibold tracking-[-0.025em] text-text leading-none">
                   {hoverNode.item.label}
                 </span>
               </div>
 
-              {/* Flyout links */}
+              {/* Links */}
               <div className="p-1.5">
                 {hoverNode.item.subItems?.length > 0 ? (
-                  hoverNode.item.subItems.map((sub) => (
-                    <button
-                      key={sub.id}
-                      onClick={() => { navigate(sub.path); setHoverNode(null); }}
-                      className={`
-                        w-full flex items-center gap-2 px-3 py-2 rounded-[7px]
-                        text-[13.5px] font-heading font-medium tracking-[-0.01em]
-                        transition-all duration-130 cursor-pointer outline-none text-left
-                        ${activeId === sub.id
-                          ? 'bg-primary/[0.10] text-primary'
-                          : 'text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80'
-                        }
-                      `}
-                    >
-                      {activeId === sub.id
-                        ? <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                        : <span className="w-1.5 h-1.5 rounded-full bg-border/30 shrink-0" />
-                      }
-                      {sub.label}
-                    </button>
-                  ))
+                  hoverNode.item.subItems.map((sub) => {
+                    // Support both regular nav IDs and profile path-based matching
+                    const isSubActive = activeId === sub.id || location.pathname === sub.path;
+                    return (
+                      <button
+                        key={sub.id}
+                        onClick={() => { navigate(sub.path); setHoverNode(null); }}
+                        className={`
+                          w-full flex items-center gap-2 px-3 py-2 rounded-[7px]
+                          text-[13.5px] font-heading font-medium tracking-[-0.01em]
+                          transition-all duration-150 cursor-pointer outline-none text-left
+                          ${isSubActive
+                            ? 'bg-primary/[0.10] text-primary'
+                            : 'text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80'
+                          }
+                        `}
+                      >
+                        <span
+                          className={`
+                            w-1.5 h-1.5 rounded-full shrink-0
+                            ${isSubActive ? 'bg-primary' : 'bg-border/30'}
+                          `}
+                        />
+                        {sub.label}
+                      </button>
+                    );
+                  })
                 ) : (
                   <button
                     onClick={() => { navigate(hoverNode.item.path); setHoverNode(null); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80 transition-all duration-130 cursor-pointer outline-none text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80 transition-all duration-150 cursor-pointer outline-none text-left"
                   >
                     <ChevronRight size={11} strokeWidth={2.5} className="text-primary/50 shrink-0" />
                     Open {hoverNode.item.label}
@@ -558,23 +588,32 @@ export function Sidebar({ collapsed, isMobile }) {
           document.body,
         )
       }
-      {/* Sticky Bottom My Account Profile Card */}
+
+      {/* ══════════════════════════════════════
+          STICKY BOTTOM — PROFILE CARD
+      ══════════════════════════════════════ */}
       <div
-        className="shrink-0 p-3 border-t bg-surface-elevated flex flex-col gap-1.5"
+        className="shrink-0 px-3 pt-2 pb-3 border-t flex flex-col gap-1"
         style={{
           borderColor: 'var(--border)',
+          backgroundColor: 'var(--surface-2)',
         }}
       >
-        {/* Accordion Submenu (Slides Upward) */}
+        {/* ── Profile submenu accordion (expands upward) ── */}
         <div
-          className="grid transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{
+            transition: 'grid-template-rows 280ms cubic-bezier(0.4,0,0.2,1), opacity 220ms ease',
+            display: 'grid',
             gridTemplateRows: showSubMenu ? '1fr' : '0fr',
             opacity: showSubMenu ? 1 : 0,
+            pointerEvents: showSubMenu ? 'auto' : 'none',
           }}
         >
           <div className="overflow-hidden min-h-0">
-            <div className="flex flex-col gap-0.5 pb-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <div
+              className="flex flex-col gap-px pb-2 mb-1 border-b"
+              style={{ borderColor: 'var(--border)' }}
+            >
               {profileSubTabs.map((sub) => {
                 const isSubActive = location.pathname === sub.path;
                 const SubIcon = sub.icon;
@@ -583,17 +622,24 @@ export function Sidebar({ collapsed, isMobile }) {
                     key={sub.id}
                     onClick={() => navigate(sub.path)}
                     className={`
-                      w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px]
+                      w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[7px]
                       text-[13px] font-heading font-medium tracking-[-0.01em] min-w-0
                       outline-none cursor-pointer transition-all duration-150 text-left
                       ${isSubActive
-                        ? 'bg-primary/[0.08] text-primary font-bold'
-                        : 'text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80'
+                        ? 'bg-primary/[0.08] text-primary'
+                        : 'text-text-muted/50 hover:bg-text/[0.04] hover:text-text/80'
                       }
                     `}
                   >
-                    <SubIcon size={12} className={isSubActive ? 'text-primary' : 'text-text-muted/30'} />
-                    <span className="truncate">{sub.label}</span>
+                    <SubIcon
+                      size={12}
+                      strokeWidth={isSubActive ? 2.2 : 1.75}
+                      className={`shrink-0 ${isSubActive ? 'text-primary' : 'text-text-muted/30'}`}
+                    />
+                    <span className="truncate flex-1">{sub.label}</span>
+                    {isSubActive && (
+                      <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
+                    )}
                   </button>
                 );
               })}
@@ -601,61 +647,74 @@ export function Sidebar({ collapsed, isMobile }) {
           </div>
         </div>
 
+        {/* ── Profile button ── */}
         <button
           onClick={() => {
             if (collapsed) {
               navigate('/admin/account/overview');
             } else {
-              setProfileMenuExpanded(!profileMenuExpanded);
+              setProfileMenuExpanded((prev) => !prev);
             }
           }}
           onMouseEnter={(e) => {
             if (collapsed) {
-              const rect = e.currentTarget.getBoundingClientRect();
-              handleHoverStart(profileItem, rect);
+              handleHoverStart(profileItem, e.currentTarget.getBoundingClientRect());
             }
           }}
           onMouseLeave={handleHoverEnd}
           className={`
-            flex items-center w-full rounded-[8px] transition-all duration-200 cursor-pointer outline-none text-left
-            ${collapsed ? 'justify-center p-1.5 gap-0' : 'p-2 hover:bg-text/[0.04] gap-3'}
-            ${location.pathname.startsWith('/admin/account') || (collapsed && hoverNode?.item.id === 'account') ? 'bg-primary/[0.08] text-primary font-bold' : 'text-text-muted/65'}
+            flex items-center w-full rounded-[8px] transition-all duration-200 cursor-pointer outline-none
+            ${collapsed ? 'justify-center p-2' : 'p-2 gap-3 hover:bg-text/[0.04]'}
+            ${isAccountActive || (collapsed && hoverNode?.item.id === 'account')
+              ? 'bg-primary/[0.08]'
+              : ''
+            }
           `}
         >
-          {/* Initials Avatar */}
+          {/* Initials avatar */}
           <div
             className={`
-              w-7.5 h-7.5 rounded-[7px] flex items-center justify-center font-heading font-black text-[10px] tracking-tight shrink-0 transition-all
-              ${location.pathname.startsWith('/admin/account')
+              rounded-[7px] flex items-center justify-center
+              font-heading font-black text-[10px] tracking-tight shrink-0 transition-all duration-200
+              ${isAccountActive
                 ? 'bg-primary text-bg'
                 : 'bg-primary/[0.12] text-primary border border-primary/20'
               }
             `}
+            style={{ width: '1.875rem', height: '1.875rem' }}   /* 30px — between w-7 and w-8 */
           >
             {user?.initials ?? 'U'}
           </div>
 
-          {/* Expanded text info & Chevron toggle */}
-          <div
-            className={`flex-1 flex flex-col items-start gap-0.5 text-left min-w-0 transition-all duration-200
-              ${collapsed ? 'opacity-0 w-0 pointer-events-none' : 'opacity-100 w-auto'}
-            `}
-          >
-            <span className="text-[12.5px] font-heading font-bold text-text truncate w-full leading-tight">
-              {user?.name ?? 'User'}
-            </span>
-            <span className="text-[9px] font-black uppercase tracking-[0.1em] text-text-muted/45 leading-none truncate w-full">
-              {user?.role === 'super-admin' ? 'Super Admin' : (user?.role === 'operations' ? 'Operations' : 'Auditor')}
-            </span>
-          </div>
+          {/* Name + role label (hidden when collapsed) */}
+          {!collapsed && (
+            <div className="flex-1 flex flex-col items-start gap-0.5 min-w-0 overflow-hidden">
+              <span className="text-[12.5px] font-heading font-bold text-text truncate w-full leading-tight">
+                {user?.name ?? 'User'}
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-[0.1em] text-text-muted/45 leading-none truncate w-full">
+                {user?.role === 'super-admin'
+                  ? 'Super Admin'
+                  : user?.role === 'operations'
+                    ? 'Operations'
+                    : 'Auditor'}
+              </span>
+            </div>
+          )}
 
-          <div
-            className={`w-6.5 h-6.5 flex items-center justify-center text-text-muted/40 shrink-0 transition-all duration-200
-              ${collapsed ? 'opacity-0 w-0 pointer-events-none' : 'opacity-100 w-auto'}
-            `}
-          >
-            <ChevronUp size={13} className={`transition-transform duration-350 ${profileMenuExpanded ? 'rotate-180 text-primary' : 'rotate-0'}`} />
-          </div>
+          {/* Chevron toggle (visible only when expanded) */}
+          {!collapsed && (
+            <div className="w-5 h-5 flex items-center justify-center shrink-0">
+              <ChevronDown
+                size={13}
+                strokeWidth={2.5}
+                className={`
+                  transition-transform duration-300
+                  ${profileMenuExpanded ? 'rotate-180 text-primary' : 'rotate-0 text-text-muted/35'}
+                `}
+              />
+            </div>
+          )}
         </button>
       </div>
 

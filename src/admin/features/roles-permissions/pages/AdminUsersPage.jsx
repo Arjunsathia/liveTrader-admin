@@ -73,7 +73,7 @@ function AdminUsersPage() {
           twoFA: admin2FA,
           region: adminRegion
         });
-        act('Admin user added successfully', adminName.trim());
+        act('Admin added', adminName.trim());
       } else {
         updateAdmin(adminForm.adminData.id, {
           name: adminName.trim(),
@@ -88,7 +88,7 @@ function AdminUsersPage() {
       }
       setAdminForm({ isOpen: false, mode: 'create', adminData: null });
     } catch (err) {
-      setFormError(err.message || 'An error occurred.');
+      setFormError(err.message || 'Something went wrong.');
     }
   };
 
@@ -111,7 +111,7 @@ function AdminUsersPage() {
     { label: 'Total Admins', value: adminUsers.length, Icon: Users, accent: 'var(--cyan)', sub: 'All admin accounts' },
     { label: 'Active', value: adminUsers.filter(r => r.status === 'ACTIVE').length, Icon: UserCheck, accent: 'var(--positive)', sub: 'Currently active' },
     { label: 'Locked', value: adminUsers.filter(r => r.locked).length, Icon: Lock, accent: 'var(--negative)', sub: 'Require unlock' },
-    { label: 'Pending Access', value: adminUsers.filter(r => r.status === 'PENDING').length, Icon: Clock, accent: 'var(--warning)', sub: 'Awaiting onboard' },
+    { label: 'Pending Access', value: adminUsers.filter(r => r.status === 'PENDING').length, Icon: Clock, accent: 'var(--warning)', sub: 'Waiting to join' },
     { label: '2FA Enabled', value: adminUsers.filter(r => r.twoFA).length, Icon: Fingerprint, accent: 'var(--positive)', sub: adminUsers.length > 0 ? `${Math.round(adminUsers.filter(r => r.twoFA).length / adminUsers.length * 100)}% coverage` : '0% coverage' },
     { label: 'Without 2FA', value: adminUsers.filter(r => !r.twoFA).length, Icon: ShieldOff, accent: 'var(--negative)', sub: 'Security risk' },
   ];
@@ -152,13 +152,13 @@ function AdminUsersPage() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted/70 mb-1.5 font-heading">
-            Access Management
+            Admin Access
           </p>
           <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text font-heading">
             Admin Users
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg font-heading">
-            Manage admin accounts, their roles, and system access.
+            Manage admins, roles, and access.
           </p>
         </div>
       </header>
@@ -168,14 +168,14 @@ function AdminUsersPage() {
         <div className="flex items-start gap-3 rounded-[12px] border border-warning/20 bg-warning/[0.05] px-4 py-3 shadow-sm">
           <ShieldOff size={14} className="text-warning flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <div className="text-[13px] font-bold text-warning font-heading">2FA Not Enabled on {adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length} Active Admin{adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length > 1 ? 's' : ''}</div>
-            <div className="text-[12px] text-warning/80 font-heading mt-1">Enforce 2FA for all admin accounts to comply with security policy.</div>
+            <div className="text-[13px] font-bold text-warning font-heading">{adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length} Active Admin{adminUsers.filter(r => !r.twoFA && r.status === 'ACTIVE').length > 1 ? 's' : ''} Without 2FA</div>
+            <div className="text-[12px] text-warning/80 font-heading mt-1">Require 2FA to keep admin accounts secure.</div>
           </div>
           <button onClick={() => {
             adminUsers.filter(r => !r.twoFA).forEach(adm => updateAdmin(adm.id, { twoFA: true }));
             act('2FA enforced for all admins');
           }} className="ml-auto flex-shrink-0 flex items-center gap-1.5 h-7 px-3 rounded-[7px] text-[11.5px] font-semibold font-heading border border-warning/25 bg-warning/[0.08] text-warning cursor-pointer hover:brightness-110">
-            <Zap size={10} /> Enforce All
+            <Zap size={10} /> Require for All
           </button>
         </div>
       )}
@@ -192,7 +192,7 @@ function AdminUsersPage() {
 
       <section className="rounded-[12px] border border-border/20 bg-surface-elevated shadow-card-subtle overflow-hidden">
         <TableToolbar
-          title="Admin Directory"
+          title="Admins"
           count={filtered.length}
           accentColor="var(--cyan)"
           search={search}
@@ -263,7 +263,7 @@ function AdminUsersPage() {
               User Directory
             </p>
             <h2 className="text-[20px] font-bold tracking-[-0.022em] text-text leading-tight font-heading">
-              {adminForm.mode === 'create' ? 'Register New Admin' : 'Edit Admin Profile'}
+              {adminForm.mode === 'create' ? 'Add Admin' : 'Edit Admin'}
             </h2>
           </div>
           <button
@@ -307,7 +307,7 @@ function AdminUsersPage() {
 
           <div className="space-y-1.5">
             <label className="block text-[9.5px] font-black uppercase tracking-[0.14em] text-text-muted/50 font-heading">
-              Assigned Role
+              Role
             </label>
             <select
               value={adminRole}
@@ -339,7 +339,7 @@ function AdminUsersPage() {
 
             <div className="space-y-1.5">
               <label className="block text-[9.5px] font-black uppercase tracking-[0.14em] text-text-muted/50 font-heading">
-                Region / Code
+                Region Code
               </label>
               <input
                 type="text"
@@ -355,8 +355,8 @@ function AdminUsersPage() {
 
           <div className="pt-2 flex items-center justify-between rounded-[9px] border border-white/[0.04] bg-bg/10 p-3">
             <div>
-              <div className="text-[12.5px] font-bold text-text font-heading">Enforce 2-Factor Authentication</div>
-              <div className="text-[11.5px] text-text-muted/60 font-heading mt-0.5">Require 2FA authentication on user logins.</div>
+              <div className="text-[12.5px] font-bold text-text font-heading">Require 2FA</div>
+              <div className="text-[11.5px] text-text-muted/60 font-heading mt-0.5">Ask for a second code at sign-in.</div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer select-none">
               <input 

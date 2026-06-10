@@ -22,12 +22,12 @@ export const AML_PROVIDERS = ['REFINITIV', 'COMPLYADVANTAGE', 'LexisNexis', 'MAN
 export const RISK_TOLERANCE_OPTIONS = [
   { label: 'Low (Strict)', value: 'LOW' },
   { label: 'Medium (Default)', value: 'MEDIUM' },
-  { label: 'High (Permissive)', value: 'HIGH' },
+  { label: 'High (Flexible)', value: 'HIGH' },
 ];
 
 export const KYC_TIERS_LIST = [
   { level: 'Tier 1: Basic', desc: 'Email and phone verification only', requirements: ['Email OTP', 'Phone verification'], limits: 'Max $1,000 deposits' },
-  { level: 'Tier 2: Standard', desc: 'Goverment-issued photo ID verification', requirements: ['Passport / National ID', 'Driving License'], limits: 'Max $10,000 deposits' },
-  { level: 'Tier 3: Advanced', desc: 'Proof of address and active selfie check', requirements: ['Utility Bill / Bank Statement', 'Liveness Selfie'], limits: 'Max $100,000 deposits' },
-  { level: 'Tier 4: VIP', desc: 'Enhanced due diligence with source of wealth', requirements: ['Source of Funds Proof', 'Manual compliance audit'], limits: 'Unlimited deposits / withdrawals' },
+  { level: 'Tier 2: Standard', desc: 'Government photo ID check', requirements: ['Passport / National ID', 'Driving License'], limits: 'Max $10,000 deposits' },
+  { level: 'Tier 3: Advanced', desc: 'Address proof and live selfie check', requirements: ['Utility Bill / Bank Statement', 'Live Selfie'], limits: 'Max $100,000 deposits' },
+  { level: 'Tier 4: VIP', desc: 'Full review with source of wealth', requirements: ['Source of Funds Proof', 'Manual compliance review'], limits: 'Unlimited deposits / withdrawals' },
 ];

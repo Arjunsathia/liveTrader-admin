@@ -75,7 +75,7 @@ export function PaymentGatewayPage({
     <div className="space-y-5.5">
       <SettingsSection
         title="Payment Gateways"
-        desc="Set up payment processors, crypto rails, bank transfers, and fee rules."
+        desc="Manage payment services, bank transfers, and fees."
       />
 
       <SettingsTabs tabs={tabs} active={activeTab} setActive={setActiveTab} />
@@ -269,7 +269,7 @@ export function PaymentGatewayPage({
                 />
               </div>
               <div>
-                <FieldLabel hint="How long before withdrawals are settled">Settlement Window</FieldLabel>
+                <FieldLabel hint="How long withdrawals take">Withdrawal Time</FieldLabel>
                 <TSelect
                   value={globalFees.processingDelay}
                   onChange={(v) => updateGlobalFeesField('processingDelay', v)}

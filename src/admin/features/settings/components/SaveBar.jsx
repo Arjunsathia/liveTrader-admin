@@ -38,12 +38,12 @@ export function SaveBar({ onSave, onReset, isDirty, label = 'Save Changes', extr
         {isDirty ? (
           <>
             <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-            <span className="text-brand font-bold tracking-tight">Unsaved changes pending</span>
+            <span className="text-brand font-bold tracking-tight">Unsaved changes</span>
           </>
         ) : (
           <>
             <CheckCircle2 size={13} className="text-positive" />
-            <span className="text-text-muted/40 font-semibold">All parameters synced</span>
+            <span className="text-text-muted/40 font-semibold">All changes saved</span>
           </>
         )}
       </div>

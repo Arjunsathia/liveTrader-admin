@@ -1,142 +1,131 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Send, User, Clock } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { useTicket } from '../hooks/useTickets';
+import { TicketStatusBadge } from '../components/TicketStatusBadge';
+import { PriorityBadge } from '../components/PriorityBadge';
+import { TicketTimeline } from '../components/TicketTimeline';
+import { TicketComposer } from '../components/TicketComposer';
+import { TICKET_META_FIELDS } from '../configs/ticketDetail.config';
+import { PageShell } from '@/shared/components/layout/PageShell';
 
-const MOCK_THREAD = [
-  { id: 'm1', author: 'John Doe',       role: 'client', time: 'Jun 2, 2026 · 10:14 AM', body: 'Hi, my withdrawal has been pending for 3 days now. Transaction ID: WD-2026-0482. Could you please look into this?' },
-  { id: 'm2', author: 'Support Agent',  role: 'agent',  time: 'Jun 2, 2026 · 11:30 AM', body: 'Hi John! Thank you for reaching out. We\'ve located your withdrawal request WD-2026-0482 and have escalated it to our finance team. You should receive an update within 24 hours. We apologize for the delay.' },
-  { id: 'm3', author: 'John Doe',       role: 'client', time: 'Jun 2, 2026 · 12:00 PM', body: 'Thank you for the quick response! I\'ll wait for the update.' },
-];
-
-export function ClientTicketDetailPage() {
+export function TicketDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [reply, setReply] = useState('');
-  const [messages, setMessages] = useState(MOCK_THREAD);
+  const { ticket, messages, loading, error, sendMessage } = useTicket(id);
+  const bottomRef = useRef();
 
-  const handleSend = () => {
-    if (!reply.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      {
-        id:     `m${Date.now()}`,
-        author: 'You',
-        role:   'client',
-        time:   'Just now',
-        body:   reply.trim(),
-      },
-    ]);
-    setReply('');
-  };
+  /* Auto-scroll to bottom on new messages */
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  return (
-    <div className="space-y-5 animate-fade-up max-w-[720px]">
-      {/* Header */}
-      <div className="flex items-center gap-3">
+  if (loading) {
+    return (
+      <PageShell className="max-w-[1100px] mx-auto space-y-4 animate-pulse">
+        <div className="h-4 w-32 bg-muted-surface rounded-full" />
+        <div className="h-10 w-56 bg-muted-surface rounded-[9px]" />
+        <div className="h-[500px] bg-surface-elevated rounded-[16px]" />
+      </PageShell>
+    );
+  }
+
+  if (error || !ticket) {
+    return (
+      <PageShell className="max-w-[1100px] mx-auto text-center py-16">
+        <p className="text-[14px] font-bold mb-2">Ticket not found</p>
+        <p className="text-[12.5px] text-text-muted mb-5">We could not load this ticket.</p>
         <button
           onClick={() => navigate('/client/support/tickets')}
-          className="w-8 h-8 rounded-[8px] flex items-center justify-center transition-all duration-150 cursor-pointer hover:bg-white/[0.04]"
-          style={{ color: 'var(--text-muted)', border: '1px solid var(--border)' }}
+          className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12px] font-bold hover:opacity-90 transition-opacity cursor-pointer"
         >
-          <ArrowLeft size={14} strokeWidth={2} />
+          Back to tickets
         </button>
-        <div>
-          <p className="text-[10.5px] font-black uppercase tracking-[0.2em] text-text-muted/40">Ticket {id}</p>
-          <h1 className="font-heading font-bold text-[18px] tracking-[-0.03em] text-text">Withdrawal delayed for 3 days</h1>
-        </div>
-      </div>
+      </PageShell>
+    );
+  }
 
-      {/* Status bar */}
-      <div
-        className="rounded-[11px] px-4 py-3 flex items-center gap-4 flex-wrap"
-        style={{ background: 'var(--muted-surface)', border: '1px solid var(--border)' }}
+  const metaValues = { id: ticket.id, category: ticket.category, priority: ticket.priority, status: ticket.status, created: ticket.created, updated: ticket.updated };
+
+  return (
+    <PageShell className="space-y-5 max-w-[1100px] w-full mx-auto">
+      {/* Back */}
+      <button
+        onClick={() => navigate('/client/support/tickets')}
+        className="flex items-center gap-2 text-[11.5px] font-bold text-text-muted hover:text-text transition-colors self-start cursor-pointer"
       >
-        {[
-          { label: 'Status',   value: 'Open',    color: 'negative' },
-          { label: 'Priority', value: 'High',    color: 'negative' },
-          { label: 'Opened',   value: 'Jun 2, 2026' },
-          { label: 'Category', value: 'Withdrawals' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.12em] text-text-muted/40">{label}</span>
-            <span
-              className="text-[11px] font-bold px-2 py-0.5 rounded-[5px]"
-              style={color
-                ? { background: `color-mix(in srgb, var(--${color}) 10%, transparent)`, color: `var(--${color})` }
-                : { color: 'var(--text)', fontWeight: 600 }}
-            >
-              {value}
-            </span>
-          </div>
-        ))}
+        <ArrowLeft size={13} /> All tickets
+      </button>
+
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <span className="font-mono text-[11px] font-bold text-text-muted/60">{ticket.id}</span>
+          <h1 className="font-heading font-semibold text-[22px] tracking-[-0.03em] text-text mt-1">
+            {ticket.subject}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <PriorityBadge priority={ticket.priority} />
+          <TicketStatusBadge status={ticket.status} />
+        </div>
       </div>
 
-      {/* Message thread */}
-      <div className="rounded-[14px] overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div className="flex flex-col gap-0">
-          {messages.map((msg, i) => {
-            const isAgent = msg.role === 'agent';
-            return (
-              <div
-                key={msg.id}
-                className="px-5 py-4"
-                style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border)', background: isAgent ? 'color-mix(in srgb, var(--brand) 3%, var(--surface))' : 'transparent' }}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-5 items-start">
+        {/* Conversation thread */}
+        <div className="rounded-[16px] border border-border/35 bg-surface-elevated overflow-hidden shadow-sm">
+          <div className="px-5 py-3.5 border-b border-border/20 bg-muted-surface/10">
+            <p className="text-[11px] font-black uppercase tracking-[0.12em] text-text-muted">
+              Conversation · {messages.length} messages
+            </p>
+          </div>
+
+          <div className="max-h-[480px] overflow-y-auto custom-scrollbar">
+            <TicketTimeline messages={messages} />
+            <div ref={bottomRef} />
+          </div>
+
+          {ticket.status !== 'RESOLVED' && (
+            <TicketComposer onSend={sendMessage} disabled={ticket.status === 'CLOSED'} />
+          )}
+
+          {ticket.status === 'RESOLVED' && (
+            <div className="px-5 py-4 border-t border-border/20 bg-positive/[0.03] text-center animate-fade-in">
+              <p className="text-[12.5px] text-positive font-bold">This ticket is resolved.</p>
+              <button
+                onClick={() => navigate('/client/support/create')}
+                className="mt-1.5 text-[12.5px] font-bold text-brand hover:opacity-75 transition-opacity cursor-pointer"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shrink-0"
-                    style={{
-                      background: isAgent ? 'color-mix(in srgb, var(--brand) 15%, transparent)' : 'color-mix(in srgb, var(--cyan) 12%, transparent)',
-                      color:      isAgent ? 'var(--brand)' : 'var(--cyan)',
-                    }}
-                  >
-                    {isAgent ? 'S' : <User size={12} strokeWidth={2} />}
-                  </div>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-[13px] font-semibold text-text truncate">{msg.author}</span>
-                    {isAgent && (
-                      <span
-                        className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded-[4px] shrink-0"
-                        style={{ background: 'color-mix(in srgb, var(--brand) 10%, transparent)', color: 'var(--brand)' }}
-                      >
-                        Support
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1 text-[11px] text-text-muted/40 shrink-0">
-                      <Clock size={10} /> {msg.time}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-[13.5px] leading-relaxed text-text-muted/80 ml-10">{msg.body}</p>
-              </div>
-            );
-          })}
+                Open a new ticket →
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Reply input */}
-        <div className="px-5 py-4" style={{ borderTop: '1px solid var(--border)', background: 'var(--muted-surface)' }}>
-          <div className="flex gap-3">
-            <textarea
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && e.ctrlKey) handleSend(); }}
-              placeholder="Write a reply… (Ctrl+Enter to send)"
-              rows={3}
-              className="flex-1 px-3.5 py-2.5 rounded-[9px] text-[13.5px] outline-none transition-all duration-200 resize-none"
-              style={{ background: 'var(--surface)', border: '1px solid rgba(173,198,255,0.08)', color: 'var(--text)', caretColor: 'var(--brand)' }}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!reply.trim()}
-              className="w-11 h-11 rounded-[9px] flex items-center justify-center self-end transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-              style={{ background: 'var(--brand)', color: 'var(--text-on-accent)' }}
-              aria-label="Send reply"
-            >
-              <Send size={16} strokeWidth={2.2} />
-            </button>
-          </div>
+        {/* Meta sidebar */}
+        <div className="rounded-[14px] border border-border/35 bg-surface-elevated p-5 space-y-4 shadow-sm">
+          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-text-muted/65">Ticket info</p>
+          {TICKET_META_FIELDS.map((f) => (
+            <div key={f.key} className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-text-muted/50">{f.label}</p>
+              {f.key === 'status' ? (
+                <TicketStatusBadge status={metaValues.status} />
+              ) : f.key === 'priority' ? (
+                <PriorityBadge priority={metaValues.priority} />
+              ) : (
+                <p className={`text-[13px] font-bold ${f.key === 'id' ? 'font-mono text-brand' : 'text-text'}`}>
+                  {metaValues[f.key] ?? '—'}
+                </p>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
+
+export default TicketDetailPage;
+
+/* Router alias — keeps existing router import working */
+export { TicketDetailPage as ClientTicketDetailPage };

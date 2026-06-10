@@ -331,7 +331,7 @@ export function AdminUserDrawer({ row, open, onClose, onAction, onEdit }) {
         </DSection>
 
         {/* ── Role & Permissions ── */}
-        <DSection icon={Shield} title="Role & Permission Scope" accent={roleColor}>
+        <DSection icon={Shield} title="Role & Permissions" accent={roleColor}>
           <div
             className="rounded-[10px] border p-3.5 space-y-3"
             style={{
@@ -364,7 +364,7 @@ export function AdminUserDrawer({ row, open, onClose, onAction, onEdit }) {
         <DSection icon={ShieldAlert} title="Security Status">
           <DGrid>
             <DField
-              label="2FA Authentication"
+              label="2FA"
               value={row.twoFA ? 'Enabled' : 'Not enabled'}
               accent={row.twoFA ? 'var(--positive)' : 'var(--negative)'}
             />
@@ -496,7 +496,7 @@ export function RoleDrawer({ row, open, onClose, onAction, onEdit }) {
   return (
     <DrawerShell open={open} onClose={onClose}>
       <DHeader
-        eyebrow="Role Configuration"
+        eyebrow="Role Settings"
         title={currentRole.label}
         subtitle={currentRole.desc}
         onClose={onClose}
@@ -560,7 +560,7 @@ export function RoleDrawer({ row, open, onClose, onAction, onEdit }) {
         </DSection>
 
         {/* ── Permission Matrix ── */}
-        <DSection icon={Key} title="Permission Matrix" accent={color}>
+        <DSection icon={Key} title="Permissions" accent={color}>
           <div className="flex flex-wrap gap-1.5">
             {PERM_ACTIONS.map((action) => {
               const allowed = currentRole.actions.includes(action);

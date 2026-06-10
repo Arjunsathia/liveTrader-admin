@@ -109,7 +109,7 @@ function TicketsPage() {
       value: breachedCount,
       accent: 'var(--negative)',
       Icon: ShieldAlert,
-      sub: 'Past due time',
+      sub: 'Past due',
       trend: breachedCount > 0 ? 'Needs action' : 'Stable',
       trendUp: breachedCount > 0 ? false : undefined,
     },
@@ -126,7 +126,7 @@ function TicketsPage() {
             All Tickets
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
-            View and manage all support tickets.
+            View and manage support tickets.
           </p>
         </div>
 

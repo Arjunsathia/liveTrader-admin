@@ -230,7 +230,7 @@ export function TicketCard({ ticket, onView, onAssign, onEscalate, onResolve, sh
             <CatTag value={ticket.category} />
           </div>
           <div className="flex flex-col items-end gap-1">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70">SLA Timer</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70">Due Time</span>
             <SlaBar pct={ticket.sla} slaMins={ticket.slaMins} />
           </div>
         </div>
@@ -269,7 +269,7 @@ export function TicketCard({ ticket, onView, onAssign, onEscalate, onResolve, sh
             type="button"
             onClick={() => onAssign?.(ticket)}
             className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-cyan/20 text-cyan/50 hover:bg-cyan/8 hover:text-cyan cursor-pointer transition-colors"
-            title="Assign / Reassign"
+            title="Assign"
           >
             <UserPlus size={11} />
           </button>
@@ -287,7 +287,7 @@ export function TicketCard({ ticket, onView, onAssign, onEscalate, onResolve, sh
             type="button"
             onClick={() => onResolve?.(ticket)}
             className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-positive/20 text-positive/50 hover:bg-positive/8 hover:text-positive cursor-pointer transition-colors"
-            title="Close / Resolve"
+            title="Resolve"
           >
             <Check size={11} />
           </button>

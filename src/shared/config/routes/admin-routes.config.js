@@ -565,7 +565,7 @@ export const adminRouteModules = [
   },
   {
     id: 'support',
-    label: 'Support Desk',
+    label: 'Support',
     icon: LifeBuoy,
     navSection: 'management',
     permission: PERMISSIONS.support.view,
@@ -578,7 +578,7 @@ export const adminRouteModules = [
         navLabel: 'All Tickets',
         permission: PERMISSIONS.support.view,
         meta: [
-          { pattern: '/admin/support/tickets', title: 'All Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.view },
+          { pattern: '/admin/support/tickets', title: 'All Tickets', section: 'Support', permission: PERMISSIONS.support.view },
         ],
       },
       {
@@ -588,7 +588,7 @@ export const adminRouteModules = [
         navLabel: 'Urgent Tickets',
         permission: PERMISSIONS.support.escalate,
         meta: [
-          { pattern: '/admin/support/escalated', title: 'Urgent Support Tickets', section: 'Support Desk', permission: PERMISSIONS.support.escalate },
+          { pattern: '/admin/support/escalated', title: 'Urgent Tickets', section: 'Support', permission: PERMISSIONS.support.escalate },
         ],
       },
       {
@@ -597,7 +597,7 @@ export const adminRouteModules = [
         pageKey: 'support/ticket-detail',
         permission: PERMISSIONS.support.view,
         meta: [
-          { pattern: '/admin/support/tickets/:ticketId', title: 'Ticket Details', section: 'Support Desk', permission: PERMISSIONS.support.view },
+          { pattern: '/admin/support/tickets/:ticketId', title: 'Ticket Details', section: 'Support', permission: PERMISSIONS.support.view },
         ],
       },
     ],
@@ -614,7 +614,7 @@ export const adminRouteModules = [
         id: 'settings-overview',
         path: 'settings/overview',
         pageKey: 'settings/settings-workspace',
-        navLabel: 'Settings Overview',
+        navLabel: 'Overview',
         permission: PERMISSIONS.settings.view,
         meta: [
           { pattern: '/admin/settings/overview', title: 'Settings Overview', section: 'Settings', permission: PERMISSIONS.settings.view },
@@ -624,10 +624,10 @@ export const adminRouteModules = [
         id: 'settings-api',
         path: 'settings/api',
         pageKey: 'settings/settings-workspace',
-        navLabel: 'API Config',
+        navLabel: 'API',
         permission: PERMISSIONS.settings.view,
         meta: [
-          { pattern: '/admin/settings/api', title: 'API Configuration', section: 'Settings', permission: PERMISSIONS.settings.view },
+          { pattern: '/admin/settings/api', title: 'API Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
         ],
       },
       {
@@ -664,7 +664,7 @@ export const adminRouteModules = [
         id: 'settings-notifications',
         path: 'settings/notifications',
         pageKey: 'settings/settings-workspace',
-        navLabel: 'Notification Settings',
+        navLabel: 'Notifications',
         permission: PERMISSIONS.settings.view,
         meta: [
           { pattern: '/admin/settings/notifications', title: 'Notification Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
@@ -674,7 +674,7 @@ export const adminRouteModules = [
         id: 'settings-system',
         path: 'settings/system',
         pageKey: 'settings/settings-workspace',
-        navLabel: 'System Settings',
+        navLabel: 'System',
         permission: PERMISSIONS.settings.view,
         meta: [
           { pattern: '/admin/settings/system', title: 'System Settings', section: 'Settings', permission: PERMISSIONS.settings.view },
@@ -684,7 +684,7 @@ export const adminRouteModules = [
   },
   {
     id: 'admin-mgmt',
-    label: 'Admin Management',
+    label: 'Admins & Access',
     icon: ShieldCheck,
     navSection: 'system',
     permission: PERMISSIONS.rolesPermissions.view,
@@ -717,7 +717,7 @@ export const adminRouteModules = [
         navLabel: 'Permissions',
         permission: PERMISSIONS.rolesPermissions.view,
         meta: [
-          { pattern: '/admin/admin-mgmt/permissions', title: 'Permissions Matrix', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
+          { pattern: '/admin/admin-mgmt/permissions', title: 'Permissions', section: 'Admin', permission: PERMISSIONS.rolesPermissions.view },
         ],
       },
     ],

@@ -729,7 +729,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
               <div className="space-y-2 pt-2.5 border-t border-border/8">
                 <SlaCheckRow label="First reply" sla="4 hrs" met={true} />
                 <SlaCheckRow label="Resolve by" sla="24 hrs" met={t.sla > 20} />
-                <SlaCheckRow label="Escalation" sla="8 hrs" met={status !== 'ESCALATED'} />
+                <SlaCheckRow label="Escalate by" sla="8 hrs" met={status !== 'ESCALATED'} />
               </div>
             </div>
           </Panel>
@@ -753,7 +753,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
             <div className="border-t border-border/10 p-3">
               <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 font-heading mb-2 px-1">
                 <Link size={9} className="shrink-0 text-text-muted/50" />
-                Previous tickets
+                Past tickets
               </p>
 
               <div className="space-y-1.5">
@@ -782,7 +782,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
               {[
                 { label: 'View Profile', icon: User, variant: 'ghost', cb: () => navigate(`/admin/users/${t.uid}`) },
                 { label: 'View Wallet', icon: CreditCard, variant: 'ghost', cb: () => notify('Wallet opened') },
-                { label: 'Security Review', icon: ShieldAlert, variant: 'warning', cb: () => notify('Sent for review') },
+                { label: 'Review Security', icon: ShieldAlert, variant: 'warning', cb: () => notify('Sent for review') },
                 { label: 'Suspend User', icon: Lock, variant: 'danger', cb: () => notify('Suspend dialog opened') },
               ].map(({ label, icon, variant, cb }) => (
                 <ActionBtn

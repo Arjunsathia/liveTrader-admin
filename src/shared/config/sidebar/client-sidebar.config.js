@@ -16,6 +16,11 @@ import {
   MessageSquarePlus,
   BookOpen,
   ShieldCheck,
+  UploadCloud,
+  Clock3,
+  Inbox,
+  MessageCircle,
+  Bell,
 } from 'lucide-react';
 
 export const clientNavigationSections = [
@@ -33,6 +38,19 @@ export const clientNavigation = [
     icon: LayoutDashboard,
     path: '/client',
     navSection: 'main',
+  },
+  {
+    id: 'client-kyc',
+    label: 'Identity Verification',
+    icon: ShieldCheck,
+    path: '/client/kyc',
+    navSection: 'main',
+    subItems: [
+      { id: 'client-kyc-overview', label: 'KYC Overview',       path: '/client/kyc',         icon: LayoutGrid },
+      { id: 'client-kyc-upload',   label: 'Upload Documents',   path: '/client/kyc/upload',  icon: UploadCloud },
+      { id: 'client-kyc-status',   label: 'Verification Status', path: '/client/kyc/status',  icon: Clock3 },
+      { id: 'client-kyc-history',  label: 'Submission History', path: '/client/kyc/history', icon: History },
+    ],
   },
 
   /* ── TRADING & FINANCE ── */
@@ -86,11 +104,15 @@ export const clientNavigation = [
     id: 'client-support',
     label: 'Support Center',
     icon: LifeBuoy,
-    path: '/client/support/tickets',
+    path: '/client/support/overview',
     navSection: 'help',
     subItems: [
-      { id: 'client-new-ticket', label: 'New Ticket',      path: '/client/support/tickets/new', icon: MessageSquarePlus },
-      { id: 'client-faq',        label: 'Knowledge Base',  path: '/client/support/faq',          icon: BookOpen },
+      { id: 'client-support-overview',  label: 'Overview',          path: '/client/support/overview',       icon: LayoutGrid          },
+      { id: 'client-support-tickets',   label: 'My Tickets',        path: '/client/support/tickets',        icon: Inbox               },
+      { id: 'client-new-ticket',        label: 'New Ticket',        path: '/client/support/create',         icon: MessageSquarePlus   },
+      { id: 'client-faq',              label: 'Knowledge Base',    path: '/client/support/kb',             icon: BookOpen            },
+      { id: 'client-chat',             label: 'Live Chat',         path: '/client/support/chat',           icon: MessageCircle       },
+      { id: 'client-announcements',    label: 'Announcements',     path: '/client/support/announcements',  icon: Bell                },
     ],
   },
 
