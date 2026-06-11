@@ -8,11 +8,14 @@ import { TicketTimeline } from '../components/TicketTimeline';
 import { TicketComposer } from '../components/TicketComposer';
 import { TICKET_META_FIELDS } from '../configs/ticketDetail.config';
 import { PageShell } from '@/shared/components/layout/PageShell';
+import { useUniversalDrawer } from '@/shared/components/overlays';
+import { CreateTicketDrawer } from './CreateTicketDrawer';
 
 export function TicketDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { ticket, messages, loading, error, sendMessage } = useTicket(id);
+  const { openDrawer } = useUniversalDrawer();
   const bottomRef = useRef();
 
   /* Auto-scroll to bottom on new messages */
@@ -93,7 +96,7 @@ export function TicketDetailPage() {
             <div className="px-5 py-4 border-t border-border/20 bg-positive/[0.03] text-center animate-fade-in">
               <p className="text-[12.5px] text-positive font-bold">This ticket is closed.</p>
               <button
-                onClick={() => navigate('/client/support/create')}
+                onClick={() => openDrawer(CreateTicketDrawer)}
                 className="mt-1.5 text-[12.5px] font-bold text-brand hover:opacity-75 transition-opacity cursor-pointer"
               >
                 Create a new ticket →

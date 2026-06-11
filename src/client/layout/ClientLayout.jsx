@@ -1,14 +1,16 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router-dom';
 import { ClientSidebar } from './ClientSidebar';
 import { ClientTopbar } from './ClientTopbar';
 import { useAdminUi } from '@/app/providers/AdminUiProvider';
+import { UniversalDrawerContainer } from '@/shared/components/overlays';
 
 export function ClientLayout() {
   const { collapsed, isMobile, setCollapsed, theme, toggleTheme } = useAdminUi();
 
   return (
     <div className="min-h-screen bg-bg text-text transition-colors duration-500 overflow-x-clip">
+      <ScrollRestoration />
       {/* Mobile overlay */}
       {isMobile && !collapsed && (
         <div
@@ -37,6 +39,7 @@ export function ClientLayout() {
           <Outlet />
         </main>
       </div>
+      <UniversalDrawerContainer />
     </div>
   );
 }

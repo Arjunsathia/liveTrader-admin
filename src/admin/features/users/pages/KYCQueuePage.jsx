@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Download, FileCheck, Layers, Search, Users, Clock, Cpu, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
@@ -40,16 +40,45 @@ function KYCQueuePage() {
   const [riskFilter, setRiskFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
 
+  const [kycList, setKycList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    const fetchQueue = async () => {
+      setLoading(true);
+      try {
+        const data = await kycService.list('all');
+        if (active) {
+          setKycList(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message || 'Failed to load verification queue');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchQueue();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // Load unique countries for dynamic triage filters
   const countries = useMemo(() => {
-    const list = kycService.list();
-    const unique = [...new Set(list.map((item) => item.country))].filter(Boolean);
+    const unique = [...new Set(kycList.map((item) => item.country))].filter(Boolean);
     return unique.sort();
-  }, []);
+  }, [kycList]);
 
   const filteredKyc = useMemo(
     () => {
-      let rows = filterBySearch(kycService.list(), search, ['id', 'user', 'tier', 'country', 'status', 'risk']);
+      let rows = filterBySearch(kycList, search, ['id', 'user', 'country', 'status', 'risk', 'submittedAt']);
       if (kycFilter !== 'all') {
         rows = rows.filter((r) => r.status === kycFilter);
       }
@@ -61,22 +90,52 @@ function KYCQueuePage() {
       }
       return rows;
     },
-    [search, kycFilter, riskFilter, countryFilter]
+    [kycList, search, kycFilter, riskFilter, countryFilter]
   );
 
   // Compute real-time KYC metrics for compliance officers
   const kpis = useMemo(() => {
-    const list = kycService.list();
     return [
-      { label: 'Total Requests', value: list.length, subtext: 'submitted requests', trend: 'Global Registry', positive: true, Icon: Users, accent: 'var(--brand)' },
-      { label: 'Pending Review', value: list.filter((k) => k.status === 'PENDING').length, subtext: 'waiting for review', trend: 'Action Required', positive: true, Icon: Clock, accent: 'var(--warning)', pulse: true },
-      { label: 'Verified Users', value: list.filter((k) => k.status === 'VERIFIED').length, subtext: 'approved users', trend: 'Active traders', positive: true, Icon: FileCheck, accent: 'var(--positive)' },
+      { label: 'Total Requests', value: kycList.length, subtext: 'submitted requests', trend: 'Global Registry', positive: true, Icon: Users, accent: 'var(--brand)' },
+      { label: 'Pending Review', value: kycList.filter((k) => k.status === 'PENDING').length, subtext: 'waiting for review', trend: 'Action Required', positive: true, Icon: Clock, accent: 'var(--warning)', pulse: true },
+      { label: 'Verified Users', value: kycList.filter((k) => k.status === 'VERIFIED').length, subtext: 'approved users', trend: 'Active traders', positive: true, Icon: FileCheck, accent: 'var(--positive)' },
       { label: 'Avg Review Time', value: '4.2 min', subtext: 'average review speed', trend: 'Fast Sync', positive: true, Icon: Cpu, accent: 'var(--cyan)' },
     ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredKyc]);
+  }, [kycList]);
 
   const tableState = useTableState(filteredKyc, { searchFields: [], initialPageSize: 10 });
+
+  if (loading) {
+    return (
+      <PageShell>
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center gap-2">
+          <span className="relative flex h-5.5 w-5.5 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-60" />
+            <span className="relative inline-flex rounded-full h-5.5 w-5.5 bg-warning/80" />
+          </span>
+          <span className="text-[12px] font-bold text-text-muted mt-2 uppercase tracking-widest animate-pulse">Loading queue...</span>
+        </div>
+      </PageShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageShell>
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center gap-4">
+          <ShieldAlert size={36} className="text-negative animate-bounce" />
+          <h2 className="text-lg font-black text-text">Failed to Load Verification Queue</h2>
+          <p className="text-[12px] text-text-muted/65 max-w-md">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="h-8 px-4 text-[11px] rounded-[7px] border border-border/20 bg-muted-surface text-text font-bold cursor-pointer hover:bg-surface-bright transition-all"
+          >
+            Retry
+          </button>
+        </div>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell>
@@ -178,7 +237,7 @@ function KYCQueuePage() {
 
           <KYCTable
             tableState={tableState}
-            onReviewUser={(nextUserId) => navigate(`/admin/users/${nextUserId}/kyc`)}
+            onReviewUser={(nextUserId, row) => navigate(`/admin/users/${nextUserId}/kyc?kycId=${row.id}`)}
           />
         </section>
 

@@ -19,13 +19,8 @@ export function UniversalDrawerProvider({ children }) {
   }, []);
 
   return (
-    <UniversalDrawerContext.Provider value={{ openDrawer, closeDrawer, isOpen }}>
+    <UniversalDrawerContext.Provider value={{ openDrawer, closeDrawer, isOpen, drawerContent, drawerProps }}>
       {children}
-      {drawerContent && React.createElement(drawerContent, {
-        ...drawerProps,
-        open: isOpen,
-        onClose: closeDrawer,
-      })}
     </UniversalDrawerContext.Provider>
   );
 }
@@ -37,3 +32,18 @@ export function useUniversalDrawer() {
   }
   return context;
 }
+
+export function UniversalDrawerContainer() {
+  const context = useContext(UniversalDrawerContext);
+  if (!context) return null;
+  const { drawerContent, drawerProps, isOpen, closeDrawer } = context;
+
+  if (!drawerContent) return null;
+
+  return React.createElement(drawerContent, {
+    ...drawerProps,
+    open: isOpen,
+    onClose: closeDrawer,
+  });
+}
+

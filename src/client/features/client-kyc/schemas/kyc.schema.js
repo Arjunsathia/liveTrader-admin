@@ -20,6 +20,14 @@ export const identityDocumentSchema = z.object({
   issuingCountry: requiredText('Issuing country'),
   front: z.any().refine(Boolean, 'Front side is required'),
   back: z.any().optional(),
+}).refine((data) => {
+  if (data.type !== 'passport' && !data.back) {
+    return false;
+  }
+  return true;
+}, {
+  message: 'Back side is required',
+  path: ['back'],
 });
 
 export const addressProofSchema = z.object({

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router-dom';
 import { useAdminUi } from '@/app/providers/AdminUiProvider';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { CommandPalette } from '@/components/overlays/CommandPalette';
+import { UniversalDrawerContainer } from '@/shared/components/overlays';
 
 export function MainLayout() {
   const { collapsed, isMobile, setCollapsed, theme, toggleTheme, effectiveSidebarWidth } = useAdminUi();
@@ -22,6 +23,7 @@ export function MainLayout() {
 
   return (
     <div className="min-h-screen bg-bg text-text transition-colors duration-500 overflow-x-clip">
+      <ScrollRestoration />
       {isMobile && !collapsed && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] animate-fade-in"
@@ -52,6 +54,7 @@ export function MainLayout() {
       </div>
 
       <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} />
+      <UniversalDrawerContainer />
     </div>
   );
 }

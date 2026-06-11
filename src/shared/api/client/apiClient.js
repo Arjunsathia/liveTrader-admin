@@ -6,7 +6,11 @@
 const DEFAULT_TIMEOUT = 15000; // 15 seconds
 
 const getBaseUrl = () => {
-  return import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+  let url = import.meta.env.VITE_API_URL || 'https://account.smatams.com/api';
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+  return url;
 };
 
 class ApiError extends Error {
@@ -54,10 +58,10 @@ const request = async (endpoint, options = {}) => {
   // Read auth token from localStorage
   const token = localStorage.getItem('admin_token');
   
+  const isFormData = body instanceof FormData;
   const config = {
     method,
     headers: {
-      'Content-Type': 'application/json',
       Accept: 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
@@ -66,8 +70,12 @@ const request = async (endpoint, options = {}) => {
     ...extraOpts,
   };
 
+  if (!isFormData) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
   if (body) {
-    config.body = typeof body === 'string' ? body : JSON.stringify(body);
+    config.body = isFormData ? body : (typeof body === 'string' ? body : JSON.stringify(body));
   }
 
   try {
@@ -122,7 +130,10 @@ export async function executeTokenRefresh() {
       const refreshToken = localStorage.getItem('refresh_token');
       if (!refreshToken) throw new Error('No refresh token available');
 
-      const authUrl = import.meta.env.VITE_ACCOUNT_API_URL || 'https://account.smatams.com/api';
+      let authUrl = import.meta.env.VITE_API_URL || 'https://account.smatams.com/api';
+      if (authUrl.endsWith('/')) {
+        authUrl = authUrl.slice(0, -1);
+      }
       const response = await fetch(`${authUrl}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },

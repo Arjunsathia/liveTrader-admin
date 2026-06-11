@@ -4,6 +4,8 @@ import { Plus, ChevronDown } from 'lucide-react';
 import { useTickets } from '../hooks/useTickets';
 import { TicketTable } from '../components/TicketTable';
 import { PageShell } from '@/shared/components/layout/PageShell';
+import { useUniversalDrawer } from '@/shared/components/overlays';
+import { CreateTicketDrawer } from './CreateTicketDrawer';
 import { TableToolbar } from '@/components/common/table';
 
 const statusOptions = [
@@ -61,6 +63,7 @@ function SelectFilter({ label, value, onChange, options, minWidth }) {
 
 export function MyTicketsPage() {
   const navigate = useNavigate();
+  const { openDrawer } = useUniversalDrawer();
   const {
     filtered, loading, tickets,
     statusFilter,   setStatusFilter,
@@ -113,7 +116,7 @@ export function MyTicketsPage() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/client/support/create')}
+          onClick={() => openDrawer(CreateTicketDrawer)}
           className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12.5px] font-bold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all duration-150 shadow-sm"
         >
           <Plus size={14} /> New Ticket

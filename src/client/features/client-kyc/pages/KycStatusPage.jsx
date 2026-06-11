@@ -1,10 +1,12 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import {
   Clock3, Check, ShieldCheck, FileSearch, Bell,
   ArrowLeft, AlertTriangle, LockKeyhole, RefreshCw, ArrowRight,
+  FileText,
 } from 'lucide-react';
 import { useKyc } from '../hooks/useKyc';
+import { KycViewDrawer } from '../components/KycViewDrawer';
 
 /* ── Status config ── */
 const STATUS_CFG = {
@@ -41,11 +43,12 @@ const STATUS_CFG = {
 export function KycStatusPage() {
   const navigate = useNavigate();
   const { overview, loading, error } = useKyc();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   /* ── Loading ── */
   if (loading) {
     return (
-      <div className="max-w-[850px] mx-auto space-y-5 px-4 sm:px-6 animate-pulse">
+      <div className="space-y-5 px-4 sm:px-6 animate-pulse">
         <div className="h-4 w-36 bg-muted-surface rounded-full" />
         <div className="h-52 bg-surface-elevated rounded-[16px]" />
         <div className="h-64 bg-surface-elevated rounded-[12px]" />
@@ -56,7 +59,7 @@ export function KycStatusPage() {
   /* ── Error ── */
   if (error || !overview) {
     return (
-      <div className="max-w-[850px] mx-auto flex flex-col items-center py-20 text-center px-4">
+      <div className="flex flex-col items-center py-20 text-center px-4">
         <div className="w-14 h-14 rounded-full bg-negative/10 flex items-center justify-center mb-4">
           <AlertTriangle size={24} className="text-negative" />
         </div>
@@ -111,14 +114,14 @@ export function KycStatusPage() {
   ];
 
   return (
-    <div className="max-w-[850px] mx-auto space-y-5 px-4 sm:px-6">
+    <div className="space-y-5 animate-fade-up">
 
       {/* ── Back nav ── */}
       <button
-        onClick={() => navigate('/client/kyc')}
+        onClick={() => navigate('/client')}
         className="flex items-center gap-2 text-[11.5px] font-bold text-text-muted hover:text-text transition-colors"
       >
-        <ArrowLeft size={13} /> Overview
+        <ArrowLeft size={13} /> Dashboard
       </button>
 
       {/* ── Status hero ── */}
@@ -149,6 +152,18 @@ export function KycStatusPage() {
             Estimated completion:{' '}
             <span className="font-bold text-text">{overview.estimatedReviewTime}</span>
           </p>
+        )}
+
+        {/* View Submitted Data Button */}
+        {overview?.kycData && (
+          <div className="mt-5">
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="h-10 px-6 rounded-[14px] bg-[#a2c1f5] text-[#0a1e3f] hover:bg-[#92b3e8] transition-all font-bold text-[12.5px] inline-flex items-center gap-2 cursor-pointer shadow-sm select-none"
+            >
+              View Submitted Data <ArrowRight size={13} />
+            </button>
+          </div>
         )}
       </div>
 
@@ -231,8 +246,52 @@ export function KycStatusPage() {
           Your files are encrypted and safe. They cannot be edited while we review them.
         </p>
       </div>
+
+      <KycViewDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        rawKyc={overview?.kycData}
+        status={status}
+      />
     </div>
   );
+}
+
+export function KycDispatcher() {
+  const { overview, loading, error } = useKyc();
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+        <div style={{
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
+          border: '2px solid rgba(99, 102, 241, 0.1)',
+          borderTopColor: '#6366f1',
+          animation: 'kycSpin 0.8s linear infinite',
+        }} />
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes kycSpin {
+            to { transform: rotate(360deg); }
+          }
+        `}} />
+        <p className="text-[12.5px] text-text-muted mt-4">Loading verification status...</p>
+      </div>
+    );
+  }
+
+  if (error || !overview) {
+    return <Navigate to="/client/kyc/upload" replace />;
+  }
+
+  const status = overview.status ?? 'not-started';
+
+  if (status === 'verified' || status === 'under-review' || status === 'pending') {
+    return <Navigate to="/client/kyc/status" replace />;
+  }
+
+  return <Navigate to="/client/kyc/upload" replace />;
 }
 
 export default KycStatusPage;

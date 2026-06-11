@@ -145,7 +145,7 @@ export function KycUploadPage() {
 
   /* ── Main upload flow ── */
   return (
-    <div className="max-w-[1220px] mx-auto space-y-5 px-4 sm:px-6">
+    <div className="space-y-5 animate-fade-up">
 
       {/* ── Page header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
@@ -201,7 +201,7 @@ export function KycUploadPage() {
             <div className="mx-5 md:mx-6 mb-4 rounded-[10px] bg-negative/[0.08] border border-negative/25 p-3.5 flex items-start gap-2.5">
               <AlertCircle size={14} className="text-negative shrink-0 mt-0.5" />
               <span className="text-[11.5px] text-negative">
-                Please fix the highlighted fields before continuing.
+                {errors.submit || 'Please fix the highlighted fields before continuing.'}
               </span>
             </div>
           )}

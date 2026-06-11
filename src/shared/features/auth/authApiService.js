@@ -10,7 +10,13 @@
  *  POST /auth/otp/verify   — Verify OTP, activates account, returns tokens + user
  */
 
-const BASE_URL = import.meta.env.VITE_ACCOUNT_API_URL || 'https://account.smatams.com/api';
+const BASE_URL = (() => {
+  let url = import.meta.env.VITE_API_URL || 'https://account.smatams.com/api';
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+  return url;
+})();
 
 /** Generic JSON fetch helper */
 async function apiFetch(path, payload) {

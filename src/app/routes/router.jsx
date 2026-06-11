@@ -55,69 +55,66 @@ import { NotFoundPage } from '@/app/pages/NotFoundPage';
 // ── Customer feature pages
 import { ClientDashboardPage } from '@/client/features/client-dashboard/pages/ClientDashboardPage';
 import AccountCenterPage from '@/shared/features/account-center/pages/AccountCenterPage';
-import { WalletsPage }           from '@/client/features/client-finance/pages/WalletsPage';
-import { DepositPage }           from '@/client/features/client-finance/pages/DepositPage';
-import { WithdrawPage }          from '@/client/features/client-finance/pages/WithdrawPage';
-import { PaymentMethodsPage }    from '@/client/features/client-finance/pages/PaymentMethodsPage';
-import { LimitsFeesPage }        from '@/client/features/client-finance/pages/LimitsFeesPage';
+import { WalletsPage } from '@/client/features/client-finance/pages/WalletsPage';
+import { DepositPage } from '@/client/features/client-finance/pages/DepositPage';
+import { WithdrawPage } from '@/client/features/client-finance/pages/WithdrawPage';
+import { PaymentMethodsPage } from '@/client/features/client-finance/pages/PaymentMethodsPage';
+import { LimitsFeesPage } from '@/client/features/client-finance/pages/LimitsFeesPage';
 import { ClientTransactionsPage } from '@/client/features/client-finance/pages/ClientTransactionsPage';
-import { SupportTicketsPage }    from '@/client/features/client-support/pages/SupportTicketsPage';
-import { NewTicketPage }         from '@/client/features/client-support/pages/NewTicketPage';
+import { SupportTicketsPage } from '@/client/features/client-support/pages/SupportTicketsPage';
 import { ClientTicketDetailPage } from '@/client/features/client-support/pages/TicketDetailPage';
-import { SupportOverviewPage }   from '@/client/features/client-support/pages/SupportOverviewPage';
-import { CreateTicketPage }      from '@/client/features/client-support/pages/CreateTicketPage';
-import { KnowledgeBasePage }     from '@/client/features/client-support/pages/KnowledgeBasePage';
-import { AnnouncementsPage }     from '@/client/features/client-support/pages/AnnouncementsPage';
-import { LiveChatPage }          from '@/client/features/client-support/pages/LiveChatPage';
-import KycOverviewPage from '@/client/features/client-kyc/pages/KycOverviewPage';
+import { SupportOverviewPage } from '@/client/features/client-support/pages/SupportOverviewPage';
+import { KnowledgeBasePage } from '@/client/features/client-support/pages/KnowledgeBasePage';
+import { AnnouncementsPage } from '@/client/features/client-support/pages/AnnouncementsPage';
+import { LiveChatPage } from '@/client/features/client-support/pages/LiveChatPage';
 import KycUploadPage from '@/client/features/client-kyc/pages/KycUploadPage';
-import KycStatusPage from '@/client/features/client-kyc/pages/KycStatusPage';
+import KycStatusPage, { KycDispatcher } from '@/client/features/client-kyc/pages/KycStatusPage';
 import KycHistoryPage from '@/client/features/client-kyc/pages/KycHistoryPage';
 
 /* ─────────────────────────────────────────────────────────
    ADMIN PAGE REGISTRY
 ───────────────────────────────────────────────────────── */
 const adminPageRegistry = {
-  'dashboard/dashboard':                   DashboardPage,
-  'users/users-list':                      UsersPage,
-  'users/kyc-queue':                       KYCQueuePage,
-  'users/mt5-queue':                       MT5QueuePage,
-  'users/mt5-review':                      MT5AccountReviewPage,
-  'users/user-detail':                     UserDetailPage,
-  'users/users-audit':                     UsersAuditPage,
-  'finance/deposits':                      DepositsPage,
-  'finance/deposit-detail':                DepositDetailPage,
-  'finance/withdrawals':                   WithdrawalsPage,
-  'finance/withdrawal-detail':             WithdrawalDetailPage,
-  'finance/transactions':                  TransactionsPage,
-  'finance/failed-payments':               FailedPaymentsPage,
-  'finance/approvals':                     ApprovalsPage,
-  'trading/trading-accounts':              TradingAccountsPage,
-  'trading/orders':                        OrdersPage,
-  'trading/positions':                     PositionsPage,
-  'trading/trade-history':                 TradeHistoryPage,
-  'trading/execution-logs':                ExecutionLogsPage,
-  'copy-trading/strategies':               CopyTradingPage,
-  'copy-trading/providers':                CopyTradingPage,
-  'copy-trading/followers':                CopyTradingPage,
-  'copy-trading/subscriptions':            CopyTradingPage,
-  'copy-trading/performance':              CopyTradingPage,
-  'copy-trading/logs':                     CopyTradingPage,
-  'copy-trading/copy-trading-detail':      CopyTradingDetailPage,
-  'ib-system/ib-system-workspace':         IBSystemPage,
-  'group-management/workspace':            GroupWorkspacePage,
-  'prop-trading/prop-trading-workspace':   PropTradingPage,
-  'reports/overview':                      ReportsOverviewPage,
-  'reports/finance':                       FinanceReportsPage,
-  'reports/trading':                       TradingReportsPage,
-  'reports/users':                         UserReportsPage,
-  'reports/system':                        SystemReportsPage,
-  'reports/exports':                       ExportCenterPage,
-  'support/support-workspace':             SupportPage,
-  'support/ticket-detail':                 TicketDetailPage,
-  'settings/settings-workspace':           SettingsPage,
+  'dashboard/dashboard': DashboardPage,
+  'users/users-list': UsersPage,
+  'users/kyc-queue': KYCQueuePage,
+  'users/mt5-queue': MT5QueuePage,
+  'users/mt5-review': MT5AccountReviewPage,
+  'users/user-detail': UserDetailPage,
+  'users/users-audit': UsersAuditPage,
+  'finance/deposits': DepositsPage,
+  'finance/deposit-detail': DepositDetailPage,
+  'finance/withdrawals': WithdrawalsPage,
+  'finance/withdrawal-detail': WithdrawalDetailPage,
+  'finance/transactions': TransactionsPage,
+  'finance/failed-payments': FailedPaymentsPage,
+  'finance/approvals': ApprovalsPage,
+  'trading/trading-accounts': TradingAccountsPage,
+  'trading/orders': OrdersPage,
+  'trading/positions': PositionsPage,
+  'trading/trade-history': TradeHistoryPage,
+  'trading/execution-logs': ExecutionLogsPage,
+  'copy-trading/strategies': CopyTradingPage,
+  'copy-trading/providers': CopyTradingPage,
+  'copy-trading/followers': CopyTradingPage,
+  'copy-trading/subscriptions': CopyTradingPage,
+  'copy-trading/performance': CopyTradingPage,
+  'copy-trading/logs': CopyTradingPage,
+  'copy-trading/copy-trading-detail': CopyTradingDetailPage,
+  'ib-system/ib-system-workspace': IBSystemPage,
+  'group-management/workspace': GroupWorkspacePage,
+  'prop-trading/prop-trading-workspace': PropTradingPage,
+  'reports/overview': ReportsOverviewPage,
+  'reports/finance': FinanceReportsPage,
+  'reports/trading': TradingReportsPage,
+  'reports/users': UserReportsPage,
+  'reports/system': SystemReportsPage,
+  'reports/exports': ExportCenterPage,
+  'support/support-workspace': SupportPage,
+  'support/ticket-detail': TicketDetailPage,
+  'settings/settings-workspace': SettingsPage,
   'admin-mgmt/roles-permissions-workspace': RolesPermissionsPage,
-  'account/account-center':                AccountCenterPage,
+  'account/account-center': AccountCenterPage,
 };
 
 function withPermission(permission, PageComponent) {
@@ -201,38 +198,36 @@ export const appRouter = createHashRouter([
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true,                      element: <ClientDashboardPage /> },
-      { path: 'account',                  element: <Navigate to="/client/account/overview" replace /> },
-      { path: 'account/:tab',             element: <AccountCenterPage /> },
-      { path: 'finance/wallets',           element: <WalletsPage /> },
-      { path: 'finance/deposit',           element: <DepositPage /> },
-      { path: 'finance/withdraw',          element: <WithdrawPage /> },
-      { path: 'finance/payment-methods',   element: <PaymentMethodsPage /> },
-      { path: 'finance/limits',            element: <LimitsFeesPage /> },
-      { path: 'finance/transactions',      element: <ClientTransactionsPage /> },
-      { path: 'support',                 element: <Navigate to="/client/support/overview" replace /> },
-      { path: 'support/overview',         element: <SupportOverviewPage /> },
-      { path: 'support/tickets',          element: <SupportTicketsPage /> },
-      { path: 'support/tickets/new',      element: <NewTicketPage /> },
-      { path: 'support/create',           element: <CreateTicketPage /> },
-      { path: 'support/tickets/:id',      element: <ClientTicketDetailPage /> },
-      { path: 'support/kb',               element: <KnowledgeBasePage /> },
-      { path: 'support/announcements',    element: <AnnouncementsPage /> },
-      { path: 'support/chat',             element: <LiveChatPage /> },
-      { path: 'kyc',                      element: <KycOverviewPage /> },
-      { path: 'kyc/upload',               element: <KycUploadPage /> },
-      { path: 'kyc/status',               element: <KycStatusPage /> },
-      { path: 'kyc/history',              element: <KycHistoryPage /> },
+      { index: true, element: <ClientDashboardPage /> },
+      { path: 'account', element: <Navigate to="/client/account/overview" replace /> },
+      { path: 'account/:tab', element: <AccountCenterPage /> },
+      { path: 'finance/wallets', element: <WalletsPage /> },
+      { path: 'finance/deposit', element: <DepositPage /> },
+      { path: 'finance/withdraw', element: <WithdrawPage /> },
+      { path: 'finance/payment-methods', element: <PaymentMethodsPage /> },
+      { path: 'finance/limits', element: <LimitsFeesPage /> },
+      { path: 'finance/transactions', element: <ClientTransactionsPage /> },
+      { path: 'support', element: <Navigate to="/client/support/overview" replace /> },
+      { path: 'support/overview', element: <SupportOverviewPage /> },
+      { path: 'support/tickets', element: <SupportTicketsPage /> },
+      { path: 'support/tickets/:id', element: <ClientTicketDetailPage /> },
+      { path: 'support/kb', element: <KnowledgeBasePage /> },
+      { path: 'support/announcements', element: <AnnouncementsPage /> },
+      { path: 'support/chat', element: <LiveChatPage /> },
+      { path: 'kyc', element: <KycDispatcher /> },
+      { path: 'kyc/upload', element: <KycUploadPage /> },
+      { path: 'kyc/status', element: <KycStatusPage /> },
+      { path: 'kyc/history', element: <KycHistoryPage /> },
       // Support FAQ redirect → knowledge base
-      { path: 'support/faq',              element: <Navigate to="/client/support/kb" replace /> },
+      { path: 'support/faq', element: <Navigate to="/client/support/kb" replace /> },
       // Stub routes for sidebar items not yet built (redirect to dashboard)
-      { path: 'copy-trading',            element: <Navigate to="/client" replace /> },
-      { path: 'prop-trading',            element: <Navigate to="/client" replace /> },
-      { path: 'ib-system',               element: <Navigate to="/client" replace /> },
-      { path: 'settings',                element: <AccountCenterPage /> },
+      { path: 'copy-trading', element: <Navigate to="/client" replace /> },
+      { path: 'prop-trading', element: <Navigate to="/client" replace /> },
+      { path: 'ib-system', element: <Navigate to="/client" replace /> },
+      { path: 'settings', element: <AccountCenterPage /> },
       // Finance root redirect
-      { path: 'finance',                 element: <Navigate to="/client/finance/wallets" replace /> },
-      { path: '*',                        element: <NotFoundPage /> },
+      { path: 'finance', element: <Navigate to="/client/finance/wallets" replace /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 

@@ -6,9 +6,12 @@ import { ArticleCard } from '../components/ArticleCard';
 import { FaqAccordion } from '../components/FaqAccordion';
 import { PageShell } from '@/shared/components/layout/PageShell';
 import { BookOpen, HelpCircle } from 'lucide-react';
+import { useUniversalDrawer } from '@/shared/components/overlays';
+import { CreateTicketDrawer } from './CreateTicketDrawer';
 
 export function KnowledgeBasePage() {
   const navigate = useNavigate();
+  const { openDrawer } = useUniversalDrawer();
   const { articles, categories, faqs, loading, search, setSearch, activeCategory, setActiveCategory } = useKnowledgeBase();
 
   return (
@@ -148,7 +151,7 @@ export function KnowledgeBasePage() {
           </div>
         </div>
         <button
-          onClick={() => navigate('/client/support/create')}
+          onClick={() => openDrawer(CreateTicketDrawer)}
           className="h-10 px-5 rounded-[9px] bg-brand text-text-on-accent text-[12.5px] font-bold hover:opacity-90 active:scale-95 transition-all duration-150 shrink-0 shadow-sm"
         >
           Open a ticket

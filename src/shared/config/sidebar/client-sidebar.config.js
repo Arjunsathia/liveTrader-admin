@@ -13,7 +13,6 @@ import {
   Copy,
   Trophy,
   Share2,
-  MessageSquarePlus,
   BookOpen,
   ShieldCheck,
   UploadCloud,
@@ -46,7 +45,6 @@ export const clientNavigation = [
     path: '/client/kyc',
     navSection: 'main',
     subItems: [
-      { id: 'client-kyc-overview', label: 'Overview',       path: '/client/kyc',         icon: LayoutGrid },
       { id: 'client-kyc-upload',   label: 'Upload ID',       path: '/client/kyc/upload',  icon: UploadCloud },
       { id: 'client-kyc-status',   label: 'Status',          path: '/client/kyc/status',  icon: Clock3 },
       { id: 'client-kyc-history',  label: 'History',         path: '/client/kyc/history', icon: History },
@@ -109,7 +107,6 @@ export const clientNavigation = [
     subItems: [
       { id: 'client-support-overview',  label: 'Overview',          path: '/client/support/overview',       icon: LayoutGrid          },
       { id: 'client-support-tickets',   label: 'My Tickets',        path: '/client/support/tickets',        icon: Inbox               },
-      { id: 'client-new-ticket',        label: 'New Ticket',        path: '/client/support/create',         icon: MessageSquarePlus   },
       { id: 'client-faq',              label: 'Knowledge Base',    path: '/client/support/kb',             icon: BookOpen            },
       { id: 'client-chat',             label: 'Live Chat',         path: '/client/support/chat',           icon: MessageCircle       },
       { id: 'client-announcements',    label: 'Announcements',     path: '/client/support/announcements',  icon: Bell                },

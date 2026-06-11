@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, HelpCircle } from 'lucide-react';
 import { LimitsFeeTable } from '../components/LimitsFeeTable';
+import { useUniversalDrawer } from '@/shared/components/overlays';
+import { CreateTicketDrawer } from '@/features/client-support/pages/CreateTicketDrawer';
 
 const FAQS = [
   {
@@ -24,6 +26,7 @@ const FAQS = [
 
 export function LimitsFeesPage() {
   const navigate = useNavigate();
+  const { openDrawer } = useUniversalDrawer();
 
   return (
     <div className="space-y-6 animate-fade-up">
@@ -96,7 +99,7 @@ export function LimitsFeesPage() {
           </button>
           <button
             id="limits-support-cta"
-            onClick={() => navigate('/client/support/tickets/new')}
+            onClick={() => openDrawer(CreateTicketDrawer)}
             className="h-10 px-4 rounded-[10px] font-bold text-[12.5px] transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-95 bg-muted-surface border border-border/40 text-text hover:bg-white/[0.02]"
           >
             Contact Support

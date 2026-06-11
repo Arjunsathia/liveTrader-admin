@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   CheckCircle,
   AlertCircle,
@@ -19,9 +20,10 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { InlineAlert } from '@/components/feedback/InlineAlert';
-import { StatusBadge } from '@/components/ui';
+import { StatusBadge, SecureImage } from '@/components/ui';
 import { DrawerField, DrawerFormGrid, DrawerSection, SelectField } from '@/components/common/drawer';
 import { usersService } from '../services/userService';
+import { kycService } from '../services/kycService';
 
 /* ─────────────────────────────────────────────────────────────
    INTERNAL DESIGN PRIMITIVES
@@ -129,6 +131,102 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectionForm, setShowRejectionForm] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
+
+  const location = useLocation();
+  const kycId = new URLSearchParams(location.search).get('kycId');
+
+  const [kycRecord, setKycRecord] = useState(null);
+  const [kycLoading, setKycLoading] = useState(false);
+  const [kycError, setKycError] = useState(null);
+  const [kycActionLoading, setKycActionLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'kyc') {
+      let active = true;
+      const fetchKyc = async () => {
+        setKycLoading(true);
+        setKycError(null);
+        try {
+          let record = null;
+          if (kycId) {
+            record = await kycService.getById(kycId);
+          } else {
+            const queue = await kycService.list('all');
+            const found = queue.find(q => q.userId === user.id);
+            if (found && found.id !== 'N/A') {
+              record = await kycService.getById(found.id);
+            }
+          }
+          if (active) {
+            setKycRecord(record);
+          }
+        } catch (err) {
+          if (active) {
+            setKycError(err.message || 'Failed to load KYC details from server');
+          }
+        } finally {
+          if (active) {
+            setKycLoading(false);
+          }
+        }
+      };
+      fetchKyc();
+      return () => {
+        active = false;
+      };
+    }
+  }, [activeTab, kycId, user.id]);
+
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    let stringPath = typeof path === 'object' ? (path.url || path.path || path.location || path.filePath || '') : path;
+    if (!stringPath) return null;
+    if (stringPath.startsWith('http://') || stringPath.startsWith('https://') || stringPath.startsWith('blob:')) {
+      return stringPath;
+    }
+    let baseUrl = import.meta.env.VITE_API_URL || 'https://account.smatams.com/api';
+    if (baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.slice(0, -1);
+    }
+    baseUrl = baseUrl.replace(/\/api$/, '');
+    return `${baseUrl}${stringPath.startsWith('/') ? '' : '/'}${stringPath}`;
+  };
+
+  const raw = kycRecord?.raw || {};
+  const idDocType = raw.idDocType || raw.identityDocument?.type || 'passport';
+  const hasBackImage = idDocType !== 'passport';
+
+  const docTabs = [];
+  const frontFile = raw.idFrontImage || raw.identityDocument?.front;
+  if (frontFile) {
+    docTabs.push({ id: 'front', label: 'ID Front', file: frontFile });
+  }
+  const backFile = raw.idBackImage || raw.identityDocument?.back;
+  if (hasBackImage && backFile) {
+    docTabs.push({ id: 'back', label: 'ID Back', file: backFile });
+  }
+  const selfieFile = raw.selfieImage || raw.selfie;
+  if (selfieFile) {
+    docTabs.push({ id: 'selfie', label: 'Selfie', file: selfieFile });
+  }
+  const addressFile = raw.addressDocImage || raw.addressProof?.file;
+  if (addressFile) {
+    docTabs.push({ id: 'address', label: 'Address Proof', file: addressFile });
+  }
+
+  if (docTabs.length === 0) {
+    docTabs.push({ id: 'passport', label: 'Passport ID', file: '/mock_passport.png' });
+    docTabs.push({ id: 'address', label: 'Proof of Address', file: '/mock_utility_bill.png' });
+  }
+
+  useEffect(() => {
+    if (activeTab === 'kyc' && docTabs.length > 0) {
+      const isValid = docTabs.some(t => t.id === selectedDoc);
+      if (!isValid) {
+        setSelectedDoc(docTabs[0].id);
+      }
+    }
+  }, [docTabs, selectedDoc, activeTab]);
 
   const [pendingAdjustments, setPendingAdjustments] = useState([]);
   const [makerAmount, setMakerAmount] = useState('');
@@ -352,34 +450,105 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
 
   /* ── 2. KYC ── */
   if (activeTab === 'kyc') {
-    const isVerified = user.kycStatus === 'VERIFIED';
-    const isRejected = user.kycStatus === 'REJECTED';
+    if (kycLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-2 animate-fade-in">
+          <span className="relative flex h-5 w-5 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-brand/80" />
+          </span>
+          <span className="text-[11px] font-bold text-text-muted mt-2 uppercase tracking-widest animate-pulse">Loading compliance data...</span>
+        </div>
+      );
+    }
 
-    const handleApprove = () => {
-      if (onUpdateUser) {
-        onUpdateUser({
-          kycStatus: 'VERIFIED',
-          kyc: { ...user.kyc, status: 'VERIFIED', reviewer: 'Compliance Officer', submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16) }
-        });
+    if (kycError) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-fade-in">
+          <ShieldAlert size={28} className="text-negative shrink-0" />
+          <h4 className="text-[14px] font-bold text-text">Compliance Data Error</h4>
+          <p className="text-[12px] text-text-muted/65 max-w-md">{kycError}</p>
+        </div>
+      );
+    }
+
+    if (!kycRecord) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-fade-in">
+          <Clock size={32} className="text-text-muted/30" />
+          <h4 className="text-[14px] font-bold text-text">No Submissions Found</h4>
+          <p className="text-[12.5px] text-text-muted/60 max-w-xs leading-relaxed">
+            This user has not submitted any KYC verification documents yet.
+          </p>
+        </div>
+      );
+    }
+
+    const isVerified = kycRecord.status === 'VERIFIED';
+    const isRejected = kycRecord.status === 'REJECTED';
+
+    const handleApprove = async () => {
+      setKycActionLoading(true);
+      try {
+        await kycService.approve(kycRecord.id);
+        if (onUpdateUser) {
+          onUpdateUser({
+            kycStatus: 'VERIFIED',
+            kyc: { 
+              ...user.kyc, 
+              status: 'VERIFIED', 
+              reviewer: 'Compliance Officer', 
+              submittedAt: kycRecord.raw?.createdAt || kycRecord.raw?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16) 
+            }
+          });
+        }
+        const updated = await kycService.getById(kycRecord.id);
+        setKycRecord(updated);
+      } catch (err) {
+        alert(err.message || 'Failed to approve KYC submission');
+      } finally {
+        setKycActionLoading(false);
       }
     };
 
-    const handleReject = () => {
-      if (!rejectionReason.trim()) { setShowRejectionForm(true); return; }
-      if (onUpdateUser) {
-        onUpdateUser({
-          kycStatus: 'REJECTED',
-          kyc: { ...user.kyc, status: 'REJECTED', reviewer: 'Compliance Officer', submittedAt: user.kyc?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16), aml: `Failed compliance criteria: ${rejectionReason}` }
-        });
+    const handleReject = async () => {
+      if (!rejectionReason.trim()) { 
+        setShowRejectionForm(true); 
+        return; 
+      }
+      setKycActionLoading(true);
+      try {
+        await kycService.reject(kycRecord.id, rejectionReason.trim());
+        if (onUpdateUser) {
+          onUpdateUser({
+            kycStatus: 'REJECTED',
+            kyc: { 
+              ...user.kyc, 
+              status: 'REJECTED', 
+              reviewer: 'Compliance Officer', 
+              submittedAt: kycRecord.raw?.createdAt || kycRecord.raw?.submittedAt || new Date().toISOString().replace('T', ' ').substring(0, 16), 
+              aml: `Failed compliance criteria: ${rejectionReason}` 
+            }
+          });
+        }
         setShowRejectionForm(false);
+        setRejectionReason('');
+        const updated = await kycService.getById(kycRecord.id);
+        setKycRecord(updated);
+      } catch (err) {
+        alert(err.message || 'Failed to reject KYC submission');
+      } finally {
+        setKycActionLoading(false);
       }
     };
 
-    const docSrc = selectedDoc === 'passport' ? '/mock_passport.png' : '/mock_utility_bill.png';
+    const currentTab = docTabs.find(t => t.id === selectedDoc) || docTabs[0];
+    const docSrc = currentTab ? getImageUrl(currentTab.file) : '';
+
     const statusConfig = isVerified
       ? { border: 'border-l-positive border-positive/12 bg-positive/[0.03]', icon: <CheckCircle size={13} className="text-positive" />, titleCls: 'text-positive', text: 'Verification Complete: The identity document and address bill have been reviewed and approved.' }
       : isRejected
-      ? { border: 'border-l-negative border-negative/12 bg-negative/[0.03]', icon: <ShieldAlert size={13} className="text-negative" />, titleCls: 'text-negative', text: `Verification Rejected: This account did not pass review. Reason: ${user.kyc?.aml || 'Operator rejection'}` }
+      ? { border: 'border-l-negative border-negative/12 bg-negative/[0.03]', icon: <ShieldAlert size={13} className="text-negative" />, titleCls: 'text-negative', text: `Verification Rejected: This account did not pass review. Reason: ${kycRecord.raw?.aml || 'Operator rejection'}` }
       : { border: 'border-l-warning border-warning/12 bg-warning/[0.03]', icon: <Clock size={13} className="text-warning" />, titleCls: 'text-warning', text: 'Pending Review: The submitted documents are waiting for administrator approval.' };
 
     return (
@@ -389,7 +558,7 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
         <div className={`flex items-start gap-3 rounded-[8px] border-l-2 border px-4 py-3 ${statusConfig.border}`}>
           <div className="shrink-0 mt-0.5">{statusConfig.icon}</div>
           <div>
-            <h4 className={`text-[12.5px] font-semibold ${statusConfig.titleCls}`}>Verification Status: {user.kycStatus}</h4>
+            <h4 className={`text-[12.5px] font-semibold ${statusConfig.titleCls}`}>Verification Status: {kycRecord.status}</h4>
             <p className="text-[12.5px] text-text-muted/80 mt-1 leading-relaxed">{statusConfig.text}</p>
           </div>
         </div>
@@ -406,15 +575,15 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
                   <div className="flex items-center gap-2">
                     {/* Doc tabs */}
                     <div className="flex bg-bg/40 rounded-[5px] border border-border/15 overflow-hidden">
-                      {[['passport', 'Passport ID'], ['address', 'Proof of Address']].map(([key, label]) => (
+                      {docTabs.map((tab) => (
                         <button
-                          key={key}
+                          key={tab.id}
                           type="button"
-                          onClick={() => { setSelectedDoc(key); setRotation(0); setZoom(1); }}
+                          onClick={() => { setSelectedDoc(tab.id); setRotation(0); setZoom(1); }}
                           className={`px-3 h-7 text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer
-                            ${selectedDoc === key ? 'bg-brand text-text-on-accent' : 'text-text-muted hover:text-text'}`}
+                            ${selectedDoc === tab.id ? 'bg-brand text-text-on-accent' : 'text-text-muted hover:text-text'}`}
                         >
-                          {label}
+                          {tab.label}
                         </button>
                       ))}
                     </div>
@@ -426,7 +595,7 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
                         { title: 'Zoom Out', label: '−', action: () => setZoom(z => Math.max(z - 0.25, 0.75)) },
                       ].map(({ title, label, action }) => (
                         <button key={label} type="button" title={title} onClick={action}
-                          className="h-7 w-7 flex items-center justify-center text-[11px] font-bold text-text-muted hover:text-text hover:bg-bg/60 transition-all cursor-pointer border-r border-border/10 last:border-0">
+                          className="h-7 w-7 flex items-center justify-center text-[11px] font-bold text-text-muted hover:text-text hover:bg-bg/60 transition-all cursor-pointer border-r border-border/10 last:border-0 font-sans">
                           {label}
                         </button>
                       ))}
@@ -439,15 +608,19 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
                   </div>
                 }
               />
-              <div className="relative h-[288px] flex items-center justify-center bg-bg overflow-hidden">
-                <img
-                  src={docSrc}
-                  alt="Verification Document"
-                  className="max-h-full max-w-full object-contain transition-all duration-300 transform-gpu"
-                  style={{ transform: `rotate(${rotation}deg) scale(${zoom})`, filter: contrastInverted ? 'invert(1) contrast(1.2)' : 'none' }}
-                />
-                <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-[3px] bg-bg/90 border border-border/12 text-[8.5px] font-mono text-text-muted/50 uppercase tracking-wide">
-                  1024 × 680 · Safe
+              <div className="relative h-[288px] flex items-center justify-center bg-bg overflow-hidden p-4">
+                {docSrc ? (
+                  <SecureImage
+                    src={docSrc}
+                    alt={currentTab?.label || "Verification Document"}
+                    className="max-h-full max-w-full object-contain transition-all duration-300 transform-gpu"
+                    style={{ transform: `rotate(${rotation}deg) scale(${zoom})`, filter: contrastInverted ? 'invert(1) contrast(1.2)' : 'none' }}
+                  />
+                ) : (
+                  <div className="text-[11.5px] text-text-muted/40 italic animate-pulse">No document image available.</div>
+                )}
+                <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-[3px] bg-bg/90 border border-border/12 text-[8.5px] font-mono text-text-muted/50 uppercase tracking-wide select-none">
+                  Secure Connection · Safe
                 </span>
               </div>
             </Panel>
@@ -460,10 +633,10 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
               <PanelHead title="Checklist" />
               <div className="divide-y divide-border/8">
                 {[
-                  ['Passport/ID', `Verified Level 1 (Submitted Passport ID)`],
+                  ['Passport/ID', `Verified Level 1 (Submitted ${idDocType.replace('_', ' ').toUpperCase()})`],
                   ['Background Check', 'AML screening reports CLEAR - System approved.'],
-                  ['Name Match', `Name matches identity document: "${user.name}"`],
-                  ['Address Match', `Address matches utility bill/bank statement: "${user.address || 'Standard Address'}"`],
+                  ['Name Match', `Name matches identity document: "${raw.fullName || user.name}"`],
+                  ['Address Match', `Address matches utility bill/bank statement: "${raw.streetAddress || user.address || 'Standard Address'}"`],
                 ].map(([label, val], idx) => (
                   <div key={idx} className="flex items-start gap-3 px-4 py-2.5">
                     <input type="checkbox" defaultChecked className="mt-0.5 accent-brand cursor-pointer shrink-0" />
@@ -488,16 +661,21 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
                       placeholder="Provide a clear rejection reason (e.g., Expired ID, utility bill name mismatch)..."
                       className="w-full text-[11px] p-2.5 rounded-[6px] border border-negative/30 bg-bg text-text outline-none focus:border-negative transition-all resize-none"
                       rows={2}
+                      disabled={kycActionLoading}
                     />
                     <div className="flex gap-2">
-                      <PillBtn onClick={() => setShowRejectionForm(false)} variant="ghost" className="flex-1">Cancel</PillBtn>
-                      <PillBtn onClick={handleReject} variant="danger" className="flex-1">Confirm Reject</PillBtn>
+                      <PillBtn onClick={() => setShowRejectionForm(false)} variant="ghost" disabled={kycActionLoading} className="flex-1">Cancel</PillBtn>
+                      <PillBtn onClick={handleReject} variant="danger" disabled={kycActionLoading} className="flex-1">
+                        {kycActionLoading ? 'Rejecting...' : 'Confirm Reject'}
+                      </PillBtn>
                     </div>
                   </div>
                 ) : (
                   <div className="flex gap-2">
-                    <PillBtn onClick={() => setShowRejectionForm(true)} variant="danger" className="flex-1">Reject</PillBtn>
-                    <PillBtn onClick={handleApprove} variant="brand" className="flex-1">Approve</PillBtn>
+                    <PillBtn onClick={() => setShowRejectionForm(true)} variant="danger" disabled={kycActionLoading || isRejected || isVerified} className="flex-1">Reject</PillBtn>
+                    <PillBtn onClick={handleApprove} variant="brand" disabled={kycActionLoading || isVerified} className="flex-1">
+                      {kycActionLoading ? 'Approving...' : 'Approve'}
+                    </PillBtn>
                   </div>
                 )}
               </div>
@@ -512,10 +690,10 @@ export function UserDetailContent({ user, activeTab, onUpdateUser, onCreateMt5Ac
           <Panel>
             <div className="divide-y divide-border/8">
               {[
-                ['Level', user.kyc?.level || 'Level 1', false],
-                ['Submitted At', user.kyc?.submittedAt || '2026-03-31 10:00', true],
-                ['Reviewer', user.kyc?.reviewer || 'Compliance Queue', false],
-                ['Files', (user.kyc?.documents ?? []).join(', ') || 'PassportID.jpg, UtilityBill.jpg', false],
+                ['Level', kycRecord.raw?.level || user.kyc?.level || 'Level 1', false],
+                ['Submitted At', kycRecord.raw?.createdAt || kycRecord.raw?.submittedAt || user.kyc?.submittedAt || '2026-03-31 10:00', true],
+                ['Reviewer', kycRecord.raw?.reviewer || user.kyc?.reviewer || 'Compliance Queue', false],
+                ['Files', [kycRecord.raw?.idFrontImage, kycRecord.raw?.idBackImage, kycRecord.raw?.selfieImage, kycRecord.raw?.addressDocImage].filter(Boolean).map(path => typeof path === 'string' ? path.split('/').pop() : 'Attached File').join(', ') || 'PassportID.jpg, UtilityBill.jpg', false],
               ].map(([label, val, mono], i) => (
                 <div key={i} className="px-4"><DataRow label={label} value={val} mono={mono} /></div>
               ))}

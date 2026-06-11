@@ -35,7 +35,7 @@ export function KycHistoryPage() {
   /* ── Loading ── */
   if (loading) {
     return (
-      <div className="max-w-[900px] mx-auto space-y-5 px-4 sm:px-6 animate-pulse">
+      <div className="space-y-5 px-4 sm:px-6 animate-pulse">
         <div className="h-4 w-36 bg-muted-surface rounded-full" />
         <div className="space-y-1.5">
           <div className="h-8 w-56 bg-muted-surface rounded-[9px]" />
@@ -58,7 +58,7 @@ export function KycHistoryPage() {
   /* ── Error ── */
   if (error) {
     return (
-      <div className="max-w-[900px] mx-auto flex flex-col items-center py-20 text-center px-4">
+      <div className="flex flex-col items-center py-20 text-center px-4">
         <div className="w-14 h-14 rounded-full bg-negative/10 flex items-center justify-center mb-4">
           <ShieldCheck size={24} className="text-negative" />
         </div>
@@ -85,14 +85,14 @@ export function KycHistoryPage() {
   const LatestIcon = STATUS_ICON[latestStatus] ?? Clock3;
 
   return (
-    <div className="max-w-[900px] mx-auto space-y-6 px-4 sm:px-6">
+    <div className="space-y-6 animate-fade-up">
 
       {/* ── Back nav ── */}
       <button
-        onClick={() => navigate('/client/kyc')}
+        onClick={() => navigate('/client')}
         className="flex items-center gap-2 text-[11.5px] font-bold text-text-muted hover:text-text transition-colors"
       >
-        <ArrowLeft size={13} /> Overview
+        <ArrowLeft size={13} /> Dashboard
       </button>
 
       {/* ── Header ── */}

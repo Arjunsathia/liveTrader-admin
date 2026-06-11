@@ -2,19 +2,23 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ChevronRight, Bell } from 'lucide-react';
 import { useSupport } from '../hooks/useSupport';
+import { useTickets } from '../hooks/useTickets';
 import { SupportStatsCards } from '../components/SupportStatsCards';
 import { TicketStatusBadge } from '../components/TicketStatusBadge';
 import { AnnouncementCard } from '../components/AnnouncementCard';
 import { QUICK_ACTIONS } from '../configs/overview.config';
-import { MOCK_TICKETS } from '../configs/tickets.config';
 import { ANNOUNCEMENTS } from '../configs/announcements.config';
 import { PageShell } from '@/shared/components/layout/PageShell';
+import { useUniversalDrawer } from '@/shared/components/overlays';
+import { CreateTicketDrawer } from './CreateTicketDrawer';
 
 export function SupportOverviewPage() {
   const navigate = useNavigate();
   const { stats, loading } = useSupport();
+  const { tickets, loading: ticketsLoading } = useTickets();
+  const { openDrawer } = useUniversalDrawer();
 
-  const unreadCount = MOCK_TICKETS.filter((t) => t.status === 'OPEN' && t.unread).length;
+  const unreadCount = tickets.filter((t) => t.status === 'OPEN' && t.unread).length;
 
   return (
     <PageShell className="max-w-[1400px] w-full">
@@ -26,7 +30,7 @@ export function SupportOverviewPage() {
           <p className="text-[13px] text-text-muted mt-1">How can we help?</p>
         </div>
         <button
-          onClick={() => navigate('/client/support/create')}
+          onClick={() => openDrawer(CreateTicketDrawer)}
           className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12.5px] font-bold flex items-center gap-2 hover:opacity-90 transition-all duration-150 active:scale-95 shadow-sm"
         >
           <Plus size={14} /> New ticket
@@ -88,25 +92,35 @@ export function SupportOverviewPage() {
             </button>
           </div>
           <div className="divide-y divide-border/15">
-            {MOCK_TICKETS.slice(0, 4).map((t) => (
-              <button
-                key={t.id}
-                onClick={() => navigate(`/client/support/tickets/${t.id}`)}
-                className="w-full flex items-center gap-3.5 px-5 py-4 hover:bg-brand/[0.01] hover:border-l-2 hover:border-l-brand/70 pl-[18px] transition-all text-left cursor-pointer border-l-2 border-transparent"
-              >
-                {t.unread && <span className="w-1.5 h-1.5 rounded-full bg-brand shrink-0 animate-pulse" />}
-                <div className="flex-1 min-w-0">
-                  <p className={`text-[13px] truncate ${t.unread ? 'font-bold text-text' : 'text-text-muted font-medium'}`}>
-                    {t.subject}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    <TicketStatusBadge status={t.status} />
-                    <span className="font-mono text-[11px] text-text-muted/50">{t.updated}</span>
+            {ticketsLoading ? (
+              <div className="p-5 text-center text-[12px] text-text-muted/50 animate-pulse">
+                Loading recent tickets...
+              </div>
+            ) : tickets.length === 0 ? (
+              <div className="p-8 text-center text-[12.5px] text-text-muted/40 font-medium leading-relaxed">
+                No support tickets found. Click "New ticket" to get started.
+              </div>
+            ) : (
+              tickets.slice(0, 4).map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => navigate(`/client/support/tickets/${t.id}`)}
+                  className="w-full flex items-center gap-3.5 px-5 py-4 hover:bg-brand/[0.01] hover:border-l-2 hover:border-l-brand/70 pl-[18px] transition-all text-left cursor-pointer border-l-2 border-transparent"
+                >
+                  {t.unread && <span className="w-1.5 h-1.5 rounded-full bg-brand shrink-0 animate-pulse" />}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-[13px] truncate ${t.unread ? 'font-bold text-text' : 'text-text-muted font-medium'}`}>
+                      {t.subject}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <TicketStatusBadge status={t.status} />
+                      <span className="font-mono text-[11px] text-text-muted/50">{t.updated}</span>
+                    </div>
                   </div>
-                </div>
-                <ChevronRight size={14} className="text-text-muted/30 shrink-0 transition-transform duration-250 group-hover:translate-x-0.5" />
-              </button>
-            ))}
+                  <ChevronRight size={14} className="text-text-muted/30 shrink-0 transition-transform duration-250 group-hover:translate-x-0.5" />
+                </button>
+              ))
+            )}
           </div>
         </div>
 

@@ -123,13 +123,13 @@ export function PersonalInfoForm({ value, onChange, errors = {} }) {
 
           <KycField label="Phone number" required error={errors.phone}>
             <div className="flex gap-2">
-              <select value={value.phoneCode ?? ''} onChange={set('phoneCode')}
+              {/* <select value={value.phoneCode ?? ''} onChange={set('phoneCode')}
                 className="h-11 rounded-[9px] bg-muted-surface border border-border/40 text-[12px] text-text outline-none focus:border-brand/55 px-2.5 shrink-0 min-w-[105px]">
                 <option value="">+ Code</option>
                 {PHONE_CODES.map(({ code, label: l }) => (
                   <option key={code} value={code}>{code} ({l})</option>
                 ))}
-              </select>
+              </select> */}
               <input type="tel" value={value.phone ?? ''} placeholder="000 000 0000"
                 onChange={set('phone')}
                 className={`flex-1 h-11 px-3.5 rounded-[9px] bg-muted-surface border text-[13px] text-text outline-none focus:border-brand/55 placeholder:text-text-muted/30 ${errors.phone ? 'border-negative/50' : 'border-border/40'}`}

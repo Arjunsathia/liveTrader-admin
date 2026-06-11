@@ -6,3 +6,4 @@ export { SectionHead } from './SectionHead';
 export { IconButton, ActionBtn } from './IconButton';
 export { Toast, ActionToast } from './Toast';
 export { TableRowActions, TableActionBtn } from './TableRowActions';
+export { SecureImage } from './SecureImage';

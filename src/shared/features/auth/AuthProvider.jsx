@@ -55,6 +55,8 @@ export function AuthProvider({ children }) {
       id: apiUser?.id ? String(apiUser.id) : `api-${Date.now()}`,
       email: apiUser?.email || '',
       name: apiUser?.name || '',
+      phone: apiUser?.phone || '',
+      country: apiUser?.country || '',
       initials: (apiUser?.name || apiUser?.email || '')
         .split(' ')
         .map((n) => n[0])

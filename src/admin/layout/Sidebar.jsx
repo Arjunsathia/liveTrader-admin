@@ -94,21 +94,24 @@ function SidebarItem({
         <span
           className={`
             relative shrink-0 flex items-center justify-center transition-all duration-200
-            ${collapsed ? 'w-5 h-5' : 'w-[18px] h-[18px]'}
+            ${collapsed ? 'w-6 h-6' : 'w-[18px] h-[18px]'}
             ${isActive
               ? 'text-primary'
               : 'text-text-muted/40 group-hover/btn:text-text/70 group-hover/btn:scale-110'
             }
           `}
         >
-          <Icon size={16} strokeWidth={isActive ? 2.1 : 1.75} />
+          <Icon size={collapsed ? 19 : 16} strokeWidth={isActive ? 2.1 : 1.75} />
         </span>
 
         {/* Label + chevron (hidden when collapsed) */}
         <span
           className={`
-            flex-1 flex items-center justify-between min-w-0 transition-all duration-200
-            ${collapsed ? 'opacity-0 w-0 overflow-hidden pointer-events-none' : 'opacity-100 w-auto'}
+            flex items-center justify-between min-w-0 transition-all duration-200
+            ${collapsed
+              ? 'w-0 flex-none opacity-0 overflow-hidden pointer-events-none'
+              : 'flex-1 opacity-100 w-auto'
+            }
           `}
         >
           <span
@@ -516,16 +519,16 @@ export function Sidebar({ collapsed, isMobile }) {
                 absolute left-0 w-2 h-2 rotate-45 -translate-x-[5px] border-l border-b
                 ${hoverNode.rect.top > window.innerHeight - 300 ? 'bottom-[14px]' : 'top-[14px]'}
               `}
-              style={{ backgroundColor: 'var(--surface-2)', borderColor: 'var(--border)' }}
+              style={{ backgroundColor: 'var(--surface-bright)', borderColor: 'var(--border)' }}
             />
 
             {/* Flyout panel */}
             <div
               className="flex flex-col rounded-[10px] overflow-hidden min-w-[205px]"
               style={{
-                backgroundColor: 'var(--surface-2)',
+                backgroundColor: 'var(--surface-bright)',
                 border: '1px solid var(--border)',
-                boxShadow: '0 16px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3)',
+                boxShadow: '0 12px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.18)',
                 animation: 'sideTooltip 0.17s cubic-bezier(0.16,1,0.3,1)',
               }}
             >
@@ -548,7 +551,7 @@ export function Sidebar({ collapsed, isMobile }) {
               </div>
 
               {/* Links */}
-              <div className="p-1.5">
+              <div className="p-1.5 flex flex-col gap-0.5">
                 {hoverNode.item.subItems?.length > 0 ? (
                   hoverNode.item.subItems.map((sub) => {
                     // Support both regular nav IDs and profile path-based matching
@@ -558,31 +561,37 @@ export function Sidebar({ collapsed, isMobile }) {
                         key={sub.id}
                         onClick={() => { navigate(sub.path); setHoverNode(null); }}
                         className={`
-                          w-full flex items-center gap-2 px-3 py-2 rounded-[7px]
-                          text-[13.5px] font-heading font-medium tracking-[-0.01em]
-                          transition-all duration-150 cursor-pointer outline-none text-left
+                          relative w-full flex items-center gap-2.5 px-3.5 py-[8px] rounded-[7px]
+                          text-[13px] font-heading tracking-[-0.01em]
+                          transition-all duration-150 cursor-pointer outline-none text-left group/flyout
                           ${isSubActive
-                            ? 'bg-primary/[0.10] text-primary'
-                            : 'text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80'
+                            ? 'bg-primary text-text-on-accent font-semibold shadow-sm'
+                            : 'font-medium text-text/70 hover:bg-primary/[0.1] hover:text-primary'
                           }
                         `}
                       >
                         <span
                           className={`
-                            w-1.5 h-1.5 rounded-full shrink-0
-                            ${isSubActive ? 'bg-primary' : 'bg-border/30'}
+                            w-[7px] h-[7px] rounded-full shrink-0 transition-all duration-150
+                            ${isSubActive
+                              ? 'bg-text-on-accent scale-110'
+                              : 'bg-text-muted/25 group-hover/flyout:bg-primary/50 group-hover/flyout:scale-110'
+                            }
                           `}
                         />
                         {sub.label}
+                        {isSubActive && (
+                          <ChevronRight size={11} strokeWidth={2.5} className="ml-auto text-text-on-accent/85 shrink-0" />
+                        )}
                       </button>
                     );
                   })
                 ) : (
                   <button
                     onClick={() => { navigate(hoverNode.item.path); setHoverNode(null); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text-muted/55 hover:bg-text/[0.04] hover:text-text/80 transition-all duration-150 cursor-pointer outline-none text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[7px] text-[13px] font-heading font-medium text-text/80 hover:bg-primary/[0.1] hover:text-primary transition-all duration-150 cursor-pointer outline-none text-left"
                   >
-                    <ChevronRight size={11} strokeWidth={2.5} className="text-primary/50 shrink-0" />
+                    <ChevronRight size={11} strokeWidth={2.5} className="text-primary/60 shrink-0" />
                     Open {hoverNode.item.label}
                   </button>
                 )}
@@ -667,8 +676,11 @@ export function Sidebar({ collapsed, isMobile }) {
           }}
           onMouseLeave={handleHoverEnd}
           className={`
-            flex items-center w-full rounded-[8px] transition-all duration-200 cursor-pointer outline-none
-            ${collapsed ? 'justify-center p-2' : 'p-2 gap-3 hover:bg-text/[0.04]'}
+            flex items-center rounded-[8px] transition-all duration-200 cursor-pointer outline-none
+            ${collapsed
+              ? 'justify-center w-10 h-10 mx-auto'
+              : 'p-2 gap-3 w-full hover:bg-text/[0.04]'
+            }
             ${isAccountActive || (collapsed && hoverNode?.item.id === 'account')
               ? 'bg-primary/[0.08]'
               : ''

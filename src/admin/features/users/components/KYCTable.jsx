@@ -6,12 +6,17 @@ export function KYCTable({ tableState, onReviewUser }) {
   const columns = [
     { 
       key: 'id', 
-      label: 'ID', 
-      render: (val) => (
-        <span className="inline-flex px-2 py-0.5 rounded-[5px] border border-brand/15 bg-brand/[0.04] font-mono text-[11px] font-bold text-brand tracking-wider select-none">
-          {val}
-        </span>
-      ) 
+      label: 'S.No.', 
+      render: (_, __, idx) => {
+        const page = tableState?.page || 1;
+        const pageSize = tableState?.pageSize || 10;
+        const sNo = (page - 1) * pageSize + idx + 1;
+        return (
+          <span className="inline-flex px-2 py-0.5 rounded-[5px] border border-border/15 bg-bg/30 font-mono text-[11px] font-bold text-text-muted select-none">
+            {sNo}
+          </span>
+        );
+      }
     },
     {
       key: 'user',
@@ -28,15 +33,6 @@ export function KYCTable({ tableState, onReviewUser }) {
           </div>
         </div>
       ),
-    },
-    { 
-      key: 'tier', 
-      label: 'Tier', 
-      render: (val) => (
-        <span className="text-[13px] font-bold text-text select-none uppercase tracking-wide">
-          {val}
-        </span>
-      ) 
     },
     { 
       key: 'docs', 
@@ -72,22 +68,43 @@ export function KYCTable({ tableState, onReviewUser }) {
       ) 
     },
     { 
-      key: 'eta', 
+      key: 'submittedAt', 
       label: 'Time', 
-      render: (val) => (
-        <span className="font-mono text-[11.5px] text-text-muted font-medium select-none">
-          {val}
-        </span>
-      ) 
+      render: (val) => {
+        if (!val) return <span className="text-text-muted/40 font-mono text-[11px]">—</span>;
+        
+        let displayVal = val;
+        try {
+          const date = new Date(val);
+          if (!isNaN(date.getTime())) {
+            displayVal = date.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            });
+          }
+        } catch (e) {
+          // fallback
+        }
+        
+        return (
+          <span className="font-mono text-[11.5px] text-text-muted font-medium select-none">
+            {displayVal}
+          </span>
+        );
+      } 
     },
-    {
+    { 
       key: 'actions',
       label: 'Actions',
       align: 'right',
       render: (_, row) => (
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); onReviewUser(row.userId); }}
+          onClick={(e) => { e.stopPropagation(); onReviewUser(row.userId, row); }}
           className="inline-flex items-center justify-center h-7 px-3.5 rounded-[7px] border border-border/15 bg-bg/25 text-text-muted hover:text-text hover:border-brand/40 hover:bg-bg/40 text-[10.5px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-[0.94] shadow-sm select-none"
         >
           Review
@@ -100,7 +117,7 @@ export function KYCTable({ tableState, onReviewUser }) {
     <MainTable
       columns={columns}
       data={tableState.items}
-      onRowClick={(row) => onReviewUser(row.userId)}
+      onRowClick={(row) => onReviewUser(row.userId, row)}
       emptyTitle="No requests match the search."
       pagination={tableState}
       rowClassName={(row) => {

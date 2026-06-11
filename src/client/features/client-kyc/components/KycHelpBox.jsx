@@ -3,6 +3,8 @@ import {
   FileImage, LockKeyhole, LifeBuoy, CheckCircle2,
   XCircle, ChevronDown, Info, HelpCircle,
 } from 'lucide-react';
+import { useUniversalDrawer } from '@/shared/components/overlays';
+import { CreateTicketDrawer } from '@/features/client-support/pages/CreateTicketDrawer';
 
 const FAQS = [
   {
@@ -28,6 +30,7 @@ const DONTs = ['No expired or blurry images', 'No screenshots or cropped photos'
 
 export function KycHelpBox() {
   const [openIdx, setOpenIdx] = useState(null);
+  const { openDrawer } = useUniversalDrawer();
 
   const toggle = (idx) => {
     setOpenIdx(openIdx === idx ? null : idx);
@@ -139,13 +142,15 @@ export function KycHelpBox() {
         </div>
 
         {/* Support link */}
-        <a href="#/client/support/tickets/new"
-          className="flex items-center gap-2.5 pt-4 border-t border-border/25 text-[11.5px] font-bold text-brand hover:opacity-75 transition-opacity">
-          <div className="w-7 h-7 rounded-[8px] bg-brand/12 flex items-center justify-center">
+        <button
+          onClick={() => openDrawer(CreateTicketDrawer)}
+          className="w-full flex items-center gap-2.5 pt-4 border-t border-border/25 text-[11.5px] font-bold text-brand hover:opacity-75 transition-opacity text-left cursor-pointer"
+        >
+          <div className="w-7 h-7 rounded-[8px] bg-brand/12 flex items-center justify-center shrink-0">
             <LifeBuoy size={13} />
           </div>
           Need help? Contact support
-        </a>
+        </button>
 
       </div>
     </div>
