@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ROLE_PRESETS } from '@/config/permissions/permissions';
+import { getPermissionsForRole } from '@/shared/config/permissions/permissions';
 
 const SESSION_KEY = 'lt_session';
 
@@ -19,13 +19,14 @@ const authSlice = createSlice({
   initialState: {
     user: initialUser,
     isAuthenticated: !!initialUser,
-    permissions: initialUser?.portalType === 'admin' ? (ROLE_PRESETS[initialUser.role] ?? []) : [],
+    permissions: initialUser?.role ? getPermissionsForRole(initialUser.role) : [],
   },
   reducers: {
     setSession: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
-      state.permissions = action.payload?.portalType === 'admin' ? (ROLE_PRESETS[action.payload.role] ?? []) : [];
+      state.permissions = action.payload?.role ? getPermissionsForRole(action.payload.role) : [];
+
       try {
         if (action.payload) {
           localStorage.setItem(SESSION_KEY, JSON.stringify(action.payload));

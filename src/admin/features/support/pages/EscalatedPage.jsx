@@ -57,42 +57,42 @@ function EscalatedPage() {
       value: escalatedData.length,
       accent: 'var(--negative)',
       Icon: AlertOctagon,
-      sub: 'Waiting for review',
+      sub: 'Needs review',
     },
     {
       label: 'Critical',
       value: escalatedData.filter((t) => t.priority === 'CRITICAL').length,
       accent: 'var(--negative)',
       Icon: AlertOctagon,
-      sub: 'Needs urgent action',
+      sub: 'Urgent action required',
     },
     {
       label: 'Overdue',
       value: escalatedData.filter((t) => t.slaMins != null && t.slaMins < 0).length,
       accent: 'var(--negative)',
       Icon: Timer,
-      sub: 'Past due',
+      sub: 'Past deadline',
     },
     {
       label: 'Compliance',
       value: escalatedData.filter((t) => t.category === 'Compliance').length,
       accent: 'var(--warning)',
       Icon: ShieldAlert,
-      sub: 'Verification checks',
+      sub: 'Needs verification',
     },
     {
       label: 'Finance',
       value: escalatedData.filter((t) => ['Finance', 'Prop'].includes(t.category)).length,
       accent: 'var(--warning)',
       Icon: Wallet,
-      sub: 'Payment reviews',
+      sub: 'Payment issues',
     },
     {
       label: 'Unassigned',
       value: escalatedData.filter((t) => t.owner === 'Unassigned').length,
       accent: 'var(--negative)',
       Icon: UserPlus,
-      sub: 'Needs an owner',
+      sub: 'No owner yet',
     },
   ];
 
@@ -104,10 +104,10 @@ function EscalatedPage() {
             Support
           </p>
           <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
-            Urgent Tickets
+            Urgent tickets
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
-            Review and act on urgent tickets.
+            Review and act on tickets that need attention.
           </p>
         </div>
       </header>
@@ -230,7 +230,7 @@ function EscalatedPage() {
                 No tickets found
               </p>
               <p className="text-[11.5px] text-text-muted/40 mt-1 max-w-[220px] leading-snug">
-                Try changing your filters or search.
+                Try different filters or search.
               </p>
             </div>
           ) : (

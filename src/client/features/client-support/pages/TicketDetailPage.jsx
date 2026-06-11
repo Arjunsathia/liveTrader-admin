@@ -34,7 +34,7 @@ export function TicketDetailPage() {
     return (
       <PageShell className="max-w-[1100px] mx-auto text-center py-16">
         <p className="text-[14px] font-bold mb-2">Ticket not found</p>
-        <p className="text-[12.5px] text-text-muted mb-5">We could not load this ticket.</p>
+        <p className="text-[12.5px] text-text-muted mb-5">This ticket does not exist or could not be loaded.</p>
         <button
           onClick={() => navigate('/client/support/tickets')}
           className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12px] font-bold hover:opacity-90 transition-opacity cursor-pointer"
@@ -76,7 +76,7 @@ export function TicketDetailPage() {
         <div className="rounded-[16px] border border-border/35 bg-surface-elevated overflow-hidden shadow-sm">
           <div className="px-5 py-3.5 border-b border-border/20 bg-muted-surface/10">
             <p className="text-[11px] font-black uppercase tracking-[0.12em] text-text-muted">
-              Conversation · {messages.length} messages
+              Messages ({messages.length})
             </p>
           </div>
 
@@ -91,12 +91,12 @@ export function TicketDetailPage() {
 
           {ticket.status === 'RESOLVED' && (
             <div className="px-5 py-4 border-t border-border/20 bg-positive/[0.03] text-center animate-fade-in">
-              <p className="text-[12.5px] text-positive font-bold">This ticket is resolved.</p>
+              <p className="text-[12.5px] text-positive font-bold">This ticket is closed.</p>
               <button
                 onClick={() => navigate('/client/support/create')}
                 className="mt-1.5 text-[12.5px] font-bold text-brand hover:opacity-75 transition-opacity cursor-pointer"
               >
-                Open a new ticket →
+                Create a new ticket →
               </button>
             </div>
           )}

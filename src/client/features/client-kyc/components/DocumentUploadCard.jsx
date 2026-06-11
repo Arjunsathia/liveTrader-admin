@@ -20,10 +20,16 @@ export function UploadArea({
   const depth = useRef(0);
 
   useEffect(() => {
-    if (!file?.type?.startsWith('image/')) { setPreview(null); return; }
+    if (!file?.type?.startsWith('image/')) {
+      const t = setTimeout(() => setPreview(null), 0);
+      return () => clearTimeout(t);
+    }
     const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
+    const t = setTimeout(() => setPreview(url), 0);
+    return () => {
+      clearTimeout(t);
+      URL.revokeObjectURL(url);
+    };
   }, [file]);
 
   const onDragEnter = (e) => { e.preventDefault(); depth.current++; setDragging(true); };
@@ -140,7 +146,8 @@ export function DocumentUploadCard({ value, onChange, errors = {} }) {
       <div>
         <SectionLabel>Document type</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {DOC_TYPES.map(({ id, label, Icon, sub }) => {
+          {DOC_TYPES.map((type) => {
+            const { id, label, Icon, sub } = type;
             const on = value.type === id;
             return (
               <button key={id} type="button" onClick={() => onChange({ ...value, type: id })}
@@ -163,7 +170,7 @@ export function DocumentUploadCard({ value, onChange, errors = {} }) {
 
       {/* ── Upload areas ── */}
       <div>
-        <SectionLabel>Document images</SectionLabel>
+        <SectionLabel>Upload document</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-[11px] font-semibold text-text-muted mb-2.5">Front side <span className="text-negative">*</span></p>
@@ -180,7 +187,7 @@ export function DocumentUploadCard({ value, onChange, errors = {} }) {
               <p className="text-[11px] font-semibold text-text-muted mb-2.5">Back side <span className="text-negative">*</span></p>
               <UploadArea
                 label="Upload back side"
-                hint="MRZ strip at the bottom must be clearly readable"
+                hint="Make sure all text is easy to read"
                 file={value.back}
                 error={errors.back}
                 onChange={(f) => onChange({ ...value, back: f })}
@@ -191,7 +198,7 @@ export function DocumentUploadCard({ value, onChange, errors = {} }) {
               <div className="w-10 h-10 rounded-full bg-positive/10 flex items-center justify-center mb-3">
                 <CheckCircle2 size={18} className="text-positive" />
               </div>
-              <p className="text-[12px] font-bold">Back page not required</p>
+              <p className="text-[12px] font-bold">Back side not required</p>
               <p className="text-[11px] text-text-muted mt-1.5 max-w-[165px] leading-relaxed">
                 Passports only need the photo data page.
               </p>
@@ -202,12 +209,12 @@ export function DocumentUploadCard({ value, onChange, errors = {} }) {
 
       {/* ── Document details ── */}
       <div>
-        <SectionLabel>Document details</SectionLabel>
+        <SectionLabel>Document info</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            ['documentNumber', 'Document number', 'text', 'e.g. A12345678'],
+            ['documentNumber', 'Document ID number', 'text', 'e.g. A12345678'],
             ['expiryDate', 'Expiry date', 'date', null],
-            ['issuingCountry', 'Issuing country', 'text', 'e.g. United Kingdom'],
+            ['issuingCountry', 'Country of issue', 'text', 'e.g. United Kingdom'],
           ].map(([name, label, type, ph]) => (
             <label key={name} className="block">
               <span className="block text-[10px] font-black uppercase tracking-[0.1em] text-text-muted mb-2">

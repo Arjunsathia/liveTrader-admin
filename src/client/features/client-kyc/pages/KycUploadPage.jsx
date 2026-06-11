@@ -16,23 +16,23 @@ import { useKycUpload } from '../hooks/useKycUpload';
 const STEPS = [
   {
     label: 'Personal info',
-    desc: 'Enter your legal details exactly as they appear on your government-issued document.',
+    desc: 'Enter your details exactly as shown on your official ID.',
   },
   {
     label: 'Identity document',
-    desc: 'Upload a valid, undamaged, government-issued identity document.',
+    desc: 'Upload a clear photo of your passport, ID card, or driver\'s license.',
   },
   {
     label: 'Face verification',
-    desc: 'Complete a quick face check so we can securely match you to your document.',
+    desc: 'Take a quick selfie to confirm your identity.',
   },
   {
     label: 'Proof of address',
-    desc: 'Confirm your residential address with a document dated within the last 90 days.',
+    desc: 'Upload a utility bill or bank statement showing your address.',
   },
   {
     label: 'Review & submit',
-    desc: 'Check every detail carefully. Files are locked for compliance review once submitted.',
+    desc: 'Make sure all details are correct before submitting.',
   },
 ];
 
@@ -111,14 +111,13 @@ export function KycUploadPage() {
         </div>
 
         <span className="text-[10px] font-black uppercase tracking-[0.13em] text-positive mb-2">
-          Submission complete
+          Done!
         </span>
         <h1 className="font-heading font-semibold text-[26px] tracking-[-0.03em] text-text mt-1 mb-3">
-          Documents submitted securely
+          Sent successfully
         </h1>
         <p className="text-[13px] text-text-muted leading-relaxed max-w-sm mb-8">
-          Our compliance team will review your submission. Most verifications complete within
-          1–3 business days. You will be notified by email when a decision is made.
+          We are checking your documents. This usually takes 1 to 3 business days. We will email you once we are done.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -126,19 +125,19 @@ export function KycUploadPage() {
             onClick={() => navigate('/client/kyc/status')}
             className="h-11 px-5 rounded-[10px] bg-brand text-text-on-accent text-[12.5px] font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
-            View verification status <ArrowRight size={14} />
+            View status <ArrowRight size={14} />
           </button>
           <button
             onClick={() => navigate('/client/kyc')}
             className="h-11 px-5 rounded-[10px] border border-border/40 bg-surface-elevated text-[12.5px] font-bold flex items-center justify-center gap-2 hover:bg-muted-surface/50 transition-colors"
           >
-            Back to overview
+            Back
           </button>
         </div>
 
         <div className="mt-8 flex items-center gap-2.5 text-[11px] text-text-muted">
           <LockKeyhole size={12} className="text-brand" />
-          Your documents are encrypted and cannot be modified during review.
+          Your files are locked while we check them.
         </div>
       </div>
     );
@@ -152,17 +151,17 @@ export function KycUploadPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.12em] text-text-muted">
-            Secure verification
+            Verify identity
           </p>
           <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-0.5">
-            Complete your KYC
+            Verify your identity
           </h1>
           <p className="text-[13px] text-text-muted mt-1">
-            Your draft is encrypted and auto-saved between steps.
+            Your progress is saved automatically as you go.
           </p>
         </div>
         <div className="flex items-center gap-2 text-[10.5px] font-bold text-positive shrink-0">
-          <LockKeyhole size={12} /> 256-bit encrypted session
+          <LockKeyhole size={12} /> Secure connection
         </div>
       </div>
 
@@ -170,7 +169,7 @@ export function KycUploadPage() {
       <KycProgressStepper
         current={step}
         completed={completedSteps ?? []}
-        onSelect={(target) => target < step && setStep(target)}
+        onSelect={(target) => setStep(target)}
       />
 
       {/* ── Main grid ── */}
@@ -208,7 +207,7 @@ export function KycUploadPage() {
           )}
 
           {/* Bottom nav bar */}
-          <div className="px-5 md:px-6 py-4 border-t border-border/25 bg-surface flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="px-5 md:px-6 py-4 border-t border-border/25 bg-surface-elevated flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               type="button"
               disabled={step === 1}
@@ -222,7 +221,7 @@ export function KycUploadPage() {
               <span className={`flex items-center gap-1.5 text-[10.5px] transition-opacity ${saving ? 'opacity-100' : 'opacity-45'}`}>
                 <Save size={11} className="text-text-muted" />
                 <span className="text-text-muted">
-                  {saving ? 'Saving draft…' : 'Draft autosaved'}
+                  {saving ? 'Saving progress…' : 'Progress saved'}
                 </span>
               </span>
               <button
@@ -232,7 +231,7 @@ export function KycUploadPage() {
                 className="w-full sm:w-auto h-10 px-5 rounded-[9px] bg-brand text-text-on-accent text-[11.5px] font-bold flex items-center justify-center gap-2 disabled:opacity-60 hover:opacity-90 transition-opacity"
               >
                 {isLastStep
-                  ? <><Send size={13} /> Submit for review</>
+                  ? <><Send size={13} /> Submit</>
                   : <>Save and continue <ArrowRight size={13} /></>}
               </button>
             </div>
@@ -244,10 +243,9 @@ export function KycUploadPage() {
           <KycHelpBox />
 
           <div className="rounded-[12px] border border-brand/20 bg-brand/[0.06] p-4">
-            <p className="text-[11.5px] font-bold text-brand mb-1">Why we verify</p>
+            <p className="text-[11.5px] font-bold text-brand mb-1">Why we ask this</p>
             <p className="text-[10.5px] text-text-muted leading-relaxed">
-              Identity checks protect your funds and help Live-Trader meet global financial
-              compliance regulations.
+              This keeps your account safe and helps us follow local trading laws.
             </p>
           </div>
 
@@ -255,7 +253,7 @@ export function KycUploadPage() {
             <div className="rounded-[12px] border border-positive/20 bg-positive/[0.05] p-4 flex items-center gap-2.5">
               <CheckCircle2 size={13} className="text-positive shrink-0" />
               <p className="text-[10.5px] text-positive font-bold leading-relaxed">
-                {doneCount} step{doneCount !== 1 ? 's' : ''} completed and saved
+                {doneCount} step{doneCount !== 1 ? 's' : ''} completed
               </p>
             </div>
           )}

@@ -92,20 +92,20 @@ export function KycHistoryPage() {
         onClick={() => navigate('/client/kyc')}
         className="flex items-center gap-2 text-[11.5px] font-bold text-text-muted hover:text-text transition-colors"
       >
-        <ArrowLeft size={13} /> Verification overview
+        <ArrowLeft size={13} /> Overview
       </button>
 
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.12em] text-text-muted">
-            Compliance audit trail
+            Past Uploads
           </p>
           <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-0.5">
-            Submission history
+            Upload history
           </h1>
           <p className="text-[13px] text-text-muted mt-1">
-            Track previous submissions, reviewer notes, and required actions.
+            View your past document uploads and notes from our team.
           </p>
         </div>
         {totalCount > 0 && (
@@ -113,7 +113,7 @@ export function KycHistoryPage() {
             onClick={() => navigate('/client/kyc/upload')}
             className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12px] font-bold shrink-0 hover:opacity-90 transition-opacity"
           >
-            New submission
+            Upload document
           </button>
         )}
       </div>
@@ -128,7 +128,7 @@ export function KycHistoryPage() {
               <History size={13} className="text-brand" />
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.1em] text-text-muted">
-              Total submissions
+              Total uploads
             </p>
             <p className="text-[22px] font-bold mt-1 text-text tracking-[-0.02em]">
               {totalCount}
@@ -141,7 +141,7 @@ export function KycHistoryPage() {
               <Clock3 size={13} className="text-brand" />
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.1em] text-text-muted">
-              Last submitted
+              Last uploaded
             </p>
             <p className="text-[13.5px] font-bold mt-1 text-text">
               {latestDate ?? '—'}
@@ -154,7 +154,7 @@ export function KycHistoryPage() {
               <LatestIcon size={13} className="text-brand" />
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.1em] text-text-muted">
-              Current status
+              Status
             </p>
             <div className="mt-2">
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full border ${STATUS_CLS[latestStatus] ?? STATUS_CLS.pending}`}>

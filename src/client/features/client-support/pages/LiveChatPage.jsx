@@ -3,7 +3,7 @@ import { Send, Paperclip, MessageCircle, Dot } from 'lucide-react';
 import { PageShell } from '@/shared/components/layout/PageShell';
 
 const INITIAL_MSGS = [
-  { id: 1, from: 'agent', name: 'Maya — Support', initials: 'MA', ts: 'Just now', text: 'Hi! Welcome to Live Trader support. How can I help you today?' },
+  { id: 1, from: 'agent', name: 'Maya — Support', initials: 'MA', ts: 'Just now', text: 'Hello! How can I help you today?' },
 ];
 
 export function LiveChatPage() {
@@ -32,10 +32,10 @@ export function LiveChatPage() {
     setTyping(true);
     setTimeout(() => {
       const replies = [
-        'Thanks for reaching out! I am looking into this for you now.',
-        'Can you provide your account email or ticket ID so I can check further?',
-        'I understand. Let me escalate this to the relevant team and they will follow up shortly.',
-        'Your request has been noted. Is there anything else I can assist you with?',
+        'Thanks! I am checking this for you now.',
+        'Please share your email or ticket ID.',
+        'I will forward this to our team. We will reply soon.',
+        'I have saved your request. Do you need help with anything else?',
       ];
       const reply = replies[Math.floor(Math.random() * replies.length)];
       setTyping(false);
@@ -56,8 +56,8 @@ export function LiveChatPage() {
       {/* Header */}
       <div>
         <p className="text-section-eyebrow">Support</p>
-        <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">Live Chat</h1>
-        <p className="text-[13px] text-text-muted mt-1">Chat with our team in real time.</p>
+        <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">Live chat</h1>
+        <p className="text-[13px] text-text-muted mt-1">Chat with our team.</p>
       </div>
 
       {/* Chat window */}
@@ -73,7 +73,7 @@ export function LiveChatPage() {
           <div>
             <p className="text-[13px] font-bold text-text">Maya — Support</p>
             <div className="flex items-center gap-1 text-[10.5px] text-positive">
-              <Dot size={14} className="-ml-1" />Online · Typically replies in &lt;5 min
+              <Dot size={14} className="-ml-1" />Online · Replies in minutes
             </div>
           </div>
           <MessageCircle size={15} className="ml-auto text-text-muted/40" />
@@ -138,7 +138,7 @@ export function LiveChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Type a message…"
+            placeholder="Type a message..."
             rows={1}
             className="flex-1 min-h-[40px] max-h-[100px] resize-none bg-surface border border-border/35 rounded-[9px] px-3 py-2.5 text-[13px] text-text placeholder:text-text-muted/50 outline-none focus:border-brand/40 transition-colors"
             style={{ fieldSizing: 'content' }}
@@ -156,7 +156,7 @@ export function LiveChatPage() {
       {/* Note */}
       <div className="text-center">
         <p className="text-[11px] text-text-muted/55">
-          Available Mon–Fri 09:00–18:00 UTC. Outside hours, chat responses may be delayed.{' '}
+          We are online Mon–Fri, 9am–6pm UTC. Outside these hours, replies might take longer.{' '}
           <button onClick={() => {}} className="text-brand hover:opacity-75 transition-opacity font-bold">
             Leave a message
           </button>

@@ -3,9 +3,9 @@ import { Camera, UploadCloud, ScanFace, CheckCircle2, X, AlertCircle, Sun, Eye, 
 import { UploadArea } from './DocumentUploadCard';
 
 const GUIDES = [
-  { Icon: Sun, title: 'Good lighting', desc: 'Face evenly lit — no harsh shadows or glare' },
-  { Icon: Eye, title: 'Face clearly visible', desc: 'No glasses, hats, masks or face coverings' },
-  { Icon: ScanFace, title: 'Centred in frame', desc: 'Your face should fill most of the frame' },
+  { Icon: Sun, title: 'Good lighting', desc: 'Make sure your face is well-lit and clear' },
+  { Icon: Eye, title: 'Clear face view', desc: 'Remove glasses, hats, and masks' },
+  { Icon: ScanFace, title: 'Center your face', desc: 'Keep your head inside the circle outline' },
 ];
 
 export function SelfieCaptureCard({ value, onChange, error }) {
@@ -17,10 +17,16 @@ export function SelfieCaptureCard({ value, onChange, error }) {
   const streamRef = useRef(null);
 
   useEffect(() => {
-    if (!value?.type?.startsWith('image/')) { setPreview(null); return; }
+    if (!value?.type?.startsWith('image/')) {
+      const t = setTimeout(() => setPreview(null), 0);
+      return () => clearTimeout(t);
+    }
     const url = URL.createObjectURL(value);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
+    const t = setTimeout(() => setPreview(url), 0);
+    return () => {
+      clearTimeout(t);
+      URL.revokeObjectURL(url);
+    };
   }, [value]);
 
   const startCamera = async () => {
@@ -36,7 +42,7 @@ export function SelfieCaptureCard({ value, onChange, error }) {
       }
       setCameraActive(true);
     } catch {
-      setCameraError('Camera access was denied. Please allow camera permissions or use file upload.');
+      setCameraError('Camera access was denied. Please allow camera permissions or upload a photo.');
     }
   };
 
@@ -75,12 +81,15 @@ export function SelfieCaptureCard({ value, onChange, error }) {
       {/* ── Mode tabs ── */}
       {!preview && (
         <div className="flex gap-1 p-1 rounded-[10px] bg-muted-surface/60 border border-border/30 w-fit">
-          {[['upload', UploadCloud, 'Upload selfie'], ['camera', Camera, 'Take photo']].map(([m, Icon, lbl]) => (
-            <button key={m} type="button" onClick={() => switchMode(m)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-[11.5px] font-bold transition-all ${mode === m ? 'bg-brand text-text-on-accent' : 'text-text-muted hover:text-text'}`}>
-              <Icon size={13} /> {lbl}
-            </button>
-          ))}
+          {[['upload', UploadCloud, 'Upload Photo'], ['camera', Camera, 'Use Camera']].map((item) => {
+            const [m, Icon, lbl] = item;
+            return (
+              <button key={m} type="button" onClick={() => switchMode(m)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-[11.5px] font-bold transition-all ${mode === m ? 'bg-brand text-text-on-accent' : 'text-text-muted hover:text-text'}`}>
+                <Icon size={13} /> {lbl}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -164,22 +173,25 @@ export function SelfieCaptureCard({ value, onChange, error }) {
         <div className="space-y-3">
           <p className="text-[10px] font-black uppercase tracking-[0.12em] text-text-muted">Photo guidelines</p>
 
-          {GUIDES.map(({ Icon, title, desc }) => (
-            <div key={title} className="flex gap-3 p-3.5 rounded-[10px] bg-muted-surface/50 border border-border/30">
-              <div className="w-7 h-7 rounded-[7px] bg-brand/12 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon size={13} className="text-brand" />
+          {GUIDES.map((guide) => {
+            const { Icon, title, desc } = guide;
+            return (
+              <div key={title} className="flex gap-3 p-3.5 rounded-[10px] bg-muted-surface/50 border border-border/30">
+                <div className="w-7 h-7 rounded-[7px] bg-brand/12 flex items-center justify-center shrink-0 mt-0.5">
+                  <Icon size={13} className="text-brand" />
+                </div>
+                <div>
+                  <p className="text-[11.5px] font-bold">{title}</p>
+                  <p className="text-[10.5px] text-text-muted mt-0.5 leading-relaxed">{desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[11.5px] font-bold">{title}</p>
-                <p className="text-[10.5px] text-text-muted mt-0.5 leading-relaxed">{desc}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
 
           <div className="flex gap-3 p-3.5 rounded-[10px] bg-warning/[0.06] border border-warning/20">
             <Lightbulb size={14} className="text-warning shrink-0 mt-0.5" />
             <p className="text-[10.5px] text-warning/80 leading-relaxed">
-              Your selfie will be compared to your identity document using facial recognition.
+              We will match your selfie to the photo on your ID to confirm it is you.
             </p>
           </div>
         </div>

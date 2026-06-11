@@ -107,7 +107,7 @@ export function MyTicketsPage() {
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <p className="text-section-eyebrow">Support</p>
-          <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">My Tickets</h1>
+          <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">Support tickets</h1>
           <p className="text-[13px] text-text-muted mt-1">
             {tickets.length} total · {openCount} open
           </p>
@@ -128,7 +128,7 @@ export function MyTicketsPage() {
           accentColor="var(--brand)"
           search={search}
           onSearchChange={setSearch}
-          searchPlaceholder="Search tickets..."
+          searchPlaceholder="Search..."
           filters={
             <>
               {/* Status Filter */}
@@ -165,7 +165,7 @@ export function MyTicketsPage() {
                   className="h-7 px-2.5 rounded-[7px] border border-negative/20 bg-negative/5 text-negative hover:bg-negative/10 font-bold text-[10.5px] cursor-pointer transition-all active:scale-[0.97]"
                   title="Reset Filters"
                 >
-                  RESET
+                  Reset
                 </button>
               )}
             </>

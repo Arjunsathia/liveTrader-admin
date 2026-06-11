@@ -21,15 +21,15 @@ export function SupportOverviewPage() {
       {/* Header */}
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <p className="text-section-eyebrow">Help &amp; Support</p>
-          <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">Support Center</h1>
-          <p className="text-[13px] text-text-muted mt-1">How can we help you today?</p>
+          <p className="text-section-eyebrow">Support</p>
+          <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">Help &amp; Support</h1>
+          <p className="text-[13px] text-text-muted mt-1">How can we help?</p>
         </div>
         <button
           onClick={() => navigate('/client/support/create')}
           className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12.5px] font-bold flex items-center gap-2 hover:opacity-90 transition-all duration-150 active:scale-95 shadow-sm"
         >
-          <Plus size={14} /> New Ticket
+          <Plus size={14} /> New ticket
         </button>
       </div>
 
@@ -38,7 +38,7 @@ export function SupportOverviewPage() {
         <div className="flex items-center gap-3 p-3.5 rounded-[12px] bg-brand/[0.06] border border-brand/20 shadow-sm animate-fade-in">
           <Bell size={14} className="text-brand shrink-0" />
           <p className="text-[12.5px] text-text-muted flex-1">
-            You have <strong className="text-text font-bold">{unreadCount} open ticket{unreadCount !== 1 ? 's' : ''}</strong> with new replies.
+            You have <strong className="text-text font-bold">{unreadCount} ticket{unreadCount !== 1 ? 's' : ''}</strong> with new replies.
           </p>
           <button
             onClick={() => navigate('/client/support/tickets')}
@@ -79,7 +79,7 @@ export function SupportOverviewPage() {
         {/* Recent tickets */}
         <div className="rounded-[16px] border border-border/35 bg-surface-elevated overflow-hidden shadow-sm">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border/20 bg-muted-surface/10">
-            <p className="text-[13px] font-bold text-text">Recent Tickets</p>
+            <p className="text-[13px] font-bold text-text">Recent tickets</p>
             <button
               onClick={() => navigate('/client/support/tickets')}
               className="text-[11.5px] font-bold text-brand hover:opacity-80 transition-opacity"
@@ -113,7 +113,7 @@ export function SupportOverviewPage() {
         {/* Latest announcements */}
         <div className="space-y-3.5">
           <div className="flex items-center justify-between">
-            <p className="text-[13px] font-bold text-text">Latest Updates</p>
+            <p className="text-[13px] font-bold text-text">Latest updates</p>
             <button
               onClick={() => navigate('/client/support/announcements')}
               className="text-[11.5px] font-bold text-brand hover:opacity-80 transition-opacity"

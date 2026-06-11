@@ -30,12 +30,12 @@ export function AnnouncementsPage() {
       <div>
         <p className="text-section-eyebrow">Support</p>
         <h1 className="font-heading font-semibold text-[27px] tracking-[-0.04em] text-text mt-1">Announcements</h1>
-        <p className="text-[13px] text-text-muted mt-1">Platform updates, maintenance schedules, and incidents.</p>
+        <p className="text-[13px] text-text-muted mt-1">Updates on maintenance and system status.</p>
       </div>
 
       {/* Incident board */}
       <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65 mb-3.5">System Status</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65 mb-3.5">System status</p>
         <div className="space-y-3">
           {incidents.map((inc) => {
             const s  = STATUS_STYLES[inc.status] ?? STATUS_STYLES.resolved;
@@ -81,7 +81,7 @@ export function AnnouncementsPage() {
 
       {/* Announcements */}
       <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65 mb-3.5">Latest Announcements</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65 mb-3.5">Announcements</p>
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map((i) => <div key={i} className="h-20 rounded-[12px] bg-surface-elevated border border-border/30 animate-pulse" />)}
@@ -96,8 +96,8 @@ export function AnnouncementsPage() {
       {announcements.length === 0 && !loading && (
         <div className="flex flex-col items-center justify-center py-12 text-center rounded-[12px] border border-dashed border-border/30">
           <Bell size={24} className="text-text-muted/30 mb-3" />
-          <p className="text-[13px] font-semibold text-text-muted">No announcements right now</p>
-          <p className="text-[11.5px] text-text-muted/55 mt-1">You will see platform updates here</p>
+          <p className="text-[13px] font-semibold text-text-muted">No announcements</p>
+          <p className="text-[11.5px] text-text-muted/55 mt-1">We will post system updates here.</p>
         </div>
       )}
     </PageShell>

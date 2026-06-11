@@ -67,7 +67,8 @@ export function KycField({ label, error, required, className = '', children, ...
 
 /* ─── Section ────────────────────────────────────────────────────────────── */
 
-function Section({ icon: Icon, title, children }) {
+function Section({ icon, title, children }) {
+  const Icon = icon;
   return (
     <div>
       <div className="flex items-center gap-2.5 mb-4">
@@ -91,10 +92,10 @@ export function PersonalInfoForm({ value, onChange, errors = {} }) {
     <div className="space-y-8">
 
       {/* ── Identity ── */}
-      <Section icon={UserRound} title="Identity details">
+      <Section icon={UserRound} title="Personal details">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <KycField label="Full legal name" required error={errors.fullName}>
-            <input type="text" value={value.fullName ?? ''} placeholder="As shown on your government ID"
+          <KycField label="Full name" required error={errors.fullName}>
+            <input type="text" value={value.fullName ?? ''} placeholder="As shown on your ID"
               onChange={set('fullName')} className={fieldBase(errors.fullName)} />
           </KycField>
 
@@ -103,7 +104,7 @@ export function PersonalInfoForm({ value, onChange, errors = {} }) {
               className={fieldBase(errors.dateOfBirth)} />
           </KycField>
 
-          <KycField label="Country of residence" required error={errors.country} className="md:col-span-2">
+          <KycField label="Country" required error={errors.country} className="md:col-span-2">
             <select value={value.country ?? ''} onChange={set('country')} className={selectBase(errors.country)}>
               <option value="">Select a country…</option>
               {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -113,7 +114,7 @@ export function PersonalInfoForm({ value, onChange, errors = {} }) {
       </Section>
 
       {/* ── Contact ── */}
-      <Section icon={Mail} title="Contact information">
+      <Section icon={Mail} title="Contact info">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <KycField label="Email address" required error={errors.email}>
             <input type="email" value={value.email ?? ''} placeholder="you@example.com"
@@ -139,10 +140,10 @@ export function PersonalInfoForm({ value, onChange, errors = {} }) {
       </Section>
 
       {/* ── Address ── */}
-      <Section icon={MapPin} title="Residential address">
+      <Section icon={MapPin} title="Address">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <KycField label="Street address" required error={errors.address} className="md:col-span-2">
-            <input type="text" value={value.address ?? ''} placeholder="123 Main Street, Apt 4B"
+            <input type="text" value={value.address ?? ''} placeholder="e.g. 123 Main Street"
               onChange={set('address')} className={fieldBase(errors.address)} />
           </KycField>
 
@@ -151,7 +152,7 @@ export function PersonalInfoForm({ value, onChange, errors = {} }) {
               onChange={set('city')} className={fieldBase(errors.city)} />
           </KycField>
 
-          <KycField label="Postal code" required error={errors.postalCode}>
+          <KycField label="Postal / ZIP code" required error={errors.postalCode}>
             <input type="text" value={value.postalCode ?? ''} placeholder="e.g. SW1A 1AA"
               onChange={set('postalCode')} className={fieldBase(errors.postalCode)} />
           </KycField>

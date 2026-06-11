@@ -9,30 +9,30 @@ import { useKyc } from '../hooks/useKyc';
 /* ── Status config ── */
 const STATUS_CFG = {
   verified: {
-    eyebrow: 'Fully verified',
-    headline: 'Your identity is verified',
-    sub: 'Full access to all trading features, higher funding limits, and withdrawals is enabled.',
+    eyebrow: 'Verified',
+    headline: 'You are verified!',
+    sub: 'You now have full access to trading features, higher limits, and withdrawals.',
     iconCls: 'bg-positive/12 text-positive',
     Icon: Check,
   },
   rejected: {
     eyebrow: 'Action required',
-    headline: 'Verification needs attention',
-    sub: 'Your submission was rejected. Review the reason below and resubmit corrected documents.',
+    headline: 'Verification failed',
+    sub: 'There was an issue with your documents. Please review the reason below and try again.',
     iconCls: 'bg-negative/12 text-negative',
     Icon: AlertTriangle,
   },
   'under-review': {
     eyebrow: 'Under review',
-    headline: 'Your verification is being reviewed',
-    sub: 'Our compliance team is reviewing your documents. We will notify you by email when complete.',
+    headline: 'Checking your documents',
+    sub: 'We are checking your documents now. We will email you once this is completed.',
     iconCls: 'bg-brand/12 text-brand',
     Icon: Clock3,
   },
   pending: {
     eyebrow: 'In progress',
-    headline: 'Your verification is being reviewed',
-    sub: 'Your documents are being processed. Estimated review time: 1–3 business days.',
+    headline: 'Checking your documents',
+    sub: 'Your documents are currently being checked. This usually takes 1 to 3 business days.',
     iconCls: 'bg-brand/12 text-brand',
     Icon: Clock3,
   },
@@ -82,28 +82,28 @@ export function KycStatusPage() {
 
   const STAGES = [
     {
-      title: 'Documents received',
-      desc: 'Your files were encrypted and securely received.',
+      title: 'Documents uploaded',
+      desc: 'Your files have been received safely.',
       Icon: Check,
       done: true,
       warn: false,
     },
     {
-      title: 'Compliance review',
+      title: 'Reviewing documents',
       desc: isRejected
-        ? 'Verification did not pass. Resubmit corrected documents.'
-        : 'Automated and specialist checks are in progress.',
+        ? 'Your documents could not be verified. Please upload them again.'
+        : 'We are checking your details and documents.',
       Icon: FileSearch,
       done: isActive || isRejected || isVerified,
       warn: isRejected,
     },
     {
-      title: 'Decision notification',
+      title: 'Final decision',
       desc: isVerified
-        ? 'Identity confirmed — full trading access enabled.'
+        ? 'Verification complete. All trading features are ready.'
         : isRejected
-          ? 'Action is required from you to proceed.'
-          : 'You will be notified by email and in-platform.',
+          ? 'Please review the issues and submit again.'
+          : 'We will notify you here and via email when done.',
       Icon: Bell,
       done: isVerified || isRejected,
       warn: isRejected,
@@ -118,7 +118,7 @@ export function KycStatusPage() {
         onClick={() => navigate('/client/kyc')}
         className="flex items-center gap-2 text-[11.5px] font-bold text-text-muted hover:text-text transition-colors"
       >
-        <ArrowLeft size={13} /> Verification overview
+        <ArrowLeft size={13} /> Overview
       </button>
 
       {/* ── Status hero ── */}
@@ -155,33 +155,36 @@ export function KycStatusPage() {
       {/* ── Process timeline ── */}
       <div className="rounded-[12px] border border-border/35 bg-surface-elevated p-6">
         <h2 className="font-heading font-semibold text-[15px] text-text mb-6">
-          {isRejected ? 'What went wrong' : 'What happens next'}
+          {isRejected ? 'Issues' : 'Next steps'}
         </h2>
 
         <div>
-          {STAGES.map(({ title, desc, Icon, done, warn }, i) => (
-            <div key={title} className="flex gap-4">
+          {STAGES.map((stage, i) => {
+            const { title, desc, Icon, done, warn } = stage;
+            return (
+              <div key={title} className="flex gap-4">
 
-              {/* Icon + connector */}
-              <div className="flex flex-col items-center">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 z-10 ${warn ? 'bg-negative/12 text-negative'
-                  : done ? 'bg-positive/12 text-positive'
-                    : 'bg-muted-surface text-text-muted'
-                  }`}>
-                  <Icon size={15} />
+                {/* Icon + connector */}
+                <div className="flex flex-col items-center">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 z-10 ${warn ? 'bg-negative/12 text-negative'
+                    : done ? 'bg-positive/12 text-positive'
+                      : 'bg-muted-surface text-text-muted'
+                    }`}>
+                    <Icon size={15} />
+                  </div>
+                  {i < STAGES.length - 1 && (
+                    <div className={`w-px flex-1 min-h-[28px] my-1 ${done ? 'bg-border/50' : 'bg-border/20'}`} />
+                  )}
                 </div>
-                {i < STAGES.length - 1 && (
-                  <div className={`w-px flex-1 min-h-[28px] my-1 ${done ? 'bg-border/50' : 'bg-border/20'}`} />
-                )}
-              </div>
 
-              {/* Content */}
-              <div className="pb-5 pt-1.5">
-                <p className="text-[12.5px] font-bold text-text leading-tight">{title}</p>
-                <p className="text-[11.5px] text-text-muted mt-0.5 leading-relaxed">{desc}</p>
+                {/* Content */}
+                <div className="pb-5 pt-1.5">
+                  <p className="text-[12.5px] font-bold text-text leading-tight">{title}</p>
+                  <p className="text-[11.5px] text-text-muted mt-0.5 leading-relaxed">{desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -198,7 +201,7 @@ export function KycStatusPage() {
             onClick={() => navigate('/client/kyc/upload?reupload=true')}
             className="h-10 px-4 rounded-[9px] bg-brand text-text-on-accent text-[12px] font-bold flex items-center gap-2 hover:opacity-90 transition-opacity"
           >
-            <RefreshCw size={13} /> Resubmit documents
+            <RefreshCw size={13} /> Try again
           </button>
         </div>
       )}
@@ -209,7 +212,7 @@ export function KycStatusPage() {
           <div className="flex items-center gap-3">
             <ShieldCheck size={18} className="text-positive shrink-0" />
             <p className="text-[12.5px] font-bold text-positive">
-              Identity verified — full trading access is enabled
+              Verified! You can now trade.
             </p>
           </div>
           <button
@@ -225,7 +228,7 @@ export function KycStatusPage() {
       <div className="flex items-center gap-3 rounded-[11px] border border-border/30 bg-surface p-4">
         <LockKeyhole size={14} className="text-brand shrink-0" />
         <p className="text-[11.5px] text-text-muted">
-          Your uploaded files are AES-256 encrypted and cannot be modified while under review.
+          Your files are encrypted and safe. They cannot be edited while we review them.
         </p>
       </div>
     </div>

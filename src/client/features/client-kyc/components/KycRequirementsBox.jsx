@@ -3,9 +3,9 @@ import { CheckCircle2, Circle, Clock3, ShieldCheck, UserRound, Contact, ScanFace
 
 const ITEMS = [
   { label: 'Personal details', sub: '~2 min', Icon: UserRound },
-  { label: 'Government-issued ID', sub: '~3 min', Icon: Contact },
-  { label: 'Selfie verification', sub: '~1 min', Icon: ScanFace },
-  { label: 'Proof of address', sub: '~2 min', Icon: MapPin },
+  { label: 'Identity ID card', sub: '~3 min', Icon: Contact },
+  { label: 'Selfie photo', sub: '~1 min', Icon: ScanFace },
+  { label: 'Address document', sub: '~2 min', Icon: MapPin },
 ];
 
 export function KycRequirementsBox({ completed = [], current = 0 }) {
@@ -17,10 +17,10 @@ export function KycRequirementsBox({ completed = [], current = 0 }) {
 
       <div className="flex items-center gap-2 mb-1">
         <ShieldCheck size={15} className="text-brand" />
-        <h3 className="font-heading font-semibold text-[13.5px]">Verification checklist</h3>
+        <h3 className="font-heading font-semibold text-[13.5px]">Steps checklist</h3>
       </div>
       <p className="text-[11px] text-text-muted mb-4 pl-[23px]">
-        {doneCount}/{ITEMS.length} completed
+        {doneCount} of {ITEMS.length} completed
         {minsLeft > 0 && (
           <span className="ml-2 inline-flex items-center gap-1 text-brand font-bold">
             <Clock3 size={10} /> ~{minsLeft} min left
@@ -29,7 +29,8 @@ export function KycRequirementsBox({ completed = [], current = 0 }) {
       </p>
 
       <div className="space-y-2">
-        {ITEMS.map(({ label, sub, Icon }, i) => {
+        {ITEMS.map((item, i) => {
+          const { label, sub, Icon } = item;
           const done = Boolean(completed[i]);
           const active = i + 1 === current;
 

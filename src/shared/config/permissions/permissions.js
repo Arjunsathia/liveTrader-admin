@@ -1,3 +1,5 @@
+import { buildInitialMatrix } from '@/shared/config/constants/roles-permissions/workspaces/admin-mgmt.workspace';
+
 /**
  * Global Permissions Registry
  * 
@@ -61,50 +63,6 @@ export const PERMISSIONS = {
 
 };
 
-/**
- * Role Presets
- * 
- * Maps generic roles (e.g., 'super-admin', 'operations') to an array of specific PERMISSIONS.
- * Use '*' for wildcard access to everything.
- */
-export const ROLE_PRESETS = {
-  'super-admin': ['*'],
-  operations: [
-    PERMISSIONS.dashboard.view,
-    PERMISSIONS.users.view,
-    PERMISSIONS.users.create,
-    PERMISSIONS.users.edit,
-    PERMISSIONS.users.kyc,
-    PERMISSIONS.users.mt5,
-    PERMISSIONS.finance.view,
-    PERMISSIONS.finance.approve,
-    PERMISSIONS.trading.view,
-    PERMISSIONS.trading.intervene,
-    PERMISSIONS.copyTrading.view,
-    PERMISSIONS.copyTrading.manage,
-    PERMISSIONS.propTrading.view,
-    PERMISSIONS.propTrading.manage,
-    PERMISSIONS.propTrading.approve,
-    PERMISSIONS.ibSystem.view,
-    PERMISSIONS.reports.view,
-    PERMISSIONS.support.view,
-    PERMISSIONS.support.escalate,
-    PERMISSIONS.groupManagement.view,
-    PERMISSIONS.groupManagement.manage,
-  ],
-  auditor: [
-    PERMISSIONS.dashboard.view,
-    PERMISSIONS.users.view,
-    PERMISSIONS.finance.view,
-    PERMISSIONS.trading.view,
-    PERMISSIONS.copyTrading.view,
-    PERMISSIONS.propTrading.view,
-    PERMISSIONS.ibSystem.view,
-    PERMISSIONS.reports.view,
-    PERMISSIONS.support.view,
-    PERMISSIONS.rolesPermissions.view,
-  ],
-};
 
 /**
  * Utility to check if a set of granted permissions covers a required permission.
@@ -127,3 +85,45 @@ export function hasPermission(grantedPermissions = [], requiredPermission) {
 
   return grantedPermissions.includes(requiredPermission);
 }
+
+/**
+ * Resolves permissions for a given role based on the local permissions matrix.
+ * Super Admin gets '*' (all permissions).
+ */
+export function getPermissionsForRole(roleName) {
+  if (!roleName) return [];
+  const normalizedRole = roleName.toUpperCase().replace(/-/g, '_');
+  
+  if (normalizedRole === 'SUPER_ADMIN') {
+    return ['*'];
+  }
+
+  let matrix = null;
+  try {
+    const cachedMatrix = localStorage.getItem('lt_admin_matrix');
+    if (cachedMatrix) {
+      matrix = JSON.parse(cachedMatrix);
+    }
+  } catch (e) {
+    console.error('Failed to parse lt_admin_matrix:', e);
+  }
+
+  if (!matrix) {
+    matrix = buildInitialMatrix();
+  }
+
+  const roleMatrix = matrix[normalizedRole];
+  if (!roleMatrix) return [];
+
+  const flat = [];
+  for (const [moduleId, actionsObj] of Object.entries(roleMatrix)) {
+    const permModuleId = moduleId.replace(/_/g, '-');
+    for (const [actionName, isAllowed] of Object.entries(actionsObj)) {
+      if (isAllowed) {
+        flat.push(`${permModuleId}.${actionName}`);
+      }
+    }
+  }
+  return flat;
+}
+

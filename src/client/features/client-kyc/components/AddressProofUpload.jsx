@@ -24,7 +24,8 @@ export function AddressProofUpload({ value, onChange, errors = {} }) {
       <div>
         <p className="text-[10px] font-black uppercase tracking-[0.12em] text-text-muted mb-3">Document type</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {DOC_TYPES.map(({ id, label, Icon, desc }) => {
+          {DOC_TYPES.map((type) => {
+            const { id, label, Icon, desc } = type;
             const on = value.type === id;
             return (
               <button key={id} type="button" onClick={() => onChange({ ...value, type: id })}

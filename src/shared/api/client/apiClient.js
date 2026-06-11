@@ -92,10 +92,17 @@ const request = async (endpoint, options = {}) => {
     }
     
     if (error instanceof ApiError) {
-      // Auto-handle 401 Unauthorized (e.g. redirect to login or clear token)
-      if (error.status === 401) {
-        localStorage.removeItem('admin_token');
-        // Optional: window.location.href = '/login';
+      // Auto-handle 401 Unauthorized (attempt token rotation once)
+      if (error.status === 401 && !options._retry) {
+        options._retry = true;
+        try {
+          await executeTokenRefresh();
+          // Retry the request
+          return await request(endpoint, options);
+        } catch (refreshErr) {
+          // Refresh failed, propagate the original 401 error
+          throw error;
+        }
       }
       throw error;
     }
@@ -104,6 +111,50 @@ const request = async (endpoint, options = {}) => {
     throw new ApiError(0, 'Network Connection Error', { message: error.message || 'Unable to connect to service.' });
   }
 };
+
+let refreshPromise = null;
+
+export async function executeTokenRefresh() {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) throw new Error('No refresh token available');
+
+      const authUrl = import.meta.env.VITE_ACCOUNT_API_URL || 'https://account.smatams.com/api';
+      const response = await fetch(`${authUrl}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Refresh token request failed');
+      }
+
+      const data = await response.json();
+      const payload = data?.data ?? data;
+      if (payload?.accessToken) {
+        localStorage.setItem('admin_token', payload.accessToken);
+      }
+      if (payload?.refreshToken) {
+        localStorage.setItem('refresh_token', payload.refreshToken);
+      }
+      return payload;
+    } catch (err) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('refresh_token');
+      window.dispatchEvent(new Event('auth-logout'));
+      throw err;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
 
 export const apiClient = {
   get: (endpoint, options = {}) => request(endpoint, { ...options, method: 'GET' }),

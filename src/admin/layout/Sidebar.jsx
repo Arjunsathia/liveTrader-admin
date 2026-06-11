@@ -230,9 +230,13 @@ export function Sidebar({ collapsed, isMobile }) {
   const [profileMenuExpanded, setProfileMenuExpanded] = useState(false);
 
   // Close profile submenu whenever the sidebar collapses
-  useEffect(() => {
-    if (collapsed) setProfileMenuExpanded(false);
-  }, [collapsed]);
+  const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
+  if (collapsed !== prevCollapsed) {
+    setPrevCollapsed(collapsed);
+    if (collapsed) {
+      setProfileMenuExpanded(false);
+    }
+  }
 
   const profileSubTabs = useMemo(() => {
     const tabs = [

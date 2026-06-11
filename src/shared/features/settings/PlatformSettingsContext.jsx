@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { INITIAL_API_CONFIG } from '@/admin/features/settings/configs/api.config';
 import { INITIAL_GATEWAYS, INITIAL_GLOBAL_FEES } from '@/admin/features/settings/configs/payment.config';
 import { INITIAL_KYC_CONFIG } from '@/admin/features/settings/configs/kyc.config';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,18 +19,12 @@ import {
   ShieldCheck,
   Fingerprint,
   CheckCircle2,
+  KeyRound,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { useAuth } from '@/auth/AuthContext';
-import { MOCK_USERS } from '@/auth/authService';
-
-/* --------------------------------------------------------------------------
-   DEMO QUICK-FILL ACCOUNTS (LOGIN)
--------------------------------------------------------------------------- */
-const DEMO_ACCOUNTS = [
-  { label: 'Super Admin', email: 'admin@livetrade.pro', password: 'admin123', color: '#7ba9ff' },
-  { label: 'Operations', email: 'ops@livetrade.pro', password: 'ops123', color: '#4ae176' },
-  { label: 'Customer', email: 'john@example.com', password: 'client123', color: '#ffb3ad' },
-];
+import { useRegisterUser, useSendOtp, useVerifyOtp, useLoginUser } from '../useAuthHooks';
 
 /* --------------------------------------------------------------------------
    PASSWORD STRENGTH UTILITY
@@ -65,10 +59,8 @@ const signupSchema = z
   .object({
     name: z.string().min(1, 'Full name is required'),
     email: z.string().min(1, 'Email is required').email('Invalid email address'),
-    phone: z.string().min(8, 'Valid phone number required'),
-    company: z.string().min(1, 'Company/Organization is required'),
-    jobTitle: z.string().optional(),
-    country: z.string().min(1, 'Country is required'),
+    phone: z.string().optional(),
+    country: z.string().optional(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
     agreedToTerms: z.literal(true, {
@@ -458,7 +450,7 @@ function CountrySelector({ value, onChange, error }) {
           transition: 'transform 0.2s',
           opacity: 0.6
         }}>
-          <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
 
@@ -572,8 +564,6 @@ function PasswordInput({
 -------------------------------------------------------------------------- */
 const LoginForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -589,16 +579,15 @@ const LoginForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) => 
   const passwordValue = watch('password');
   const strength = getPasswordStrength(passwordValue || '');
 
+  const { mutateAsync: doLogin, isPending: loading } = useLoginUser();
+
   const onSubmit = async (data) => {
-    setLoading(true);
     onError('');
     try {
-      const user = await login(data.email, data.password);
+      const user = await doLogin({ email: data.email, password: data.password });
       navigate(user.portalType === 'admin' ? '/admin' : '/client', { replace: true });
     } catch (err) {
-      onError(err.message);
-    } finally {
-      setLoading(false);
+      onError(err.message || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -725,7 +714,7 @@ const LoginForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) => 
             }}
             onClick={() => alert('SSO Apple integration (demo)')}
           >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.49-.62.71-1.16 1.85-1.01 2.96 1.1.09 2.23-.55 2.96-1.39z" fill="#fff"/></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.49-.62.71-1.16 1.85-1.01 2.96 1.1.09 2.23-.55 2.96-1.39z" fill="#fff" /></svg>
             Apple
           </button>
           <button
@@ -747,39 +736,180 @@ const LoginForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) => 
             <Fingerprint size={12} /> Passkey
           </button>
         </div>
-
-        <div className="auth-sep" style={{ marginTop: 10 }}>
-          Quick demo access
-        </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
-          {DEMO_ACCOUNTS.map((acc) => (
-            <button
-              key={acc.email}
-              type="button"
-              className="demo-pill"
-              onClick={() => {
-                setValue('email', acc.email);
-                setValue('password', acc.password);
-                onError('');
-              }}
-            >
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: acc.color, boxShadow: `0 0 5px ${acc.color}` }} />
-              {acc.label}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );
 });
 
 /* --------------------------------------------------------------------------
-   REGISTER FORM (FULL CRM FIELDS)
+   OTP VERIFICATION PANEL
+   Shown after successful registration — user must verify their email.
+-------------------------------------------------------------------------- */
+function OtpPanel({ email, onVerified, onError, onBack, isActive, shake }) {
+  const [otp, setOtp] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const inputs = useRef([]);
+
+  const { mutate: doVerify, isPending: verifying } = useVerifyOtp({
+    onSuccess: (data) => onVerified(data),
+    onError: (err) => onError(err.message || 'Invalid or expired OTP.'),
+  });
+
+  const { mutate: doResend, isPending: resending } = useSendOtp({
+    onSuccess: () => {
+      setResendCooldown(60);
+    },
+    onError: (err) => onError(err.message || 'Could not resend OTP.'),
+  });
+
+  // Cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  // Start cooldown immediately on mount (OTP was just sent by register)
+  useEffect(() => { setResendCooldown(60); }, []);
+
+  const handleOtpChange = (idx, val) => {
+    if (!/^[0-9]?$/.test(val)) return;
+    const next = otp.split('');
+    next[idx] = val;
+    // Pad/fill to 6 chars
+    const filled = next.join('').padEnd(6, '').substring(0, 6);
+    setOtp(filled);
+    if (val && idx < 5) inputs.current[idx + 1]?.focus();
+  };
+
+  const handleOtpKeyDown = (idx, e) => {
+    if (e.key === 'Backspace' && !otp[idx] && idx > 0) {
+      inputs.current[idx - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
+    if (pasted.length === 6) {
+      setOtp(pasted);
+      inputs.current[5]?.focus();
+      e.preventDefault();
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onError('');
+    if (otp.replace(/\s/g, '').length < 6) {
+      onError('Please enter the full 6-digit code.');
+      return;
+    }
+    doVerify({ email, otp });
+  };
+
+  return (
+    <div className={`auth-panel ${isActive ? 'visible' : 'slide-out-right'}${shake ? ' auth-shake' : ''}`}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* Icon + heading */}
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: 16,
+            background: 'linear-gradient(135deg, rgba(167,139,250,0.2), rgba(167,139,250,0.05))',
+            border: '1px solid rgba(167,139,250,0.3)',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: 12,
+          }}>
+            <KeyRound size={22} color="#a78bfa" />
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Check your email</div>
+          <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+            We sent a 6-digit code to<br />
+            <span style={{ color: '#a78bfa', fontWeight: 600 }}>{email}</span>
+          </div>
+        </div>
+
+        {/* OTP digit inputs */}
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }} onPaste={handlePaste}>
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <input
+              key={idx}
+              ref={(el) => (inputs.current[idx] = el)}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={otp[idx] || ''}
+              onChange={(e) => handleOtpChange(idx, e.target.value)}
+              onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+              style={{
+                width: 44, height: 52,
+                background: otp[idx] ? 'rgba(167,139,250,0.12)' : 'rgba(255,255,255,0.04)',
+                border: `1.5px solid ${otp[idx] ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                borderRadius: 12,
+                color: '#fff',
+                fontSize: 20,
+                fontWeight: 700,
+                textAlign: 'center',
+                outline: 'none',
+                transition: 'all 0.2s',
+                caretColor: '#a78bfa',
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Verify button */}
+        <button
+          type="submit"
+          disabled={verifying || otp.replace(/\s/g, '').length < 6}
+          className="auth-btn-primary"
+        >
+          <div className="btn-shimmer" />
+          {verifying ? (
+            <><Loader2 size={15} style={{ animation: 'authSpin 0.7s linear infinite' }} /> Verifying...</>
+          ) : (
+            <><ShieldCheck size={15} /> Verify & Activate Account</>
+          )}
+        </button>
+
+        {/* Resend + back */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={onBack}
+            style={{ background: 'none', border: 'none', fontSize: 12, color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontWeight: 600 }}
+          >
+            ← Back
+          </button>
+          <button
+            type="button"
+            disabled={resendCooldown > 0 || resending}
+            onClick={() => { onError(''); doResend(email); }}
+            style={{
+              background: 'none', border: 'none', cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer',
+              fontSize: 12, fontWeight: 600,
+              color: resendCooldown > 0 ? 'rgba(255,255,255,0.25)' : '#a78bfa',
+              display: 'flex', alignItems: 'center', gap: 5, opacity: resendCooldown > 0 ? 0.6 : 1,
+            }}
+          >
+            {resending ? <Loader2 size={11} style={{ animation: 'authSpin 0.7s linear infinite' }} /> : <RefreshCw size={11} />}
+            {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------------
+   REGISTER FORM (FULL API FLOW: REGISTER → OTP VERIFY)
 -------------------------------------------------------------------------- */
 const RegisterForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
+  /** 'form' | 'otp' */
+  const [step, setStep] = useState('form');
+  const [registeredEmail, setRegisteredEmail] = useState('');
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -795,8 +925,6 @@ const RegisterForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) 
       name: '',
       email: '',
       phone: '',
-      company: '',
-      jobTitle: '',
       country: '',
       password: '',
       confirmPassword: '',
@@ -807,147 +935,146 @@ const RegisterForm = React.forwardRef(({ onError, shake, mode, isActive }, ref) 
   const passwordValue = watch('password');
   const strength = getPasswordStrength(passwordValue || '');
 
-  const onSubmit = async (data) => {
-    setLoading(true);
+  /* TanStack Query mutation */
+  const { mutate: doRegister, isPending: registering } = useRegisterUser({
+    onSuccess: (_data, variables) => {
+      setRegisteredEmail(variables.email);
+      setStep('otp');
+      onError('');
+    },
+    onError: (err) => {
+      onError(err.message || 'Registration failed. Please try again.');
+    },
+  });
+
+  const onSubmit = (data) => {
     onError('');
+    doRegister({
+      name: data.name,
+      email: data.email.toLowerCase().trim(),
+      password: data.password,
+      ...(data.country ? { country: data.country } : {}),
+      ...(data.phone ? { phone: data.phone } : {}),
+    });
+  };
+
+  const { establishSession } = useAuth();
+
+  /** Called by OtpPanel on successful verification */
+  const handleVerified = useCallback(async (apiData) => {
     try {
-      const exists = MOCK_USERS.some((u) => u.email.toLowerCase() === data.email.toLowerCase().trim());
-      if (exists) throw new Error('An account with this email already exists.');
-
-      // Extend mock user with CRM fields
-      MOCK_USERS.push({
-        id: `crm-${Date.now()}`,
-        email: data.email.toLowerCase().trim(),
-        password: data.password,
-        name: data.name,
-        phone: data.phone,
-        company: data.company,
-        jobTitle: data.jobTitle || '',
-        country: data.country,
-        initials: data.name.split(' ').map((n) => n[0]).join('').toUpperCase().substring(0, 2),
-        role: 'client',
-        portalType: 'client',
-      });
-
-      const user = await login(data.email, data.password);
+      const { accessToken, refreshToken, user: apiUser } = apiData;
+      const user = establishSession(apiUser, accessToken, refreshToken);
       navigate(user.portalType === 'admin' ? '/admin' : '/client', { replace: true });
     } catch (err) {
-      onError(err.message);
-    } finally {
-      setLoading(false);
+      onError('Account verified! Please sign in to continue.');
     }
-  };
+  }, [establishSession, navigate, onError]);
 
   return (
     <div ref={ref} className={`auth-panel ${isActive ? 'visible' : 'slide-out-right'}${shake ? ' auth-shake' : ''}`}>
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {/* Full name */}
-        <div>
-          <label className="auth-label">Full name</label>
-          <div className="auth-input-wrap">
-            <div className="auth-input-icon"><User size={14} /></div>
-            <input {...register('name')} placeholder="Alex Morgan" className={`auth-input ${errors.name ? 'has-error' : ''}`} />
-          </div>
-          {errors.name && <div className="auth-error-msg"><AlertCircle size={11} />{errors.name.message}</div>}
-        </div>
-
-        {/* Email */}
-        <div>
-          <label className="auth-label">Work Email</label>
-          <div className="auth-input-wrap">
-            <div className="auth-input-icon"><Mail size={14} /></div>
-            <input {...register('email')} type="email" placeholder="alex@crmcompany.com" className={`auth-input ${errors.email ? 'has-error' : ''}`} />
-          </div>
-          {errors.email && <div className="auth-error-msg"><AlertCircle size={11} />{errors.email.message}</div>}
-        </div>
-
-        {/* Row: Phone + Company */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      {/* ─── STEP 1: Registration Form ─── */}
+      {step === 'form' && (
+        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {/* Full name */}
           <div>
-            <label className="auth-label">Phone</label>
+            <label className="auth-label">Full name</label>
             <div className="auth-input-wrap">
-              <div className="auth-input-icon"><Phone size={14} /></div>
-              <input {...register('phone')} placeholder="+1 (555) 000-9999" className={`auth-input ${errors.phone ? 'has-error' : ''}`} />
+              <div className="auth-input-icon"><User size={14} /></div>
+              <input {...register('name')} placeholder="Alex Morgan" className={`auth-input ${errors.name ? 'has-error' : ''}`} />
             </div>
-            {errors.phone && <div className="auth-error-msg"><AlertCircle size={11} />{errors.phone.message}</div>}
+            {errors.name && <div className="auth-error-msg"><AlertCircle size={11} />{errors.name.message}</div>}
           </div>
-          <div>
-            <label className="auth-label">Company</label>
-            <div className="auth-input-wrap">
-              <div className="auth-input-icon"><Building2 size={14} /></div>
-              <input {...register('company')} placeholder="Acme Inc." className={`auth-input ${errors.company ? 'has-error' : ''}`} />
-            </div>
-            {errors.company && <div className="auth-error-msg"><AlertCircle size={11} />{errors.company.message}</div>}
-          </div>
-        </div>
 
-        {/* Row: Job Title + Country */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {/* Email */}
           <div>
-            <label className="auth-label">Job Title (optional)</label>
+            <label className="auth-label">Email address</label>
             <div className="auth-input-wrap">
-              <div className="auth-input-icon"><Briefcase size={14} /></div>
-              <input {...register('jobTitle')} placeholder="Head of Sales" className="auth-input" />
+              <div className="auth-input-icon"><Mail size={14} /></div>
+              <input {...register('email')} type="email" placeholder="alex@example.com" className={`auth-input ${errors.email ? 'has-error' : ''}`} />
             </div>
+            {errors.email && <div className="auth-error-msg"><AlertCircle size={11} />{errors.email.message}</div>}
           </div>
-          <div>
-            <label className="auth-label">Country</label>
-            <div className="auth-input-wrap">
-              <div className="auth-input-icon"><Globe size={14} /></div>
-              <Controller
-                control={control}
-                name="country"
-                render={({ field }) => (
-                  <CountrySelector
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errors.country}
-                  />
-                )}
-              />
-            </div>
-            {errors.country && <div className="auth-error-msg"><AlertCircle size={11} />{errors.country.message}</div>}
-          </div>
-        </div>
 
-        {/* Password row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <div>
-            <label className="auth-label">Password</label>
-            <PasswordInput {...register('password')} show={showPassword} onToggle={() => setShowPassword((p) => !p)} error={errors.password} mode={mode} />
-            {passwordValue && (
-              <div className="strength-bar">
-                <div className="strength-fill" style={{ width: strength.width, background: strength.color }} />
+          {/* Row: Phone + Country */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label className="auth-label">Phone (optional)</label>
+              <div className="auth-input-wrap">
+                <div className="auth-input-icon"><Phone size={14} /></div>
+                <input {...register('phone')} placeholder="+1 555 0000" className="auth-input" />
               </div>
+            </div>
+            <div>
+              <label className="auth-label">Country (optional)</label>
+              <div className="auth-input-wrap">
+                <div className="auth-input-icon"><Globe size={14} /></div>
+                <Controller
+                  control={control}
+                  name="country"
+                  render={({ field }) => (
+                    <CountrySelector
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.country}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Password row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label className="auth-label">Password</label>
+              <PasswordInput {...register('password')} show={showPassword} onToggle={() => setShowPassword((p) => !p)} error={errors.password} mode={mode} />
+              {passwordValue && (
+                <div className="strength-bar">
+                  <div className="strength-fill" style={{ width: strength.width, background: strength.color }} />
+                </div>
+              )}
+              {errors.password && <div className="auth-error-msg"><AlertCircle size={11} />{errors.password.message}</div>}
+            </div>
+            <div>
+              <label className="auth-label">Confirm</label>
+              <PasswordInput {...register('confirmPassword')} show={showConfirm} onToggle={() => setShowConfirm((p) => !p)} error={errors.confirmPassword} mode={mode} />
+              {errors.confirmPassword && <div className="auth-error-msg"><AlertCircle size={11} />{errors.confirmPassword.message}</div>}
+            </div>
+          </div>
+
+          {/* Terms agreement */}
+          <div style={{ marginTop: 2 }}>
+            <label className="auth-checkbox-wrap">
+              <input type="checkbox" {...register('agreedToTerms')} />
+              <div className="auth-checkbox-box"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>I accept the <strong style={{ color: '#a78bfa' }}>Terms</strong> and <strong style={{ color: '#a78bfa' }}>Privacy Policy</strong></span>
+            </label>
+            {errors.agreedToTerms && <div className="auth-error-msg"><AlertCircle size={11} />{errors.agreedToTerms.message}</div>}
+          </div>
+
+          <button type="submit" disabled={registering} className="auth-btn-primary">
+            <div className="btn-shimmer" />
+            {registering ? (
+              <><Loader2 size={15} style={{ animation: 'authSpin 0.7s linear infinite' }} /> Creating account...</>
+            ) : (
+              <><span>Create secure account</span> <ShieldCheck size={15} /></>
             )}
-            {errors.password && <div className="auth-error-msg"><AlertCircle size={11} />{errors.password.message}</div>}
-          </div>
-          <div>
-            <label className="auth-label">Confirm</label>
-            <PasswordInput {...register('confirmPassword')} show={showConfirm} onToggle={() => setShowConfirm((p) => !p)} error={errors.confirmPassword} mode={mode} />
-            {errors.confirmPassword && <div className="auth-error-msg"><AlertCircle size={11} />{errors.confirmPassword.message}</div>}
-          </div>
-        </div>
+          </button>
+        </form>
+      )}
 
-        {/* Terms agreement */}
-        <div style={{ marginTop: 2 }}>
-          <label className="auth-checkbox-wrap">
-            <input type="checkbox" {...register('agreedToTerms')} />
-            <div className="auth-checkbox-box"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>I accept the <strong style={{ color: '#a78bfa' }}>Terms</strong> and <strong style={{ color: '#a78bfa' }}>Privacy Policy</strong></span>
-          </label>
-          {errors.agreedToTerms && <div className="auth-error-msg"><AlertCircle size={11} />{errors.agreedToTerms.message}</div>}
-        </div>
-
-        <button type="submit" disabled={loading} className="auth-btn-primary">
-          <div className="btn-shimmer" />
-          {loading ? (
-            <><div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'authSpin 0.7s linear infinite' }} /> Creating workspace...</>
-          ) : (
-            <><span>Create secure account</span> <ShieldCheck size={15} /></>
-          )}
-        </button>
-      </form>
+      {/* ─── STEP 2: OTP Verification ─── */}
+      {step === 'otp' && (
+        <OtpPanel
+          email={registeredEmail}
+          onVerified={handleVerified}
+          onError={onError}
+          onBack={() => { setStep('form'); onError(''); }}
+          isActive
+          shake={shake}
+        />
+      )}
     </div>
   );
 });
@@ -973,10 +1100,10 @@ export default function AuthForm({ mode, onModeChange }) {
           setContainerHeight(height);
         }
       };
-      
+
       // Measure immediately
       updateHeight();
-      
+
       // Update on resizing (e.g. error alerts appearing)
       const observer = new ResizeObserver(() => {
         updateHeight();

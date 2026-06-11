@@ -9,10 +9,16 @@ import {
 function FileThumb({ file }) {
   const [src, setSrc] = useState(null);
   useEffect(() => {
-    if (!file?.type?.startsWith('image/')) { setSrc(null); return; }
+    if (!file?.type?.startsWith('image/')) {
+      const t = setTimeout(() => setSrc(null), 0);
+      return () => clearTimeout(t);
+    }
     const url = URL.createObjectURL(file);
-    setSrc(url);
-    return () => URL.revokeObjectURL(url);
+    const t = setTimeout(() => setSrc(url), 0);
+    return () => {
+      clearTimeout(t);
+      URL.revokeObjectURL(url);
+    };
   }, [file]);
 
   if (!file) return null;
@@ -25,7 +31,8 @@ function FileThumb({ file }) {
 
 /* ─── ReviewBlock ────────────────────────────────────────────────────────── */
 
-function ReviewBlock({ icon: Icon, title, complete, children, onEdit }) {
+function ReviewBlock({ icon, title, complete, children, onEdit }) {
+  const Icon = icon;
   return (
     <div className={`rounded-[12px] border p-4 ${complete ? 'border-border/30 bg-muted-surface/20' : 'border-warning/25 bg-warning/[0.04]'}`}>
       <div className="flex items-center justify-between gap-3 mb-3">
@@ -93,9 +100,9 @@ export function ReviewSummary({ data, onEdit, errors = {}, onDeclaration }) {
         <div className="flex items-start gap-3 rounded-[11px] bg-warning/[0.07] border border-warning/25 p-4">
           <AlertTriangle size={15} className="text-warning shrink-0 mt-0.5" />
           <div>
-            <p className="text-[12px] font-bold text-warning">Missing information</p>
+            <p className="text-[12px] font-bold text-warning">Incomplete sections</p>
             <p className="text-[11px] text-text-muted mt-0.5">
-              {missingCount} section{missingCount !== 1 ? 's' : ''} still need{missingCount === 1 ? 's' : ''} to be completed before you can submit.
+              Please complete {missingCount} more section{missingCount !== 1 ? 's' : ''} to submit.
             </p>
           </div>
         </div>
@@ -152,8 +159,7 @@ export function ReviewSummary({ data, onEdit, errors = {}, onDeclaration }) {
         <Checkbox checked={data.declaration ?? false} onChange={onDeclaration} />
         <div>
           <p className="text-[12px] text-text leading-relaxed select-none">
-            I confirm that all information and documents I have submitted are accurate, current, and belong to me.
-            I authorise Live-Trader to verify them for compliance and regulatory purposes.
+            I confirm that these documents are mine and the information is correct.
           </p>
           {errors.declaration && (
             <p className="flex items-center gap-1 text-[11px] text-negative mt-1.5">
@@ -166,7 +172,7 @@ export function ReviewSummary({ data, onEdit, errors = {}, onDeclaration }) {
       {/* ── Security note ── */}
       <div className="flex items-center gap-2.5 text-[11px] text-text-muted px-1">
         <LockKeyhole size={12} className="text-brand shrink-0" />
-        Your data is AES-256 encrypted in transit and at rest, stored in compliance with applicable data protection law.
+        Your data is securely encrypted and stored according to data privacy laws.
       </div>
     </div>
   );

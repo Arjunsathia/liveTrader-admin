@@ -22,12 +22,12 @@ export function KnowledgeBasePage() {
         </div>
 
         <div className="relative z-10 max-w-[620px] w-full flex flex-col items-center">
-          <span className="text-section-eyebrow">Knowledge Hub</span>
+          <span className="text-section-eyebrow">Help Center</span>
           <h1 className="font-heading font-semibold text-[28px] tracking-[-0.04em] text-text mt-1.5 mb-2">
-            How can we help you today?
+            How can we help?
           </h1>
           <p className="text-[13px] text-text-muted/80 mb-6.5 leading-relaxed">
-            Search our guides, platform setups, and FAQs, or select a category below to browse.
+            Search guides and FAQs, or select a category below.
           </p>
           <KnowledgeSearch value={search} onChange={setSearch} />
         </div>
@@ -36,7 +36,7 @@ export function KnowledgeBasePage() {
       {/* Categories */}
       {!search && (
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65 mb-3.5">Browse by topic</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65 mb-3.5">Topics</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {/* All Topic Card */}
             <button
@@ -51,12 +51,12 @@ export function KnowledgeBasePage() {
                 <div className="w-8 h-8 rounded-[8px] bg-muted-surface border border-border/25 flex items-center justify-center">
                   <BookOpen size={14} className="text-text-muted" />
                 </div>
-                <p className="text-[13.5px] font-bold text-text group-hover:text-brand transition-colors duration-150">All Guides</p>
+                <p className="text-[13.5px] font-bold text-text group-hover:text-brand transition-colors duration-150">All guides</p>
               </div>
               <p className="text-[11px] text-text-muted/70 leading-normal flex-1 relative z-10">
-                Explore every setup guide, technical detail, and financial rule across the platform.
+                View all platform setup and help guides.
               </p>
-              <p className="text-[10.5px] font-semibold text-brand/75 mt-3 relative z-10">View all collections →</p>
+              <p className="text-[10.5px] font-semibold text-brand/75 mt-3 relative z-10">View all →</p>
             </button>
 
             {/* Configured Categories */}
@@ -100,7 +100,7 @@ export function KnowledgeBasePage() {
       <div>
         <div className="flex items-center justify-between mb-3.5">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted/65">
-            {search ? `Results for "${search}"` : activeCategory === 'ALL' ? 'Popular Articles' : activeCategory}
+            {search ? `Results for "${search}"` : activeCategory === 'ALL' ? 'Popular articles' : activeCategory}
           </p>
           <span className="text-[11px] font-semibold text-text-muted/60 bg-muted-surface/30 border border-border/20 px-2 py-0.5 rounded-md">
             {articles.length} articles
@@ -123,7 +123,7 @@ export function KnowledgeBasePage() {
           <div className="flex flex-col items-center justify-center py-16 text-center rounded-[16px] border border-dashed border-border/30 bg-muted-surface/10">
             <BookOpen size={28} className="text-text-muted/30 mb-3" />
             <p className="text-[13.5px] font-bold text-text-muted">No articles found</p>
-            <p className="text-[11.5px] text-text-muted/50 mt-1">Try searching with a different keyword</p>
+            <p className="text-[11.5px] text-text-muted/50 mt-1">Try a different search term.</p>
           </div>
         )}
       </div>
@@ -143,15 +143,15 @@ export function KnowledgeBasePage() {
             <HelpCircle size={18} strokeWidth={2.2} />
           </div>
           <div>
-            <p className="text-[14px] font-bold text-text">Still need assistance?</p>
-            <p className="text-[12.5px] text-text-muted/80 mt-0.5">If you can't find your answer here, please launch a ticket and our support team will help.</p>
+            <p className="text-[14px] font-bold text-text">Need more help?</p>
+            <p className="text-[12.5px] text-text-muted/80 mt-0.5">If you cannot find the answer, open a support ticket.</p>
           </div>
         </div>
         <button
           onClick={() => navigate('/client/support/create')}
           className="h-10 px-5 rounded-[9px] bg-brand text-text-on-accent text-[12.5px] font-bold hover:opacity-90 active:scale-95 transition-all duration-150 shrink-0 shadow-sm"
         >
-          Create a ticket
+          Open a ticket
         </button>
       </div>
     </PageShell>

@@ -4,20 +4,20 @@ export const KB_CATEGORIES = [
   {
     id: 'finance',
     Icon: Wallet,
-    label: 'Deposits & Withdrawals',
+    label: 'Deposits & withdrawals',
     count: 24,
     colorCls: 'text-brand',
     bgCls: 'bg-brand/10 border border-brand/20',
-    desc: 'Funding accounts, bank traces, and deposit rules.'
+    desc: 'Account funding, bank transfers, and deposit rules.'
   },
   {
     id: 'kyc',
     Icon: Shield,
-    label: 'KYC & Verification',
+    label: 'Identity verification',
     count: 18,
     colorCls: 'text-positive',
     bgCls: 'bg-positive/10 border border-positive/20',
-    desc: 'ID checks, document requirements, and status.'
+    desc: 'ID checks and document requirements.'
   },
   {
     id: 'trading',
@@ -26,34 +26,34 @@ export const KB_CATEGORIES = [
     count: 32,
     colorCls: 'text-warning',
     bgCls: 'bg-warning/10 border border-warning/20',
-    desc: 'MT5 settings, terminal setups, and leverage.'
+    desc: 'MT5 setup, settings, and leverage.'
   },
   {
     id: 'copy',
     Icon: Layers,
-    label: 'Copy Trading',
+    label: 'Copy trading',
     count: 15,
     colorCls: 'text-purple',
     bgCls: 'bg-purple/10 border border-purple/20',
-    desc: 'Provider links, copy ratios, and profit sharing.'
+    desc: 'Linking accounts, ratios, and profits.'
   },
   {
     id: 'account',
     Icon: User,
-    label: 'Account Management',
+    label: 'Account settings',
     count: 21,
     colorCls: 'text-cyan',
     bgCls: 'bg-cyan/10 border border-cyan/20',
-    desc: 'Passwords, 2FA, settings, and profile details.'
+    desc: 'Password, 2FA, and profile settings.'
   },
   {
     id: 'payments',
     Icon: CreditCard,
-    label: 'Payments',
+    label: 'Billing',
     count: 12,
     colorCls: 'text-negative',
     bgCls: 'bg-negative/10 border border-negative/20',
-    desc: 'Card systems, crypto rails, and billing info.'
+    desc: 'Card payments, crypto, and billing info.'
   },
 ];
 
@@ -70,31 +70,31 @@ export const KB_FAQS = [
   {
     id: 'f1',
     q: 'How long do withdrawals take?',
-    a: 'Bank wire transfers take 3–5 business days. Crypto withdrawals process within 24 hours. Card refunds take 5–10 business days depending on your bank.',
+    a: 'Bank transfers take 3–5 business days. Crypto takes up to 24 hours. Card refunds take 5–10 business days.',
   },
   {
     id: 'f2',
-    q: 'Why was my KYC rejected?',
-    a: 'KYC is typically rejected due to blurry documents, expired ID, mismatched name, or utility bills older than 3 months. Resubmit clear, valid documents.',
+    q: 'Why was my verification rejected?',
+    a: 'Verification usually fails due to blurry documents, expired IDs, name mismatches, or old utility bills. Please upload clear documents.',
   },
   {
     id: 'f3',
-    q: 'How do I change my leverage?',
-    a: 'Log into MT5, right-click your account number, and select Account Properties. Leverage cannot be changed while you have open positions.',
+    q: 'How do I change leverage?',
+    a: 'Change it in MT5 under Account Properties. You cannot have open positions when changing leverage.',
   },
   {
     id: 'f4',
     q: 'Can I have multiple accounts?',
-    a: 'Each client may have one Live account and one Demo account. Duplicate accounts may lead to suspension under our multi-account policy.',
+    a: 'You can have one Live and one Demo account. Extra accounts will be suspended.',
   },
   {
     id: 'f5',
     q: 'What is the minimum deposit?',
-    a: 'The minimum initial deposit is $100 USD. For subsequent deposits the minimum is $50 USD via all supported payment methods.',
+    a: 'The first deposit must be at least $100. Later deposits must be at least $50.',
   },
   {
     id: 'f6',
     q: 'How does copy trading work?',
-    a: 'You allocate funds to a strategy. When the provider places trades, proportional positions are automatically copied to your account based on your copy ratio.',
+    a: 'We automatically copy trades from a provider to your account based on your copy settings.',
   },
 ];

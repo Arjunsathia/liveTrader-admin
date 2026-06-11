@@ -53,10 +53,15 @@ export function useTicket(id) {
   const [error, setError]     = useState(null);
   const [messages, setMessages] = useState([]);
 
+  const [prevId, setPrevId] = useState(id);
+  if (id !== prevId) {
+    setPrevId(id);
+    setLoading(true);
+  }
+
   useEffect(() => {
     if (!id) return;
     let active = true;
-    setLoading(true);
     supportApi.getTicket(id).then((data) => {
       if (!active) return;
       const { conversation = [], ...meta } = data;

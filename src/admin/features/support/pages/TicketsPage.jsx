@@ -79,21 +79,21 @@ function TicketsPage() {
       value: ticketsData.filter((t) => t.status === 'OPEN').length,
       accent: 'var(--positive)',
       Icon: MessageCircle,
-      sub: 'Waiting for help',
+      sub: 'Needs a reply',
     },
     {
       label: 'Pending',
       value: ticketsData.filter((t) => t.status === 'PENDING').length,
       accent: 'var(--warning)',
       Icon: Timer,
-      sub: 'Being checked',
+      sub: 'In progress',
     },
     {
       label: 'Escalated',
       value: ticketsData.filter((t) => t.status === 'ESCALATED').length,
       accent: 'var(--negative)',
       Icon: AlertOctagon,
-      sub: 'Need review',
+      sub: 'Needs review',
       trend: 'Urgent',
       trendUp: false,
     },
@@ -102,7 +102,7 @@ function TicketsPage() {
       value: ticketsData.filter((t) => t.status === 'RESOLVED').length,
       accent: 'var(--positive)',
       Icon: CheckCircle2,
-      sub: 'Closed tickets',
+      sub: 'Done',
     },
     {
       label: 'Overdue',
@@ -110,7 +110,7 @@ function TicketsPage() {
       accent: 'var(--negative)',
       Icon: ShieldAlert,
       sub: 'Past due',
-      trend: breachedCount > 0 ? 'Needs action' : 'Stable',
+      trend: breachedCount > 0 ? 'Act now' : 'On track',
       trendUp: breachedCount > 0 ? false : undefined,
     },
   ];
@@ -123,10 +123,10 @@ function TicketsPage() {
             Support
           </p>
           <h2 className="text-[26px] font-semibold tracking-[-0.03em] leading-tight text-text">
-            All Tickets
+            All tickets
           </h2>
           <p className="text-[13.5px] text-text-muted/80 mt-2 leading-snug max-w-lg">
-            View and manage support tickets.
+            View and manage all support tickets.
           </p>
         </div>
 
@@ -143,7 +143,7 @@ function TicketsPage() {
             onClick={() => showToast('New ticket form opened')}
             className="flex items-center gap-1.5 h-8 px-3 rounded-[8px] bg-brand text-text-on-accent border border-brand/20 text-[11px] font-bold transition-all duration-300 ease-out transform-gpu will-change-transform hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
           >
-            <Plus size={12} /> New Ticket
+            <Plus size={12} /> New ticket
           </button>
         </div>
       </header>
@@ -165,7 +165,7 @@ function TicketsPage() {
               {breachedCount} overdue ticket{breachedCount > 1 ? 's' : ''}
             </h4>
             <p className="text-[12px] text-negative/80 font-heading mt-1 leading-relaxed">
-              These tickets are past their response time.
+              {breachedCount > 1 ? 'These tickets are' : 'This ticket is'} past the response deadline.
             </p>
           </div>
           <button
@@ -195,7 +195,7 @@ function TicketsPage() {
             setSearch(v);
             setPage(1);
           }}
-          searchPlaceholder="Search tickets..."
+          searchPlaceholder="Search..."
           filters={
             <>
               <div className="flex items-center gap-1">
@@ -293,7 +293,7 @@ function TicketsPage() {
                 No tickets found
               </p>
               <p className="text-[11.5px] text-text-muted/40 mt-1 max-w-[220px] leading-snug">
-                Try a different search or filter.
+                Try different filters or search terms.
               </p>
             </div>
           ) : (

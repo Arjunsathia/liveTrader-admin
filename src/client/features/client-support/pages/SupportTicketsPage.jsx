@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * SupportTicketsPage — entry point
  * Maps to: /client/support/tickets

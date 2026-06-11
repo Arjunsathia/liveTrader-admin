@@ -15,8 +15,8 @@ export function SubmissionTimeline({ items = [], onReupload }) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center rounded-[12px] border border-dashed border-border/30 bg-muted-surface/10">
         <FileText size={28} className="text-text-muted/30 mb-3" />
-        <p className="text-[13px] font-semibold text-text-muted">No submissions yet</p>
-        <p className="text-[11.5px] text-text-muted/55 mt-1">Your submission history will appear here once you submit.</p>
+        <p className="text-[13px] font-semibold text-text-muted">No uploads yet</p>
+        <p className="text-[11.5px] text-text-muted/55 mt-1">Your upload history will appear here once you send documents.</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export function SubmissionTimeline({ items = [], onReupload }) {
                       {label}
                     </span>
                   </div>
-                  <p className="text-[11.5px] text-text-muted mt-0.5">Submitted {item.submittedAt}</p>
+                  <p className="text-[11.5px] text-text-muted mt-0.5">Uploaded {item.submittedAt}</p>
                 </div>
                 <ChevronDown size={15} className={`text-text-muted shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -60,20 +60,20 @@ export function SubmissionTimeline({ items = [], onReupload }) {
                 <div className="border-t border-border/20 p-4 space-y-4">
                   {item.note && (
                     <div>
-                      <p className="text-[9.5px] uppercase tracking-[0.12em] font-black text-text-muted mb-1.5">Reviewer note</p>
+                      <p className="text-[9.5px] uppercase tracking-[0.12em] font-black text-text-muted mb-1.5">Review note</p>
                       <p className="text-[12.5px] leading-relaxed">{item.note}</p>
                     </div>
                   )}
                   {item.rejectionReason && (
                     <div className="rounded-[9px] bg-negative/[0.07] border border-negative/20 p-3.5">
-                      <p className="text-[9.5px] uppercase tracking-[0.1em] font-black text-negative/60 mb-1.5">Rejection reason</p>
+                      <p className="text-[9.5px] uppercase tracking-[0.1em] font-black text-negative/60 mb-1.5">Reason</p>
                       <p className="text-[12px] text-negative leading-relaxed">{item.rejectionReason}</p>
                     </div>
                   )}
                   {item.status === 'rejected' && (
                     <button type="button" onClick={onReupload}
                       className="flex items-center gap-2 h-9 px-4 rounded-[8px] bg-brand text-text-on-accent text-[11.5px] font-bold hover:opacity-90 transition-opacity">
-                      <RefreshCw size={12} /> Reupload documents
+                      <RefreshCw size={12} /> Try again
                     </button>
                   )}
                 </div>

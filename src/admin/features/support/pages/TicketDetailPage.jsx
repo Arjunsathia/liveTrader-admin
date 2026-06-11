@@ -232,7 +232,7 @@ function ReplyComposer({ noteType, setNoteType, replyText, setReplyText, onSend,
       <div className="flex items-end px-5 pt-3.5 gap-0 border-b border-border/10">
         {[
           ['REPLY', 'Reply', Send],
-          ['INTERNAL', 'Private Note', Lock],
+          ['INTERNAL', 'Note', Lock],
         ].map((item) => {
           const IconComponent = item[2];
           const type = item[0];
@@ -266,8 +266,8 @@ function ReplyComposer({ noteType, setNoteType, replyText, setReplyText, onSend,
           onChange={(e) => setReplyText(e.target.value)}
           placeholder={
             noteType === 'REPLY'
-              ? 'Type your reply...'
-              : 'Add a private note...'
+              ? 'Write your reply...'
+              : 'Write a private note...'
           }
           rows={4}
           className="w-full resize-none rounded-[8px] border border-border/20 bg-bg/18 px-3.5 py-3 text-[12.5px] text-text font-heading font-medium outline-none placeholder:text-text-muted/22 transition-all leading-relaxed"
@@ -318,7 +318,7 @@ function ReplyComposer({ noteType, setNoteType, replyText, setReplyText, onSend,
               }
             >
               <Send size={10} />
-              {noteType === 'REPLY' ? 'Send' : 'Save'}
+              {noteType === 'REPLY' ? 'Send' : 'Save note'}
             </button>
           </div>
         </div>
@@ -583,7 +583,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
                 <div className="flex items-center gap-3.5 text-[9.5px] font-heading font-semibold text-text-muted/30">
                   <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--text-muted)', opacity: 0.35 }} />
-                    Customer
+                    Client
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--brand)', opacity: 0.6 }} />
@@ -660,7 +660,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
 
         <div className="space-y-4">
           <Panel>
-            <PanelHead icon={User} title="Customer" />
+            <PanelHead icon={User} title="Client" />
 
             <div className="p-4 space-y-3.5">
               <div className="flex items-center gap-3">
@@ -710,14 +710,14 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
                 className="w-full h-8 flex items-center justify-center gap-1.5 rounded-[7px] border border-border/14 bg-bg/10 text-text-muted/70 hover:text-text hover:border-border/28 hover:bg-bg/22 text-[10.5px] font-semibold uppercase tracking-wider font-heading transition-all cursor-pointer"
               >
                 <ExternalLink size={10} />
-                View Profile
+                View profile
               </button>
             </div>
 
             <div className="border-t border-border/10 p-4 space-y-2.5">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70 font-heading">
-                  Time Left
+                  Time left
                 </span>
                 <span className="font-mono font-semibold text-[11.5px]" style={{ color: slaColor }}>
                   {t.slaMins != null ? `${t.slaMins}m left` : 'Done'}
@@ -739,7 +739,7 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
 
             <div className="px-4 py-1">
               {[
-                { label: 'Assigned', value: owner?.name || 'Unassigned' },
+                { label: 'Assigned to', value: owner?.name || 'Unassigned' },
                 { label: 'Category', value: t.category },
                 { label: 'Priority', value: t.priority },
                 { label: 'Opened', value: t.created },
@@ -780,10 +780,10 @@ function TicketDetail({ ticket: t, onBack, navigate }) {
             <PanelHead icon={Zap} title="Actions" />
             <div className="p-3 space-y-1.5">
               {[
-                { label: 'View Profile', icon: User, variant: 'ghost', cb: () => navigate(`/admin/users/${t.uid}`) },
-                { label: 'View Wallet', icon: CreditCard, variant: 'ghost', cb: () => notify('Wallet opened') },
-                { label: 'Review Security', icon: ShieldAlert, variant: 'warning', cb: () => notify('Sent for review') },
-                { label: 'Suspend User', icon: Lock, variant: 'danger', cb: () => notify('Suspend dialog opened') },
+                { label: 'View profile', icon: User, variant: 'ghost', cb: () => navigate(`/admin/users/${t.uid}`) },
+                { label: 'View wallet', icon: CreditCard, variant: 'ghost', cb: () => notify('Wallet opened') },
+                { label: 'Review security', icon: ShieldAlert, variant: 'warning', cb: () => notify('Sent for review') },
+                { label: 'Suspend user', icon: Lock, variant: 'danger', cb: () => notify('Suspend dialog opened') },
               ].map(({ label, icon, variant, cb }) => (
                 <ActionBtn
                   key={label}

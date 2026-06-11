@@ -2,17 +2,17 @@ import React from 'react';
 import { Check, UserRound, Contact, ScanFace, MapPin, ClipboardCheck, Send } from 'lucide-react';
 
 const STEPS = [
-  { label: 'Personal', sub: 'Identity details', Icon: UserRound },
-  { label: 'Document', sub: 'ID upload', Icon: Contact },
-  { label: 'Face check', sub: 'Selfie verify', Icon: ScanFace },
-  { label: 'Address', sub: 'Proof of address', Icon: MapPin },
-  { label: 'Review', sub: 'Confirm & submit', Icon: ClipboardCheck },
-  { label: 'Submitted', sub: 'Awaiting review', Icon: Send },
+  { label: 'Personal info', sub: 'Name & birth', Icon: UserRound },
+  { label: 'Identity ID', sub: 'Passport / ID card', Icon: Contact },
+  { label: 'Selfie photo', sub: 'Verify face', Icon: ScanFace },
+  { label: 'Address proof', sub: 'Utility bill / bank', Icon: MapPin },
+  { label: 'Review details', sub: 'Check info', Icon: ClipboardCheck },
+  { label: 'Finished', sub: 'Under review', Icon: Send },
 ];
 
 export function KycProgressStepper({ current = 1, completed = [], onSelect }) {
-  const doneCount = STEPS.filter((_, i) => completed[i] || (i + 1) < current).length;
-  const pct = Math.round((Math.max(0, current - 1) / (STEPS.length - 1)) * 100);
+  const doneCount = completed.slice(0, 5).filter(Boolean).length;
+  const pct = Math.round((doneCount / 5) * 100);
 
   return (
     <div>
@@ -31,22 +31,20 @@ export function KycProgressStepper({ current = 1, completed = [], onSelect }) {
 
       {/* ── Step cards ── */}
       <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-        {STEPS.map(({ label, sub, Icon }, i) => {
+        {STEPS.map((stepItem, i) => {
+          const { label, sub, Icon } = stepItem;
           const num = i + 1;
-          const done = completed[i] || num < current;
+          const done = completed[i];
           const active = num === current;
-          const locked = num > current && !completed[i];
 
           return (
             <button key={label} type="button"
-              disabled={locked}
-              onClick={() => !locked && onSelect?.(num)}
+              onClick={() => onSelect?.(num)}
               className={[
-                'relative p-3 rounded-[10px] border text-left transition-all',
+                'relative p-3 rounded-[10px] border text-left transition-all cursor-pointer',
                 active ? 'border-brand/50 bg-brand/[0.08]'
                   : done ? 'border-positive/30 bg-positive/[0.04] hover:border-positive/50'
-                    : locked ? 'border-border/20 bg-muted-surface/20 opacity-40 cursor-not-allowed'
-                      : 'border-border/30 bg-surface hover:border-border/55',
+                    : 'border-border/30 bg-surface hover:border-border/55 hover:bg-muted-surface/10',
               ].join(' ')}
             >
               <span className="absolute top-2.5 right-2.5 font-mono text-[8px] text-text-muted/25 font-bold">

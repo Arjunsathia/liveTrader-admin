@@ -41,15 +41,15 @@ export const clientNavigation = [
   },
   {
     id: 'client-kyc',
-    label: 'Identity Verification',
+    label: 'Verify Identity',
     icon: ShieldCheck,
     path: '/client/kyc',
     navSection: 'main',
     subItems: [
-      { id: 'client-kyc-overview', label: 'KYC Overview',       path: '/client/kyc',         icon: LayoutGrid },
-      { id: 'client-kyc-upload',   label: 'Upload Documents',   path: '/client/kyc/upload',  icon: UploadCloud },
-      { id: 'client-kyc-status',   label: 'Verification Status', path: '/client/kyc/status',  icon: Clock3 },
-      { id: 'client-kyc-history',  label: 'Submission History', path: '/client/kyc/history', icon: History },
+      { id: 'client-kyc-overview', label: 'Overview',       path: '/client/kyc',         icon: LayoutGrid },
+      { id: 'client-kyc-upload',   label: 'Upload ID',       path: '/client/kyc/upload',  icon: UploadCloud },
+      { id: 'client-kyc-status',   label: 'Status',          path: '/client/kyc/status',  icon: Clock3 },
+      { id: 'client-kyc-history',  label: 'History',         path: '/client/kyc/history', icon: History },
     ],
   },
 

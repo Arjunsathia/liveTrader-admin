@@ -226,11 +226,11 @@ export function TicketCard({ ticket, onView, onAssign, onEscalate, onResolve, sh
         {/* Row 4: Category & SLA */}
         <div className="flex items-center justify-between gap-3 border-t border-border/10 pt-3">
           <div className="flex flex-col gap-0.5">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70">Category</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70">Type</span>
             <CatTag value={ticket.category} />
           </div>
           <div className="flex flex-col items-end gap-1">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70">Due Time</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-muted/70">Due</span>
             <SlaBar pct={ticket.sla} slaMins={ticket.slaMins} />
           </div>
         </div>
