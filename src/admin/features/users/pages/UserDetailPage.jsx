@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -33,7 +33,7 @@ import { usersService } from '../services/userService';
 import { kycService } from '../services/kycService';
 import { userDetailTabs } from '@/config/constants/USER_TABS';
 import { AddUserDrawer } from '../components/AddUserDrawer';
-import { buildUserDraft, applyDraftToUser } from '@/utils/userDraftUtils';
+import { buildUserDraft } from '@/utils/userDraftUtils';
 import { useDrawerState } from '@/hooks/useDrawerState';
 import { Mt5AccountDrawer } from '../components/UserDrawers';
 
@@ -89,7 +89,9 @@ export function UserDetailPage() {
   const navigate = useNavigate();
   const activeTab = tab || 'overview';
 
-  const [user, setUser] = useState(() => usersService.getById(userId));
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [formOpen, setFormOpen] = useState(false);
   const [userDraft, setUserDraft] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -101,19 +103,57 @@ export function UserDetailPage() {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
-  const handleSaveMt5Account = (accountData) => {
+  const fetchUserDetail = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const data = await usersService.getById(userId);
+      setUser(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load user details:', err);
+      setError(err.message || 'Failed to load user details from the server.');
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await usersService.getById(userId);
+        if (active) {
+          setUser(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message || 'Failed to load user details.');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+    load();
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
+  const handleSaveMt5Account = async (accountData) => {
     const target = mt5Drawer.value;
     if (!target) return;
     if (accountData.login) {
       usersService.updateMt5AccountForUser(user.id, accountData.login, accountData);
-      const updatedUser = usersService.getById(userId);
-      setUser({ ...updatedUser });
+      await fetchUserDetail(false);
       triggerToast(`Successfully updated MT5 Account #${accountData.login}`);
     } else {
       const newAcct = usersService.createMt5AccountForUser(user.id, accountData);
       if (newAcct) {
-        const updatedUser = usersService.getById(userId);
-        setUser({ ...updatedUser });
+        await fetchUserDetail(false);
         triggerToast(`Successfully created MT5 Account #${newAcct.login} for ${user.name}`);
       }
     }
@@ -128,30 +168,47 @@ export function UserDetailPage() {
     setFormOpen(true);
   };
 
-  const handleSaveUser = () => {
-    const target = usersService.getById(userId);
-    if (target) {
-      const updated = applyDraftToUser(target, userDraft);
-      Object.assign(target, updated);
-      setUser({ ...target });
+  const handleSaveUser = async () => {
+    try {
+      const payload = {
+        name: userDraft.name,
+        email: userDraft.email,
+        phone: userDraft.phone,
+        country: userDraft.country,
+      };
+      await usersService.update(userId, payload);
+      triggerToast('Profile updated successfully');
+      setFormOpen(false);
+      await fetchUserDetail(false);
+    } catch (err) {
+      console.error('Failed to save profile:', err);
+      triggerToast(err.message || 'Failed to update profile.');
     }
-    setFormOpen(false);
   };
 
-  const handleToggleSuspension = () => {
-    const target = usersService.getById(userId);
-    if (target) {
-      target.suspended = !target.suspended;
-      setUser({ ...target });
+  const handleToggleSuspension = async () => {
+    try {
+      const targetSuspended = !user.suspended;
+      await usersService.toggleBlock(user.id, targetSuspended);
+      triggerToast(`User ${targetSuspended ? 'suspended' : 'unsuspended'} successfully`);
+      await fetchUserDetail(false);
+    } catch (err) {
+      console.error('Failed to toggle suspension state:', err);
+      triggerToast(err.message || 'Failed to update suspension status.');
     }
   };
 
-  const handleUpdateUser = (updatedFields) => {
-    const target = usersService.getById(userId);
-    if (target) {
-      usersService.update(userId, updatedFields);
-      if (updatedFields.kycStatus) kycService.updateStatusByUserId(userId, updatedFields.kycStatus);
-      setUser({ ...target, ...updatedFields });
+  const handleUpdateUser = async (updatedFields) => {
+    try {
+      await usersService.update(userId, updatedFields);
+      if (updatedFields.kycStatus) {
+        kycService.updateStatusByUserId(userId, updatedFields.kycStatus);
+      }
+      triggerToast('User details updated successfully');
+      await fetchUserDetail(false);
+    } catch (err) {
+      console.error('Failed to update user:', err);
+      triggerToast(err.message || 'Failed to update user.');
     }
   };
 
@@ -160,6 +217,36 @@ export function UserDetailPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) {
+    return (
+      <PageShell>
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-2">
+          <span className="relative flex h-5.5 w-5.5 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
+            <span className="relative inline-flex rounded-full h-5.5 w-5.5 bg-brand/80" />
+          </span>
+          <span className="text-[12px] font-bold text-text-muted mt-2 uppercase tracking-widest animate-pulse">Loading user profile...</span>
+        </div>
+      </PageShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageShell>
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-4">
+          <ShieldAlert size={36} className="text-negative animate-bounce" />
+          <h2 className="text-lg font-black text-text">Failed to Load User Dossier</h2>
+          <p className="text-[12px] text-text-muted/65 max-w-md">{error}</p>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => navigate('/admin/users')}>Back to Users</Button>
+            <Button variant="primary" onClick={() => fetchUserDetail(true)}>Retry</Button>
+          </div>
+        </div>
+      </PageShell>
+    );
+  }
 
   /* ── Not found ── */
   if (!user) {

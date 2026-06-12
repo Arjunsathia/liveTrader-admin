@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Download, FileCheck, Layers, Plus, Search, ShieldAlert, Users, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
@@ -11,7 +11,7 @@ import { usersService } from '../services/userService';
 import {
   FUNDING_OPTIONS, KYC_OPTIONS, RISK_OPTIONS,
 } from '@/config/constants/USER_FORM';
-import { applyDraftToUser, buildUserDraft, createDefaultUserDraft } from '@/utils/userDraftUtils';
+import { buildUserDraft, createDefaultUserDraft } from '@/utils/userDraftUtils';
 import { AddUserDrawer } from '../components/AddUserDrawer';
 import { UsersKPIGrid } from '../components/UsersKpiGrid';
 import { UsersListTable } from '../components/UsersTable';
@@ -42,7 +42,9 @@ function filterBySearch(items, search, fields) {
 function UsersPage() {
   const navigate = useNavigate();
 
-  const [userRows, setUserRows] = useState(() => usersService.list());
+  const [userRows, setUserRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [kycFilter, setKycFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');
@@ -61,12 +63,51 @@ function UsersPage() {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
-  const handleSaveMt5Account = (accountData) => {
+  const fetchUsers = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const data = await usersService.list();
+      setUserRows(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load users:', err);
+      setError(err.message || 'Failed to load users from the server.');
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const data = await usersService.list();
+        if (active) {
+          setUserRows(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message || 'Failed to load users from the server.');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+    load();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleSaveMt5Account = async (accountData) => {
     const targetUser = mt5Drawer.value;
     if (targetUser) {
       const newAcct = usersService.createMt5AccountForUser(targetUser.id, accountData);
       if (newAcct) {
-        setUserRows(usersService.list()); // Refresh list of users to sync counts
+        await fetchUsers(false); // Refresh list of users to sync counts
         triggerToast(`Successfully created MT5 Account #${newAcct.login} for ${targetUser.name}`);
       }
     }
@@ -91,18 +132,80 @@ function UsersPage() {
 
   const openUser = (nextUserId) => navigate(`/admin/users/${nextUserId}`);
 
-  const handleSaveUser = () => {
-    if (formMode === 'edit' && editingUserId) {
-      setUserRows((rows) => rows.map((user) => (user.id === editingUserId ? applyDraftToUser(user, userDraft) : user)));
-    } else {
-      setUserRows((rows) => [applyDraftToUser(usersService.create({}), userDraft), ...rows]);
+  const handleSaveUser = async () => {
+    try {
+      if (formMode === 'edit' && editingUserId) {
+        const payload = {
+          name: userDraft.name,
+          email: userDraft.email,
+          phone: userDraft.phone,
+          country: userDraft.country,
+        };
+        await usersService.update(editingUserId, payload);
+        triggerToast(`Successfully updated user: ${userDraft.name}`);
+      } else {
+        const payload = {
+          name: userDraft.name,
+          email: userDraft.email,
+          phone: userDraft.phone,
+          country: userDraft.country,
+          password: userDraft.password,
+          confirmPassword: userDraft.confirmPassword,
+        };
+        await usersService.create(payload);
+        triggerToast(`Successfully created user: ${userDraft.name}`);
+      }
+      setFormOpen(false);
+      await fetchUsers(false);
+    } catch (err) {
+      console.error('Failed to save user:', err);
+      triggerToast(err.message || 'Failed to save user.');
     }
-    setFormOpen(false);
   };
 
-  const handleToggleSuspend = (user) => {
-    setUserRows((rows) => rows.map((item) => (item.id === user.id ? { ...item, suspended: !item.suspended } : item)));
+  const handleToggleSuspend = async (user) => {
+    try {
+      const targetSuspended = !user.suspended;
+      await usersService.toggleBlock(user.id, targetSuspended);
+      triggerToast(`User ${user.name} ${targetSuspended ? 'suspended' : 'unsuspended'} successfully`);
+      await fetchUsers(false);
+    } catch (err) {
+      console.error('Failed to toggle block status:', err);
+      triggerToast(err.message || 'Failed to update user block status.');
+    }
   };
+
+  if (loading) {
+    return (
+      <PageShell>
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center gap-2">
+          <span className="relative flex h-5.5 w-5.5 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
+            <span className="relative inline-flex rounded-full h-5.5 w-5.5 bg-brand/80" />
+          </span>
+          <span className="text-[12px] font-bold text-text-muted mt-2 uppercase tracking-widest animate-pulse">Loading directory...</span>
+        </div>
+      </PageShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageShell>
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center gap-4">
+          <ShieldAlert size={36} className="text-negative animate-bounce" />
+          <h2 className="text-lg font-black text-text">Failed to Load Users Directory</h2>
+          <p className="text-[12px] text-text-muted/65 max-w-md">{error}</p>
+          <button
+            onClick={() => fetchUsers(true)}
+            className="h-8 px-4 text-[11px] rounded-[7px] border border-border/20 bg-surface-elevated text-text font-bold cursor-pointer hover:bg-surface-bright transition-all"
+          >
+            Retry
+          </button>
+        </div>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell>

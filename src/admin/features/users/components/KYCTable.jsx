@@ -86,7 +86,7 @@ export function KYCTable({ tableState, onReviewUser }) {
               hour12: false
             });
           }
-        } catch (e) {
+        } catch {
           // fallback
         }
         

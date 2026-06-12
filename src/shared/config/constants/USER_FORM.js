@@ -19,6 +19,8 @@ export const USER_DRAFT_DEFAULTS = {
   mt5Deposit: '',
   note: '',
   ibCode: '',
+  password: '',
+  confirmPassword: '',
 };
 
 export const KYC_OPTIONS = [
